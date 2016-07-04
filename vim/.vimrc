@@ -11,11 +11,13 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
-set rtp+=$VIMFILES
+let &rtp=$VIMFILES . ',' . &rtp
 
 if filereadable(expand('$VIMFILES/.vimrc.bundles'))
   source $VIMFILES/.vimrc.bundles
 endif
+
+set rtp+=$VIMFILES/after
 
 filetype plugin on
 filetype plugin indent on
@@ -79,7 +81,7 @@ endfunction
 command! CTags :call UpdateTags()
 
 "persistent undo
-set undodir=expand('$VIMFILES/_undodir')
+set undodir=$VIMFILES/_undodir
 set undolevels=1000 "maximum number of set changes that can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 set undofile
@@ -394,6 +396,14 @@ let g:livedown_open = 1
 " the port on which Livedown server will run
 let g:livedown_port = 1337
 map gm :call LivedownPreview()<CR>
+
+
+"syntastic
+"-------------------------------------------------------------------------------- 
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "active_filetypes": ["ruby", "php"],
+    \ "passive_filetypes": ["puppet", "python"] }
 
 
 " Editing a protected file as 'sudo'
