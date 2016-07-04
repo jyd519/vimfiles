@@ -1,0 +1,29 @@
+#vim: noexpandtab
+BIN=
+STATIC_LIB=
+DYNAMIC_LIB=
+CC=g++
+AR=ar 
+CFLAG=-g -Wall	
+LIB=-lm
+CPP_SRC=$(wildcard *.cpp)
+HEAD_SRC=$(wildcard *.h)
+OBJ=$(CPP_SRC:%.cpp=%.o)
+
+all: ${BIN} ${STATIC_LIB} ${DYNAMIC_LIB}
+
+%.o: %.cpp %.h
+		${CC} -c ${CFLAG} $< -o $@ 
+${BIN}: ${OBJ} ${HEAD_SRC}
+		${CC} -o $@ ${OBJ} ${CFLAG} ${LIB}
+${STATIC_LIB}: ${OBJ} ${HEAD_SRC}
+		${AR} -cvq $@ ${OBJ}	
+${DYNAMIC_LIB}: ${CPP_SRC} ${HEAD_SRC}
+		${CC} -fPIC -c ${CPP_SRC} ${CFLAG}
+${CC} -shared -o $@ ${OBJ} 
+
+clean:
+		rm -f ${BIN} ${OBJ} ${STATIC_LIB} ${DYNAMIC_LIB}
+
+
+

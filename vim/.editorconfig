@@ -1,0 +1,26 @@
+root = true
+
+[**.js]
+;vim:max_char=0:brace-style=collapse
+indent_style = space
+indent_size = 2
+
+[**.json]
+;vim:max_char=0:brace-style=collapse
+indent_style = space
+indent_size = 2
+
+[**.jsx]
+e4x = true
+indent_style = space
+indent_size = 4
+
+[**.css]
+;v:selector_separator_newline=true:end_with_newline=true
+indent_style = space
+indent_size = 2
+
+[**.html]
+;vim:max_char=0:brace_style=collapse:indent_scripts=normal
+indent_style = space
+indent_size = 2

@@ -1,0 +1,24 @@
+#vim: set noexpandtab
+priority 1
+
+clearsnippets html5 
+snippet html5template "html5 template" b
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1.0">
+		<title>${1:`substitute(vim_snippets#Filename('', 'Page Title'), '^.', '\u&', '')`}</title>
+	</head>
+	<body>	
+	</body>
+</html>
+endsnippet
+
+snippet script "embbed script block" b
+<script>
+	$1
+</script>
+endsnippet
+
+

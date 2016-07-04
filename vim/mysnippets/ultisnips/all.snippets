@@ -1,0 +1,21 @@
+priority -60
+
+snippet tern "term template" b
+//vim: set ft=json
+//.tern-project
+{
+	"libs": [
+		"browser",
+		"jquery"
+	],
+	"loadEagerly": [
+		"importantfile.js"
+	],
+	"plugins": {
+		"requirejs": {
+			"baseURL": "./",
+			"paths": {}
+		}
+	}
+}
+endsnippet
