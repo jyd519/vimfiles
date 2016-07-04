@@ -349,7 +349,7 @@ let g:UltiSnipsListSnippets="<C-l>"
 let g:UltiSnipsJumpForwardTrigger="<C-k>"
 let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 let g:UltiSnipsEditSplit='vertical'
-let g:UltiSnipsSnippetDirectories = ["ultisnips"]
+let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
 set runtimepath+=$VIMFILES/mysnippets
 
