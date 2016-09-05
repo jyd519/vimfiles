@@ -178,8 +178,8 @@ if has("mac")
   "let s:fontbase="Ubuntu_Mono"
   let s:fontwide="Hiragino_Sans_GB"
 else
-  let s:fontbase="Consolas"
-  let s:fontwide="YaHei_Consolas_Hybrid"
+  let s:fontbase="Ubuntu_Mono"
+  let s:fontwide="SimSun"
 endif
 let s:font_size=12
 
