@@ -36,7 +36,10 @@ Plug 'wesleyche/SrcExpl'
 Plug 'ervandew/supertab'
 Plug 'scrooloose/syntastic'
 Plug 'junegunn/vim-easy-align'
+
 Plug 'tomtom/tcomment_vim'
+Plug 'scrooloose/nerdcommenter'
+
 Plug 'marijnh/tern_for_vim'
 Plug 'edkolev/tmuxline.vim'
 
@@ -62,6 +65,7 @@ Plug 'xolox/vim-session'
 Plug 'kshenoy/vim-signature'
 Plug 'jez/vim-superman'
 Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'majutsushi/tagbar'
 
@@ -70,5 +74,20 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 Plug 'thinca/vim-quickrun'
 
 Plug 'jiangmiao/auto-pairs'
+Plug 'tmhedberg/matchit'
+
+"git
+Plug 'airblade/vim-gitgutter'
+
+"A solid language pack 
+Plug 'sheerun/vim-polyglot'
+
+"Gist
+Plug 'mattn/webapi-vim'
+Plug 'mattn/gist-vim'
+
+"Shell
+Plug 'Shougo/vimproc.vim', { 'do': 'make' }
+Plug 'Shougo/vimshell.vim'
 
 call plug#end() 

@@ -11,7 +11,11 @@ set nocompatible              " be iMproved, required
 filetype off                  " required
 
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
-let &rtp=$VIMFILES . ',' . &rtp
+set rtp^=$VIMFILES
+
+if filereadable(expand("~/.vimrc.before"))
+  source ~/.vimrc.before
+endif
 
 if filereadable(expand('$VIMFILES/.vimrc.bundles'))
   source $VIMFILES/.vimrc.bundles
@@ -20,7 +24,7 @@ endif
 set rtp+=$VIMFILES/after
 
 filetype plugin on
-filetype plugin indent on
+filetype indent on
 
 set ruler
 set showcmd
@@ -42,17 +46,26 @@ set nowritebackup
 set showmatch
 set cmdheight=1
 set history=100
-set foldlevel=4
-"set foldcolumn=4
+" enable mouse
+set mouse=a
+
+"Fold
+set foldmethod=indent   "fold based on indent
+set foldnestmax=3       "deepest fold is 3 levels
+set nofoldenable        "dont fold by default
+
 set scrolloff=2
 set guioptions-=T
 set linespace=6
 set encoding=utf-8
+
 set fileencodings=ucs-bom,utf-8,gb2312,cp936,gbk,gb18030
 set wildmenu " show a navigable menu for tab completion
 set wildmode=list:longest,full
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
+set wildignore+=*DS_Store
+
 set completeopt=menuone,longest,preview
 if has("gui_running")
   set ballooneval
@@ -60,7 +73,8 @@ if has("gui_running")
   set cursorline
 endif
 
-set t_ti= t_te=
+" Keep screen after vim exited
+"set t_ti= t_te=
 
 set path=.,./include/**/*,/usr/local/include,/usr/include
 
@@ -79,6 +93,22 @@ function! UpdateTags()
   echohl StatusLine | echo "C/C++ tags updated" | echohl None
 endfunction
 command! CTags :call UpdateTags()
+
+" Auto load cscope db
+if has("cscope")
+  set csprg=/usr/local/bin/cscope
+  set csto=0
+  set cst
+  set nocsverb
+  " add any database in current directory
+  if filereadable("cscope.out")
+      cs add cscope.out
+  " else add database pointed to by environment
+  elseif $CSCOPE_DB != ""
+      cs add $CSCOPE_DB
+  endif
+  set csverb
+endif
 
 "persistent undo
 set undodir=$VIMFILES/_undodir
@@ -185,8 +215,6 @@ map <leader>e :e! $MYVIMRC<CR>
 if has("win32")
   source $VIMRUNTIME/mswin.vim
 endif
-
-behave mswin
 
 "Smart way to move btw. windows
 nnoremap <C-j> <C-W>j
@@ -401,9 +429,9 @@ map gm :call LivedownPreview()<CR>
 "syntastic
 "-------------------------------------------------------------------------------- 
 let g:syntastic_mode_map = {
-    \ "mode": "active",
+    \ "mode": "passive",
     \ "active_filetypes": ["ruby", "php"],
-    \ "passive_filetypes": ["puppet", "python"] }
+    \ "passive_filetypes": [] }
 
 
 " Editing a protected file as 'sudo'
@@ -571,4 +599,8 @@ function! s:ToJS(sep, first_line, last_line)
 endfunction
 
 command!  -nargs=1 -range ToJs call s:ToJS(<q-args>, <line1>, <line2>)
+
+if filereadable(expand("~/.vimrc.after"))
+  source ~/.vimrc.after
+endif
 
