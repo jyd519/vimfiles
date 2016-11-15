@@ -1,4 +1,22 @@
-snippet #! "Description" b
+snippet #! "shebang" b
 #!/bin/sh
+
+#Exit immediately if a command exits with a non-zero status
+set -e 
+
+SCRIPT_PATH="\$( cd "\$(dirname \$0)" ; pwd -P )"
+#SCRIPT_PATH="\$( cd "\$( dirname "\$\{BASH_SOURCE[0]}" )" && pwd )
+
 endsnippet
 
+snippet SCRIPT_PATH "script path" b
+SCRIPT_PATH="\$( cd "\$(dirname \$0)" ; pwd -P )"
+endsnippet
+
+snippet SCRIPT_PATH2 "script path method2" b
+FILE=\$\{BASH_SOURCE[0]}
+pushd \`dirname $FILE\` > /dev/null
+SCRIPT_PATH=\`pwd -P\`
+popd > /dev/null
+SCRIPT_FILE=\`basename \$FILE\`
+endsnippet

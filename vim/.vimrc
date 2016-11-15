@@ -391,6 +391,8 @@ let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
 set runtimepath+=$VIMFILES/mysnippets
 
+let $SNIPPETS=expand("$VIMFILES/mysnippets")
+
 "neocomplete (requires LUA)
 "-------------------------------------------------------------------------------- 
 if &rtp =~ 'neocomplete.vim'
