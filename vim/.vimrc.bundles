@@ -17,7 +17,7 @@ endfunction
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
-Plug 'flazz/vim-colorschemes'
+Plug 'flazz/vim-colorschemes.git'
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'ctrlpvim/ctrlp.vim'

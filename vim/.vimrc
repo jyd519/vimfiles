@@ -179,7 +179,7 @@ if has("mac")
   let s:fontwide="Hiragino_Sans_GB"
 else
   let s:fontbase="Ubuntu_Mono"
-  let s:fontwide="SimSun"
+  let s:fontwide="NSimSun"
 endif
 let s:font_size=12
 
@@ -203,12 +203,20 @@ endfunction
 map <leader>fi :call <SID>IncFontSize()<CR>
 map <leader>fo :call <SID>DecFontSize()<CR>
 
+if has('directx')
+  set renderoptions="type:directx"
+endif
+
 "toggle between interface file and implementation file, etc. .h/.c
 map <M-o> :A<CR>
 
 "insert a blank line 
 imap <C-Return> <CR><CR><C-o>k<Tab> 
 
+"quick editing myvimrc
+if !exists("$MYVIMRC")
+  let $MYVIMRC = expand("<sfile>:p")
+endif
 map <leader>s :source %<CR>
 map <leader>e :e! $MYVIMRC<CR>
 
@@ -390,10 +398,19 @@ if &rtp =~ 'neocomplete.vim'
 endif
 
 "neocomplcache
-"-------------------------------------------------------------------------------- 
-if &rtp =~ 'neocomplcache.vim' 
-  source $VIMFILES/neocomplcache.conf
+if &rtp =~ 'neocomplcache.vim'
+  source $VIMFILES/neocomplcache.conf  
 endif
+
+" Post-startup initializations
+"-------------------------------------------------------------------------------- 
+augroup PostInit 
+  autocmd!
+  " autocmd VimEnter * 
+  "       \ if exists("*neocomplcache#close_popup") 
+  "       \ |   source $VIMFILES/neocomplcache.conf  
+  "       \ | endif
+augroup end
 
 "ctrlp settings
 "-------------------------------------------------------------------------------- 
