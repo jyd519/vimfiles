@@ -204,7 +204,8 @@ map <leader>fi :call <SID>IncFontSize()<CR>
 map <leader>fo :call <SID>DecFontSize()<CR>
 
 if has('directx')
-  set renderoptions="type:directx"
+  set renderoptions=type:directx,level:0.75,gamma:1.25,contrast:0.5,
+                        \geom:1,renmode:5,taamode:1
 endif
 
 "toggle between interface file and implementation file, etc. .h/.c
