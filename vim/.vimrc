@@ -306,6 +306,16 @@ inoremap <C-e> <Esc>A
 inoremap <C-a> <Esc>I
 cnoremap <C-a> <C-b>
 
+"Markdown preview
+function! PreviewMarkdown()
+  execute ":silent !open -a \"Typora.app\" \"%:p\""
+  execute ":redraw!"
+endfunction
+if has("mac")
+  nmap <leader>md :update<cr>:call PreviewMarkdown()<cr>
+endif
+
+"Start browser
 if has("win32")
   "quick start IE
   nmap <leader>ie :update<cr>:silent !start ie.bat "file://%:p"<cr>
@@ -315,7 +325,7 @@ if has("win32")
   nmap <leader>ch :update<cr>:silent !start "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" "file://%:p"<cr>
 endif
 if has("mac")
-  nmap <leader>ch :update<cr>:!open -a "Google Chrome" "file://%:p"<cr>
+  nmap <leader>ch :update<cr>:silent !open -a "Google Chrome" "file://%:p"<cr>:redraw!<cr>
 endif
 
 "xml configuration
@@ -459,6 +469,8 @@ autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
 "-------------------------------------------------------------------------------- 
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=1
+"surroud: wrapping code
+autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
 
 "livedown
 "-------------------------------------------------------------------------------- 
@@ -653,6 +665,8 @@ function! ExecuteMacroOverVisualRange()
   execute ":'<,'>normal @".nr2char(getchar())
 endfunction
 
+"NERDTree
+noremap <F3> :NERDTreeToggle<cr>
 
 if filereadable(expand("~/.vimrc.after"))
   source ~/.vimrc.after

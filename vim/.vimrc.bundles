@@ -17,7 +17,7 @@ endfunction
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
-Plug 'flazz/vim-colorschemes.git'
+Plug 'flazz/vim-colorschemes'
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'ctrlpvim/ctrlp.vim'
@@ -52,6 +52,7 @@ Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
 Plug 'gilligan/vim-lldb', { 'on' : 'Lversion' } 
 
+Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'shime/vim-livedown'
 
@@ -66,6 +67,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'majutsushi/tagbar'
 
 Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 
 Plug 'thinca/vim-quickrun'
 
