@@ -1,0 +1,51 @@
+snippet createtable "create table statement" b
+drop table if exists ${1:tablename};
+create table $1 (
+	FID int not null auto_increment primary key,
+	FSUBJECTID varchar(36),
+	FITEMTYPE int default null,
+	FSCORE decimal(5,2) default null comment '缺省分数',
+	FSTATUS smallint(6) DEFAULT 1 comment '1: 启用;  0: 不启用',
+	FSUBITEMS int default 1 comment '小题数: 综合题>1, 其他1',
+	-- key idx_xxx (fieldname),
+	-- constraint fk_subject foreign key fk_subject (FSUBJECTID) references tsubject(FID)
+);
+endsnippet
+
+
+snippet addindex "add index on table" b
+alter table ${1:tablename} add index ${2:idx_formid} using btree (ffid);
+endsnippet
+
+snippet addindex2 "create index syntax" b
+create index {${1:idx_name} on {${2:tablename}({${3:fieldname});
+endsnippet
+
+
+snippet addcolumn "add column on table" b
+alter table ${1} add column ${2:fieldname} int not null default 1 comment '1 form, 2 package';
+endsnippet
+
+snippet modcolumn "modify column on table" b
+alter table ${1} modify column ${2} varchar(100) comment '${3}';
+endsnippet
+
+snippet replace "replace text on field" b
+update ${1} set ${2} = replace(filepath,'path/to/search','path/to/replace');
+endsnippet
+
+snippet select-duplicate-record "select duplicate records" b
+select foo, bar 
+from mytable
+group by foo, bar
+having count(*)>1;
+endsnippet
+
+snippet regexp-mysql "regexp example" b
+update [table]
+set name = concat('the ', trim(name))
+where name not regexp '^the'
+endsnippet
+
+
+
