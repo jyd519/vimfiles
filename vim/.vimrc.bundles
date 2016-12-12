@@ -25,11 +25,7 @@ Plug 'easymotion/vim-easymotion'
 Plug 'mattn/emmet-vim'
 Plug 'kelan/gyp.vim'
 Plug 'Shutnik/jshint2.vim'
-if has('lua')
-  Plug 'Shougo/neocomplete.vim'
-else
-  Plug 'Shougo/neocomplcache.vim'
-endif
+Plug 'Shougo/neocomplete.vim'
 Plug 'scrooloose/nerdtree'
 Plug 'rkulla/pydiction'
 Plug 'wesleyche/SrcExpl'
@@ -73,7 +69,7 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
 
 Plug 'thinca/vim-quickrun'
 
-Plug 'jiangmiao/auto-pairs'
+Plug 'jiangmiao/auto-pairs', {'on': 'AutoPair'}
 Plug 'tmhedberg/matchit'
 
 "git
@@ -86,8 +82,7 @@ Plug 'sheerun/vim-polyglot'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim'
 
-"Shell
-Plug 'Shougo/vimproc.vim', { 'do': 'make' }
-Plug 'Shougo/vimshell.vim'
+"Only avaiable on Linux
+"Plug 'alx741/vinfo'
 
 call plug#end() 

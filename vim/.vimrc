@@ -1,18 +1,24 @@
 "--------------------------------------------------------------------------------
-" Configurations for Vim
-"   +lua, +python
+" Configurations for Vim ( +lua, +python )
 " Jyd  2014-12-15 12:50
 "
-" Dependents :
-"   ctags
-"   jsctags(Tagbar)  npm install -g git://github.com/ramitos/jsctags.git
+" Dependencies :
+"   ctags: 
+"     OSX: brew install ctags
+"     Windows: http://ctags.sourceforge.net/
+"   jsctags
+"     npm install -g git://github.com/ramitos/jsctags.git
+"   The_Silver_Searcher:
+"     https://github.com/ggreer/the_silver_searcher
+"     OSX: brew install the_silver_searcher
+"
 "--------------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 filetype off                  " required
 
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
 set rtp^=$VIMFILES
-
+set nocscopeverbose
 if filereadable(expand("~/.vimrc.before"))
   source ~/.vimrc.before
 endif
@@ -87,6 +93,10 @@ augroup END
 " and looking up and up until /
 set tags=./tags,tags;/
 let g:easytags_dynamic_files = 1
+let g:easytags_always_enabled=0
+let g:easytags_on_cursorhold=0
+let g:easytags_events = []
+
 function! UpdateTags()
   execute ":silent !ctags -R –languages=C++ –c++-kinds=+p –fields=+iaS –extra=+q ./"
   execute ":redraw!"
@@ -111,7 +121,7 @@ if has("cscope")
 endif
 
 "persistent undo
-set undodir=$VIMFILES/_undodir
+set undodir=~/.vim_undodir
 set undolevels=1000 "maximum number of set changes that can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 set undofile
@@ -125,10 +135,26 @@ set statusline=\ %F%m%r%h\ %w\ %y\ %{getcwd()}\ \ \ Line:\ %l/%L:%c
 set laststatus=2
 
 "On mac os x, disable IME when we enter normal mode
+function! Fcitx2en()
+  let input_status = system('fcitx-remote')
+  if input_status == 2 "cn
+    let b:inputtoggle = 1
+    call system('fcitx-remote -c') "use en ime
+  endif
+endfunction
+function! Fcitx2zh()
+  try
+    if b:inputtoggle == 1
+      call system('fcitx-remote -s com.sogou.inputmethod.sogou.pinyin')
+      let b:inputtoggle = 0
+    endif
+  catch /inputtoggle/
+    let b:inputtoggle = 0
+  endtry
+endfunction
 if has("mac")
-  set noimdisable
-  autocmd! vimrc InsertLeave * set imdisable|set iminsert=0
-  autocmd! vimrc InsertEnter * set noimdisable|set iminsert=0
+  au! vimrc InsertLeave * call Fcitx2en()
+  au! vimrc InsertEnter * call Fcitx2zh()
 endif
 
 set helplang=cn
@@ -181,7 +207,7 @@ else
   let s:fontbase="Ubuntu_Mono"
   let s:fontwide="NSimSun"
 endif
-let s:font_size=12
+let s:font_size=14
 
 execute "set guifont=". s:fontbase . ":h" . s:font_size
 execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
@@ -289,7 +315,7 @@ if has("win32")
   nmap <leader>ch :update<cr>:silent !start "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" "file://%:p"<cr>
 endif
 if has("mac")
-  nmap <leader>ch :update<cr>:silent !open -a "Google Chrome" "file://%:p"<cr>
+  nmap <leader>ch :update<cr>:!open -a "Google Chrome" "file://%:p"<cr>
 endif
 
 "xml configuration
@@ -468,6 +494,7 @@ let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_key_invoke_completion = '<C-Space>'
 
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
+nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
 
 let g:ycm_filetype_blacklist = {
       \ 'tagbar' : 1,
@@ -588,16 +615,16 @@ endif
 " W e E t T I o O { } [[ [] ][ ]] [m [M ]m ]M [( ]) [{ ]} | A f F ge gE gg G g0 g^
 " g$ g, g; gj gk gI h H j k l L ; ' z. z<CR> z- zz zt zb b B n N M , / ?
 
-" Disable Arrow keys in Escape mode
-map <up> <nop>
-map <down> <nop>
-map <left> <nop>
-map <right> <nop>
-" Disable Arrow keys in Insert mode
-imap <up> <nop>
-imap <down> <nop>
-imap <left> <nop>
-imap <right> <nop>
+"Disable Arrow keys in Escape mode
+" map <up> <nop>
+" map <down> <nop>
+" map <left> <nop>
+" map <right> <nop>
+"Disable Arrow keys in Insert mode
+" imap <up> <nop>
+" imap <down> <nop>
+" imap <left> <nop>
+" imap <right> <nop>
 
 nmap <silent> <RIGHT> :cnext<CR>
 nmap <silent> <LEFT> :cprev<CR>
@@ -617,8 +644,15 @@ function! s:ToJS(sep, first_line, last_line)
       let i=i+1
     endwhile
 endfunction
-
 command!  -nargs=1 -range ToJs call s:ToJS(<q-args>, <line1>, <line2>)
+
+"Apply macro on selected lines
+xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+function! ExecuteMacroOverVisualRange()
+  echo "@".getcmdline()
+  execute ":'<,'>normal @".nr2char(getchar())
+endfunction
+
 
 if filereadable(expand("~/.vimrc.after"))
   source ~/.vimrc.after

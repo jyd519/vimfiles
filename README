@@ -2,7 +2,7 @@
 git clone https://github.com/jyd519/vimfiles  ~/.vimgit
 
 2. Create symbol links
-sudo ln -s ~/.vimgit/vimfiles/_vimrc  ~/.vimrc
+sudo ln -s ~/.vimgit/vim/.vimrc  ~/.vimrc
 
 3. Install plugins
 vim -c "PlugInstall"
