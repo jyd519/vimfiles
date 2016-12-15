@@ -1,10 +1,7 @@
 *.pyc
 tags
-vimfiles/bundle
-vimfiles/doc
-vimfiles/sessions
-vimfiles/plugged
 .DS_Store
 .netrwhist
 vim/sessions
 vim/plugged
+vim/undodir

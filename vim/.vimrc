@@ -105,7 +105,7 @@ endfunction
 command! CTags :call UpdateTags()
 
 "persistent undo
-set undodir=$HOME/.vim_undodir
+set undodir=$VIMFILES/undodir
 set undolevels=1000 "maximum number of set changes that can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 set undofile
