@@ -104,24 +104,8 @@ function! UpdateTags()
 endfunction
 command! CTags :call UpdateTags()
 
-" Auto load cscope db
-if has("cscope")
-  set csprg=/usr/local/bin/cscope
-  set csto=0
-  set cst
-  set nocsverb
-  " add any database in current directory
-  if filereadable("cscope.out")
-      cs add cscope.out
-  " else add database pointed to by environment
-  elseif $CSCOPE_DB != ""
-      cs add $CSCOPE_DB
-  endif
-  set csverb
-endif
-
 "persistent undo
-set undodir=~/.vim_undodir
+set undodir=$HOME/.vim_undodir
 set undolevels=1000 "maximum number of set changes that can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 set undofile
@@ -471,6 +455,10 @@ let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=1
 "surroud: wrapping code
 autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
+
+"gulp
+"-------------------------------------------------------------------------------- 
+autocmd vimrc BufRead,BufNewFile gulpfile.js setlocal errorformat=%-G[%.%#,%f:%m,%-G%p,%-G%n%perror
 
 "livedown
 "-------------------------------------------------------------------------------- 
