@@ -1,0 +1,20 @@
+snippet ng2-ngClass "ng2-ngClass"
+[ngClass]="{${1:#:cssClass}: ${2:#:expression}}"
+endsnippet
+
+snippet ng2-ngIf "ng2-ngIf"
+*ngIf="${1:#:expression}""
+endsnippet
+
+snippet ng2-routerLink "ng2-routerLink"
+[routerLink]="['${1:#:routeName}']""
+endsnippet
+
+snippet ng2-ngSwitch "ng2-ngSwitch"
+<div [ngSwitch]="${1:#:conditionExpression}">
+  <div *ngSwitchWhen="${2:#:expression}"></div>
+  <div *ngSwitchDefault>${3:#:output2}</div>
+</div>
+endsnippet
+
+

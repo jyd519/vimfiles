@@ -1,3 +1,7 @@
+snippet createdatabse "create database ..." b
+create database if not exists $1 default character set utf8 default collate utf8-bin;
+endsnippet
+
 snippet createtable "create table statement" b
 drop table if exists ${1:tablename};
 create table $1 (

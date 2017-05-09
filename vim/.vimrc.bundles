@@ -87,5 +87,24 @@ Plug 'mattn/gist-vim'
 "Only avaiable on Linux
 "Plug 'alx741/vinfo'
 Plug 'skywind3000/asyncrun.vim'
+Plug 'tpope/vim-dispatch'
+
+Plug 'tpope/vim-fugitive'
+
+"Graphviz+UML
+Plug 'aklt/plantuml-syntax'
+Plug 'wannesm/wmgraphviz.vim'
+
+"EditorConfig
+Plug 'editorconfig/editorconfig-vim'
+
+"typescript
+Plug 'leafgarland/typescript-vim'
+
+"es6
+Plug 'isRuslan/vim-es6'
+
+"nginx
+Plug 'evanmiller/nginx-vim-syntax'
 
 call plug#end() 

@@ -1,0 +1,1 @@
+/Users/jiyongdong/vimgit/vim/.vimrc

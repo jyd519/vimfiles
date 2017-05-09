@@ -6,78 +6,78 @@ snippet gulp "gulp file" b
 
 // Load plugins
 var gulp = require('gulp'),
-    sass = require('gulp-ruby-sass'),
-    autoprefixer = require('gulp-autoprefixer'),
-    minifycss = require('gulp-minify-css'),
-    jshint = require('gulp-jshint'),
-    uglify = require('gulp-uglify'),
-    imagemin = require('gulp-imagemin'),
-    rename = require('gulp-rename'),
-    concat = require('gulp-concat'),
-    notify = require('gulp-notify'),
-    cache = require('gulp-cache'),
-    livereload = require('gulp-livereload'),
-    del = require('del');
+		sass = require('gulp-ruby-sass'),
+		autoprefixer = require('gulp-autoprefixer'),
+		minifycss = require('gulp-minify-css'),
+		jshint = require('gulp-jshint'),
+		uglify = require('gulp-uglify'),
+		imagemin = require('gulp-imagemin'),
+		rename = require('gulp-rename'),
+		concat = require('gulp-concat'),
+		notify = require('gulp-notify'),
+		cache = require('gulp-cache'),
+		livereload = require('gulp-livereload'),
+		del = require('del');
 
 // Styles
 gulp.task('styles', function() {
-  return gulp.src('src/styles/main.scss')
-    .pipe(sass({ style: 'expanded', }))
-    .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
-    .pipe(gulp.dest('dist/styles'))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(minifycss())
-    .pipe(gulp.dest('dist/styles'))
-    .pipe(notify({ message: 'Styles task complete' }));
+	return gulp.src('src/styles/main.scss')
+		.pipe(sass({ style: 'expanded', }))
+		.pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
+		.pipe(gulp.dest('dist/styles'))
+		.pipe(rename({ suffix: '.min' }))
+		.pipe(minifycss())
+		.pipe(gulp.dest('dist/styles'))
+		.pipe(notify({ message: 'Styles task complete' }));
 });
 
 // Scripts
 gulp.task('scripts', function() {
-  return gulp.src('src/scripts/**/*.js')
-    .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('default'))
-    .pipe(concat('main.js'))
-    .pipe(gulp.dest('dist/scripts'))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(uglify())
-    .pipe(gulp.dest('dist/scripts'))
-    .pipe(notify({ message: 'Scripts task complete' }));
+	return gulp.src('src/scripts/**/*.js')
+		.pipe(jshint('.jshintrc'))
+		.pipe(jshint.reporter('default'))
+		.pipe(concat('main.js'))
+		.pipe(gulp.dest('dist/scripts'))
+		.pipe(rename({ suffix: '.min' }))
+		.pipe(uglify())
+		.pipe(gulp.dest('dist/scripts'))
+		.pipe(notify({ message: 'Scripts task complete' }));
 });
 
 // Images
 gulp.task('images', function() {
-  return gulp.src('src/images/**/*')
-    .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
-    .pipe(gulp.dest('dist/images'))
-    .pipe(notify({ message: 'Images task complete' }));
+	return gulp.src('src/images/**/*')
+		.pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
+		.pipe(gulp.dest('dist/images'))
+		.pipe(notify({ message: 'Images task complete' }));
 });
 
 // Clean
 gulp.task('clean', function(cb) {
-    del(['dist/assets/css', 'dist/assets/js', 'dist/assets/img'], cb)
+		del(['dist/assets/css', 'dist/assets/js', 'dist/assets/img'], cb)
 });
 
 // Default task
 gulp.task('default', ['clean'], function() {
-    gulp.start('styles', 'scripts', 'images');
+		gulp.start('styles', 'scripts', 'images');
 });
 
 // Watch
 gulp.task('watch', function() {
-  // Watch .scss files
-  gulp.watch('src/styles/**/*.scss', ['styles']);
+	// Watch .scss files
+	gulp.watch('src/styles/**/*.scss', ['styles']);
 
-  // Watch .js files
-  gulp.watch('src/scripts/**/*.js', ['scripts']);
+	// Watch .js files
+	gulp.watch('src/scripts/**/*.js', ['scripts']);
 
-  // Watch image files
-  gulp.watch('src/images/**/*', ['images']);
+	// Watch image files
+	gulp.watch('src/images/**/*', ['images']);
 
-  // Create LiveReload server
-  livereload.listen();
+	// Create LiveReload server
+	livereload.listen();
 
-  // Watch any files in dist/, reload on change
-  gulp.watch(['dist/**']).on('change', livereload.changed);
+	// Watch any files in dist/, reload on change
+	gulp.watch(['dist/**']).on('change', livereload.changed);
 });
 
 endsnippet
@@ -85,26 +85,26 @@ endsnippet
 snippet htmlreplace "replace html snippets" b
 var htmlreplace = require('gulp-html-replace');
 >>>>>>>>>>
-     <!-- build:js -->
-     <script src="js/player.js"></script> 
-     <script src="js/monster.js"></script> 
-     <script src="js/world.js"></script> 
-     <!-- endbuild -->
-    
-     .pipe(htmlreplace({
-         'css': 'styles.min.css',
-         'js': 'js/bundle.min.js'
-     }))
+		 <!-- build:js -->
+		 <script src="js/player.js"></script> 
+		 <script src="js/monster.js"></script> 
+		 <script src="js/world.js"></script> 
+		 <!-- endbuild -->
+		
+		 .pipe(htmlreplace({
+				 'css': 'styles.min.css',
+				 'js': 'js/bundle.min.js'
+		 }))
 endsnippet
 
 snippet jqueryplugin "jQuery plugin skeletion" b
 (function( $ ){
 		"use strict";
-    $.extend($.fn, {
-        ${1:myplugin}: function(){
+		$.extend($.fn, {
+				${1:myplugin}: function(){
 					${2}
-        }
-    });
+				}
+		});
 }( jQuery ));
 endsnippet
 
@@ -113,4 +113,119 @@ snippet jqueryjshint "tell jshint to ignore jquery " b
 endsnippet
 
 
+snippet hasProcessFlag "hasProcessFlag" b
+function hasProcessFlag(flag) \{
+	return process.argv.join('').indexOf(flag) > -1;
+}
+endsnippet
 
+snippet root "root" b
+const _root = path.resolve(__dirname);
+
+function root(args) \{
+	args = Array.prototype.slice.call(arguments, 0);
+	return path.join.apply(path, [_root].concat(args));
+}
+endsnippet
+
+snippet gid "getElementById" b
+${1:document}.getElementById('${2:id}');
+endsnippet
+
+snippet fori "for x in {}" b
+for (var ${1:prop} in ${2:obj}) {
+    if (${2:obj}.hasOwnProperty(${1:prop})) {
+        ${3}
+    }
+}
+endsnippet
+
+snippet cl "console.log(...)" b
+console.log($0);
+endsnippet
+
+snippet re "require" b
+const `!p
+def formatVariableName(path):
+	lastPart = path.split('/')[-1]
+	if lastPart == 'underscore':
+		return '_'
+	elif lastPart == 'jquery':
+		return '$'
+	else:
+		return re.sub(r'[_\-]', '', lastPart)
+snip.rv = formatVariableName(t[1])
+` = require('${1}');$0
+endsnippet
+
+snippet ajax
+$.ajax({
+	url: '${1:mydomain.com/url}',
+	type: '${2:POST}',
+	dataType: '${3:xml/html/script/json}',
+	data: $.param( $('${4:Element or Expression}') ),
+	complete: function (jqXHR, textStatus) {
+		${5:// callback}
+	},
+	success: function (data, textStatus, jqXHR) {
+		${6:// success callback}
+	},
+	error: function (jqXHR, textStatus, errorThrown) {
+		${7:// error callback}
+		console.log(textStatus, errorThrown);
+	}
+});
+endsnippet
+
+
+snippet jready "JQuery document ready handler" b
+\$(function() {
+    // let's get up in heeya
+});
+endsnippet
+
+
+snippet ajaxquery "ajax get query example" b
+function getName(personid) \{
+	var dynamicData = \{};
+	dynamicData["id"] = personID;
+	return $.ajax(\{
+		url: "getName.php",
+		type: "get",
+		data: dynamicData
+	});
+}
+
+getName("2342342").done(function(data) \{
+	// Updates the UI based the ajax result
+	\$(".person-name").text(data.name); 
+});
+endsnippet
+
+
+snippet ajaxerror-global "global ajaxError handler" b
+\$( document ).ajaxError(function( event, request, settings ) \{
+  \$( "#msg" ).append( "<li>Error requesting page " + settings.url + "</li>" );
+});
+endsnippet
+
+snippet serv-express "Simple http server based expressjs" b
+var express = require("express");
+var webpackDevMiddleware = require("webpack-dev-middleware");
+var webpack = require("webpack");
+var webpackConfig = require("./webpack.config")();
+
+var app = express();
+var compiler = webpack(webpackConfig);
+
+app.use(webpackDevMiddleware(compiler, \{
+  // lazy: true,
+  index: "index.html",
+  publicPath: "/" // Same as `output.publicPath` in most cases.
+}));
+app.use(require("webpack-hot-middleware")(compiler));
+
+app.listen(5000, function () \{
+  console.log("Listening on port 5000!");
+});
+endsnippet

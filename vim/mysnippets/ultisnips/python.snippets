@@ -1,5 +1,9 @@
-snippet SCRIPT_PATH "get currrent script file path" b
-SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+snippet script_path "get currrent script file path" b
+script_path = os.path.dirname(os.path.realpath(__file__))
+endsnippet
+
+snippet root_path "get currrent script file path" b
+root_path = os.path.dirname(os.path.realpath(__file__))
 endsnippet
 
 snippet optparse "optparse template" b
@@ -88,5 +92,88 @@ def rm_rf(path):
   except OSError as e:
     if e.errno != errno.ENOENT:
       raise
+endsnippet
+
+
+snippet argparse1 "argparse example 1" b
+import argparse
+parser = argparse.ArgumentParser(description="calculate X to the power of Y")
+
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-v", "--verbose", action="store_true")
+group.add_argument("-q", "--quiet", action="store_true")
+
+parser.add_argument("x", type=int, help="the base")
+parser.add_argument("y", type=int, help="the exponent")
+
+args = parser.parse_args()
+
+answer = args.x**args.y
+
+if args.quiet:
+    print answer
+elif args.verbose:
+    print "{} to the power {} equals {}".format(args.x, args.y, answer)
+else:
+    print "{}^{} == {}".format(args.x, args.y, answer)
+endsnippet
+
+
+snippet argparse2 "argparse count verbosity" b
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("x", type=int, help="the base")
+parser.add_argument("y", type=int, help="the exponent")
+parser.add_argument("-v", "--verbosity", action="count", default=0)
+args = parser.parse_args()
+answer = args.x**args.y
+if args.verbosity >= 2:
+    print "{} to the power {} equals {}".format(args.x, args.y, answer)
+elif args.verbosity >= 1:
+    print "{}^{} == {}".format(args.x, args.y, answer)
+else:
+    print answer
+endsnippet
+
+snippet devnull "import DEVNULL" b
+try:
+    from subprocess import DEVNULL # py3k
+except ImportError:
+    import os
+    DEVNULL = open(os.devnull, 'wb')
+endsnippet
+
+snippet ifmain "main and ifmain" b
+def main():
+	pass
+
+if __name__ == '__main__':
+  sys.exit(main())
+endsnippet
+
+
+snippet ftp-down-upload "ftp download/upload file" b
+import ftplib
+ 
+def getFile(ftp, filename):
+    try:
+        ftp.retrbinary("RETR " + filename ,open(filename, 'wb').write)
+    except:
+        print "Error"
+ 
+def upload(ftp, file):
+    ext = os.path.splitext(file)[1]
+    if ext in (".txt", ".htm", ".html"):
+        ftp.storlines("STOR " + file, open(file))
+    else:
+        ftp.storbinary("STOR " + file, open(file, "rb"), 1024)
+ 
+ftp = ftplib.FTP("127.0.0.1")
+ftp.login("username", "password")
+ 
+ftp.cwd('/pub/')         # change directory to /pub/
+upload(ftp, "README.nluug")
+getFile(ftp,'README.nluug')
+ftp.quit()
 endsnippet
 

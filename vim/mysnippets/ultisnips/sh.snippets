@@ -19,3 +19,12 @@ SCRIPT_PATH=\`pwd -P\`
 popd > /dev/null
 SCRIPT_FILE=\`basename \$FILE\`
 endsnippet
+
+snippet safe_add "safely append text to the specified file" b
+function safe-append() {
+    # \$1 filename, \$2 string to append
+    if [ -s "\$1" ] && ! grep -q "\$2" "\$1"; then
+        echo "\$2" >> \$1
+    fi
+}
+endsnippet

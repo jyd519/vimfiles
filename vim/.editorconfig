@@ -13,7 +13,7 @@ indent_size = 2
 [**.jsx]
 e4x = true
 indent_style = space
-indent_size = 4
+indent_size = 2
 
 [**.css]
 ;v:selector_separator_newline=true:end_with_newline=true

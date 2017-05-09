@@ -49,6 +49,7 @@ set autoindent
 set smartindent
 set nobackup nowb noswf
 set nowritebackup
+set backupcopy=yes
 set showmatch
 set cmdheight=1
 set history=100
@@ -83,6 +84,9 @@ endif
 "set t_ti= t_te=
 
 set path=.,./include/**/*,/usr/local/include,/usr/include
+
+" Default sh is Bash
+let g:bash_is_sh=1
 
 " define a group `vimrc` and initialize.
 augroup vimrc
@@ -137,8 +141,8 @@ function! Fcitx2zh()
   endtry
 endfunction
 if has("mac")
-  au! vimrc InsertLeave * call Fcitx2en()
-  au! vimrc InsertEnter * call Fcitx2zh()
+  " au! vimrc InsertLeave * call Fcitx2en()
+  " au! vimrc InsertEnter * call Fcitx2zh()
 endif
 
 set helplang=cn
@@ -176,6 +180,7 @@ endif
 
 "define leader char
 let g:mapleader = ","
+let g:maplocalleader = ","
 
 "font
 "set guifont=Consolas:h12:cANSI
@@ -183,7 +188,7 @@ let g:mapleader = ","
 set ambiwidth="double"
 let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
-  let s:fontbase="Anonymous_Pro" 
+  let s:fontbase="Fira_Code" 
   "let s:fontbase="Source_Code_Pro"
   "let s:fontbase="Ubuntu_Mono"
   let s:fontwide="Hiragino_Sans_GB"
@@ -244,7 +249,6 @@ nnoremap <C-l> <C-W>l
 "Use the arrows to something usefull
 map <M-right> :bn<cr>
 map <M-left> :bp<cr>
-map <C-TAB> :bn<cr>
 
 "Switch to current dir
 map <leader>cd :lcd %:p:h<cr>:pwd<cr>
@@ -290,15 +294,6 @@ inoremap <C-e> <Esc>A
 inoremap <C-a> <Esc>I
 cnoremap <C-a> <C-b>
 
-"Markdown preview
-function! PreviewMarkdown()
-  execute ":silent !open -a \"Typora.app\" \"%:p\""
-  execute ":redraw!"
-endfunction
-if has("mac")
-  nmap <leader>md :update<cr>:call PreviewMarkdown()<cr>
-endif
-
 "Start browser
 if has("win32")
   "quick start IE
@@ -316,7 +311,7 @@ endif
 "-------------------------------------------------------------------------------- 
 "let g:xml_syntax_folding = 1
 "au BufReadPost *.xsd,*.xml,*.xslt set foldmethod=syntax
-au vimrc FileType xml set ep=xmllint\ --format\ --encode\ utf-8\ -
+au vimrc FileType xml setlocal ep=xmllint\ --format\ --encode\ utf-8\ -
 
 "pascal configuration
 "-------------------------------------------------------------------------------- 
@@ -453,8 +448,11 @@ autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
 "-------------------------------------------------------------------------------- 
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=1
-"surroud: wrapping code
+
+"vim-surroud: wrapping code
 autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
+let g:surround_indent = 0 " Disable indenting for surrounded text
+
 
 "gulp
 "-------------------------------------------------------------------------------- 
@@ -479,6 +477,7 @@ let g:syntastic_mode_map = {
     \ "active_filetypes": ["ruby", "php"],
     \ "passive_filetypes": [] }
 
+let g:syntastic_javascript_checkers = ['eslint']
 
 " Editing a protected file as 'sudo'
 "cmap W w !sudo tee % >/dev/null
@@ -655,8 +654,42 @@ endfunction
 
 "NERDTree
 noremap <F3> :NERDTreeToggle<cr>
+noremap <leader>nf :NERDTreeFind<cr>
 
+" Quick unescape xml entities
+function! XmlUnescape()
+  silent! execute ':%s/&lt;/</g' 
+  silent! execute ':%s/&gt;/>/g'
+endfunction
+
+" Unescape \uXXXX sequences in selected lines
+function! UnescapeUnicode() range 
+  let cmd = a:firstline . "," . a:lastline . 's/\\u\(\x\{4\}\)/\=nr2char("0x".submatch(1),1)/g'
+  silent! execute cmd
+endfunction
+command! -nargs=0 -range=% UnescapeUnicode :<line1>,<line2>call UnescapeUnicode() 
+
+function! Dot(bang, format)
+    let fmt = a:format
+    if empty(fmt)
+      let fmt = 'png'
+    endif
+    let cmd = '!dot'
+    let opt = ' -T' . fmt . ' -o '
+    let currfile = expand('%:p')
+    let outfile = expand('%:p:r') . '.' . fmt
+    echom opt
+    silent execute cmd . ' "' . currfile . '" '. opt . ' "' . outfile . '" '
+    if a:bang
+      call system('open ' . outfile)
+    endif
+endfunction
+command! -nargs=* -bang Dot :call Dot(<bang>0, <q-args>)|redraw!
+let g:WMGraphviz_output = "svg"
+
+" Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))
   source ~/.vimrc.after
 endif
+
 
