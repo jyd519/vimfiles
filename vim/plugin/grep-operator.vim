@@ -17,6 +17,7 @@ function! s:GrepOperator(type)
 
     silent execute "grep! -R " . shellescape(@@) . " ."
     copen
+    redraw!
 
     let @@ = saved_unnamed_register
 endfunction

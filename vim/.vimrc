@@ -3,7 +3,7 @@
 " Jyd  2014-12-15 12:50
 "
 " Dependencies :
-"   ctags: 
+"   ctags:
 "     OSX: brew install ctags
 "     Windows: http://ctags.sourceforge.net/
 "   jsctags
@@ -167,11 +167,11 @@ syntax sync minlines=256
 "color wombat
 "color inkpot
 if has("gui_running")
-  color vc 
-else
-  "color peachpuff 
   color vc
-endif  
+else
+  "color peachpuff
+  color vc
+endif
 
 "windows size
 if has("win32")
@@ -188,7 +188,7 @@ let g:maplocalleader = ","
 set ambiwidth="double"
 let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
-  let s:fontbase="Fira_Code" 
+  let s:fontbase="Fira_Code"
   "let s:fontbase="Source_Code_Pro"
   "let s:fontbase="Ubuntu_Mono"
   let s:fontwide="Hiragino_Sans_GB"
@@ -226,8 +226,8 @@ endif
 "toggle between interface file and implementation file, etc. .h/.c
 map <M-o> :A<CR>
 
-"insert a blank line 
-imap <C-Return> <CR><CR><C-o>k<Tab> 
+"insert a blank line
+imap <C-Return> <CR><CR><C-o>k<Tab>
 
 "quick editing myvimrc
 if !exists("$MYVIMRC")
@@ -308,21 +308,21 @@ if has("mac")
 endif
 
 "xml configuration
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 "let g:xml_syntax_folding = 1
 "au BufReadPost *.xsd,*.xml,*.xslt set foldmethod=syntax
-au vimrc FileType xml setlocal ep=xmllint\ --format\ --encode\ utf-8\ -
+"au vimrc FileType xml setlocal ep=xmllint\ --format\ --encode\ utf-8\ -
 
 "pascal configuration
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 au vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
 "Perl
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 "au vimrc BufReadPost *.pl so $VIM\perltidy.vim
 
 "javascript
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 au vimrc FileType javascript setlocal dictionary=$VIMFILES\dict\javascript.dict
 au vimrc BufRead,BufNewFile *.js setlocal foldmethod=indent
 let g:tern_map_keys=1
@@ -333,12 +333,12 @@ let g:tern_show_signature_in_pum=1
 let g:vim_json_syntax_conceal = 0
 
 "html
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 "au FileType html set equalprg=tidy\ -utf8\ --indent\ yes\ -q\ -f\ err.txt
-command! Thtml :%!tidy -utf8 --indent yes -q -f tidyerr.txt 
+command! Thtml :%!tidy -utf8 --indent yes -q -f tidyerr.txt
 
 "MiniBufExplorer
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:miniBufExplorerMoreThanOne=0
 let g:miniBufExplMapWindowNavVim=1
 let g:miniBufExplMapWindowNavArrows=1
@@ -350,18 +350,18 @@ let g:miniBufExplForceSyntaxEnable=0 "very slow if enabled when editing js file
 let g:miniBufExplAutoStart=0 " temporary disabled,  conflicts with session restore
 
 "SuperTab
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 " let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabDefaultCompletionType='<c-x><c-u><c-p>'
 
 "python
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:pydiction_location=$VIMFILES . '/plugged/pydiction/complete-dict/'
 let g:pydiction_menu_height = 20
 au vimrc BufEnter *.py nmap <f9> :!python %<CR>
 
 "NSIS
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 function! Makensis(arg)
   let l:path = expand("%:p")
   let l:cmd="!cmd /k \"setnsis && makensis " . a:arg . " " . iconv(l:path, "utf8", "cp936") . "\""
@@ -374,11 +374,11 @@ au vimrc FileType nsis nmap <F9> :update<cr>:call Makensis("/DMYDEBUG")<cr>
 au vimrc FileType nsis syntax on
 
 "FindFile
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:FindFileIgnore = ['*.o', '*.pyc', '*/tmp/*', '.svn', '.git', '*.exe', '*.dll']
 
 "Toggle [\], [/]
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 function! ToggleSlash(independent) range
   let from = ''
   for lnum in range(a:firstline, a:lastline)
@@ -396,7 +396,7 @@ endfunction
 command! -bang -range ToggleSlash <line1>,<line2>call ToggleSlash(<bang>1)
 
 " UltiSnips
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 " Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<C-k>"
 let g:UltiSnipsListSnippets="<C-l>"
@@ -410,28 +410,28 @@ set runtimepath+=$VIMFILES/mysnippets
 let $SNIPPETS=expand("$VIMFILES/mysnippets")
 
 "neocomplete (requires LUA)
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 if &rtp =~ 'neocomplete.vim'
-  source $VIMFILES/neocomplete.conf  
+  source $VIMFILES/neocomplete.conf
 endif
 
 "neocomplcache
 if &rtp =~ 'neocomplcache.vim'
-  source $VIMFILES/neocomplcache.conf  
+  source $VIMFILES/neocomplcache.conf
 endif
 
 " Post-startup initializations
-"-------------------------------------------------------------------------------- 
-augroup PostInit 
+"--------------------------------------------------------------------------------
+augroup PostInit
   autocmd!
-  " autocmd VimEnter * 
-  "       \ if exists("*neocomplcache#close_popup") 
-  "       \ |   source $VIMFILES/neocomplcache.conf  
+  " autocmd VimEnter *
+  "       \ if exists("*neocomplcache#close_popup")
+  "       \ |   source $VIMFILES/neocomplcache.conf
   "       \ | endif
 augroup end
 
 "ctrlp settings
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:ctrlp_custom_ignore = {
                               \ 'dir':  '\v[\/]\.(git|hg|svn)$',
                               \ 'file': '\v\.(exe|so|dll)$',
@@ -440,12 +440,12 @@ let g:ctrlp_custom_ignore = {
 let g:ctrlp_working_path_mode = ''
 
 "cmake
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
 autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
 
 "markdown
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=1
 
@@ -455,15 +455,15 @@ let g:surround_indent = 0 " Disable indenting for surrounded text
 
 
 "gulp
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 autocmd vimrc BufRead,BufNewFile gulpfile.js setlocal errorformat=%-G[%.%#,%f:%m,%-G%p,%-G%n%perror
 
 "livedown
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:livedown_autorun = 0
 
 " should the browser window pop-up upon previewing
-let g:livedown_open = 1 
+let g:livedown_open = 1
 
 " the port on which Livedown server will run
 let g:livedown_port = 1337
@@ -471,7 +471,7 @@ map gm :call LivedownPreview()<CR>
 
 
 "syntastic
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:syntastic_mode_map = {
     \ "mode": "passive",
     \ "active_filetypes": ["ruby", "php"],
@@ -479,20 +479,31 @@ let g:syntastic_mode_map = {
 
 let g:syntastic_javascript_checkers = ['eslint']
 
+"ALE
+"--------------------------------------------------------------------------------
+let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['tslint']}
+
 " Editing a protected file as 'sudo'
 "cmap W w !sudo tee % >/dev/null
 command! W w !sudo tee % > /dev/null
 
-" ycm 
-"-------------------------------------------------------------------------------- 
+" ycm
+"--------------------------------------------------------------------------------
 let g:ycm_min_num_of_chars_for_completion = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_use_ultisnips_completer = 1
 let g:ycm_filepath_completion_use_working_dir = 1
-let g:ycm_collect_identifiers_from_tags_files = 1 
+let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_key_invoke_completion = '<C-Space>'
 
+if !exists("g:ycm_semantic_triggers")
+  let g:ycm_semantic_triggers = {}
+endif
+let g:ycm_semantic_triggers['typescript'] = ['.']
+let g:ycm_semantic_triggers['go'] = ['.', '->']
+
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
+nnoremap <leader>jm :YcmCompleter GetDoc<CR>
 nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
 
 let g:ycm_filetype_blacklist = {
@@ -511,7 +522,7 @@ let g:ycm_filetype_blacklist = {
 function! Multiple_cursors_before()
     let g:ycm_auto_trigger = 0
 endfunction
- 
+
 function! Multiple_cursors_after()
     let g:ycm_auto_trigger = 1
 endfunction
@@ -520,7 +531,7 @@ endfunction
 let g:jedi#completions_enabled=0
 
 " tagbar settings
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 map <leader>t :TagbarToggle<cr>
 if filereadable($VIMFILES . '/tagbar.conf')
     source $VIMFILES/tagbar.conf
@@ -528,30 +539,31 @@ endif
 
 
 " vim-session settings
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:session_autosave='no'
 let g:session_autoload='no'
 
 " airline settings
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 let g:airline#extensions#tagbar#enabled = 0
-let g:airline_section_b = '%{getcwd()}'
+let g:airline_section_b = '' "'%-20{getcwd()}'
 let g:airline#extensions#tmuxline#enabled = 0
 
+"%-0{minwid}.{maxwid}{item}
 "jsbeautify settings
-"-------------------------------------------------------------------------------- 
-function! s:JBeautify() 
+"--------------------------------------------------------------------------------
+function! s:JBeautify()
   if &ft ==? 'css'
-    call CSSBeautify() 
+    call CSSBeautify()
   elseif &ft ==? 'html' || &ft ==? 'xhtml'
-    call HtmlBeautify() 
+    call HtmlBeautify()
   elseif &ft ==? 'javascript'
     call JsBeautify()
   elseif &ft ==? 'json'
     call JsonBeautify()
   else
-     echom 'JSBeautify: ' . &ft . ' is not supported' 
-  endif 
+     echom 'JSBeautify: ' . &ft . ' is not supported'
+  endif
 endfunction
 
 nnoremap <leader>jb :call <SID>JBeautify()<CR>
@@ -563,11 +575,11 @@ autocmd vimrc FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>
 
 
 "easy switching buffers
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 nnoremap <leader>b :buffers<CR>:buffer<Space>
 
 " The Silver Searcher
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 if executable('ag')
   " Use ag over grep
   set grepprg=ag\ --nogroup\ --nocolor\ --column
@@ -577,25 +589,25 @@ if executable('ag')
   "let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
   "Note that other CtrlP options related to which files get included in the index
   "(g:ctrlp_show_hidden, wildignore, g:ctrlp_custom_ignore, g:ctrlp_max_files, g:ctrlp_max_depth, g:ctrlp_follow_symlinks)
-  "do not apply when using g:ctrlp_user_command. 
-  let g:ctrlp_user_command = 'ag %s -l --nocolor --nogroup 
-         \ --ignore .git --ignore .svn --ignore .hg --ignore .DS_Store 
+  "do not apply when using g:ctrlp_user_command.
+  let g:ctrlp_user_command = 'ag %s -l --nocolor --nogroup
+         \ --ignore .git --ignore .svn --ignore .hg --ignore .DS_Store
          \ --ignore .cache --ignore .npm --ignore .idea --ignore .m2 -g ""'
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
-  
-  " Ag command 
+
+  " Ag command
   command! -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
 endif
 
 
 "Man
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 source $VIMRUNTIME/ftplugin/man.vim
 noremap <leader>k :Man <cword><cr>
 
 "vim-easy-align
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
@@ -603,7 +615,7 @@ nmap ga <Plug>(EasyAlign)
 
 
 "load local customized script
-"-------------------------------------------------------------------------------- 
+"--------------------------------------------------------------------------------
 if filereadable(expand("~/.vimrc.local"))
     source ~/.vimrc.local
 endif
@@ -630,7 +642,7 @@ nmap <silent> <LEFT> :cprev<CR>
 
 "Convert selected text to javascript string
 "--------------------------------------------------------------------------------
-function! s:ToJS(sep, first_line, last_line) 
+function! s:ToJS(sep, first_line, last_line)
     let i = a:first_line
     while i<a:last_line
       let l = getline(i)
@@ -658,16 +670,16 @@ noremap <leader>nf :NERDTreeFind<cr>
 
 " Quick unescape xml entities
 function! XmlUnescape()
-  silent! execute ':%s/&lt;/</g' 
+  silent! execute ':%s/&lt;/</g'
   silent! execute ':%s/&gt;/>/g'
 endfunction
 
 " Unescape \uXXXX sequences in selected lines
-function! UnescapeUnicode() range 
+function! UnescapeUnicode() range
   let cmd = a:firstline . "," . a:lastline . 's/\\u\(\x\{4\}\)/\=nr2char("0x".submatch(1),1)/g'
   silent! execute cmd
 endfunction
-command! -nargs=0 -range=% UnescapeUnicode :<line1>,<line2>call UnescapeUnicode() 
+command! -nargs=0 -range=% UnescapeUnicode :<line1>,<line2>call UnescapeUnicode()
 
 function! Dot(bang, format)
     let fmt = a:format
@@ -686,6 +698,8 @@ function! Dot(bang, format)
 endfunction
 command! -nargs=* -bang Dot :call Dot(<bang>0, <q-args>)|redraw!
 let g:WMGraphviz_output = "svg"
+
+let g:previm_open_cmd = 'open -a "google chrome"'
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))

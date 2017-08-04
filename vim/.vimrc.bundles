@@ -30,7 +30,10 @@ Plug 'scrooloose/nerdtree'
 Plug 'rkulla/pydiction'
 Plug 'wesleyche/SrcExpl'
 Plug 'ervandew/supertab'
-Plug 'scrooloose/syntastic'
+
+"Plug 'scrooloose/syntastic'
+Plug 'w0rp/ale'
+
 Plug 'junegunn/vim-easy-align'
 
 Plug 'tomtom/tcomment_vim'
@@ -95,16 +98,27 @@ Plug 'tpope/vim-fugitive'
 Plug 'aklt/plantuml-syntax'
 Plug 'wannesm/wmgraphviz.vim'
 
+" Preview for VIM (Markdown, reStructuredText, textile)
+Plug 'kannokanno/previm'
+
 "EditorConfig
 Plug 'editorconfig/editorconfig-vim'
 
 "typescript
 Plug 'leafgarland/typescript-vim'
 
+"angula2 snippets
+Plug 'mhartington/vim-angular2-snippets'
+
+"Plug 'Quramy/tsuquyomi'
+
 "es6
 Plug 'isRuslan/vim-es6'
 
 "nginx
 Plug 'evanmiller/nginx-vim-syntax'
+
+"Go
+Plug 'fatih/vim-go'
 
 call plug#end() 

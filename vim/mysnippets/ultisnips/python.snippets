@@ -122,6 +122,14 @@ endsnippet
 snippet argparse2 "argparse count verbosity" b
 import argparse
 parser = argparse.ArgumentParser()
+parser.add_argument( '--msvc', type = int, choices = [ 12, 14, 15 ],
+										 default = 15, help = 'Choose the Microsoft Visual '
+										 'Studio version (default: %(default)s).' )
+  parser.add_argument( '--all',
+                       action = 'store_true',
+                       help   = 'Enable all supported completers',
+                       dest   = 'all_completers' )
+
 parser.add_argument("x", type=int, help="the base")
 parser.add_argument("y", type=int, help="the exponent")
 parser.add_argument("-v", "--verbosity", action="count", default=0)
@@ -177,5 +185,74 @@ ftp.cwd('/pub/')         # change directory to /pub/
 upload(ftp, "README.nluug")
 getFile(ftp,'README.nluug')
 ftp.quit()
+endsnippet
+snippet nonBlockRead "nonblock read from fd" b
+import fcntl
+#nonBlockRead(stdout)
+def nonBlockRead(output):
+    fd = output.fileno()
+    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+    try:
+        return output.read()
+    except:
+        return ''
+endsnippet
+
+
+
+snippet is_python_64bit "detect python architecture"
+def is_python_64bit():
+  return (struct.calcsize("P") == 8)
+endsnippet
+
+snippet is_windows_64bit "detect Windows architecture"
+def is_windows_64bit():
+    if 'PROCESSOR_ARCHITEW6432' in os.environ:
+        return True
+    return os.environ['PROCESSOR_ARCHITECTURE'].endswith('64')
+endsnippet
+
+
+snippet py3 "python3 imports and version validation" b
+
+from __future__ import print_function
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import absolute_import
+
+PY_MAJOR, PY_MINOR = sys.version_info[ 0 : 2 ]
+if not ( ( PY_MAJOR == 2 and PY_MINOR >= 6 ) or
+         ( PY_MAJOR == 3 and PY_MINOR >= 3 ) or
+         PY_MAJOR > 3 ):
+  sys.exit( 'This scripts requires Python >= 2.6 or >= 3.3; '
+            'your version of Python is ' + sys.version )
+
+endsnippet
+
+
+snippet FindExecutable "Find executable file in PATH" b
+def FindExecutable( executable ):
+  # Executable extensions used on Windows
+  WIN_EXECUTABLE_EXTS = [ '.exe', '.bat', '.cmd' ]
+
+  paths = os.environ[ 'PATH' ].split( os.pathsep )
+  base, extension = os.path.splitext( executable )
+
+  if OnWindows() and extension.lower() not in WIN_EXECUTABLE_EXTS:
+    extensions = WIN_EXECUTABLE_EXTS
+  else:
+    extensions = ['']
+
+  for extension in extensions:
+    executable_name = executable + extension
+    if not os.path.isfile( executable_name ):
+      for path in paths:
+        executable_path = os.path.join(path, executable_name )
+        if os.path.isfile( executable_path ):
+          return executable_path
+    else:
+      return executable_name
+  return None
 endsnippet
 
