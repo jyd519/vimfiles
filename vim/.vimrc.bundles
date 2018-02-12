@@ -55,10 +55,13 @@ Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
 Plug 'gilligan/vim-lldb', { 'on' : 'Lversion' } 
 
-Plug 'godlygeek/tabular'
+" Preview for VIM (Markdown, reStructuredText, textile)
+Plug 'kannokanno/previm'
 Plug 'plasticboy/vim-markdown'
-Plug 'shime/vim-livedown'
+"Plug 'shime/vim-livedown'
+Plug 'ferrine/md-img-paste.vim'
 
+Plug 'godlygeek/tabular'
 Plug 'xolox/vim-misc'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'xolox/vim-session'
@@ -76,6 +79,7 @@ Plug 'thinca/vim-quickrun'
 
 Plug 'jiangmiao/auto-pairs', {'on': 'AutoPair'}
 Plug 'tmhedberg/matchit'
+Plug 'AndrewRadev/splitjoin.vim'
 
 "git
 Plug 'airblade/vim-gitgutter'
@@ -98,9 +102,6 @@ Plug 'tpope/vim-fugitive'
 Plug 'aklt/plantuml-syntax'
 Plug 'wannesm/wmgraphviz.vim'
 
-" Preview for VIM (Markdown, reStructuredText, textile)
-Plug 'kannokanno/previm'
-
 "EditorConfig
 Plug 'editorconfig/editorconfig-vim'
 
@@ -112,8 +113,10 @@ Plug 'mhartington/vim-angular2-snippets'
 
 "Plug 'Quramy/tsuquyomi'
 
-"es6
+"es6 & node
 Plug 'isRuslan/vim-es6'
+Plug 'moll/vim-node'
+Plug 'geekjuice/vim-mocha'
 
 "nginx
 Plug 'evanmiller/nginx-vim-syntax'
@@ -121,4 +124,6 @@ Plug 'evanmiller/nginx-vim-syntax'
 "Go
 Plug 'fatih/vim-go'
 
+" Python libraries for smarter Vim coding
+Plug 'seletskiy/vim-pythonx'
 call plug#end() 

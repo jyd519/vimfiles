@@ -11,11 +11,11 @@ import optparse
 
 parser = optparse.OptionParser()
 parser.add_option("-s", "--scan", action="store_true", dest="scan",
-                  help="scan branches")
+									help="scan branches")
 parser.add_option("-a", "--analyze", action="store_true", dest="analyze",
-                  help="analyze dependencies")
+									help="analyze dependencies")
 parser.add_option("-c", "--conflict", action="store_true", dest="conflict",
-                  help="analyze conflicts")
+									help="analyze conflicts")
 (options, args) = parser.parse_args()
 endsnippet
 
@@ -23,42 +23,42 @@ endsnippet
 snippet shell_run "shell run" b
 import subprocess
 def shell_run(command):
-    p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True)
-    out, err = p.communicate()
-    retcode = p.poll()
-    if retcode != 0:
-        print "[ERROR] ", p.returncode, ' cmd: ', command
-        print err
-        return []
+		p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell=True)
+		out, err = p.communicate()
+		retcode = p.poll()
+		if retcode != 0:
+				print "[ERROR] ", p.returncode, ' cmd: ', command
+				print err
+				return []
 
-    return out.split('\n')
+		return out.split('\n')
 endsnippet
 
 
 snippet mkdirs "mkdir recursively" b 
 def mkdirs(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
+		try:
+				os.makedirs(path)
+		except OSError as exc:
+				if exc.errno == errno.EEXIST and os.path.isdir(path):
+						pass
 endsnippet
 
 
 snippet walk_dir "walk directory recursively" b
 for root, dirs, files in os.walk(path):
-    for file in files:
-      filename = os.path.join(root, file)
-      print filename
+		for file in files:
+			filename = os.path.join(root, file)
+			print filename
 
-    for subdir in dirs:
-      #os.path.join(root, subdir)
-      pass
+		for subdir in dirs:
+			#os.path.join(root, subdir)
+			pass
 endsnippet
 
 snippet warn "print warn message" b
 def warn(msg):
-  warn.warned = True
+	warn.warned = True
 	prefix = '\033[1m\033[93mWARNING\033[0m' if os.isatty(1) else 'WARNING'
 	print('%s: %s' % (prefix, msg))
 
@@ -69,31 +69,35 @@ endsnippet
 
 snippet pkg_config "Description" b
 def pkg_config(pkg):
-  pkg_config = os.environ.get('PKG_CONFIG', 'pkg-config')
-  retval = ()
-  for flag in ['--libs-only-l', '--cflags-only-I', '--libs-only-L']:
-    try:
-      proc = subprocess.Popen(
-          shlex.split(pkg_config) + ['--silence-errors', flag, pkg],
-          stdout=subprocess.PIPE)
-      val = proc.communicate()[0].strip()
-    except OSError, e:
-      if e.errno != errno.ENOENT: raise e  # Unexpected error.
-      return (None, None, None)  # No pkg-config/pkgconf installed.
-    retval += (val,)
-  return retval
+	pkg_config = os.environ.get('PKG_CONFIG', 'pkg-config')
+	retval = ()
+	for flag in ['--libs-only-l', '--cflags-only-I', '--libs-only-L']:
+		try:
+			proc = subprocess.Popen(
+					shlex.split(pkg_config) + ['--silence-errors', flag, pkg],
+					stdout=subprocess.PIPE)
+			val = proc.communicate()[0].strip()
+		except OSError, e:
+			if e.errno != errno.ENOENT: raise e  # Unexpected error.
+			return (None, None, None)  # No pkg-config/pkgconf installed.
+		retval += (val,)
+	return retval
 endsnippet
 
 
 snippet rm_rf "remove directory" b
-def rm_rf(path):
-  try:
-    shutil.rmtree(path)
-  except OSError as e:
-    if e.errno != errno.ENOENT:
-      raise
-endsnippet
+def remove_readonly(func, path, _):
+		"Clear the readonly bit and reattempt the removal"
+		os.chmod(path, stat.S_IWRITE)
+		func(path)
 
+def rm_rf(path):
+	try:
+		shutil.rmtree(path, onerror=remove_readonly)
+	except OSError as e:
+		if e.errno != errno.ENOENT:
+			raise
+endsnippet
 
 snippet argparse1 "argparse example 1" b
 import argparse
@@ -111,11 +115,11 @@ args = parser.parse_args()
 answer = args.x**args.y
 
 if args.quiet:
-    print answer
+		print answer
 elif args.verbose:
-    print "{} to the power {} equals {}".format(args.x, args.y, answer)
+		print "{} to the power {} equals {}".format(args.x, args.y, answer)
 else:
-    print "{}^{} == {}".format(args.x, args.y, answer)
+		print "{}^{} == {}".format(args.x, args.y, answer)
 endsnippet
 
 
@@ -125,10 +129,10 @@ parser = argparse.ArgumentParser()
 parser.add_argument( '--msvc', type = int, choices = [ 12, 14, 15 ],
 										 default = 15, help = 'Choose the Microsoft Visual '
 										 'Studio version (default: %(default)s).' )
-  parser.add_argument( '--all',
-                       action = 'store_true',
-                       help   = 'Enable all supported completers',
-                       dest   = 'all_completers' )
+	parser.add_argument( '--all',
+											 action = 'store_true',
+											 help		= 'Enable all supported completers',
+											 dest		= 'all_completers' )
 
 parser.add_argument("x", type=int, help="the base")
 parser.add_argument("y", type=int, help="the exponent")
@@ -138,19 +142,19 @@ parser.add_argument("-v", "--verbosity", action="count", default=0)
 args = parser.parse_args()
 answer = args.x**args.y
 if args.verbosity >= 2:
-    print "{} to the power {} equals {}".format(args.x, args.y, answer)
+		print "{} to the power {} equals {}".format(args.x, args.y, answer)
 elif args.verbosity >= 1:
-    print "{}^{} == {}".format(args.x, args.y, answer)
+		print "{}^{} == {}".format(args.x, args.y, answer)
 else:
-    print answer
+		print answer
 endsnippet
 
 snippet devnull "import DEVNULL" b
 try:
-    from subprocess import DEVNULL # py3k
+		from subprocess import DEVNULL # py3k
 except ImportError:
-    import os
-    DEVNULL = open(os.devnull, 'wb')
+		import os
+		DEVNULL = open(os.devnull, 'wb')
 endsnippet
 
 snippet ifmain "main and ifmain" b
@@ -158,7 +162,7 @@ def main():
 	pass
 
 if __name__ == '__main__':
-  sys.exit(main())
+	sys.exit(main())
 endsnippet
 
 
@@ -166,22 +170,22 @@ snippet ftp-down-upload "ftp download/upload file" b
 import ftplib
  
 def getFile(ftp, filename):
-    try:
-        ftp.retrbinary("RETR " + filename ,open(filename, 'wb').write)
-    except:
-        print "Error"
+		try:
+				ftp.retrbinary("RETR " + filename ,open(filename, 'wb').write)
+		except:
+				print "Error"
  
 def upload(ftp, file):
-    ext = os.path.splitext(file)[1]
-    if ext in (".txt", ".htm", ".html"):
-        ftp.storlines("STOR " + file, open(file))
-    else:
-        ftp.storbinary("STOR " + file, open(file, "rb"), 1024)
+		ext = os.path.splitext(file)[1]
+		if ext in (".txt", ".htm", ".html"):
+				ftp.storlines("STOR " + file, open(file))
+		else:
+				ftp.storbinary("STOR " + file, open(file, "rb"), 1024)
  
 ftp = ftplib.FTP("127.0.0.1")
 ftp.login("username", "password")
  
-ftp.cwd('/pub/')         # change directory to /pub/
+ftp.cwd('/pub/')				 # change directory to /pub/
 upload(ftp, "README.nluug")
 getFile(ftp,'README.nluug')
 ftp.quit()
@@ -190,27 +194,27 @@ snippet nonBlockRead "nonblock read from fd" b
 import fcntl
 #nonBlockRead(stdout)
 def nonBlockRead(output):
-    fd = output.fileno()
-    fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-    fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
-    try:
-        return output.read()
-    except:
-        return ''
+		fd = output.fileno()
+		fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+		fcntl.fcntl(fd, fcntl.F_SETFL, fl | os.O_NONBLOCK)
+		try:
+				return output.read()
+		except:
+				return ''
 endsnippet
 
 
 
 snippet is_python_64bit "detect python architecture"
 def is_python_64bit():
-  return (struct.calcsize("P") == 8)
+	return (struct.calcsize("P") == 8)
 endsnippet
 
 snippet is_windows_64bit "detect Windows architecture"
 def is_windows_64bit():
-    if 'PROCESSOR_ARCHITEW6432' in os.environ:
-        return True
-    return os.environ['PROCESSOR_ARCHITECTURE'].endswith('64')
+		if 'PROCESSOR_ARCHITEW6432' in os.environ:
+				return True
+		return os.environ['PROCESSOR_ARCHITECTURE'].endswith('64')
 endsnippet
 
 
@@ -223,36 +227,55 @@ from __future__ import absolute_import
 
 PY_MAJOR, PY_MINOR = sys.version_info[ 0 : 2 ]
 if not ( ( PY_MAJOR == 2 and PY_MINOR >= 6 ) or
-         ( PY_MAJOR == 3 and PY_MINOR >= 3 ) or
-         PY_MAJOR > 3 ):
-  sys.exit( 'This scripts requires Python >= 2.6 or >= 3.3; '
-            'your version of Python is ' + sys.version )
+				 ( PY_MAJOR == 3 and PY_MINOR >= 3 ) or
+				 PY_MAJOR > 3 ):
+	sys.exit( 'This scripts requires Python >= 2.6 or >= 3.3; '
+						'your version of Python is ' + sys.version )
 
 endsnippet
 
 
 snippet FindExecutable "Find executable file in PATH" b
 def FindExecutable( executable ):
-  # Executable extensions used on Windows
-  WIN_EXECUTABLE_EXTS = [ '.exe', '.bat', '.cmd' ]
+	# Executable extensions used on Windows
+	WIN_EXECUTABLE_EXTS = [ '.exe', '.bat', '.cmd' ]
 
-  paths = os.environ[ 'PATH' ].split( os.pathsep )
-  base, extension = os.path.splitext( executable )
+	paths = os.environ[ 'PATH' ].split( os.pathsep )
+	base, extension = os.path.splitext( executable )
 
-  if OnWindows() and extension.lower() not in WIN_EXECUTABLE_EXTS:
-    extensions = WIN_EXECUTABLE_EXTS
-  else:
-    extensions = ['']
+	if OnWindows() and extension.lower() not in WIN_EXECUTABLE_EXTS:
+		extensions = WIN_EXECUTABLE_EXTS
+	else:
+		extensions = ['']
 
-  for extension in extensions:
-    executable_name = executable + extension
-    if not os.path.isfile( executable_name ):
-      for path in paths:
-        executable_path = os.path.join(path, executable_name )
-        if os.path.isfile( executable_path ):
-          return executable_path
-    else:
-      return executable_name
-  return None
+	for extension in extensions:
+		executable_name = executable + extension
+		if not os.path.isfile( executable_name ):
+			for path in paths:
+				executable_path = os.path.join(path, executable_name )
+				if os.path.isfile( executable_path ):
+					return executable_path
+		else:
+			return executable_name
+	return None
 endsnippet
 
+
+snippet stages "multiple stages" b
+STAGES = {
+		'test': {
+				'hosts': ['root@172.16.18.211'],
+		},
+		'production': {
+				'hosts': ['joy-web1', 'joy-web2'],
+		},
+}
+
+def stage_set(stage_name='test'):
+		env.stage = stage_name
+		for option, value in STAGES[env.stage].items():
+				setattr(env, option, value)
+
+
+require('stage', provided_by=(test,production,))
+endsnippet

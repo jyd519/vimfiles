@@ -58,3 +58,18 @@ endsnippet
 snippet reference "typescript reference" b
 /// <reference path="${0}"/>
 endsnippet
+
+snippet Promise "Return Promise" b
+return new Promise<${1:any}>((resolve, reject) => {
+	$2
+});
+endsnippet
+
+snippet then "Promise then" w
+then( (res) => {$1} )
+.catch( (err) => {$2} );
+endsnippet
+
+snippet arrow "() => {}" w
+($1) => { $2 }
+endsnippet

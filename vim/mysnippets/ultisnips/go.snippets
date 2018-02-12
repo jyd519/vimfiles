@@ -1,0 +1,378 @@
+global !p
+import px.langs.go
+endglobal
+
+snippet iferr "if err != nil" b
+if err != nil {
+	return nil, err
+}
+endsnippet
+
+
+snippet httpPost "httpPost" b
+func httpPostForm() error {
+	resp, err := http.PostForm("url",
+		url.Values{"key": {"Value"}, "id": {"123"}})
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(body))
+}
+
+endsnippet
+
+
+snippet httpDo "http more customizable" b
+func httpDo() {
+	client := &http.Client{}
+
+	req, err := http.NewRequest("POST", 
+		"http://www.01happy.com/demo/accept.php",
+		strings.NewReader("name=cjb"))
+	if err != nil {
+		// handle error
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("Cookie", "name=anny")
+
+	resp, err := client.Do(req)
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// handle error
+	}
+
+	fmt.Println(string(body))
+}
+endsnippet
+
+snippet uploadFile "upload file with multiform data" b
+func uploadFile(url, filename, path, deviceType, deviceId string, filePath string) error {
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Println("error opening file")
+		return err
+	}
+
+	defer file.Close()
+
+	bodyBuf := &bytes.Buffer{}
+	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	//设置文件的上传参数叫uploadfile, 文件名是filename,
+	fileWriter, err := bodyWriter.CreateFormFile("uploadfile", filename)
+	if err != nil {
+		fmt.Println("error writing to buffer")
+		return err
+	}
+
+	_, err = io.Copy(fileWriter, file)
+	if err != nil {
+		return err
+	}
+
+	//获取上传文件的类型,multipart/form-data; boundary=...
+	contentType := bodyWriter.FormDataContentType()
+
+	//这个很关键,必须这样写关闭,不能使用defer关闭,不然会导致错误
+	bodyWriter.Close()
+
+	//其他参数设置
+	params := map[string]string{
+		"filename" : filename,
+			"path" : path,
+			"deviceType" : deviceType,
+			"deviceId" : deviceId,
+	}
+	for key, val := range params {
+		_ = bodyWriter.WriteField(key, val)
+	}
+
+	//发送请求
+	resp, err := http.Post(url, contentType, bodyBuf)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	resp_body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(resp.Status, string(resp_body))
+	return nil
+}
+endsnippet
+
+snippet httpstatic "static assets handler" b
+	//static file handler.
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+endsnippet
+
+snippet handlPost "Description" b
+
+// Use temporary file
+//parse the multipart form in the request
+//	err := r.ParseMultipartForm(100000)
+//	if err != nil {
+//		http.Error(w, err.Error(), http.StatusInternalServerError)
+//		return
+//	}
+//
+//	//get a ref to the parsed multipart form
+//	m := r.MultipartForm
+//
+//	//get the *fileheaders
+//	files := m.File["myfiles"]
+//	for i, _ := range files {
+
+// 
+// MultipartReader avoid the temporary disk file
+// get the multipart reader for the request.
+reader, err := r.MultipartReader()
+
+if err != nil {
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+	return
+}
+
+//copy each part to destination.
+for {
+	part, err := reader.NextPart()
+	if err == io.EOF {
+		break
+	}
+
+	//if part.FileName() is empty, skip this iteration.
+	if part.FileName() == "" {
+		continue
+	}
+	dst, err := os.Create("/home/sanat/" + part.FileName())
+	defer dst.Close()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	
+	if _, err := io.Copy(dst, part); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+//display success message.
+endsnippet
+
+snippet uploadfile2 " newfileUploadRequest" b
+// Creates a new file upload http request with optional extra params
+func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	fi, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	file.Close()
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, fi.Name())
+	if err != nil {
+		return nil, err
+	}
+	part.Write(fileContents)
+
+	for key, val := range params {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	request := http.NewRequest("POST", uri, body)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	return request, err
+}
+endsnippet
+
+snippet assertEqual "assertEqual" b
+func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
+	if a == b {
+		return
+	}
+	if len(message) == 0 {
+		message = fmt.Sprintf("%v != %v", a, b)
+	}
+	t.Fatal(message)
+}
+endsnippet
+
+
+snippet assertLib "testify/assert"
+//import "github.com/stretchr/testify/assert"
+func TestAssert(t *testing.T) {
+	var a string = "Hello"
+	var b string = "Hello"
+
+	assert.Equal(t, a, b, "The two words should be the same.")
+	assert.Contains(t, "Hello World", "World")
+	assert.Empty(t, nil)
+	assert.InDeltaf(t, math.Pi, (22 / 7.0, "error message %s", "formatted"), 0.01)
+	assert.JSONEqf(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, "error message %s", "formatted")
+	actualObj, err := SomeFunction()
+	if assert.Error(t, err) {
+		assert.Equal(t, expectedError, err)
+	}
+}
+endsnippet
+
+snippet usage "flag.Usage" b
+	flag.Usage = func() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
+}
+endsnippet
+
+snippet usage "GzippedText " b
+type GzippedText []byte
+
+func (g GzippedText) Value() (driver.Value, error) {
+	b := make([]byte, 0, len(g))
+	buf := bytes.NewBuffer(b)
+	w := gzip.NewWriter(buf)
+	w.Write(g)
+	w.Close()
+	return buf.Bytes(), nil
+}
+
+func (g *GzippedText) Scan(src interface{}) error {
+	var source []byte // let's support string and []byte
+	switch src.(type) {
+	case string:
+		source = []byte(src.(string))
+	case []byte:
+		source = src.([]byte)
+	default:
+		return errors.New("Incompatible type for GzippedText")
+	}
+	reader, _ := gzip.NewReader(bytes.NewReader(source))
+	defer reader.Close()
+	b, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return err
+	}
+	*g = GzippedText(b)
+	return nil
+}
+endsnippet
+
+snippet decode "decode http body" b
+decoder := json.NewDecoder(r.Body)
+d := struct {
+$1
+}{}
+err := decoder.Decode(&d)
+if	err != nil {
+	return err
+}
+defer r.Body.Close()
+endsnippet
+
+
+snippet imtestify "add testify package" b
+"github.com/stretchr/testify/assert"
+endsnippet
+
+snippet imgin "add gin package" b
+	"github.com/gin-gonic/gin"
+endsnippet
+
+snippet imtoml "add toml package" b
+	"github.com/BurntSushi/toml"
+endsnippet
+
+
+snippet IndexFunc "Index function" b
+func Index(vs []string, t string) int {
+		for i, v := range vs {
+				if v == t {
+						return i
+				}
+		}
+		return -1
+}
+endsnippet
+
+snippet FilterFunc "Filter function" b
+func Filter(vs []string, f func(string) bool) []string {
+		vsf := make([]string, 0)
+		for _, v := range vs {
+				if f(v) {
+						vsf = append(vsf, v)
+				}
+		}
+		return vsf
+}
+endsnippet
+
+snippet AnyFunc "Any function" b
+func Any(vs []string, f func(string) bool) bool {
+		for _, v := range vs {
+				if f(v) {
+						return true
+				}
+		}
+		return false
+}
+endsnippet
+
+snippet MapFunc "Map function" b
+func Map(vs []string, f func(string) string) []string {
+		vsm := make([]string, len(vs))
+		for i, v := range vs {
+				vsm[i] = f(v)
+		}
+		return vsm
+}
+endsnippet
+
+snippet AllFunc "All function" b
+func All(vs []string, f func(string) bool) bool {
+		for _, v := range vs {
+				if !f(v) {
+						return false
+				}
+		}
+		return true
+}
+endsnippet
+
+snippet fileNotExists "check if file not exists" b
+if _, err := os.Stat("$1"); os.IsNotExist(err) {
+	// path/to/whatever does not exist
+}
+endsnippet
+
+snippet fileExists "check if file exists" b
+if _, err := os.Stat("$1"); err == nil {
+	// path/to/whatever exists
+}
+endsnippet

@@ -188,8 +188,8 @@ let g:maplocalleader = ","
 set ambiwidth="double"
 let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
-  let s:fontbase="Fira_Code"
-  "let s:fontbase="Source_Code_Pro"
+  "let s:fontbase="Fira_Code"
+  let s:fontbase="Source_Code_Pro"
   "let s:fontbase="Ubuntu_Mono"
   let s:fontwide="Hiragino_Sans_GB"
 else
@@ -448,11 +448,17 @@ autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
 "--------------------------------------------------------------------------------
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=1
+let g:instant_markdown_autostart = 0
+let g:instant_markdown_slow = 1
 
 "vim-surroud: wrapping code
 autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
 let g:surround_indent = 0 " Disable indenting for surrounded text
 
+autocmd vimrc FileType markdown nmap <silent> <leader>p :call mdip#MarkdownClipboardImage()<CR>
+" there are some defaults for image directory and image name, you can change them
+let g:mdip_imgdir = 'images'
+" let g:mdip_imgname = 'image'
 
 "gulp
 "--------------------------------------------------------------------------------
@@ -501,6 +507,7 @@ if !exists("g:ycm_semantic_triggers")
 endif
 let g:ycm_semantic_triggers['typescript'] = ['.']
 let g:ycm_semantic_triggers['go'] = ['.', '->']
+let g:ycm_rust_src_path='/Users/jiyongdong/dev/rust/rustc-1.23.0-src/src'
 
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
 nnoremap <leader>jm :YcmCompleter GetDoc<CR>
@@ -533,6 +540,7 @@ let g:jedi#completions_enabled=0
 " tagbar settings
 "--------------------------------------------------------------------------------
 map <leader>t :TagbarToggle<cr>
+let g:tagbar_compact = 1
 if filereadable($VIMFILES . '/tagbar.conf')
     source $VIMFILES/tagbar.conf
 endif
@@ -557,7 +565,7 @@ function! s:JBeautify()
     call CSSBeautify()
   elseif &ft ==? 'html' || &ft ==? 'xhtml'
     call HtmlBeautify()
-  elseif &ft ==? 'javascript'
+  elseif &ft =~ 'javascript'
     call JsBeautify()
   elseif &ft ==? 'json'
     call JsonBeautify()
@@ -576,7 +584,8 @@ autocmd vimrc FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>
 
 "easy switching buffers
 "--------------------------------------------------------------------------------
-nnoremap <leader>b :buffers<CR>:buffer<Space>
+"nnoremap <leader>b :buffers<CR>:buffer<Space>
+nnoremap <leader>b :CtrlPBuffer<CR>
 
 " The Silver Searcher
 "--------------------------------------------------------------------------------
@@ -672,6 +681,7 @@ noremap <leader>nf :NERDTreeFind<cr>
 function! XmlUnescape()
   silent! execute ':%s/&lt;/</g'
   silent! execute ':%s/&gt;/>/g'
+  silent! execute ':%s/&amp;/\&/g'
 endfunction
 
 " Unescape \uXXXX sequences in selected lines
@@ -700,6 +710,25 @@ command! -nargs=* -bang Dot :call Dot(<bang>0, <q-args>)|redraw!
 let g:WMGraphviz_output = "svg"
 
 let g:previm_open_cmd = 'open -a "google chrome"'
+
+" vim-go
+let g:go_fmt_fail_silently = 1
+let g:go_highlight_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_build_constraints = 1
+let g:go_autodetect_gopath=1
+
+autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+
+" mysnippets template
+" T *
+source $VIMFILES/t.vim
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))

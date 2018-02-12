@@ -1,11 +1,17 @@
 snippet #! "shebang" b
-#!/bin/sh
+#!/usr/bin/env bash
 
-#Exit immediately if a command exits with a non-zero status
-set -e 
+set -o errexit
+set -o pipefail
+set -o nounset
+# set -o xtrace
 
-SCRIPT_PATH=\$( cd "\$( dirname "\$\{BASH_SOURCE[0]}" )" && pwd )
+__dir="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+__file="\${__dir}/\$(basename "\${BASH_SOURCE[0]}")"
+__base="\$(basename \${__file} .sh)"
+__root="\$(cd "\$(dirname "\${__dir}")" && pwd)" # <-- change this as it depends on your app
 
+arg1="\${1:-}"
 endsnippet
 
 snippet SCRIPT_PATH "script path" b
@@ -22,9 +28,20 @@ endsnippet
 
 snippet safe_add "safely append text to the specified file" b
 function safe-append() {
-    # \$1 filename, \$2 string to append
-    if [ -s "\$1" ] && ! grep -q "\$2" "\$1"; then
-        echo "\$2" >> \$1
-    fi
+		# \$1 filename, \$2 string to append
+		if [ -s "\$1" ] && ! grep -q "\$2" "\$1"; then
+				echo "\$2" >> \$1
+		fi
 }
+endsnippet
+
+snippet args "loop args" b
+while (( "\$#" )); do
+	if [[ \$(ls "\$1") == "" ]]; then 
+		echo "Empty directory, nothing to be done."
+	else 
+		find "\$1" -type f -a -atime +365 -exec rm -i {} \;
+	fi
+	shift
+done
 endsnippet
