@@ -1,13 +1,7 @@
-global !p
-import px.langs.go
-endglobal
-
-snippet iferr "if err != nil" b
-if err != nil {
-	return nil, err
-}
-endsnippet
-
+# global p
+# import px.langs.go
+# endglobal
+#
 
 snippet httpPost "httpPost" b
 func httpPostForm() error {
@@ -25,9 +19,7 @@ func httpPostForm() error {
 
 	fmt.Println(string(body))
 }
-
 endsnippet
-
 
 snippet httpDo "http more customizable" b
 func httpDo() {
@@ -214,17 +206,12 @@ func newfileUploadRequest(uri string, params map[string]string, paramName, path 
 endsnippet
 
 snippet assertEqual "assertEqual" b
-func assertEqual(t *testing.T, a interface{}, b interface{}, message string) {
-	if a == b {
-		return
+func assertEqual(t *testing.T, val interface{}, exp interface{}) {
+	if val != exp {
+		t.Errorf("Expected %v, got %v.", exp, val)
 	}
-	if len(message) == 0 {
-		message = fmt.Sprintf("%v != %v", a, b)
-	}
-	t.Fatal(message)
 }
 endsnippet
-
 
 snippet assertLib "testify/assert"
 //import "github.com/stretchr/testify/assert"
@@ -290,10 +277,11 @@ d := struct {
 $1
 }{}
 err := decoder.Decode(&d)
-if	err != nil {
-	return err
+if err != nil {
+	log.Println(err)
+	http.Error(w, http.StatusText(400), 400)
+	return
 }
-defer r.Body.Close()
 endsnippet
 
 
@@ -372,7 +360,91 @@ if _, err := os.Stat("$1"); os.IsNotExist(err) {
 endsnippet
 
 snippet fileExists "check if file exists" b
+if _, err := os.Stat("$1"); os.IsNotExist(err) {
+	// doesn't exist
+}
+
 if _, err := os.Stat("$1"); err == nil {
-	// path/to/whatever exists
+	// exists
+}
+endsnippet
+
+snippet timeformat "time.Now().Format(...)" b
+time.Now().Format("2006-01-02 03:04:05")
+tm.Format("2006-01-02 15:04:05")
+endsnippet
+
+
+snippet sig_usr1 "handle signal" b
+func toggleOutput(c chan os.Signal) {
+	for {
+		// This line will block until the signal is received
+		<-c
+
+		// Whenver the signal is received toggle the target writer. If it's stdout swap it with ioutil.Discard and vice versa.
+		mutex.Lock()
+		if writeTo == os.Stdout {
+			writeTo = ioutil.Discard
+		} else {
+			writeTo = os.Stdout
+		}
+		mutex.Unlock()
+	}
+}
+
+	c := make(chan os.Signal, 1)
+	// Send to channel c whenver you receive a SIGUSR1 signal.
+	signal.Notify(c, syscall.SIGUSR1)
+	go toggleOutput(c)
+
+endsnippet
+
+snippet hfm "handler func with receiver" w
+func (s *$1) $2(w http.ResponseWriter, r *http.Request) {
+$3
+}
+endsnippet
+
+snippet hfe "handler func embedded" w
+func (w http.ResponseWriter, r *http.Request) {
+$1
+}
+endsnippet
+
+snippet he500 "http error 500" b
+if err != nil {
+	http.Error(w, http.StatusText(500), 500)
+	return
+}
+endsnippet
+
+snippet he400 "http error 400" b
+if err != nil {
+	http.Error(w, http.StatusText(400), 400)
+	return
+}
+endsnippet
+
+snippet fors "for range slice" b
+for _, v := range $1 {
+	$2
+}
+endsnippet
+
+
+snippet form "for range map" b
+for k, v := range $1 {
+	$2
+}
+endsnippet
+
+
+snippet isMultipartForm "check content-type if multipart/formdata" b
+func isMultipartForm(r *http.Request) bool {
+	t := strings.ToLower(r.Header.Get("Content-Type"))
+	if strings.HasPrefix(t, "multipart/form-data") {
+		return true
+	}
+	return false
 }
 endsnippet

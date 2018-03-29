@@ -190,6 +190,7 @@ let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
   "let s:fontbase="Fira_Code"
   let s:fontbase="Source_Code_Pro"
+  let s:fontbase="PT_Mono"
   "let s:fontbase="Ubuntu_Mono"
   let s:fontwide="Hiragino_Sans_GB"
 else
@@ -683,6 +684,7 @@ function! XmlUnescape()
   silent! execute ':%s/&gt;/>/g'
   silent! execute ':%s/&amp;/\&/g'
 endfunction
+command! -nargs=0 UnescapeXml :call XmlUnescape()
 
 " Unescape \uXXXX sequences in selected lines
 function! UnescapeUnicode() range
@@ -726,9 +728,17 @@ autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit'
 autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
+noremap <F5> :GoBuild<cr>
+
 " mysnippets template
 " T *
+" TS xxx
 source $VIMFILES/t.vim
+
+" abbrev
+ca yc YcmCompleter
+ca se UltiSnipsEdit
+ca ips GoImports
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))

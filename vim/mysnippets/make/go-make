@@ -1,0 +1,12 @@
+FLAGS=-ldflags "-w -s"
+TARGET=sms-server
+
+linux-bin:
+	GOOS=linux GOARCH=amd64 go build -o ${TARGET} ${FLAGS}
+
+deploy:
+	fab -H root@172.16.18.211 -f scripts/fabfile.py deploy
+
+all: | linux-bin deploy
+
+# vim: noet

@@ -38,6 +38,7 @@ Plug 'junegunn/vim-easy-align'
 
 Plug 'tomtom/tcomment_vim'
 Plug 'scrooloose/nerdcommenter'
+Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'marijnh/tern_for_vim'
 Plug 'edkolev/tmuxline.vim'
@@ -104,6 +105,7 @@ Plug 'wannesm/wmgraphviz.vim'
 
 "EditorConfig
 Plug 'editorconfig/editorconfig-vim'
+Plug 'vim-scripts/DrawIt'
 
 "typescript
 Plug 'leafgarland/typescript-vim'
@@ -124,6 +126,10 @@ Plug 'evanmiller/nginx-vim-syntax'
 "Go
 Plug 'fatih/vim-go'
 
-" Python libraries for smarter Vim coding
+"Python libraries for smarter Vim coding
 Plug 'seletskiy/vim-pythonx'
+
+"docker
+Plug 'ekalinin/Dockerfile.vim'
+
 call plug#end() 

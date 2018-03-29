@@ -18,9 +18,6 @@ def import_var_from_vim(*var_names):
   return result
 EOS
 
-command! -nargs=1 -bang -complete=customlist,TplFileComplete
-                        \ T call InsertFile(<q-args>)
-
 fun! TplFileComplete(A,L,P)
 let p = a:A
 python <<EOF
@@ -31,14 +28,13 @@ ft = vim.eval('&ft')
 
 snippets_dir= os.environ['SNIPPETS']
 base_dir = snippets_dir
-if os.path.exists(os.path.join(base_dir, ft)):
+if ft and os.path.exists(os.path.join(base_dir, ft)):
   base_dir = os.path.join(base_dir, ft)
 
 if not pattern:
-  pattern = '**/*.*'
+  pattern = '**/*'
 if not '*' in pattern:
   pattern = pattern + '*'
-
 files = vim.eval('split(globpath(expand("{0}"), "{1}"), "\n")'.format(base_dir, pattern))
 n = len(base_dir) + 1
 files = map(lambda x: x[n:], files)
@@ -55,15 +51,56 @@ SNIPPETS_DIR = os.environ['SNIPPETS']
 fp = vim.eval('a:A')
 _, ext = os.path.splitext(fp)
 if not ext:
-  ft = vim.eval('&ft')
-  fp = fp + '.' + ft
+  ext = vim.eval("expand('%:p:e')")
+  if ext:
+    fp = fp + '.' + ext 
 
-if not os.path.exists(fp):
-  fp = os.path.join(SNIPPETS_DIR, fp)
-if os.path.exists(fp):
-  with open(fp, 'rb') as f:
+base_dir = SNIPPETS_DIR
+dst = os.path.join(base_dir, fp)
+if not os.path.exists(dst):
+  dst = os.path.join(SNIPPETS_DIR, ft, fp)
+if os.path.exists(dst):
+  with open(dst, 'rb') as f:
     content = f.readlines()
   r = vim.current.range
   r.append(content)
 EOF
 endfunc
+
+function! SelText() abort
+  try
+    let a_save = @a
+    silent! normal! gv"ay
+    return @a
+  finally
+    let @a = a_save
+  endtry
+endfunction
+
+fun! SaveTemplate(name)
+python <<EOF
+import vim
+import os
+
+name = vim.eval('a:name')
+ft = vim.eval('&ft')
+snippets_dir= os.environ['SNIPPETS']
+base_dir = os.path.join(snippets_dir,ft)
+if not os.path.exists(base_dir):
+  os.mkdir(base_dir)
+
+if not '.' in name:
+  name += '.' + vim.eval('expand("%:p:e")') 
+
+text = vim.eval('SelText()')
+fp = os.path.join(base_dir, name) 
+with open(fp, 'wb') as f:
+  f.write(text)
+EOF
+endfun
+
+
+command! -nargs=1 -range TS call SaveTemplate(<q-args>)
+command! -nargs=1 -bang -complete=customlist,TplFileComplete
+                        \ T call InsertFile(<q-args>)
+

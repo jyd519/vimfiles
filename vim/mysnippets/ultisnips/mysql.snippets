@@ -8,12 +8,12 @@ select count(*)
 into @exists
 from information_schema.tables 
 where table_schema = @db_name
-    and table_type = 'base table'
-    and table_name = '${1:tablename}';
+		and table_type = 'base table'
+		and table_name = '${1:tablename}';
 
 set @query = if(@exists>0,
-    'rename table $1 to ${2:newname}',
-    'select \'nothing to rename\' status');
+		'rename table $1 to ${2:newname}',
+		'select \'nothing to rename\' status');
 
 prepare stmt from @query;
 execute stmt;
