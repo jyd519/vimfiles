@@ -50,7 +50,6 @@ Plug 'bling/vim-airline'
 Plug 'kchmck/vim-coffee-script'
 Plug 'xolox/vim-easytags'
 Plug 'nathanaelkane/vim-indent-guides'
-Plug 'digitaltoad/vim-jade'
 Plug 'pangloss/vim-javascript'
 Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
@@ -59,8 +58,7 @@ Plug 'gilligan/vim-lldb', { 'on' : 'Lversion' }
 " Preview for VIM (Markdown, reStructuredText, textile)
 Plug 'kannokanno/previm'
 Plug 'plasticboy/vim-markdown'
-"Plug 'shime/vim-livedown'
-Plug 'ferrine/md-img-paste.vim'
+Plug 'jyd519/md-img-paste.vim'
 
 Plug 'godlygeek/tabular'
 Plug 'xolox/vim-misc'
@@ -73,12 +71,12 @@ Plug 'tpope/vim-repeat'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'majutsushi/tagbar'
 
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+Plug 'Valloric/YouCompleteMe' 
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 
 Plug 'thinca/vim-quickrun'
 
-Plug 'jiangmiao/auto-pairs', {'on': 'AutoPair'}
+Plug 'jiangmiao/auto-pairs'
 Plug 'tmhedberg/matchit'
 Plug 'AndrewRadev/splitjoin.vim'
 
@@ -106,6 +104,7 @@ Plug 'wannesm/wmgraphviz.vim'
 "EditorConfig
 Plug 'editorconfig/editorconfig-vim'
 Plug 'vim-scripts/DrawIt'
+Plug 'rhysd/vim-clang-format'
 
 "typescript
 Plug 'leafgarland/typescript-vim'
@@ -121,13 +120,14 @@ Plug 'moll/vim-node'
 Plug 'geekjuice/vim-mocha'
 
 "nginx
-Plug 'evanmiller/nginx-vim-syntax'
+Plug 'chr4/nginx.vim'
 
 "Go
-Plug 'fatih/vim-go'
+Plug 'fatih/vim-go', { 'for': 'go', 'tag': '*' }
 
-"Python libraries for smarter Vim coding
-Plug 'seletskiy/vim-pythonx'
+"Rust
+Plug 'rust-lang/rust.vim'
+Plug 'racer-rust/vim-racer'
 
 "docker
 Plug 'ekalinin/Dockerfile.vim'

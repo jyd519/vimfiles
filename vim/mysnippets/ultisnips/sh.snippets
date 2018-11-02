@@ -45,3 +45,24 @@ while (( "\$#" )); do
 	shift
 done
 endsnippet
+
+
+snippet ostype "case ostype" b
+case "$OSTYPE" in
+	solaris*) echo "SOLARIS" ;;
+	darwin*)	echo "OSX" ;; 
+	linux*)		echo "LINUX" ;;
+	bsd*)			echo "BSD" ;;
+	msys*)		echo "WINDOWS" ;;
+	*)				echo "unknown: $OSTYPE" ;;
+esac
+endsnippet
+
+snippet ifostuype "check os type" b
+if [[ "$OSTYPE" =~ ^linux ]]; then
+	echo "linux"
+fi
+if [[ "$OSTYPE" =~ ^darwin]]; then
+	echo "darwin"
+fi
+endsnippet

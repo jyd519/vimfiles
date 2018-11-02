@@ -1,26 +1,26 @@
 snippet ng2-component "ng2-component"
 import { Component, OnInit } from '@angular/core';
 @Component({
-  moduleId: module.id,
-  selector: '${1:#:selector}',
-  templateUrl: '${2:#:name}.component.html'
+	moduleId: module.id,
+	selector: '${1:#:selector}',
+	templateUrl: '${2:#:name}.component.html'
 })
 export class ${1:#:ComponentName}Component implements OnInit {
-  constructor() { }
-  ngOnInit() { }
-  ${0}
+	constructor() { }
+	ngOnInit() { }
+	${0}
 }
 endsnippet
 
 snippet ng2-pipe "ng2-pipe"
 import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
-  name: '${name}'
+	name: '${name}'
 })
 export class ${1:#:PipeName}Pipe implements PipeTransform {
-  transform(value: any, args: any[]): any {
-    ${0}
-  }
+	transform(value: any, args: any[]): any {
+		${0}
+	}
 }
 endsnippet
 
@@ -40,17 +40,17 @@ import { HTTP_PROVIDERS } from '@angular/http';
 import { Routes, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router';
 import 'rxjs/Rx'; // load the full rxjs
 @Component({
-  moduleId: module.id,
-  selector: '${1:#:selector}',
-  templateUrl: '${2:#:name}.component.html',
-  directives: [ROUTER_DIRECTIVES],
-  providers: [
-    HTTP_PROVIDERS,
-    ROUTER_PROVIDERS
-  ]
+	moduleId: module.id,
+	selector: '${1:#:selector}',
+	templateUrl: '${2:#:name}.component.html',
+	directives: [ROUTER_DIRECTIVES],
+	providers: [
+		HTTP_PROVIDERS,
+		ROUTER_PROVIDERS
+	]
 })
 @Routes([
-  ${0}
+	${0}
 ])
 export class AppComponent {}
 endsnippet
@@ -63,13 +63,55 @@ snippet Promise "Return Promise" b
 return new Promise<${1:any}>((resolve, reject) => {
 	$2
 });
+
 endsnippet
 
-snippet then "Promise then" w
-then( (res) => {$1} )
-.catch( (err) => {$2} );
+snippet np "return new Promise" b
+return new Promise<${1:any}>((resolve, reject) => {
+	$2
+});
+endsnippet
+
+snippet then "Promise then" i
+then((res) => {$1})
+.catch((err) => {$2});
 endsnippet
 
 snippet arrow "() => {}" w
 ($1) => { $2 }
+endsnippet
+
+
+snippet myerrore "Custom Error(extends)" b
+export class ${1:HttpError} extends Error {
+	static name: string;
+	constructor(public code: number, message: string) {
+		super(message);
+		// V8 only
+		Error.captureStackTrace(this, this.constructor);
+		this.name = '$1';
+	}
+}
+endsnippet
+
+snippet myerrorn "Custom Error Func(inherits)" b
+// import * as util from "util";
+const ${1:CustomError1} = function(message) {
+		this.name = '$1';
+		this.message = message;
+		// V8 only
+		Error.captureStackTrace && Error.captureStackTrace(this, this.constructor);
+};
+util.inherits($1, Error);
+endsnippet
+
+snippet myerrorn "Custom Error Func" b
+function ${1:userError}(message: string) {
+	const error = Error(message);
+	error.message = message;
+	if (Error.captureStackTrace) {
+		Error.captureStackTrace(error, $1);
+	}
+	return error
+}
 endsnippet

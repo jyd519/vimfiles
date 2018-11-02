@@ -61,6 +61,9 @@ set foldmethod=indent   "fold based on indent
 set foldnestmax=3       "deepest fold is 3 levels
 set nofoldenable        "dont fold by default
 
+" Eliminating delays on ESC
+set timeoutlen=1000 ttimeoutlen=30
+
 set scrolloff=2
 set guioptions-=T
 set linespace=6
@@ -77,7 +80,6 @@ set completeopt=menuone,longest,preview
 if has("gui_running")
   set ballooneval
   set balloondelay=100
-  set cursorline
 endif
 
 " Keep screen after vim exited
@@ -145,6 +147,21 @@ if has("mac")
   " au! vimrc InsertEnter * call Fcitx2zh()
 endif
 
+" Enable / disable cusorline between insert mode and non-insert mode
+function! SetCursorLine()
+  set cursorline
+  hi cursorline cterm=none term=none
+  hi CursorLine guibg=lightblue ctermbg=229
+endfunction
+
+function! SetNoCursorLine()
+  set nocursorline
+endfunction
+
+" autocmd! vimrc InsertEnter * call SetCursorLine()
+" autocmd! vimrc InsertLeave * call SetNoCursorLine()
+
+" set default help language to zh_CN
 set helplang=cn
 set langmenu=zh_CN.utf-8
 language message zh_CN.utf-8
@@ -157,6 +174,7 @@ endif
 " enable syntax highlighting
 syntax on
 syntax sync minlines=256
+set synmaxcol=300
 
 "color pyte
 "color DarkBlue
@@ -185,19 +203,24 @@ let g:maplocalleader = ","
 "font
 "set guifont=Consolas:h12:cANSI
 "let s:fontbase="Consolas"
+let s:font_size=14
 set ambiwidth="double"
 let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
   "let s:fontbase="Fira_Code"
   let s:fontbase="Source_Code_Pro"
   let s:fontbase="PT_Mono"
+  let s:fontbase="Anonymous_Pro"
   "let s:fontbase="Ubuntu_Mono"
   let s:fontwide="Hiragino_Sans_GB"
+  "let s:fontwide="SimHei"
+  if has("gui_running")
+    let s:fontbase="PT_Mono"
+  endif
 else
   let s:fontbase="Ubuntu_Mono"
   let s:fontwide="NSimSun"
 endif
-let s:font_size=14
 
 execute "set guifont=". s:fontbase . ":h" . s:font_size
 execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
@@ -434,11 +457,13 @@ augroup end
 "ctrlp settings
 "--------------------------------------------------------------------------------
 let g:ctrlp_custom_ignore = {
-                              \ 'dir':  '\v[\/]\.(git|hg|svn)$',
+                              \ 'dir':  '\v[\/]\.(git|hg|svn|node_modules)$',
                               \ 'file': '\v\.(exe|so|dll)$',
                               \ 'link': 'some_bad_symbolic_links',
                               \ }
-let g:ctrlp_working_path_mode = ''
+let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_max_files = 10000
+let g:ctrlp_max_depth = 20
 
 "cmake
 "--------------------------------------------------------------------------------
@@ -455,7 +480,6 @@ let g:instant_markdown_slow = 1
 "vim-surroud: wrapping code
 autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
 let g:surround_indent = 0 " Disable indenting for surrounded text
-
 autocmd vimrc FileType markdown nmap <silent> <leader>p :call mdip#MarkdownClipboardImage()<CR>
 " there are some defaults for image directory and image name, you can change them
 let g:mdip_imgdir = 'images'
@@ -488,27 +512,57 @@ let g:syntastic_javascript_checkers = ['eslint']
 
 "ALE
 "--------------------------------------------------------------------------------
-let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['tslint']}
+let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['tslint'], 'go': ['gometalinter', 'gofmt']}
+let g:ale_pattern_options = {
+      \ '\.min.js$': {'ale_enabled': 0},
+      \ '\v\.(m|mm|cpp|cxx|cc|h|hpp)$': {'ale_enabled': 0}
+      \}
+let g:ale_go_gometalinter_options = '--fast --config=~/.gometalinter'
 
 " Editing a protected file as 'sudo'
 "cmap W w !sudo tee % >/dev/null
 command! W w !sudo tee % > /dev/null
 
+
+" tcomment
+"--------------------------------------------------------------------------------
+let g:tcomment#options_comments = {'whitespace': 'no'}
+let g:tcomment#options_commentstring = {'whitespace': 'no'}
+
 " ycm
 "--------------------------------------------------------------------------------
-let g:ycm_min_num_of_chars_for_completion = 1
+let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_use_ultisnips_completer = 1
-let g:ycm_filepath_completion_use_working_dir = 1
-let g:ycm_collect_identifiers_from_tags_files = 1
-let g:ycm_key_invoke_completion = '<C-Space>'
-
+let g:ycm_filepath_completion_use_working_dir = 0
+let g:ycm_collect_identifiers_from_tags_files = 0
+let g:ycm_key_invoke_completion = ''
+let g:ycm_python_binary_path = 'python'
 if !exists("g:ycm_semantic_triggers")
   let g:ycm_semantic_triggers = {}
 endif
-let g:ycm_semantic_triggers['typescript'] = ['.']
-let g:ycm_semantic_triggers['go'] = ['.', '->']
-let g:ycm_rust_src_path='/Users/jiyongdong/dev/rust/rustc-1.23.0-src/src'
+let g:ycm_semantic_triggers =  {
+            \   'c' : ['->', '.'],
+            \   'objc' : ['->', '.'],
+            \   'ocaml' : ['.', '#'],
+            \   'cpp,objcpp' : ['->', '.', '::'],
+            \   'perl' : ['->'],
+            \   'php' : ['->', '::', '"', "'", 'use ', 'namespace ', '\'],
+            \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,go' : ['.'],
+            \   'html': ['<', '"', '</', ' '],
+            \   'vim' : ['re![_a-za-z]+[_\w]*\.'],
+            \   'ruby' : ['.', '::'],
+            \   'lua' : ['.', ':'],
+            \   'erlang' : [':'],
+            \   'haskell' : ['.', 're!.']
+            \ }
+
+" Rust
+au FileType rust nmap gd <Plug>(rust-def)
+au FileType rust nmap gs <Plug>(rust-def-split)
+au FileType rust nmap gx <Plug>(rust-def-vertical)
+au FileType rust nmap <leader>gd <Plug>(rust-doc)
+" let g:ycm_rust_src_path='/Users/jiyongdong/dev/rust/rustc-1.23.0-src/src'
 
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
 nnoremap <leader>jm :YcmCompleter GetDoc<CR>
@@ -581,7 +635,6 @@ autocmd vimrc FileType json vnoremap <buffer> <c-f> :call RangeJsonBeautify()<cr
 autocmd vimrc FileType jsx vnoremap <buffer> <c-f> :call RangeJsxBeautify()<cr>
 autocmd vimrc FileType html vnoremap <buffer> <c-f> :call RangeHtmlBeautify()<cr>
 autocmd vimrc FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>
-
 
 "easy switching buffers
 "--------------------------------------------------------------------------------
@@ -715,13 +768,14 @@ let g:previm_open_cmd = 'open -a "google chrome"'
 
 " vim-go
 let g:go_fmt_fail_silently = 1
+let g:go_highlight_structs=1
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_build_constraints = 1
-let g:go_autodetect_gopath=1
+" let g:go_autodetect_gopath=1
 
 autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')

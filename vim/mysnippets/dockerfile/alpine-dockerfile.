@@ -1,0 +1,10 @@
+FROM alpine:3.8
+
+
+RUN apk update &&\
+    apk add --no-cache shadow su-exec 
+
+COPY entrypoint.sh /entrypoint.sh
+COPY alias.sh /etc/profile.d/aliases.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

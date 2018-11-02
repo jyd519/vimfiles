@@ -1,5 +1,3 @@
-package web
-
 import (
 	"context"
 	"net/http"

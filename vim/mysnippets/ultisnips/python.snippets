@@ -279,3 +279,12 @@ def stage_set(stage_name='test'):
 
 require('stage', provided_by=(test,production,))
 endsnippet
+
+snippet fileinuse "check if file in use" w
+try:
+	open( p.join( xxx ), 'a' ).close()
+except IOError as error:
+	if error.errno == errno.EACCES:
+		sys.exit( 'ERROR: xxx is currently in use. ' )
+endsnippet
+

@@ -1,7 +1,10 @@
-# global p
-# import px.langs.go
-# endglobal
-#
+snippet urlJoin "join url paths" b
+func urlJoin(base, elem ...string) string {
+	u, _ := url.Parse(base)
+	u.Path = path.Join(append([]string{u.Path}, elem...)...)
+	return u.String()
+}
+endsnippet
 
 snippet httpPost "httpPost" b
 func httpPostForm() error {
@@ -354,23 +357,21 @@ func All(vs []string, f func(string) bool) bool {
 endsnippet
 
 snippet fileNotExists "check if file not exists" b
-if _, err := os.Stat("$1"); os.IsNotExist(err) {
-	// path/to/whatever does not exist
+if _, err := os.Stat(${1:p}); os.IsNotExist(err) {
+	// does not exist
+	$2
 }
 endsnippet
 
 snippet fileExists "check if file exists" b
-if _, err := os.Stat("$1"); os.IsNotExist(err) {
-	// doesn't exist
-}
-
-if _, err := os.Stat("$1"); err == nil {
+if _, err := os.Stat(${1:p}); err == nil {
 	// exists
+	$2
 }
 endsnippet
 
 snippet timeformat "time.Now().Format(...)" b
-time.Now().Format("2006-01-02 03:04:05")
+time.Now().Format("2006-01-02 15:04:05")
 tm.Format("2006-01-02 15:04:05")
 endsnippet
 
