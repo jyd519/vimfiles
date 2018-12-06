@@ -383,6 +383,7 @@ let g:SuperTabDefaultCompletionType='<c-x><c-u><c-p>'
 let g:pydiction_location=$VIMFILES . '/plugged/pydiction/complete-dict/'
 let g:pydiction_menu_height = 20
 au vimrc BufEnter *.py nmap <f9> :!python %<CR>
+au vimrc FileType python setlocal equalprg=autopep8\ -
 
 "NSIS
 "--------------------------------------------------------------------------------
@@ -477,6 +478,14 @@ let g:vim_markdown_initial_foldlevel=1
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
 
+let g:tagbar_type_markdown = {
+    \ 'ctagstype' : 'markdown',
+    \ 'kinds' : [
+        \ 'h:Heading_L1',
+        \ 'i:Heading_L2',
+        \ 'k:Heading_L3'
+    \ ]
+\ }
 "vim-surroud: wrapping code
 autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
 let g:surround_indent = 0 " Disable indenting for surrounded text

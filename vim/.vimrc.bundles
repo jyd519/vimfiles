@@ -132,4 +132,8 @@ Plug 'racer-rust/vim-racer'
 "docker
 Plug 'ekalinin/Dockerfile.vim'
 
+Plug 'chrisbra/unicode.vim'
+
+Plug 'tell-k/vim-autopep8'
+
 call plug#end() 

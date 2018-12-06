@@ -1,4 +1,4 @@
-python << EOS
+py3 << EOS
 def vim2py(name):
   """Get Vim's variable from Python's world"""
   return vim.eval(name)
@@ -60,10 +60,7 @@ dst = os.path.join(base_dir, fp)
 if not os.path.exists(dst):
   dst = os.path.join(SNIPPETS_DIR, ft, fp)
 if os.path.exists(dst):
-  with open(dst, 'rb') as f:
-    content = f.readlines()
-  r = vim.current.range
-  r.append(content)
+  vim.command('r ' + dst)
 EOF
 endfunc
 

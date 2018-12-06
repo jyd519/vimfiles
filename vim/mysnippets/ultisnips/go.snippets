@@ -275,16 +275,19 @@ func (g *GzippedText) Scan(src interface{}) error {
 endsnippet
 
 snippet decode "decode http body" b
-decoder := json.NewDecoder(r.Body)
-d := struct {
+req := struct {
 $1
 }{}
-err := decoder.Decode(&d)
-if err != nil {
-	log.Println(err)
+decoder := json.NewDecoder(r.Body)
+if err := decoder.Decode(&req); err != nil {
+	log.Println("parse body failure:", err)
 	http.Error(w, http.StatusText(400), 400)
 	return
 }
+endsnippet
+
+snippet imerrors "add errors package" b
+"github.com/pkg/errors"
 endsnippet
 
 
@@ -449,3 +452,22 @@ func isMultipartForm(r *http.Request) bool {
 	return false
 }
 endsnippet
+
+
+snippet Batch "batch db operations" i 
+$1.Batch(func(tx store.Tx) error {
+	$2
+	return nil
+})
+endsnippet
+
+
+snippet action "actor_send_msg" b
+done := make(chan struct{})
+s.actions <- func() {
+	defer close(done)
+	$1
+}
+<-done
+endsnippet
+
