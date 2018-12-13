@@ -80,6 +80,8 @@ set completeopt=menuone,longest,preview
 if has("gui_running")
   set ballooneval
   set balloondelay=100
+else
+  set termguicolors
 endif
 
 " Keep screen after vim exited
@@ -176,6 +178,14 @@ syntax on
 syntax sync minlines=256
 set synmaxcol=300
 
+let g:PaperColor_Theme_Options = {
+  \   'theme': {
+  \     'default': {
+  \       'transparent_background': 1
+  \     }
+  \   }
+  \ }
+
 "color pyte
 "color DarkBlue
 "color solarized
@@ -184,12 +194,14 @@ set synmaxcol=300
 "color molokai
 "color wombat
 "color inkpot
+"color PaperColor
 if has("gui_running")
   color vc
 else
   "color peachpuff
-  color vc
+  color PaperColor
 endif
+
 
 "windows size
 if has("win32")
@@ -201,22 +213,18 @@ let g:mapleader = ","
 let g:maplocalleader = ","
 
 "font
-"set guifont=Consolas:h12:cANSI
-"let s:fontbase="Consolas"
 let s:font_size=14
 set ambiwidth="double"
 let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
   "let s:fontbase="Fira_Code"
-  let s:fontbase="Source_Code_Pro"
+  "let s:fontbase="Ubuntu_Mono"
   let s:fontbase="PT_Mono"
   let s:fontbase="Anonymous_Pro"
-  "let s:fontbase="Ubuntu_Mono"
+  let s:fontbase="Source_Code_Pro"
+
   let s:fontwide="Hiragino_Sans_GB"
   "let s:fontwide="SimHei"
-  if has("gui_running")
-    let s:fontbase="PT_Mono"
-  endif
 else
   let s:fontbase="Ubuntu_Mono"
   let s:fontwide="NSimSun"
@@ -475,17 +483,10 @@ autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
 "--------------------------------------------------------------------------------
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=1
+let g:vim_markdown_toc_autofit = 1
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
 
-let g:tagbar_type_markdown = {
-    \ 'ctagstype' : 'markdown',
-    \ 'kinds' : [
-        \ 'h:Heading_L1',
-        \ 'i:Heading_L2',
-        \ 'k:Heading_L3'
-    \ ]
-\ }
 "vim-surroud: wrapping code
 autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
 let g:surround_indent = 0 " Disable indenting for surrounded text
@@ -493,6 +494,21 @@ autocmd vimrc FileType markdown nmap <silent> <leader>p :call mdip#MarkdownClipb
 " there are some defaults for image directory and image name, you can change them
 let g:mdip_imgdir = 'images'
 " let g:mdip_imgname = 'image'
+let s:mdctags_path = expand('$VIMFILES').'/tools/markdown2ctags.py'
+let g:tagbar_type_markdown = {
+            \ 'ctagsbin'  : s:mdctags_path,
+            \ 'ctagsargs' : '-f - --sort=yes',
+            \ 'kinds' : [
+            \     's:sections',
+            \     'i:images',
+            \     '?:unknown',
+            \   ],
+            \ 'sro' : '|',
+            \ 'kind2scope' : {
+            \     's' : 'section',
+            \   },
+            \ 'sort': 0,
+            \ }
 
 "gulp
 "--------------------------------------------------------------------------------

@@ -18,6 +18,7 @@ call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'flazz/vim-colorschemes'
+" Plug 'rafi/awesome-vim-colorschemes'
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'ctrlpvim/ctrlp.vim'
@@ -55,11 +56,6 @@ Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
 Plug 'gilligan/vim-lldb', { 'on' : 'Lversion' } 
 
-" Preview for VIM (Markdown, reStructuredText, textile)
-Plug 'kannokanno/previm'
-Plug 'plasticboy/vim-markdown'
-Plug 'jyd519/md-img-paste.vim'
-
 Plug 'godlygeek/tabular'
 Plug 'xolox/vim-misc'
 Plug 'terryma/vim-multiple-cursors'
@@ -70,6 +66,11 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'majutsushi/tagbar'
+
+" Preview for VIM (Markdown, reStructuredText, textile)
+Plug 'kannokanno/previm'
+Plug 'plasticboy/vim-markdown'
+Plug 'jyd519/md-img-paste.vim'
 
 Plug 'Valloric/YouCompleteMe' 
 Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
