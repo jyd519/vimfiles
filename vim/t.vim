@@ -1,4 +1,4 @@
-py << EOS
+py3 << EOS
 def vim2py(name):
   """Get Vim's variable from Python's world"""
   return vim.eval(name)
@@ -20,7 +20,7 @@ EOS
 
 fun! TplFileComplete(A,L,P)
 let p = a:A
-py <<EOF
+py3 <<EOF
 import vim
 import os
 pattern = vim.eval('p')
@@ -44,7 +44,7 @@ return files
 endfun
 
 function! InsertFile(A)
-python <<EOF
+py3 <<EOF
 import os
 import vim
 SNIPPETS_DIR = os.environ['SNIPPETS']
@@ -75,7 +75,7 @@ function! SelText() abort
 endfunction
 
 fun! SaveTemplate(name)
-python <<EOF
+py3 <<EOF
 import vim
 import os
 
