@@ -23,8 +23,12 @@ if filereadable(expand("~/.vimrc.before"))
   source ~/.vimrc.before
 endif
 
-if filereadable(expand('$VIMFILES/.vimrc.bundles'))
-  source $VIMFILES/.vimrc.bundles
+if $VIM_MODE =~ 'man'
+    source $VIMFILES/.vimrc.man.bundles
+else
+  if filereadable(expand('$VIMFILES/.vimrc.bundles'))
+    source $VIMFILES/.vimrc.bundles
+  endif
 endif
 
 set rtp+=$VIMFILES/after
@@ -89,6 +93,11 @@ endif
 
 set path=.,./include/**/*,/usr/local/include,/usr/include
 
+if has('nvim')
+  let g:python_host_prog = $HOME . '/.virtualenvs/py2/bin/python'
+  let g:python3_host_prog = $HOME . '/.virtualenvs/py3/bin/python'
+endif
+
 " Default sh is Bash
 let g:bash_is_sh=1
 
@@ -127,26 +136,28 @@ set statusline=\ %F%m%r%h\ %w\ %y\ %{getcwd()}\ \ \ Line:\ %l/%L:%c
 set laststatus=2
 
 "On mac os x, disable IME when we enter normal mode
-function! Fcitx2en()
-  let input_status = system('fcitx-remote')
-  if input_status == 2 "cn
+function! Ime_en()
+  let input_status = system('im-select')
+  if input_status != "com.apple.keylayout.ABC"
     let b:inputtoggle = 1
-    call system('fcitx-remote -c') "use en ime
+    call system('im-select com.apple.keylayout.ABC') "use en ime
   endif
 endfunction
-function! Fcitx2zh()
+
+function! Ime_zh()
   try
     if b:inputtoggle == 1
-      call system('fcitx-remote -s com.sogou.inputmethod.sogou.pinyin')
+      call system('im-select com.apple.inputmethod.SCIM.ITABC')
       let b:inputtoggle = 0
     endif
   catch /inputtoggle/
     let b:inputtoggle = 0
   endtry
 endfunction
+
 if has("mac")
-  " au! vimrc InsertLeave * call Fcitx2en()
-  " au! vimrc InsertEnter * call Fcitx2zh()
+  au! vimrc InsertLeave * call Ime_en()
+  au! vimrc InsertEnter * call Ime_zh()
 endif
 
 " Enable / disable cusorline between insert mode and non-insert mode
@@ -186,6 +197,8 @@ let g:PaperColor_Theme_Options = {
   \   }
   \ }
 
+set background=light
+
 "color pyte
 "color DarkBlue
 "color solarized
@@ -217,21 +230,21 @@ let s:font_size=14
 set ambiwidth="double"
 let s:fontbase="Bitstream_Vera_Sans_Mono"
 if has("mac")
-  "let s:fontbase="Fira_Code"
-  "let s:fontbase="Ubuntu_Mono"
-  let s:fontbase="PT_Mono"
-  let s:fontbase="Anonymous_Pro"
-  let s:fontbase="Source_Code_Pro"
-
-  let s:fontwide="Hiragino_Sans_GB"
-  "let s:fontwide="SimHei"
+  " let s:fontbase="Ubuntu_Mono"
+  " let s:fontbase="PT_Mono"
+  " let s:fontbase="Anonymous_Pro"
+  " let s:fontbase="Source_Code_Pro"
+  let s:fontbase="FiraCode-Light"
+  let s:fontwide="Lantinghei_TC"
 else
   let s:fontbase="Ubuntu_Mono"
   let s:fontwide="NSimSun"
 endif
 
-execute "set guifont=". s:fontbase . ":h" . s:font_size
-execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
+if !has('gui_vimr')
+  execute "set guifont=". s:fontbase . ":h" . s:font_size
+  execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
+endif
 
 function! s:IncFontSize()
   let s:font_size+=1
@@ -551,8 +564,8 @@ command! W w !sudo tee % > /dev/null
 
 " tcomment
 "--------------------------------------------------------------------------------
-let g:tcomment#options_comments = {'whitespace': 'no'}
-let g:tcomment#options_commentstring = {'whitespace': 'no'}
+let g:tcomment#options_comments = {'whitespace': 'left'}
+let g:tcomment#options_commentstring = {'whitespace': 'left'}
 
 " ycm
 "--------------------------------------------------------------------------------
@@ -587,7 +600,6 @@ au FileType rust nmap gd <Plug>(rust-def)
 au FileType rust nmap gs <Plug>(rust-def-split)
 au FileType rust nmap gx <Plug>(rust-def-vertical)
 au FileType rust nmap <leader>gd <Plug>(rust-doc)
-" let g:ycm_rust_src_path='/Users/jiyongdong/dev/rust/rustc-1.23.0-src/src'
 
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
 nnoremap <leader>jm :YcmCompleter GetDoc<CR>

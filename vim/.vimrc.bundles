@@ -18,11 +18,14 @@ call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'flazz/vim-colorschemes'
-" Plug 'rafi/awesome-vim-colorschemes'
+
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'ctrlpvim/ctrlp.vim'
+
 Plug 'easymotion/vim-easymotion'
+Plug 'justinmk/vim-sneak'
+
 Plug 'mattn/emmet-vim'
 Plug 'kelan/gyp.vim'
 Plug 'Shutnik/jshint2.vim'
@@ -38,7 +41,6 @@ Plug 'w0rp/ale'
 Plug 'junegunn/vim-easy-align'
 
 Plug 'tomtom/tcomment_vim'
-Plug 'scrooloose/nerdcommenter'
 Plug 'dhruvasagar/vim-table-mode'
 
 Plug 'marijnh/tern_for_vim'
@@ -56,7 +58,6 @@ Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
 Plug 'gilligan/vim-lldb', { 'on' : 'Lversion' } 
 
-Plug 'godlygeek/tabular'
 Plug 'xolox/vim-misc'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'xolox/vim-session'
@@ -68,7 +69,7 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'majutsushi/tagbar'
 
 " Preview for VIM (Markdown, reStructuredText, textile)
-Plug 'kannokanno/previm'
+Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'jyd519/md-img-paste.vim'
 
@@ -83,9 +84,6 @@ Plug 'AndrewRadev/splitjoin.vim'
 
 "git
 Plug 'airblade/vim-gitgutter'
-
-"A solid language pack 
-Plug 'sheerun/vim-polyglot'
 
 "Gist
 Plug 'mattn/webapi-vim'
@@ -133,6 +131,7 @@ Plug 'racer-rust/vim-racer'
 "docker
 Plug 'ekalinin/Dockerfile.vim'
 
+" Input unicode characters
 Plug 'chrisbra/unicode.vim'
 
 Plug 'tell-k/vim-autopep8'

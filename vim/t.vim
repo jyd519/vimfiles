@@ -1,4 +1,4 @@
-py3 << EOS
+py << EOS
 def vim2py(name):
   """Get Vim's variable from Python's world"""
   return vim.eval(name)
@@ -20,7 +20,7 @@ EOS
 
 fun! TplFileComplete(A,L,P)
 let p = a:A
-python <<EOF
+py <<EOF
 import vim
 import os
 pattern = vim.eval('p')
