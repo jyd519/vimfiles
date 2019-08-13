@@ -4,3 +4,7 @@ snippet #ifndef "c include guard" b
 
 #endif //${1/([A-Za-z0-9_]+).*/$1/}
 endsnippet
+
+snippet napi_method "napi method prototype" b
+Napi::Value ${1:name}(const Napi::CallbackInfo& info)
+endsnippet

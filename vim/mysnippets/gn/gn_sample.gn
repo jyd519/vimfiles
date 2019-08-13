@@ -1,0 +1,50 @@
+config("includes") {
+  include_dirs = [ "src" ]
+}
+
+config("ignored_warnings") {
+  if (is_win) {
+    cflags = [
+      "/wd4131",  # old-style declarator
+      "/wd4127",  # conditional expression is constant
+      "/wd4244",  # possible loss of data on type conversion
+      "/wd4996",  # deprecated 'open'
+    ]
+  } else {
+    cflags = [
+      "-Wno-implicit-function-declaration",
+      "-Wno-shift-negative-value",
+    ]
+  }
+}
+
+static_library("sqlcipher_lib") {
+  sources = [
+         "sqlite3.c", "sqlite3.h"
+  ]
+
+  deps += [ "//third_party/boringssl" ]
+
+  if (is_win) {
+    defines = [ "_REENTRANT=1",
+                "SQLITE_HAS_CODEC",
+                "SQLITE_TEMP_STORE=2",
+                "SQLITE_THREADSAFE=1",
+                "SQLITE_ENABLE_FTS3",
+                "SQLITE_ENABLE_FTS4",
+                "SQLITE_ENABLE_FTS5",
+                "SQLITE_ENABLE_JSON1",
+                "SQLITE_ENABLE_RTREE" ]
+  }
+
+  configs += [ ":ignored_warnings" ]
+
+  public_configs = [ ":includes" ]
+}
+
+executable("sqlcipher") {
+  sources = [ "shell.c" ]
+  deps += ["sqlcipher_lib",  "//third_party/boringssl" ]
+
+  configs = [ ":includes" ]
+}

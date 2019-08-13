@@ -87,6 +87,7 @@ export class ${1:HttpError} extends Error {
 	static name: string;
 	constructor(public code: number, message: string) {
 		super(message);
+		Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
 		// V8 only
 		Error.captureStackTrace(this, this.constructor);
 		this.name = '$1';
