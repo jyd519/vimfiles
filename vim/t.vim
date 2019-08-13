@@ -1,4 +1,15 @@
-py3 << EOS
+if !(has('python') || has('python3'))
+  echo "Error: T.vim requires vim compiled with +python"
+  finish
+endif
+
+if has('python')
+  command! -nargs=* Py python <args>
+elseif has('python3')
+  command! -nargs=* Py python3 <args>
+endif
+
+Py << EOS
 def vim2py(name):
   """Get Vim's variable from Python's world"""
   return vim.eval(name)
@@ -6,24 +17,26 @@ def vim2py(name):
 def py2vim(name):
   """Export Python's variable to Vim world"""
   cmd = "let %s = %s" % (name , repr(eval(name)))
+  print(cmd)
   vim.command(cmd)
 
 def export_var_to_vim(*var_names):
-  for var_name in var_names: py2vim(var_name)
+  for var_name in var_names: 
+    py2vim(var_name)
 
 def import_var_from_vim(*var_names):
   """Import Vim's variable to Python world"""
   result = {}
-  for var_name in var_names: result[var_name] = vim2py(var_name)
+  for var_name in var_names:
+    result[var_name] = vim2py(var_name)
   return result
 EOS
 
-fun! TplFileComplete(A,L,P)
-let p = a:A
-py3 <<EOF
+fun! MyTComplete(A,L,P)
+Py <<EOF
 import vim
 import os
-pattern = vim.eval('p')
+pattern = vim.eval('a:A')
 ft = vim.eval('&ft')
 
 snippets_dir= os.environ['SNIPPETS']
@@ -37,14 +50,14 @@ if not '*' in pattern:
   pattern = pattern + '*'
 files = vim.eval('split(globpath(expand("{0}"), "{1}"), "\n")'.format(base_dir, pattern))
 n = len(base_dir) + 1
-files = map(lambda x: x[n:], files)
+files = list(map(lambda x: x[n:], files))
 export_var_to_vim("files")
 EOF
 return files
 endfun
 
 function! InsertFile(A)
-py3 <<EOF
+Py <<EOF
 import os
 import vim
 SNIPPETS_DIR = os.environ['SNIPPETS']
@@ -75,7 +88,7 @@ function! SelText() abort
 endfunction
 
 fun! SaveTemplate(name)
-py3 <<EOF
+Py <<EOF
 import vim
 import os
 
@@ -97,7 +110,6 @@ EOF
 endfun
 
 
-command! -nargs=1 -range TS call SaveTemplate(<q-args>)
-command! -nargs=1 -bang -complete=customlist,TplFileComplete
-                        \ T call InsertFile(<q-args>)
+command! -nargs=1 -range -complete=customlist,MyTComplete TS call SaveTemplate(<q-args>)
+command! -nargs=1 -bang -complete=customlist,MyTComplete T call InsertFile(<q-args>)
 

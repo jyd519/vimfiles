@@ -1,6 +1,5 @@
 " Jyd
-
-if exists('did_markdown_vim') || &cp || version < 700
+if exists('b:did_markdown_vim')
   finish
 endif
 
@@ -10,24 +9,29 @@ function! PreviewMarkdown()
   execute ":redraw!"
 endfunction
 
-"Key Mapings
-if has("mac")
-  autocmd FileType markdown nmap <buffer> <LocalLeader>r :update<cr>:call PreviewMarkdown()<cr>
-endif
-
-autocmd FileType markdown nmap <buffer> <space> ysiw`
-
 " Customizing surround 
 let g:surround_{char2nr("*")} = "**\r**"
 let g:surround_{char2nr("I")} = "_\r_"
+let g:surround_{char2nr('c')}="```\r```"
+let g:surround_{char2nr('C')}="```\1lang:\1\r```"
 
-autocmd FileType markdown nmap <buffer> <LocalLeader>tf :TableFormat<cr>
+nmap <buffer> <LocalLeader>r :update<cr>:call PreviewMarkdown()<cr>
 
-autocmd FileType markdown nmap <buffer> <LocalLeader>1 :call setline('.', substitute(getline('.'), '^#* *', '# ', ''))<cr>
-autocmd FileType markdown nmap <buffer> <LocalLeader>2 :call setline('.', substitute(getline('.'), '^#* *', '## ', ''))<cr>
-autocmd FileType markdown nmap <buffer> <LocalLeader>3 :call setline('.', substitute(getline('.'), '^#* *', '### ', ''))<cr>
-autocmd FileType markdown nmap <buffer> <LocalLeader>4 :call setline('.', substitute(getline('.'), '^#* *', '#### ', ''))<cr>
-autocmd FileType markdown nmap <buffer> <LocalLeader>5 :call setline('.', substitute(getline('.'), '^#* *', '##### ', ''))<cr>
-autocmd FileType markdown nmap <buffer> <LocalLeader>6 :call setline('.', substitute(getline('.'), '^#* *', '###### ', ''))<cr>
+"Key Mapings
+if has("mac")
+  nmap <buffer> <LocalLeader>r :update<cr>:call PreviewMarkdown()<cr>
+endif
 
-let did_markdown_vim = 1
+nmap <buffer> <space> ysiw`
+
+nmap <buffer> <LocalLeader>p :call mdip#MarkdownClipboardImage()<CR>
+nmap <buffer> <LocalLeader>tf :TableFormat<cr>
+
+nmap <buffer> <LocalLeader>1 :call setline('.', substitute(getline('.'), '^#* *', '# ', ''))<cr>
+nmap <buffer> <LocalLeader>2 :call setline('.', substitute(getline('.'), '^#* *', '## ', ''))<cr>
+nmap <buffer> <LocalLeader>3 :call setline('.', substitute(getline('.'), '^#* *', '### ', ''))<cr>
+nmap <buffer> <LocalLeader>4 :call setline('.', substitute(getline('.'), '^#* *', '#### ', ''))<cr>
+nmap <buffer> <LocalLeader>5 :call setline('.', substitute(getline('.'), '^#* *', '##### ', ''))<cr>
+nmap <buffer> <LocalLeader>6 :call setline('.', substitute(getline('.'), '^#* *', '###### ', ''))<cr>
+
+let b:did_markdown_vim = 1

@@ -24,18 +24,15 @@ if filereadable(expand("~/.vimrc.before"))
 endif
 
 if $VIM_MODE =~ 'man'
-    source $VIMFILES/.vimrc.man.bundles
+  source $VIMFILES/.vimrc.man.bundles
 else
-  if filereadable(expand('$VIMFILES/.vimrc.bundles'))
-    source $VIMFILES/.vimrc.bundles
-  endif
+  source $VIMFILES/.vimrc.bundles
 endif
 
 set rtp+=$VIMFILES/after
 
 filetype plugin on
 filetype indent on
-
 set ruler
 set showcmd
 set shiftwidth=2
@@ -70,7 +67,6 @@ set timeoutlen=1000 ttimeoutlen=30
 
 set scrolloff=2
 set guioptions-=T
-set linespace=6
 set encoding=utf-8
 
 set fileencodings=ucs-bom,utf-8,gb2312,cp936,gbk,gb18030
@@ -94,8 +90,8 @@ endif
 set path=.,./include/**/*,/usr/local/include,/usr/include
 
 if has('nvim')
-  let g:python_host_prog = $HOME . '/.virtualenvs/py2/bin/python'
-  let g:python3_host_prog = $HOME . '/.virtualenvs/py3/bin/python'
+  let g:python_host_prog = $HOME . '/.virtualenvs/py2/bin/python2.7'
+  let g:python3_host_prog = $HOME . '/.virtualenvs/py3/bin/python3.7'
 endif
 
 " Default sh is Bash
@@ -138,7 +134,9 @@ set laststatus=2
 "On mac os x, disable IME when we enter normal mode
 function! Ime_en()
   let input_status = system('im-select')
-  if input_status != "com.apple.keylayout.ABC"
+  if input_status =~ "com.apple.keylayout.ABC"
+    let b:inputtoggle = 0
+  else
     let b:inputtoggle = 1
     call system('im-select com.apple.keylayout.ABC') "use en ime
   endif
@@ -148,7 +146,6 @@ function! Ime_zh()
   try
     if b:inputtoggle == 1
       call system('im-select com.apple.inputmethod.SCIM.ITABC')
-      let b:inputtoggle = 0
     endif
   catch /inputtoggle/
     let b:inputtoggle = 0
@@ -163,16 +160,18 @@ endif
 " Enable / disable cusorline between insert mode and non-insert mode
 function! SetCursorLine()
   set cursorline
-  hi cursorline cterm=none term=none
-  hi CursorLine guibg=lightblue ctermbg=229
+  " hi cursorline cterm=none term=none
+  " hi CursorLine guibg=lightCyan ctermbg=229
 endfunction
 
 function! SetNoCursorLine()
   set nocursorline
 endfunction
 
-" autocmd! vimrc InsertEnter * call SetCursorLine()
-" autocmd! vimrc InsertLeave * call SetNoCursorLine()
+" autocmd! vimrc InsertLeave,WinEnter * call SetCursorLine()
+" autocmd! vimrc InsertEnter,WinLeave * call SetNoCursorLine()
+
+call SetCursorLine()
 
 " set default help language to zh_CN
 set helplang=cn
@@ -191,32 +190,30 @@ set synmaxcol=300
 
 let g:PaperColor_Theme_Options = {
   \   'theme': {
-  \     'default': {
+  \     'default.light': {
   \       'transparent_background': 1
+  \     },
+  \     'default.dark': {
+  \       'transparent_background': 0
+  \     }
+  \   },
+  \   'language': {
+  \     'python': {
+  \       'highlight_builtins' : 1
+  \     },
+  \     'cpp': {
+  \       'highlight_standard_library': 1
+  \     },
+  \     'c': {
+  \       'highlight_builtins' : 1
   \     }
   \   }
   \ }
 
 set background=light
+color PaperColor
 
-"color pyte
-"color DarkBlue
-"color solarized
-"color darkblack
-"color desert256
-"color molokai
-"color wombat
-"color inkpot
-"color PaperColor
-if has("gui_running")
-  color vc
-else
-  "color peachpuff
-  color PaperColor
-endif
-
-
-"windows size
+" Windows size
 if has("win32")
   au GUIEnter * simalt ~x
 endif
@@ -226,37 +223,37 @@ let g:mapleader = ","
 let g:maplocalleader = ","
 
 "font
-let s:font_size=14
-set ambiwidth="double"
-let s:fontbase="Bitstream_Vera_Sans_Mono"
-if has("mac")
-  " let s:fontbase="Ubuntu_Mono"
-  " let s:fontbase="PT_Mono"
-  " let s:fontbase="Anonymous_Pro"
-  " let s:fontbase="Source_Code_Pro"
-  let s:fontbase="FiraCode-Light"
-  let s:fontwide="Lantinghei_TC"
-else
-  let s:fontbase="Ubuntu_Mono"
-  let s:fontwide="NSimSun"
-endif
+if has("gui_running")
+  let s:font_size=15
+  let s:fontbase="Bitstream_Vera_Sans_Mono"
+  if has("gui_macvim")
+    " let s:fontbase="PT_Mono"
+    " let s:fontbase="FiraCode-Light"
+    " let s:fontbase="SourceCodePro-Light"
+    let s:fontbase="Source_Code_Pro"
+    let s:fontwide="Lantinghei_TC"
+  else
+    " let s:fontbase="Ubuntu_Mono"
+    " let s:fontbase="Anonymous_Pro"
+    " let s:fontbase="Source_Code_Pro"
+    let s:fontbase="Ubuntu_Mono"
+    let s:fontwide="NSimSun"
+  endif
 
-if !has('gui_vimr')
-  execute "set guifont=". s:fontbase . ":h" . s:font_size
-  execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
+  if !has('gui_vimr')
+    execute "set guifont=". s:fontbase . ":h" . s:font_size
+  endif
 endif
 
 function! s:IncFontSize()
   let s:font_size+=1
   execute "set guifont=". s:fontbase . ":h" . s:font_size
-  execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
   echom s:font_size
 endfunction
 
 function! s:DecFontSize()
   let s:font_size-=1
   execute "set guifont=". s:fontbase . ":h" . s:font_size
-  execute "set guifontwide=" . s:fontwide . ":h" . s:font_size
   echom s:font_size
 endfunction
 
@@ -268,9 +265,6 @@ if has('directx')
                         \geom:1,renmode:5,taamode:1
 endif
 
-"toggle between interface file and implementation file, etc. .h/.c
-map <M-o> :A<CR>
-
 "insert a blank line
 imap <C-Return> <CR><CR><C-o>k<Tab>
 
@@ -278,8 +272,9 @@ imap <C-Return> <CR><CR><C-o>k<Tab>
 if !exists("$MYVIMRC")
   let $MYVIMRC = expand("<sfile>:p")
 endif
+map <leader>ev :e! $MYVIMRC<CR>
+map <leader>eb :e! $VIMFILES/.vimrc.bundles<CR>
 map <leader>s :source %<CR>
-map <leader>e :e! $MYVIMRC<CR>
 
 if has("win32")
   source $VIMRUNTIME/mswin.vim
@@ -451,7 +446,7 @@ let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 let g:UltiSnipsEditSplit='vertical'
 let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
-set runtimepath+=$VIMFILES/mysnippets
+set rtp+=$VIMFILES/mysnippets
 
 let $SNIPPETS=expand("$VIMFILES/mysnippets")
 
@@ -484,13 +479,16 @@ let g:ctrlp_custom_ignore = {
                               \ 'link': 'some_bad_symbolic_links',
                               \ }
 let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_max_files = 10000
+let g:ctrlp_max_files = 5000
 let g:ctrlp_max_depth = 20
 
 "cmake
 "--------------------------------------------------------------------------------
 autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
 autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
+
+"vim-surroud: wrapping code
+let g:surround_indent = 0 " Disable indenting for surrounded text
 
 "markdown
 "--------------------------------------------------------------------------------
@@ -500,10 +498,6 @@ let g:vim_markdown_toc_autofit = 1
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
 
-"vim-surroud: wrapping code
-autocmd vimrc FileType markdown let g:surround_{char2nr('c')}="```\r```"
-let g:surround_indent = 0 " Disable indenting for surrounded text
-autocmd vimrc FileType markdown nmap <silent> <leader>p :call mdip#MarkdownClipboardImage()<CR>
 " there are some defaults for image directory and image name, you can change them
 let g:mdip_imgdir = 'images'
 " let g:mdip_imgname = 'image'
@@ -582,6 +576,7 @@ endif
 let g:ycm_semantic_triggers =  {
             \   'c' : ['->', '.'],
             \   'objc' : ['->', '.'],
+            \   'rust' : ['.', '::'],
             \   'ocaml' : ['.', '#'],
             \   'cpp,objcpp' : ['->', '.', '::'],
             \   'perl' : ['->'],
@@ -596,6 +591,9 @@ let g:ycm_semantic_triggers =  {
             \ }
 
 " Rust
+let g:racer_cmd = '~/.cargo/bin/racer'
+let g:racer_experimental_completer = 1
+let g:rustfmt_autosave = 1
 au FileType rust nmap gd <Plug>(rust-def)
 au FileType rust nmap gs <Plug>(rust-def-split)
 au FileType rust nmap gx <Plug>(rust-def-vertical)
@@ -604,6 +602,7 @@ au FileType rust nmap <leader>gd <Plug>(rust-doc)
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
 nnoremap <leader>jm :YcmCompleter GetDoc<CR>
 nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
+nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
 
 let g:ycm_filetype_blacklist = {
       \ 'tagbar' : 1,
@@ -767,6 +766,7 @@ endfunction
 "NERDTree
 noremap <F3> :NERDTreeToggle<cr>
 noremap <leader>nf :NERDTreeFind<cr>
+let g:NERDTreeWinSize=40
 
 " Quick unescape xml entities
 function! XmlUnescape()
@@ -809,27 +809,47 @@ let g:go_highlight_structs=1
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
+let g:go_highlight_function_parameters=1
 let g:go_highlight_methods = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_build_constraints = 1
+let g:go_snippet_engine='ultisnips'
 " let g:go_autodetect_gopath=1
+" let g:go_def_mode='guru'
+" let g:go_info_mode='guru'
 
+" autocmd BufRead,BufNewFile *.go noremap <buffer> <F5> :GoBuild<cr>
+autocmd Filetype go noremap <buffer> <F5> :GoBuild<cr>
 autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
 autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
-
-noremap <F5> :GoBuild<cr>
 
 " mysnippets template
 " T *
 " TS xxx
 source $VIMFILES/t.vim
 
+" clang_format
+let g:clang_format#style_options = {
+            \ "ColumnLimit": 0,
+            \ "AllowShortIfStatementsOnASingleLine" : "true",
+            \ "AlwaysBreakTemplateDeclarations" : "true",
+            \ "Standard" : "C++11"}
+" map to <Leader>cf in C++ code
+autocmd FileType c,cpp,objc,objcpp nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
+autocmd FileType c,cpp,objc,objcpp vnoremap <buffer><Leader>cf :ClangFormat<CR>
+" if you install vim-operator-user
+" autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
+" Toggle auto formatting:
+nmap <Leader>C :ClangFormatAutoToggle<CR>
+
 " abbrev
 ca yc YcmCompleter
-ca se UltiSnipsEdit
 ca ips GoImports
+
+" victionary
+let g:victionary#map_defaults = 0
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))

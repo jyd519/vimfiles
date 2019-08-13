@@ -19,121 +19,136 @@ call plug#begin('$VIMFILES/plugged')
 Plug 'mhinz/vim-startify'
 Plug 'flazz/vim-colorschemes'
 
+" efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
-Plug 'ctrlpvim/ctrlp.vim'
-
 Plug 'easymotion/vim-easymotion'
 Plug 'justinmk/vim-sneak'
-
 Plug 'mattn/emmet-vim'
-Plug 'kelan/gyp.vim'
-Plug 'Shutnik/jshint2.vim'
-Plug 'Shougo/neocomplete.vim'
-Plug 'scrooloose/nerdtree'
-Plug 'rkulla/pydiction'
-Plug 'wesleyche/SrcExpl'
-Plug 'ervandew/supertab'
 
-"Plug 'scrooloose/syntastic'
-Plug 'w0rp/ale'
-
-Plug 'junegunn/vim-easy-align'
-
-Plug 'tomtom/tcomment_vim'
-Plug 'dhruvasagar/vim-table-mode'
-
-Plug 'marijnh/tern_for_vim'
-Plug 'edkolev/tmuxline.vim'
-
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
-
-Plug 'bling/vim-airline'
-Plug 'kchmck/vim-coffee-script'
-Plug 'xolox/vim-easytags'
-Plug 'nathanaelkane/vim-indent-guides'
-Plug 'pangloss/vim-javascript'
-Plug 'maksimr/vim-jsbeautify'
-Plug 'elzr/vim-json'
-Plug 'gilligan/vim-lldb', { 'on' : 'Lversion' } 
-
-Plug 'xolox/vim-misc'
-Plug 'terryma/vim-multiple-cursors'
-Plug 'xolox/vim-session'
-Plug 'kshenoy/vim-signature'
-Plug 'jez/vim-superman'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'majutsushi/tagbar'
-
-" Preview for VIM (Markdown, reStructuredText, textile)
-Plug 'godlygeek/tabular'
-Plug 'plasticboy/vim-markdown'
-Plug 'jyd519/md-img-paste.vim'
-
-Plug 'Valloric/YouCompleteMe' 
-Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
-
+Plug 'chiedojohn/vim-case-convert'
 Plug 'thinca/vim-quickrun'
 
 Plug 'jiangmiao/auto-pairs'
 Plug 'tmhedberg/matchit'
 Plug 'AndrewRadev/splitjoin.vim'
 
-"git
-Plug 'airblade/vim-gitgutter'
+Plug 'scrooloose/nerdtree'
+Plug 'ctrlpvim/ctrlp.vim'
 
-"Gist
-Plug 'mattn/webapi-vim'
-Plug 'mattn/gist-vim'
+Plug 'wesleyche/SrcExpl'
+Plug 'ervandew/supertab'
+Plug 'junegunn/vim-easy-align'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tomtom/tcomment_vim'
 
-"Only avaiable on Linux
-"Plug 'alx741/vinfo'
-Plug 'skywind3000/asyncrun.vim'
-Plug 'tpope/vim-dispatch'
+Plug 'w0rp/ale'
 
-Plug 'tpope/vim-fugitive'
+Plug 'bling/vim-airline'
+Plug 'xolox/vim-easytags'
+Plug 'nathanaelkane/vim-indent-guides'
 
-"Graphviz+UML
-Plug 'aklt/plantuml-syntax'
-Plug 'wannesm/wmgraphviz.vim'
+Plug 'xolox/vim-misc'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'xolox/vim-session'
+Plug 'kshenoy/vim-signature'
+Plug 'jez/vim-superman'
+Plug 'majutsushi/tagbar'
 
-"EditorConfig
-Plug 'editorconfig/editorconfig-vim'
-Plug 'vim-scripts/DrawIt'
-Plug 'rhysd/vim-clang-format'
+" tmux
+Plug 'edkolev/tmuxline.vim'
+Plug 'christoomey/vim-tmux-navigator'
 
-"typescript
-Plug 'leafgarland/typescript-vim'
-
+" snippets
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 "angula2 snippets
 Plug 'mhartington/vim-angular2-snippets'
 
-"Plug 'Quramy/tsuquyomi'
+" Markdown, reStructuredText, textile
+Plug 'godlygeek/tabular'
+Plug 'plasticboy/vim-markdown'
+Plug 'jyd519/md-img-paste.vim'
+Plug 'dhruvasagar/vim-table-mode'
+Plug 'vim-scripts/DrawIt'
 
-"es6 & node
+
+" Auto Completion 
+" Plug 'Shougo/neocomplete.vim'
+Plug 'Valloric/YouCompleteMe' 
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+
+" Git
+Plug 'tpope/vim-fugitive'
+Plug 'airblade/vim-gitgutter'
+
+" Gist
+Plug 'mattn/webapi-vim'
+Plug 'mattn/gist-vim'
+
+" async
+Plug 'skywind3000/asyncrun.vim'
+Plug 'tpope/vim-dispatch'
+
+" Graphviz+UML
+Plug 'aklt/plantuml-syntax'
+Plug 'wannesm/wmgraphviz.vim'
+
+" EditorConfig
+Plug 'editorconfig/editorconfig-vim'
+Plug 'rhysd/vim-clang-format'
+
+"js & node
 Plug 'isRuslan/vim-es6'
 Plug 'moll/vim-node'
 Plug 'geekjuice/vim-mocha'
 
-"nginx
+Plug 'marijnh/tern_for_vim'
+
+Plug 'kchmck/vim-coffee-script'
+Plug 'pangloss/vim-javascript'
+Plug 'maksimr/vim-jsbeautify'
+Plug 'elzr/vim-json'
+Plug 'Shutnik/jshint2.vim'
+
+" typescript
+Plug 'leafgarland/typescript-vim'
+
+" nginx
 Plug 'chr4/nginx.vim'
 
-"Go
-Plug 'fatih/vim-go', { 'for': 'go', 'tag': '*' }
+" gyp
+Plug 'kelan/gyp.vim'
 
-"Rust
-Plug 'rust-lang/rust.vim'
-Plug 'racer-rust/vim-racer'
+" Go
+Plug 'fatih/vim-go', { 'for': 'go', 'do': ':GoUpdateBinaries' }
+" Plug 'fatih/vim-go', { 'for': 'go', 'tag': 'v1.20' }
 
-"docker
+" Rust
+Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+Plug 'racer-rust/vim-racer', { 'for': 'rust' }
+Plug 'timonv/vim-cargo', { 'for': 'rust' }
+
+" Google GN
+Plug 'c0nk/vim-gn'
+
+" docker
 Plug 'ekalinin/Dockerfile.vim'
 
-" Input unicode characters
+" unicode characters
 Plug 'chrisbra/unicode.vim'
 
-Plug 'tell-k/vim-autopep8'
+" python
+Plug 'rkulla/pydiction', { 'for': 'python' }
+Plug 'tell-k/vim-autopep8', { 'for': 'python' }
+
+" toml
+Plug 'cespare/vim-toml', {'for': 'toml'}
+
+" tool
+Plug 'farconics/victionary'
+
+Plug 'rhysd/vim-grammarous'
 
 call plug#end() 
