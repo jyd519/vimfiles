@@ -1,3 +1,10 @@
+" mysnippets template
+"
+" Author: JiYongdong
+" Two commands:
+"   T *     load snippets
+"   TS xxx  save selection as xxx
+
 if !(has('python') || has('python3'))
   echo "Error: T.vim requires vim compiled with +python"
   finish
@@ -112,4 +119,3 @@ endfun
 
 command! -nargs=1 -range -complete=customlist,MyTComplete TS call SaveTemplate(<q-args>)
 command! -nargs=1 -bang -complete=customlist,MyTComplete T call InsertFile(<q-args>)
-
