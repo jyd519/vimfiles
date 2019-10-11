@@ -1,0 +1,5 @@
+# Prepare "Catch" library for other executables
+set(CATCH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(Catch2::Catch IMPORTED INTERFACE)
+set_property(TARGET Catch2::Catch PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${CATCH_INCLUDE_DIR}")
+# target_link_libraries(example_test PUBLIC Catch2::Catch)

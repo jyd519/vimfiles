@@ -107,7 +107,9 @@ if not os.path.exists(base_dir):
   os.mkdir(base_dir)
 
 if not '.' in name:
-  name += '.' + vim.eval('expand("%:p:e")') 
+  ext = vim.eval('expand("%:p:e")')
+  if ext:
+    name += '.' +  ext 
 
 text = vim.eval('SelText()')
 fp = os.path.join(base_dir, name) 

@@ -2,16 +2,6 @@
 " Configurations for Vim ( +lua, +python )
 " Jyd  2014-12-15 12:50
 "
-" Dependencies :
-"   ctags:
-"     OSX: brew install ctags
-"     Windows: http://ctags.sourceforge.net/
-"   jsctags
-"     npm install -g git://github.com/ramitos/jsctags.git
-"   The_Silver_Searcher:
-"     https://github.com/ggreer/the_silver_searcher
-"     OSX: brew install the_silver_searcher
-"
 "--------------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -24,9 +14,9 @@ if filereadable(expand("~/.vimrc.before"))
 endif
 
 if $VIM_MODE =~ 'man'
-  source $VIMFILES/.vimrc.man.bundles
+  source $VIMFILES/man.bundles.vim
 else
-  source $VIMFILES/.vimrc.bundles
+  source $VIMFILES/bundles.vim
 endif
 
 set rtp+=$VIMFILES/after
@@ -118,7 +108,7 @@ endfunction
 command! CTags :call UpdateTags()
 
 "persistent undo
-set undodir=$VIMFILES/undodir
+set undodir=$HOME/undodir
 set undolevels=1000 "maximum number of set changes that can be undone
 set undoreload=10000 "maximum number lines to save for undo on a buffer reload
 set undofile
@@ -616,6 +606,7 @@ nnoremap <leader>jd :YcmCompleter GoTo<CR>
 nnoremap <leader>jm :YcmCompleter GetDoc<CR>
 nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
 nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
+nnoremap <leader>jf :YcmCompleter FixIt<CR>
 
 let g:ycm_filetype_specific_completion_to_disable = {
       \ 'gitcommit': 1
@@ -929,6 +920,7 @@ let g:clang_format#style_options = {
             \ "AllowShortIfStatementsOnASingleLine" : "true",
             \ "AlwaysBreakTemplateDeclarations" : "true",
             \ "Standard" : "C++11"}
+" let g:clang_format#command='/usr/local/bin/clang-format'
 " map to <Leader>cf in C++ code
 autocmd FileType c,cpp,objc,objcpp nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
 autocmd FileType c,cpp,objc,objcpp vnoremap <buffer><Leader>cf :ClangFormat<CR>
