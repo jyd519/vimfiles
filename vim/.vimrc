@@ -52,7 +52,7 @@ set nobackup nowb noswf
 set nowritebackup
 set backupcopy=yes
 set showmatch
-set cmdheight=1
+set cmdheight=2
 set history=100
 " enable mouse
 set mouse=a
@@ -226,11 +226,11 @@ let g:maplocalleader = ","
 if has("gui_running")
   let s:font_size=15
   let s:fontbase="Bitstream_Vera_Sans_Mono"
-  if has("gui_macvim")
+  if has("mac")
     " let s:fontbase="PT_Mono"
     " let s:fontbase="FiraCode-Light"
     " let s:fontbase="SourceCodePro-Light"
-    let s:fontbase="Source_Code_Pro"
+    let s:fontbase="SF_Mono"
     let s:fontwide="Lantinghei_TC"
   else
     " let s:fontbase="Ubuntu_Mono"
@@ -443,7 +443,7 @@ let g:UltiSnipsExpandTrigger="<C-k>"
 let g:UltiSnipsListSnippets="<C-l>"
 let g:UltiSnipsJumpForwardTrigger="<C-k>"
 let g:UltiSnipsJumpBackwardTrigger="<C-p>"
-let g:UltiSnipsEditSplit='vertical'
+let g:UltiSnipsEditSplit='horizontal'
 let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
 set rtp+=$VIMFILES/mysnippets
@@ -533,23 +533,17 @@ let g:livedown_port = 1337
 map gm :call LivedownPreview()<CR>
 
 
-"syntastic
-"--------------------------------------------------------------------------------
-let g:syntastic_mode_map = {
-    \ "mode": "passive",
-    \ "active_filetypes": ["ruby", "php"],
-    \ "passive_filetypes": [] }
-
-let g:syntastic_javascript_checkers = ['eslint']
-
 "ALE
 "--------------------------------------------------------------------------------
-let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['tslint'], 'go': ['gometalinter', 'gofmt']}
+let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['eslint', 'tslint', 'tsserver'], 'go': ['gometalinter', 'gofmt']}
 let g:ale_pattern_options = {
       \ '\.min.js$': {'ale_enabled': 0},
-      \ '\v\.(m|mm|cpp|cxx|cc|h|hpp)$': {'ale_enabled': 0}
+      \ '\v\.(m|mm|cpp|cxx|cc|h|hpp)$': {'ale_enabled': 0},
+      \ '\v\.py$': {'ale_linters': ['flake8', 'pylint'], 'ale_fixers': ['autopep8', 'yapf']}
       \}
 let g:ale_go_gometalinter_options = '--fast --config=~/.gometalinter'
+let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
+
 
 " Editing a protected file as 'sudo'
 "cmap W w !sudo tee % >/dev/null
@@ -560,6 +554,32 @@ command! W w !sudo tee % > /dev/null
 "--------------------------------------------------------------------------------
 let g:tcomment#options_comments = {'whitespace': 'left'}
 let g:tcomment#options_commentstring = {'whitespace': 'left'}
+
+" nerdcommenter
+" Add spaces after comment delimiters by default
+let g:NERDSpaceDelims = 1
+
+" Use compact syntax for prettified multi-line comments
+let g:NERDCompactSexyComs = 1
+
+" Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDDefaultAlign = 'left'
+
+" Set a language to use its alternate delimiters by default
+let g:NERDAltDelims_java = 1
+
+" Add your own custom formats or override the defaults
+let g:NERDCustomDelimiters = { 'c': { 'left': '/**','right': '*/' } }
+
+" Allow commenting and inverting empty lines (useful when commenting a region)
+let g:NERDCommentEmptyLines = 1
+
+" Enable trimming of trailing whitespace when uncommenting
+let g:NERDTrimTrailingWhitespace = 1
+
+" Enable NERDCommenterToggle to check all selected lines is commented or not
+let g:NERDToggleCheckAllLines = 1
+
 
 " ycm
 "--------------------------------------------------------------------------------
@@ -573,6 +593,8 @@ let g:ycm_python_binary_path = 'python'
 if !exists("g:ycm_semantic_triggers")
   let g:ycm_semantic_triggers = {}
 endif
+let g:ycm_global_ycm_extra_conf = expand('$VIMFILES/ycm_extra_conf.py')
+
 let g:ycm_semantic_triggers =  {
             \   'c' : ['->', '.'],
             \   'objc' : ['->', '.'],
@@ -581,7 +603,7 @@ let g:ycm_semantic_triggers =  {
             \   'cpp,objcpp' : ['->', '.', '::'],
             \   'perl' : ['->'],
             \   'php' : ['->', '::', '"', "'", 'use ', 'namespace ', '\'],
-            \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,go' : ['.'],
+            \   'python,cs,java,javascript,typescript,d,perl6,scala,vb,go' : ['.'],
             \   'html': ['<', '"', '</', ' '],
             \   'vim' : ['re![_a-za-z]+[_\w]*\.'],
             \   'ruby' : ['.', '::'],
@@ -590,25 +612,21 @@ let g:ycm_semantic_triggers =  {
             \   'haskell' : ['.', 're!.']
             \ }
 
-" Rust
-let g:racer_cmd = '~/.cargo/bin/racer'
-let g:racer_experimental_completer = 1
-let g:rustfmt_autosave = 1
-au FileType rust nmap gd <Plug>(rust-def)
-au FileType rust nmap gs <Plug>(rust-def-split)
-au FileType rust nmap gx <Plug>(rust-def-vertical)
-au FileType rust nmap <leader>gd <Plug>(rust-doc)
-
 nnoremap <leader>jd :YcmCompleter GoTo<CR>
 nnoremap <leader>jm :YcmCompleter GetDoc<CR>
 nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
 nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
+
+let g:ycm_filetype_specific_completion_to_disable = {
+      \ 'gitcommit': 1
+      \}
 
 let g:ycm_filetype_blacklist = {
       \ 'tagbar' : 1,
       \ 'qf' : 1,
       \ 'notes' : 1,
       \ 'markdown' : 1,
+      \ 'json': 1,
       \ 'unite' : 1,
       \ 'vimwiki' : 1,
       \ 'pandoc' : 1,
@@ -624,6 +642,15 @@ endfunction
 function! Multiple_cursors_after()
     let g:ycm_auto_trigger = 1
 endfunction
+
+" Rust
+let g:racer_cmd = '~/.cargo/bin/racer'
+let g:racer_experimental_completer = 1
+let g:rustfmt_autosave = 1
+au FileType rust nmap gd <Plug>(rust-def)
+au FileType rust nmap gs <Plug>(rust-def-split)
+au FileType rust nmap gx <Plug>(rust-def-vertical)
+au FileType rust nmap <leader>gd <Plug>(rust-doc)
 
 " jedi settings
 let g:jedi#completions_enabled=0
@@ -805,7 +832,9 @@ let g:previm_open_cmd = 'open -a "google chrome"'
 
 " vim-go
 let g:go_fmt_fail_silently = 1
-let g:go_highlight_structs=1
+let g:go_highlight_structs=0
+let g:go_highlight_interfaces = 0
+let g:go_highlight_operators = 0
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
@@ -817,13 +846,82 @@ let g:go_snippet_engine='ultisnips'
 " let g:go_autodetect_gopath=1
 " let g:go_def_mode='guru'
 " let g:go_info_mode='guru'
+let g:go_def_mode='gopls'
+let g:go_info_mode='gopls'
 
-" autocmd BufRead,BufNewFile *.go noremap <buffer> <F5> :GoBuild<cr>
+" disable vim-go :GoDef short cut (gd)
+" this is handled by LanguageClient [LC]
+let g:go_def_mapping_enabled = 1
+
 autocmd Filetype go noremap <buffer> <F5> :GoBuild<cr>
 autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
 autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
 autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
 autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+
+" -------------------------------------------------------------------------------------------------
+" coc.nvim default settings
+" -------------------------------------------------------------------------------------------------
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=300
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+" always show signcolumns
+set signcolumn=yes
+
+" Use tab for trigger completion with characters ahead and navigate.
+" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+inoremap <silent><expr> <c-space> coc#refresh()
+
+" Use `[c` and `]c` to navigate diagnostics
+nmap <silent> [c <Plug>(coc-diagnostic-prev)
+nmap <silent> ]c <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use U to show documentation in preview window
+nnoremap <silent> U :call <SID>show_documentation()<CR>
+
+" Remap for rename current word
+nmap <leader>rn <Plug>(coc-rename)
+
+" Remap for format selected region
+vmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+" Show all diagnostics
+nnoremap <silent> <leader>ca  :<C-u>CocList diagnostics<cr>
+" Manage extensions
+nnoremap <silent> <leader>ce  :<C-u>CocList extensions<cr>
+" Show commands
+nnoremap <silent> <leader>cc  :<C-u>CocList commands<cr>
+" Find symbol of current document
+nnoremap <silent> <leader>co  :<C-u>CocList outline<cr>
+" Search workspace symbols
+nnoremap <silent> <leader>cs  :<C-u>CocList -I symbols<cr>
+" Do default action for next item.
+nnoremap <silent> <leader>cj  :<C-u>CocNext<CR>
+" Do default action for previous item.
+nnoremap <silent> <leader>ck  :<C-u>CocPrev<CR>
+" Resume latest coc list
+nnoremap <silent> <leader>cp  :<C-u>CocListResume<CR>
+nnoremap <silent> <leader>y  :<C-u>CocList -A --normal yank<cr>
 
 " clang_format
 let g:clang_format#style_options = {

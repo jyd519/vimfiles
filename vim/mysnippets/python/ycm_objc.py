@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# .ycm_extra_conf.py
+
 import time
 import os
 

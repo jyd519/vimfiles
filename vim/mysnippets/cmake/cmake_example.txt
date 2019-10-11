@@ -1,0 +1,32 @@
+cmake_minimum_required(VERSION 3.8)
+
+project(example C CXX)
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+add_subdirectory(googletest)
+add_subdirectory(test)
+
+set(Headers
+  example.hpp
+)
+
+set(Sources
+  example.cpp
+)
+
+add_library(example STATIC ${Sources}, ${Headers})
+
+# test
+add_executable(example_test test.cpp)
+
+target_link_libraries(example_test PUBLIC 
+  gtest_main  # main program provided by googletest
+  example
+)
+
+add_test( NAME example_test
+  COMMAND example_test
+)

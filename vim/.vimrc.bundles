@@ -18,7 +18,7 @@ call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'flazz/vim-colorschemes'
-
+Plug 'sheerun/vim-polyglot'
 " efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
@@ -37,7 +37,7 @@ Plug 'scrooloose/nerdtree'
 Plug 'ctrlpvim/ctrlp.vim'
 
 Plug 'wesleyche/SrcExpl'
-Plug 'ervandew/supertab'
+" Plug 'ervandew/supertab'
 Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
@@ -76,8 +76,9 @@ Plug 'vim-scripts/DrawIt'
 
 " Auto Completion 
 " Plug 'Shougo/neocomplete.vim'
-Plug 'Valloric/YouCompleteMe' 
-Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+Plug 'ycm-core/YouCompleteMe' 
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
 
 " Git
 Plug 'tpope/vim-fugitive'
