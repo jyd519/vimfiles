@@ -1,10 +1,48 @@
-snippet #ifndef "c include guard" b
-#ifndef ${1/([A-Za-z0-9_]+).*/$1/}
-#define ${1:SYMBOL} 
+snippet ig "C header file include guard" b
+#ifndef ${1:`!p snip.rv = snip.basename.upper() + "_H"`}
+#define $1
 
-#endif //${1/([A-Za-z0-9_]+).*/$1/}
+#endif //$1
 endsnippet
 
 snippet napi_method "napi method prototype" b
 Napi::Value ${1:name}(const Napi::CallbackInfo& info)
+endsnippet
+
+snippet copy_funcs "copy sementics" b
+${1:CLASS}(const $1&);
+$1& operator=(const $1&);
+endsnippet
+
+snippet copy_funcs_disable "disable copy sementics" b
+${1:CLASS}(const $1&) = delete;
+$1& operator=(const $1&) = delete;
+endsnippet
+
+snippet move_funcs "move sementics" b
+${1:${VISUAL}}($1&&);
+$1& operator=($1&&); $0
+endsnippet
+
+snippet std "use namespace std" b
+using namespace std;
+endsnippet
+
+snippet up "Unique Pointer" i
+std::unique_ptr<${1:`!p
+snip.rv = snip.v.text.strip("*") or "klass"
+`}>
+endsnippet
+
+
+snippet RAII "RAII pattern" b
+class ${1:Class}{
+public:
+    $1();
+    // no copy
+    $1(const $1&) = delete;
+    $1& operator=(const $1&) = delete;
+    ~$1();
+private:
+};
 endsnippet

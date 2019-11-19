@@ -152,4 +152,6 @@ Plug 'farconics/victionary'
 
 Plug 'rhysd/vim-grammarous'
 
+Plug 'vhdirk/vim-cmake'
+
 call plug#end() 

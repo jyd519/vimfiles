@@ -263,7 +263,7 @@ if !exists("$MYVIMRC")
   let $MYVIMRC = expand("<sfile>:p")
 endif
 map <leader>ev :e! $MYVIMRC<CR>
-map <leader>eb :e! $VIMFILES/.vimrc.bundles<CR>
+map <leader>eb :e! $VIMFILES/bundles.vim<CR>
 map <leader>s :source %<CR>
 
 if has("win32")
@@ -476,6 +476,9 @@ let g:ctrlp_max_depth = 20
 "--------------------------------------------------------------------------------
 autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
 autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
+let g:cmake_build_type='Debug'
+let g:cmake_export_compile_commands=1
+let g:cmake_ycm_symlinks=1
 
 "vim-surroud: wrapping code
 let g:surround_indent = 0 " Disable indenting for surrounded text
@@ -792,7 +795,7 @@ function! XmlUnescape()
   silent! execute ':%s/&gt;/>/g'
   silent! execute ':%s/&amp;/\&/g'
 endfunction
-command! -nargs=0 UnescapeXml :call XmlUnescape()
+command! -nargs=0 XmlUnescape :call XmlUnescape()
 
 " Unescape \uXXXX sequences in selected lines
 function! UnescapeUnicode() range

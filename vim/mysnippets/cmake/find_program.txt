@@ -1,0 +1,8 @@
+  if( NOT APPLE )
+    find_program( CLANG_TIDY NAMES clang-tidy )
+  else()
+    execute_process( COMMAND brew --prefix llvm OUTPUT_VARIABLE LLVM_ROOT )
+    string( STRIP ${LLVM_ROOT} LLVM_ROOT )
+    message( STATUS "${LLVM_ROOT}/bin" )
+    find_program( CLANG_TIDY NAMES clang-tidy PATHS "${LLVM_ROOT}/bin" )
+  endif()
