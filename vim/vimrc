@@ -79,7 +79,7 @@ endif
 
 set path=.,./include/**/*,/usr/local/include,/usr/include
 
-if has('nvim')
+if filereadable($HOME . '/.virtualenvs/py2/bin/python2.7')
   let g:python_host_prog = $HOME . '/.virtualenvs/py2/bin/python2.7'
   let g:python3_host_prog = $HOME . '/.virtualenvs/py3/bin/python3.7'
 endif
@@ -167,8 +167,11 @@ call SetCursorLine()
 set helplang=cn
 set langmenu=zh_CN.utf-8
 language message zh_CN.utf-8
+
 if has("win32")
-  set termencoding=gb2312
+  if has('termencoding')
+    set termencoding=gb2312
+  endif
   source $VIMRUNTIME/delmenu.vim
   source $VIMRUNTIME/menu.vim
 endif
