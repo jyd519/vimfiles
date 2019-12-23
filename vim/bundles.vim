@@ -18,7 +18,6 @@ call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'flazz/vim-colorschemes'
-Plug 'sheerun/vim-polyglot'
 " efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
@@ -76,7 +75,7 @@ Plug 'vim-scripts/DrawIt'
 
 " Auto Completion 
 " Plug 'Shougo/neocomplete.vim'
-Plug 'ycm-core/YouCompleteMe' 
+" Plug 'ycm-core/YouCompleteMe' 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 
@@ -153,5 +152,7 @@ Plug 'farconics/victionary'
 Plug 'rhysd/vim-grammarous'
 
 Plug 'vhdirk/vim-cmake'
+
+Plug 'sheerun/vim-polyglot'
 
 call plug#end() 

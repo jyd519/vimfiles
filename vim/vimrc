@@ -48,7 +48,7 @@ set history=100
 set mouse=a
 
 "Fold
-set foldmethod=indent   "fold based on indent
+set foldmethod=manual "fold based on indent
 set foldnestmax=3       "deepest fold is 3 levels
 set nofoldenable        "dont fold by default
 
@@ -486,8 +486,8 @@ let g:surround_indent = 0 " Disable indenting for surrounded text
 "markdown
 "--------------------------------------------------------------------------------
 let g:vim_markdown_folding_disabled=0
-let g:vim_markdown_initial_foldlevel=1
 let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding = 2
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
 
@@ -885,19 +885,42 @@ nmap <silent> ]c <Plug>(coc-diagnostic-next)
 
 " Remap keys for gotos
 nmap <silent> gd <Plug>(coc-definition)
+nnoremap <leader>jd <Plug>(coc-definition)
+
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-
-" Use U to show documentation in preview window
-nnoremap <silent> U :call <SID>show_documentation()<CR>
-
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
+" Fix autofix problem of current line
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Use K to show documentation in preview window
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  else
+    call CocAction('doHover')
+  endif
+endfunction
+
+" Highlight symbol under cursor on CursorHold
+autocmd CursorHold * silent call CocActionAsync('highlight')
 
 " Remap for format selected region
 vmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
+
+" Use `:Format` to format current buffer
+command! -nargs=0 Format :call CocAction('format')
+
+" Use `:Fold` to fold current buffer
+command! -nargs=? Fold :call     CocAction('fold', <f-args>)
+
+" use `:OR` for organize import of current buffer
+command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
 
 " Show all diagnostics
 nnoremap <silent> <leader>ca  :<C-u>CocList diagnostics<cr>
@@ -938,6 +961,9 @@ ca ips GoImports
 
 " victionary
 let g:victionary#map_defaults = 0
+
+" Polyglot
+let g:polyglot_disabled=['typescript', 'go']
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))
