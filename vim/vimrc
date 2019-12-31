@@ -1,6 +1,6 @@
 "--------------------------------------------------------------------------------
 " Configurations for Vim ( +lua, +python )
-" Jyd  2014-12-15 12:50
+" Jyd  2019-12-31 12:50
 "
 "--------------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
@@ -47,6 +47,13 @@ set history=100
 " enable mouse
 set mouse=a
 
+" Smaller updatetime for CursorHold & CursorHoldI
+set updatetime=300
+" don't give |ins-completion-menu| messages.
+set shortmess+=c
+" always show signcolumns
+set signcolumn=yes
+
 "Fold
 set foldmethod=manual "fold based on indent
 set foldnestmax=3       "deepest fold is 3 levels
@@ -78,11 +85,6 @@ endif
 "set t_ti= t_te=
 
 set path=.,./include/**/*,/usr/local/include,/usr/include
-
-if filereadable($HOME . '/.virtualenvs/py2/bin/python2.7')
-  let g:python_host_prog = $HOME . '/.virtualenvs/py2/bin/python2.7'
-  let g:python3_host_prog = $HOME . '/.virtualenvs/py3/bin/python3.7'
-endif
 
 " Default sh is Bash
 let g:bash_is_sh=1
@@ -164,9 +166,8 @@ endfunction
 call SetCursorLine()
 
 " set default help language to zh_CN
-set helplang=cn
-set langmenu=zh_CN.utf-8
-language message zh_CN.utf-8
+" set helplang=cn
+" language message zh_CN.utf-8
 
 if has("win32")
   if has('termencoding')
@@ -208,7 +209,7 @@ color PaperColor
 
 " Windows size
 if has("win32")
-  au GUIEnter * simalt ~x
+  autocmd GUIEnter * simalt ~x
 endif
 
 "define leader char
@@ -236,6 +237,9 @@ if has("gui_running")
   if !has('gui_vimr')
     execute "set guifont=". s:fontbase . ":h" . s:font_size
   endif
+
+  map <leader>fi :call <SID>IncFontSize()<CR>
+  map <leader>fo :call <SID>DecFontSize()<CR>
 endif
 
 function! s:IncFontSize()
@@ -249,9 +253,6 @@ function! s:DecFontSize()
   execute "set guifont=". s:fontbase . ":h" . s:font_size
   echom s:font_size
 endfunction
-
-map <leader>fi :call <SID>IncFontSize()<CR>
-map <leader>fo :call <SID>DecFontSize()<CR>
 
 if has('directx')
   set renderoptions=type:directx,level:0.75,gamma:1.25,contrast:0.5,
@@ -285,32 +286,6 @@ map <M-left> :bp<cr>
 
 "Switch to current dir
 map <leader>cd :lcd %:p:h<cr>:pwd<cr>
-
-"Redefine Omni completion behavior - no auto selection and auto replacement
-" By default, Vim will auto select the first candidate when completion is invoked.
-" inoremap <C-X><C-O> <C-X><C-O><C-P>
-
-""""""""""""""""""""""""""""""
-" Visual Search
-""""""""""""""""""""""""""""""
-" From an idea by Michael Naumann
-function! VisualSearch(direction) range
-  let l:saved_reg = @"
-  execute "normal! vgvy"
-  let l:pattern = escape(@", '\\/.*$^~[]')
-  let l:pattern = substitute(l:pattern, "\n$", "", "")
-  if a:direction == 'b'
-    execute "normal ?" . l:pattern . "^M"
-  else
-    execute "normal /" . l:pattern . "^M"
-  endif
-  let @/ = l:pattern
-  let @" = l:saved_reg
-endfunction
-
-"Basically you press * or # to search for the current selection !! Really useful
-vnoremap <silent> * :call VisualSearch('f')<CR>
-vnoremap <silent> # :call VisualSearch('b')<CR>
 
 "Tab configuration
 map <leader>tn :tabnew %<cr>
@@ -348,7 +323,7 @@ endif
 
 "pascal configuration
 "--------------------------------------------------------------------------------
-au vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
+autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
 "Perl
 "--------------------------------------------------------------------------------
@@ -356,8 +331,8 @@ au vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
 "javascript
 "--------------------------------------------------------------------------------
-au vimrc FileType javascript setlocal dictionary=$VIMFILES\dict\javascript.dict
-au vimrc BufRead,BufNewFile *.js setlocal foldmethod=indent
+autocmd vimrc FileType javascript,typescript setlocal dictionary=$VIMFILES\dict\javascript.dict
+autocmd vimrc FileType javascript,typescript setlocal foldmethod=indent
 let g:tern_map_keys=1
 let g:tern_show_argument_hints='on_hold'
 let g:tern_show_signature_in_pum=1
@@ -370,18 +345,6 @@ let g:vim_json_syntax_conceal = 0
 "au FileType html set equalprg=tidy\ -utf8\ --indent\ yes\ -q\ -f\ err.txt
 command! Thtml :%!tidy -utf8 --indent yes -q -f tidyerr.txt
 
-"MiniBufExplorer
-"--------------------------------------------------------------------------------
-let g:miniBufExplorerMoreThanOne=0
-let g:miniBufExplMapWindowNavVim=1
-let g:miniBufExplMapWindowNavArrows=1
-let g:miniBufExplMapCTabSwitchBufs=1
-let g:miniBufExplModSelTarget=1
-let g:miniBufExplMaxSize=2
-let g:miniBufExplModSelTarget=1
-let g:miniBufExplForceSyntaxEnable=0 "very slow if enabled when editing js file
-let g:miniBufExplAutoStart=0 " temporary disabled,  conflicts with session restore
-
 "SuperTab
 "--------------------------------------------------------------------------------
 " let g:SuperTabDefaultCompletionType = "context"
@@ -391,21 +354,6 @@ let g:SuperTabDefaultCompletionType='<c-x><c-u><c-p>'
 "--------------------------------------------------------------------------------
 let g:pydiction_location=$VIMFILES . '/plugged/pydiction/complete-dict/'
 let g:pydiction_menu_height = 20
-au vimrc BufEnter *.py nmap <f9> :!python %<CR>
-au vimrc FileType python setlocal equalprg=autopep8\ -
-
-"NSIS
-"--------------------------------------------------------------------------------
-function! Makensis(arg)
-  let l:path = expand("%:p")
-  let l:cmd="!cmd /k \"setnsis && makensis " . a:arg . " " . iconv(l:path, "utf8", "cp936") . "\""
-  execute l:cmd
-endfunction
-
-au vimrc FileType nsis set foldmethod=syntax
-au vimrc FileType nsis colorscheme vc
-au vimrc FileType nsis nmap <F9> :update<cr>:call Makensis("/DMYDEBUG")<cr>
-au vimrc FileType nsis syntax on
 
 "FindFile
 "--------------------------------------------------------------------------------
@@ -441,7 +389,8 @@ let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
 set rtp+=$VIMFILES/mysnippets
 
-let $SNIPPETS=expand("$VIMFILES/mysnippets")
+" t.vim
+let g:mysnippets_dir = expand("$VIMFILES/mysnippets")
 
 "neocomplete (requires LUA)
 "--------------------------------------------------------------------------------
@@ -453,16 +402,6 @@ endif
 if &rtp =~ 'neocomplcache.vim'
   source $VIMFILES/neocomplcache.conf
 endif
-
-" Post-startup initializations
-"--------------------------------------------------------------------------------
-augroup PostInit
-  autocmd!
-  " autocmd VimEnter *
-  "       \ if exists("*neocomplcache#close_popup")
-  "       \ |   source $VIMFILES/neocomplcache.conf
-  "       \ | endif
-augroup end
 
 "ctrlp settings
 "--------------------------------------------------------------------------------
@@ -524,10 +463,6 @@ let g:livedown_autorun = 0
 " should the browser window pop-up upon previewing
 let g:livedown_open = 1
 
-" the port on which Livedown server will run
-let g:livedown_port = 1337
-map gm :call LivedownPreview()<CR>
-
 
 "ALE
 "--------------------------------------------------------------------------------
@@ -584,12 +519,16 @@ let g:ycm_confirm_extra_conf = 0
 let g:ycm_use_ultisnips_completer = 1
 let g:ycm_filepath_completion_use_working_dir = 0
 let g:ycm_collect_identifiers_from_tags_files = 0
+let g:ycm_always_populate_location_list = 0
 let g:ycm_key_invoke_completion = ''
 let g:ycm_python_binary_path = 'python'
 if !exists("g:ycm_semantic_triggers")
   let g:ycm_semantic_triggers = {}
 endif
+
 let g:ycm_global_ycm_extra_conf = expand('$VIMFILES/ycm_extra_conf.py')
+
+ca yc YcmCompleter
 
 let g:ycm_semantic_triggers =  {
             \   'c' : ['->', '.'],
@@ -608,11 +547,12 @@ let g:ycm_semantic_triggers =  {
             \   'haskell' : ['.', 're!.']
             \ }
 
-nnoremap <leader>jd :YcmCompleter GoTo<CR>
-nnoremap <leader>jm :YcmCompleter GetDoc<CR>
-nnoremap <leader>ji :YcmCompleter GoToInclude<CR>
-nnoremap <leader>jr :YcmCompleter GoToReferences<CR>
-nnoremap <leader>jf :YcmCompleter FixIt<CR>
+nmap <leader>jd :YcmCompleter GoTo<CR>
+nmap <leader>jt :YcmCompleter GoToDefinition<CR>
+nmap <leader>jD :YcmCompleter GetDoc<CR>
+nmap <leader>jf :YcmCompleter GoToInclude<CR>
+nmap <leader>jI :YcmCompleter GoToImplementation<CR>
+nmap <leader>jr :YcmCompleter GoToReferences<CR>
 
 let g:ycm_filetype_specific_completion_to_disable = {
       \ 'gitcommit': 1
@@ -622,6 +562,9 @@ let g:ycm_filetype_blacklist = {
       \ 'tagbar' : 1,
       \ 'qf' : 1,
       \ 'notes' : 1,
+      \ 'python' : 1,
+      \ 'typescript' : 1,
+      \ 'javascript' : 1,
       \ 'markdown' : 1,
       \ 'json': 1,
       \ 'unite' : 1,
@@ -639,15 +582,6 @@ endfunction
 function! Multiple_cursors_after()
     let g:ycm_auto_trigger = 1
 endfunction
-
-" Rust
-let g:racer_cmd = '~/.cargo/bin/racer'
-let g:racer_experimental_completer = 1
-let g:rustfmt_autosave = 1
-au FileType rust nmap gd <Plug>(rust-def)
-au FileType rust nmap gs <Plug>(rust-def-split)
-au FileType rust nmap gx <Plug>(rust-def-vertical)
-au FileType rust nmap <leader>gd <Plug>(rust-doc)
 
 " jedi settings
 let g:jedi#completions_enabled=0
@@ -748,18 +682,6 @@ endif
 " ` # $ % ^ * ( ) 0 _ - + w
 " W e E t T I o O { } [[ [] ][ ]] [m [M ]m ]M [( ]) [{ ]} | A f F ge gE gg G g0 g^
 " g$ g, g; gj gk gI h H j k l L ; ' z. z<CR> z- zz zt zb b B n N M , / ?
-
-"Disable Arrow keys in Escape mode
-" map <up> <nop>
-" map <down> <nop>
-" map <left> <nop>
-" map <right> <nop>
-"Disable Arrow keys in Insert mode
-" imap <up> <nop>
-" imap <down> <nop>
-" imap <left> <nop>
-" imap <right> <nop>
-
 nmap <silent> <RIGHT> :cnext<CR>
 nmap <silent> <LEFT> :cprev<CR>
 
@@ -799,6 +721,7 @@ function! XmlUnescape()
   silent! execute ':%s/&amp;/\&/g'
 endfunction
 command! -nargs=0 XmlUnescape :call XmlUnescape()
+nnoremap <leader>xf :call XmlUnescape()
 
 " Unescape \uXXXX sequences in selected lines
 function! UnescapeUnicode() range
@@ -827,7 +750,7 @@ let g:WMGraphviz_output = "svg"
 
 let g:previm_open_cmd = 'open -a "google chrome"'
 
-" vim-go
+" vim-go / golang
 let g:go_fmt_fail_silently = 1
 let g:go_highlight_structs=0
 let g:go_highlight_interfaces = 0
@@ -846,102 +769,23 @@ let g:go_snippet_engine='ultisnips'
 let g:go_def_mode='gopls'
 let g:go_info_mode='gopls'
 
-" disable vim-go :GoDef short cut (gd)
-" this is handled by LanguageClient [LC]
-let g:go_def_mapping_enabled = 1
-
-autocmd Filetype go noremap <buffer> <F5> :GoBuild<cr>
-autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
-autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
-autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
-
-" -------------------------------------------------------------------------------------------------
-" coc.nvim default settings
-" -------------------------------------------------------------------------------------------------
-" Smaller updatetime for CursorHold & CursorHoldI
-set updatetime=300
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
-" always show signcolumns
-set signcolumn=yes
-
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use `[c` and `]c` to navigate diagnostics
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nnoremap <leader>jd <Plug>(coc-definition)
-
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
-" Fix autofix problem of current line
-nmap <leader>qf  <Plug>(coc-fix-current)
+" abbrev
+autocmd vimrc Filetype go ca <buffer> ips GoImports
+autocmd vimrc Filetype go noremap <buffer> <F5> :GoBuild<cr>
+autocmd vimrc Filetype go command! -buffer -bang A call go#alternate#Switch(<bang>0, 'edit')
+autocmd vimrc Filetype go command! -buffer -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+autocmd vimrc Filetype go command! -buffer -bang AS call go#alternate#Switch(<bang>0, 'split')
+autocmd vimrc Filetype go command! -buffer -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
 " Use K to show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
   else
-    call CocAction('doHover')
+    exec 'Man '.expand('<cword>')
   endif
 endfunction
-
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Remap for format selected region
-vmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-" Use `:Format` to format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` to fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
-" Show all diagnostics
-nnoremap <silent> <leader>ca  :<C-u>CocList diagnostics<cr>
-" Manage extensions
-nnoremap <silent> <leader>ce  :<C-u>CocList extensions<cr>
-" Show commands
-nnoremap <silent> <leader>cc  :<C-u>CocList commands<cr>
-" Find symbol of current document
-nnoremap <silent> <leader>co  :<C-u>CocList outline<cr>
-" Search workspace symbols
-nnoremap <silent> <leader>cs  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent> <leader>cj  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <leader>ck  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent> <leader>cp  :<C-u>CocListResume<CR>
-nnoremap <silent> <leader>y  :<C-u>CocList -A --normal yank<cr>
+nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 " clang_format
 let g:clang_format#style_options = {
@@ -949,18 +793,14 @@ let g:clang_format#style_options = {
             \ "AllowShortIfStatementsOnASingleLine" : "true",
             \ "AlwaysBreakTemplateDeclarations" : "true",
             \ "Standard" : "C++11"}
-" let g:clang_format#command='/usr/local/bin/clang-format'
-" map to <Leader>cf in C++ code
-autocmd FileType c,cpp,objc,objcpp nnoremap <buffer><Leader>cf :<C-u>ClangFormat<CR>
-autocmd FileType c,cpp,objc,objcpp vnoremap <buffer><Leader>cf :ClangFormat<CR>
-" if you install vim-operator-user
-" autocmd FileType c,cpp,objc map <buffer><Leader>x <Plug>(operator-clang-format)
-" Toggle auto formatting:
-nmap <Leader>C :ClangFormatAutoToggle<CR>
 
-" abbrev
-ca yc YcmCompleter
-ca ips GoImports
+" let g:clang_format#command='/usr/local/bin/clang-format'
+autocmd vimrc FileType c,cpp,objc,objcpp nnoremap <buffer> <Leader>cf :<C-u>ClangFormat<CR>
+autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangFormat<CR>
+autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
+
+" coc.nvim
+runtime! coc_config.vim
 
 " victionary
 let g:victionary#map_defaults = 0
@@ -972,5 +812,3 @@ let g:polyglot_disabled=['typescript', 'go']
 if filereadable(expand("~/.vimrc.after"))
   source ~/.vimrc.after
 endif
-
-

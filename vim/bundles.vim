@@ -75,9 +75,8 @@ Plug 'vim-scripts/DrawIt'
 
 " Auto Completion 
 " Plug 'Shougo/neocomplete.vim'
-" Plug 'ycm-core/YouCompleteMe' 
+Plug 'ycm-core/YouCompleteMe' 
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -153,6 +152,11 @@ Plug 'rhysd/vim-grammarous'
 
 Plug 'vhdirk/vim-cmake'
 
-Plug 'sheerun/vim-polyglot'
+" Plug 'sheerun/vim-polyglot'
+
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
+
+" vimdoc - Chinese version
+Plug 'yianwillis/vimcdoc'
 
 call plug#end() 

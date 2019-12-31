@@ -1,13 +1,20 @@
 " mysnippets template
 "
-" Author: JiYongdong
-" Two commands:
+" Author: jyd119@qq.com
+" Supports two commands:
 "   T *     load snippets
 "   TS xxx  save selection as xxx
 
 if !(has('python') || has('python3'))
   echo "Error: T.vim requires vim compiled with +python"
   finish
+endif
+
+if (!exists('g:mysnippets_dir'))
+  let g:mysnippets_dir = expand("$SNIPPETS_DIR") 
+  if empty(g:mysnippets_dir)
+    let g:mysnippets_dir = expand("~/mysnippets")
+  endif
 endif
 
 if has('python')
@@ -39,14 +46,14 @@ def import_var_from_vim(*var_names):
   return result
 EOS
 
-fun! MyTComplete(A,L,P)
+fun! s:snippet_files(A,L,P)
 Py <<EOF
 import vim
 import os
 pattern = vim.eval('a:A')
 ft = vim.eval('&ft')
 
-snippets_dir= os.environ['SNIPPETS']
+snippets_dir= vim.eval("g:mysnippets_dir") 
 base_dir = snippets_dir
 if ft and os.path.exists(os.path.join(base_dir, ft)):
   base_dir = os.path.join(base_dir, ft)
@@ -63,11 +70,11 @@ EOF
 return files
 endfun
 
-function! InsertFile(A)
+function! InsertTemplate(A)
 Py <<EOF
 import os
 import vim
-SNIPPETS_DIR = os.environ['SNIPPETS']
+snippets_dir= vim.eval("g:mysnippets_dir") 
 fp = vim.eval('a:A')
 _, ext = os.path.splitext(fp)
 if not ext:
@@ -75,10 +82,10 @@ if not ext:
   if ext:
     fp = fp + '.' + ext 
 
-base_dir = SNIPPETS_DIR
+base_dir = snippets_dir
 dst = os.path.join(base_dir, fp)
 if not os.path.exists(dst):
-  dst = os.path.join(SNIPPETS_DIR, ft, fp)
+  dst = os.path.join(snippets_dir, ft, fp)
 if os.path.exists(dst):
   vim.command('r ' + dst)
 EOF
@@ -118,6 +125,5 @@ with open(fp, 'wb') as f:
 EOF
 endfun
 
-
-command! -nargs=1 -range -complete=customlist,MyTComplete TS call SaveTemplate(<q-args>)
-command! -nargs=1 -bang -complete=customlist,MyTComplete T call InsertFile(<q-args>)
+command! -nargs=1 -range -complete=customlist,s:snippet_files TS call SaveTemplate(<q-args>)
+command! -nargs=1 -bang -complete=customlist,s:snippet_files T call InsertTemplate(<q-args>)
