@@ -4,8 +4,13 @@
 " Supports two commands:
 "   T *     load snippets
 "   TS xxx  save selection as xxx
+"
+if exists('g:did_t_vim') || &cp || version < 700
+  finish
+endif
+let g:did_t_vim = 1
 
-if !(has('python') || has('python3'))
+if !(has('pythonx') || has('python3'))
   echo "Error: T.vim requires vim compiled with +python"
   finish
 endif
@@ -17,13 +22,7 @@ if (!exists('g:mysnippets_dir'))
   endif
 endif
 
-if has('python')
-  command! -nargs=* Py python <args>
-elseif has('python3')
-  command! -nargs=* Py python3 <args>
-endif
-
-Py << EOS
+pyx << EOF
 def vim2py(name):
   """Get Vim's variable from Python's world"""
   return vim.eval(name)
@@ -44,10 +43,10 @@ def import_var_from_vim(*var_names):
   for var_name in var_names:
     result[var_name] = vim2py(var_name)
   return result
-EOS
+EOF
 
 fun! s:snippet_files(A,L,P)
-Py <<EOF
+pyx <<EOF
 import vim
 import os
 pattern = vim.eval('a:A')
@@ -71,7 +70,7 @@ return files
 endfun
 
 function! InsertTemplate(A)
-Py <<EOF
+pyx <<EOF
 import os
 import vim
 snippets_dir= vim.eval("g:mysnippets_dir") 
@@ -102,7 +101,7 @@ function! SelText() abort
 endfunction
 
 fun! SaveTemplate(name)
-Py <<EOF
+pyx <<EOF
 import vim
 import os
 
@@ -120,7 +119,7 @@ if not '.' in name:
 
 text = vim.eval('SelText()')
 fp = os.path.join(base_dir, name) 
-with open(fp, 'wb') as f:
+with open(fp, 'wt') as f:
   f.write(text)
 EOF
 endfun

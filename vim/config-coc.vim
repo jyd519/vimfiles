@@ -1,10 +1,8 @@
 let g:coc_conf_loaded = 0 
 
-augroup cocrc 
+augroup coc_config
   autocmd!
   autocmd BufRead,BufNewFile * call s:init_coc() 
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
 augroup END 
 
 function! s:init_coc()
@@ -13,6 +11,10 @@ function! s:init_coc()
   endif
 
   let g:coc_conf_loaded = 1
+
+  if index(['typescript', 'json'], &filetype) >= 0
+    setlocal formatexpr=CocAction('formatSelected')
+  endif
 
   " Use tab for trigger completion with characters ahead and navigate.
   " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -66,7 +68,8 @@ function! s:init_coc()
   omap <buffer> af <Plug>(coc-funcobj-a)
 
   " Use <TAB> for select selections ranges, needs server support, like: coc-tsserver, coc-python
-  nmap <buffer> <silent> <TAB> <Plug>(coc-range-select)
+  " conflict with +jumplist shortcut 
+  " nmap <buffer> <silent> <TAB> <Plug>(coc-range-select)
   xmap <buffer> <silent> <TAB> <Plug>(coc-range-select)
 
   " Use `:Format` to format current buffer
@@ -92,13 +95,13 @@ nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
+    silent! execute 'h '.expand('<cword>')
     return
   endif
 
   if (g:coc_conf_loaded) 
     call CocAction('doHover')
   else
-    execute 'Man '.expand('<cword>')
+    silent! execute 'Man '.expand('<cword>')
   endif
 endfunction

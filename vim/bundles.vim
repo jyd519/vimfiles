@@ -18,6 +18,7 @@ call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'flazz/vim-colorschemes'
+
 " efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
@@ -34,6 +35,11 @@ Plug 'AndrewRadev/splitjoin.vim'
 
 Plug 'scrooloose/nerdtree'
 Plug 'ctrlpvim/ctrlp.vim'
+Plug 'liuchengxu/vim-clap'
+if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
+  Plug '/usr/local/opt/fzf'
+  Plug 'junegunn/fzf.vim'
+endif
 
 Plug 'wesleyche/SrcExpl'
 " Plug 'ervandew/supertab'
@@ -68,15 +74,21 @@ Plug 'mhartington/vim-angular2-snippets'
 " Markdown, reStructuredText, textile
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
 Plug 'jyd519/md-img-paste.vim'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'vim-scripts/DrawIt'
+Plug 'gyim/vim-boxdraw'
+Plug 'vim-scripts/sketch.vim'
 
 
 " Auto Completion 
-" Plug 'Shougo/neocomplete.vim'
-Plug 'ycm-core/YouCompleteMe' 
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+if g:use_ycm
+  Plug 'ycm-core/YouCompleteMe'
+endif
+if g:use_coc
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -93,9 +105,11 @@ Plug 'tpope/vim-dispatch'
 " Graphviz+UML
 Plug 'aklt/plantuml-syntax'
 Plug 'wannesm/wmgraphviz.vim'
+Plug 'tyru/open-browser.vim'
+Plug 'weirongxu/plantuml-previewer.vim'
 
 " EditorConfig
-Plug 'editorconfig/editorconfig-vim'
+" Plug 'editorconfig/editorconfig-vim'
 Plug 'rhysd/vim-clang-format'
 
 "js & node
@@ -118,16 +132,14 @@ Plug 'leafgarland/typescript-vim'
 Plug 'chr4/nginx.vim'
 
 " gyp
-Plug 'kelan/gyp.vim'
+Plug 'kelan/gyp.vim', { 'for': 'gyp' }
 
 " Go
 Plug 'fatih/vim-go', { 'for': 'go', 'do': ':GoUpdateBinaries' }
-" Plug 'fatih/vim-go', { 'for': 'go', 'tag': 'v1.20' }
 
 " Rust
 Plug 'rust-lang/rust.vim', { 'for': 'rust' }
 Plug 'racer-rust/vim-racer', { 'for': 'rust' }
-Plug 'timonv/vim-cargo', { 'for': 'rust' }
 
 " Google GN
 Plug 'c0nk/vim-gn'
@@ -159,4 +171,7 @@ Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 " vimdoc - Chinese version
 Plug 'yianwillis/vimcdoc'
 
+Plug 'pechorin/any-jump.vim'
+
+Plug 'mhinz/vim-rfc'
 call plug#end() 

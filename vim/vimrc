@@ -9,12 +9,22 @@ filetype off                  " required
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
 set rtp^=$VIMFILES
 set nocscopeverbose
+
 if filereadable(expand("~/.vimrc.before"))
   source ~/.vimrc.before
 endif
 
+if $VIM_MODE =~ 'ycm'
+  let g:use_ycm = 1
+  let g:use_coc = 0
+else
+  let g:use_ycm = 0
+  let g:use_coc = 1
+endif
+
 if $VIM_MODE =~ 'man'
-  source $VIMFILES/man.bundles.vim
+  let g:use_coc = 0
+  source $VIMFILES/bundles-man.vim
 else
   source $VIMFILES/bundles.vim
 endif
@@ -74,11 +84,18 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
 set wildignore+=*DS_Store
 
 set completeopt=menuone,longest,preview
-if has("gui_running")
+if has("gui_running") && !has('gui_vimr')
   set ballooneval
   set balloondelay=100
-else
+endif
+
+if has('termguicolors')
   set termguicolors
+  " Correct RGB escape codes for vim inside tmux
+  if !has('nvim') && $TERM ==# 'screen-256color'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+  endif
 endif
 
 " Keep screen after vim exited
@@ -218,14 +235,14 @@ let g:maplocalleader = ","
 
 "font
 if has("gui_running")
-  let s:font_size=15
+  let s:font_size=16
   let s:fontbase="Bitstream_Vera_Sans_Mono"
   if has("mac")
     " let s:fontbase="PT_Mono"
     " let s:fontbase="FiraCode-Light"
     " let s:fontbase="SourceCodePro-Light"
     let s:fontbase="SF_Mono"
-    let s:fontwide="Lantinghei_TC"
+    let s:fontwide="Hei"
   else
     " let s:fontbase="Ubuntu_Mono"
     " let s:fontbase="Anonymous_Pro"
@@ -236,6 +253,7 @@ if has("gui_running")
 
   if !has('gui_vimr')
     execute "set guifont=". s:fontbase . ":h" . s:font_size
+    execute "set guifontwide=". s:fontwide . ":h" . s:font_size
   endif
 
   map <leader>fi :call <SID>IncFontSize()<CR>
@@ -245,12 +263,14 @@ endif
 function! s:IncFontSize()
   let s:font_size+=1
   execute "set guifont=". s:fontbase . ":h" . s:font_size
+  execute "set guifontwide=". s:fontwide . ":h" . s:font_size
   echom s:font_size
 endfunction
 
 function! s:DecFontSize()
   let s:font_size-=1
   execute "set guifont=". s:fontbase . ":h" . s:font_size
+  execute "set guifontwide=". s:fontwide . ":h" . s:font_size
   echom s:font_size
 endfunction
 
@@ -306,8 +326,6 @@ cnoremap <C-a> <C-b>
 if has("win32")
   "quick start IE
   nmap <leader>ie :update<cr>:silent !start ie.bat "file://%:p"<cr>
-  "quick start firefox
-  nmap <leader>ff :update<cr>:silent !start ff.bat "file://%:p"<cr>
   "start chrome
   nmap <leader>ch :update<cr>:silent !start "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" "file://%:p"<cr>
 endif
@@ -392,17 +410,6 @@ set rtp+=$VIMFILES/mysnippets
 " t.vim
 let g:mysnippets_dir = expand("$VIMFILES/mysnippets")
 
-"neocomplete (requires LUA)
-"--------------------------------------------------------------------------------
-if &rtp =~ 'neocomplete.vim'
-  source $VIMFILES/neocomplete.conf
-endif
-
-"neocomplcache
-if &rtp =~ 'neocomplcache.vim'
-  source $VIMFILES/neocomplcache.conf
-endif
-
 "ctrlp settings
 "--------------------------------------------------------------------------------
 let g:ctrlp_custom_ignore = {
@@ -466,13 +473,12 @@ let g:livedown_open = 1
 
 "ALE
 "--------------------------------------------------------------------------------
-let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['eslint', 'tslint', 'tsserver'], 'go': ['gometalinter', 'gofmt']}
+let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['eslint', 'tslint', 'tsserver'], 'go': ['gofmt']}
 let g:ale_pattern_options = {
       \ '\.min.js$': {'ale_enabled': 0},
       \ '\v\.(m|mm|cpp|cxx|cc|h|hpp)$': {'ale_enabled': 0},
       \ '\v\.py$': {'ale_linters': ['flake8', 'pylint'], 'ale_fixers': ['autopep8', 'yapf']}
       \}
-let g:ale_go_gometalinter_options = '--fast --config=~/.gometalinter'
 let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
 
 
@@ -512,77 +518,6 @@ let g:NERDTrimTrailingWhitespace = 1
 let g:NERDToggleCheckAllLines = 1
 
 
-" ycm
-"--------------------------------------------------------------------------------
-let g:ycm_min_num_of_chars_for_completion = 2
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_use_ultisnips_completer = 1
-let g:ycm_filepath_completion_use_working_dir = 0
-let g:ycm_collect_identifiers_from_tags_files = 0
-let g:ycm_always_populate_location_list = 0
-let g:ycm_key_invoke_completion = ''
-let g:ycm_python_binary_path = 'python'
-if !exists("g:ycm_semantic_triggers")
-  let g:ycm_semantic_triggers = {}
-endif
-
-let g:ycm_global_ycm_extra_conf = expand('$VIMFILES/ycm_extra_conf.py')
-
-ca yc YcmCompleter
-
-let g:ycm_semantic_triggers =  {
-            \   'c' : ['->', '.'],
-            \   'objc' : ['->', '.'],
-            \   'rust' : ['.', '::'],
-            \   'ocaml' : ['.', '#'],
-            \   'cpp,objcpp' : ['->', '.', '::'],
-            \   'perl' : ['->'],
-            \   'php' : ['->', '::', '"', "'", 'use ', 'namespace ', '\'],
-            \   'python,cs,java,javascript,typescript,d,perl6,scala,vb,go' : ['.'],
-            \   'html': ['<', '"', '</', ' '],
-            \   'vim' : ['re![_a-za-z]+[_\w]*\.'],
-            \   'ruby' : ['.', '::'],
-            \   'lua' : ['.', ':'],
-            \   'erlang' : [':'],
-            \   'haskell' : ['.', 're!.']
-            \ }
-
-nmap <leader>jd :YcmCompleter GoTo<CR>
-nmap <leader>jt :YcmCompleter GoToDefinition<CR>
-nmap <leader>jD :YcmCompleter GetDoc<CR>
-nmap <leader>jf :YcmCompleter GoToInclude<CR>
-nmap <leader>jI :YcmCompleter GoToImplementation<CR>
-nmap <leader>jr :YcmCompleter GoToReferences<CR>
-
-let g:ycm_filetype_specific_completion_to_disable = {
-      \ 'gitcommit': 1
-      \}
-
-let g:ycm_filetype_blacklist = {
-      \ 'tagbar' : 1,
-      \ 'qf' : 1,
-      \ 'notes' : 1,
-      \ 'python' : 1,
-      \ 'typescript' : 1,
-      \ 'javascript' : 1,
-      \ 'markdown' : 1,
-      \ 'json': 1,
-      \ 'unite' : 1,
-      \ 'vimwiki' : 1,
-      \ 'pandoc' : 1,
-      \ 'infolog' : 1,
-      \ 'mail' : 1
-      \}
-
-" multiple_cursors and YCM
-function! Multiple_cursors_before()
-    let g:ycm_auto_trigger = 0
-endfunction
-
-function! Multiple_cursors_after()
-    let g:ycm_auto_trigger = 1
-endfunction
-
 " jedi settings
 let g:jedi#completions_enabled=0
 
@@ -605,6 +540,7 @@ let g:session_autoload='no'
 let g:airline#extensions#tagbar#enabled = 0
 let g:airline_section_b = '' "'%-20{getcwd()}'
 let g:airline#extensions#tmuxline#enabled = 0
+let g:airline#extensions#coc#enabled = 1
 
 "%-0{minwid}.{maxwid}{item}
 "jsbeautify settings
@@ -630,10 +566,25 @@ autocmd vimrc FileType jsx vnoremap <buffer> <c-f> :call RangeJsxBeautify()<cr>
 autocmd vimrc FileType html vnoremap <buffer> <c-f> :call RangeHtmlBeautify()<cr>
 autocmd vimrc FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>
 
-"easy switching buffers
-"--------------------------------------------------------------------------------
-"nnoremap <leader>b :buffers<CR>:buffer<Space>
-nnoremap <leader>b :CtrlPBuffer<CR>
+" File searching
+if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
+  let g:fzf_action = {
+    \ 'ctrl-t': 'tab split',
+    \ 'ctrl-s': 'split',
+    \ 'ctrl-v': 'vsplit'
+    \}
+
+  let g:ctrlp_map = ''
+
+  " fzf binding
+  nnoremap <C-P> :Files<CR>
+  nnoremap <leader>ff :Files<CR>
+  nnoremap <leader>fb :Buffers<CR>
+  nnoremap <leader>b :Buffers<CR>
+  nnoremap <leader>fh :History<CR>
+else 
+  nnoremap <leader>b :CtrlPBuffer<CR>
+endif
 
 " The Silver Searcher
 "--------------------------------------------------------------------------------
@@ -660,8 +611,7 @@ endif
 
 "Man
 "--------------------------------------------------------------------------------
-source $VIMRUNTIME/ftplugin/man.vim
-noremap <leader>k :Man <cword><cr>
+runtime ftplugin/man.vim
 
 "vim-easy-align
 "--------------------------------------------------------------------------------
@@ -682,8 +632,10 @@ endif
 " ` # $ % ^ * ( ) 0 _ - + w
 " W e E t T I o O { } [[ [] ][ ]] [m [M ]m ]M [( ]) [{ ]} | A f F ge gE gg G g0 g^
 " g$ g, g; gj gk gI h H j k l L ; ' z. z<CR> z- zz zt zb b B n N M , / ?
-nmap <silent> <RIGHT> :cnext<CR>
-nmap <silent> <LEFT> :cprev<CR>
+"
+" Conflicts with DrawIt plugin
+" nmap <silent> <RIGHT> :cnext<CR>
+" nmap <silent> <LEFT> :cprev<CR>
 
 "Convert selected text to javascript string
 "--------------------------------------------------------------------------------
@@ -752,9 +704,9 @@ let g:previm_open_cmd = 'open -a "google chrome"'
 
 " vim-go / golang
 let g:go_fmt_fail_silently = 1
-let g:go_highlight_structs=0
-let g:go_highlight_interfaces = 0
-let g:go_highlight_operators = 0
+" let g:go_highlight_structs=0
+" let g:go_highlight_interfaces = 0
+" let g:go_highlight_operators = 0
 let g:go_highlight_types = 1
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
@@ -766,8 +718,7 @@ let g:go_snippet_engine='ultisnips'
 " let g:go_autodetect_gopath=1
 " let g:go_def_mode='guru'
 " let g:go_info_mode='guru'
-let g:go_def_mode='gopls'
-let g:go_info_mode='gopls'
+let g:go_doc_popup_window = 1
 
 " abbrev
 autocmd vimrc Filetype go ca <buffer> ips GoImports
@@ -800,13 +751,36 @@ autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangForm
 autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
 
 " coc.nvim
-runtime! coc_config.vim
+if g:use_coc
+  runtime! config-coc.vim
+endif
+
+" ycm
+if g:use_ycm
+  runtime! config-ycm.vim
+endif
 
 " victionary
 let g:victionary#map_defaults = 0
 
 " Polyglot
 let g:polyglot_disabled=['typescript', 'go']
+
+" Draw ascii box
+map <leader>tsk :call ToggleSketch()<CR>
+
+" =======================================================
+" any-jump
+" =======================================================
+let g:any_jump_disable_default_keybindings = 1
+
+" Jump to definition under cursore
+nnoremap gs :AnyJump<CR>
+
+" Visual mode: jump to selected text in visual mode
+xnoremap gs :AnyJumpVisual<CR>
+" open last closed search window again
+nnoremap gl :AnyJumpLastResults<CR>
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))

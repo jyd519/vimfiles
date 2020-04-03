@@ -19,9 +19,11 @@ default_flags = [
     '-ferror-limit=10000',
 ]
 
-def IsHeaderFile( filename ):
-  extension = os.path.splitext( filename )[ 1 ]
-  return extension in [ '.h', '.hxx', '.hpp', '.hh' ]
+
+def IsHeaderFile(filename):
+    extension = os.path.splitext(filename)[1]
+    return extension in ['.h', '.hxx', '.hpp', '.hh']
+
 
 ##
 # C header extensions
@@ -725,6 +727,8 @@ def parse_default_flags(file_name):
 ####
 # Entry point for the YouCompleteMe plugin
 ####
+
+
 def FlagsForFile(file_name, **kwargs):
     """
     This method is the entry point for the YCM plugin. It is called by the
