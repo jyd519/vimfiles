@@ -1,18 +1,26 @@
 if exists('did_gpg_enc_vim') || &cp || version < 700
   finish
 endif
-
 let did_gpg_enc_vim = 1
 
-function! GpgDec() range
+let g:gpg_input_passphrase = 1
+
+function! GpgDec(...) range
+  let passphrase = a:0 > 0 ? a:1 : ""
+  if empty(passphrase) && g:gpg_input_passphrase
+    let passphrase = inputsecret("Passphrase: ")
+  endif
+  let extra = ""
+  if !empty(passphrase)
+    let extra = " --batch --passphrase " . passphrase
+  endif
   if a:lastline != a:firstline
-    call GpgDecAll()
+    call GpgDecAll(extra)
     return
   endif
 
   let cur = line('.')
-  let b = cur
-  let e = cur
+  let [b, e] = [cur, cur]
   while b >= 1 
     if getline(b) =~ '^ *-----BEGIN PGP MESSAGE'
       break
@@ -34,10 +42,11 @@ function! GpgDec() range
   if getline(e) !~ '^ *-----END PGP MESSAGE'
     return 
   endif
-  execute(b . ',' . e . '!gpg -da')
+
+  silent!  execute(b . ',' . e . '!gpg -da ' . extra . ' 2>/dev/null')
 endfunction
  
-function! GpgDecAll() 
+function! GpgDecAll(extra) 
   let i = 1 
   let b = i 
   let e = i 
@@ -48,16 +57,25 @@ function! GpgDecAll()
     elseif getline(i) =~ '^ *-----END PGP MESSAGE'
       let e = i
       if e > b 
-         silent! execute(b . ',' . e . '!gpg -da')
+         silent! execute(b . ',' . e . '!gpg -da' . a:extra . ' 2>/dev/null')
       endif
     endif
     let i += 1
   endwhile
 endfunction
 
-function! GpgEnc() range
-  silent! execute(a:firstline . ',' . a:lastline . '!gpg -ca')
+function! GpgEnc(...) range
+  let passphrase = a:0 > 0 ? a:1 : ""
+  if empty(passphrase) && g:gpg_input_passphrase
+    let passphrase = inputsecret("Passphrase: ")
+  endif
+  let extra = ""
+  if !empty(passphrase)
+    let extra = " --batch --passphrase " . passphrase
+  endif
+
+  silent! execute(a:firstline . ',' . a:lastline . '!gpg -ca' . extra)
 endfunction
 
-command! -nargs=0 -range GpgEnc <line1>,<line2>call GpgEnc() 
-command! -nargs=0 -range GpgDec <line1>,<line2>call GpgDec() 
+command! -nargs=? -range GpgEnc <line1>,<line2>call GpgEnc(<f-args>) 
+command! -nargs=? -range GpgDec <line1>,<line2>call GpgDec(<f-args>) 
