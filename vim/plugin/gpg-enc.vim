@@ -66,6 +66,7 @@ endfunction
 
 function! GpgEnc(...) range
   let passphrase = a:0 > 0 ? a:1 : ""
+  let comment = a:0 > 1 ? a:2 : ""
   if empty(passphrase) && g:gpg_input_passphrase
     let passphrase = inputsecret("Passphrase: ")
   endif
@@ -73,9 +74,12 @@ function! GpgEnc(...) range
   if !empty(passphrase)
     let extra = " --batch --passphrase " . passphrase
   endif
+  if !empty(comment) 
+    let extra .= " --comment " . shellescape(comment)
+  endif
 
   silent! execute(a:firstline . ',' . a:lastline . '!gpg -ca' . extra)
 endfunction
 
-command! -nargs=? -range GpgEnc <line1>,<line2>call GpgEnc(<f-args>) 
+command! -nargs=* -range GpgEnc <line1>,<line2>call GpgEnc(<f-args>) 
 command! -nargs=? -range GpgDec <line1>,<line2>call GpgDec(<f-args>) 
