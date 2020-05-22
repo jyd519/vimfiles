@@ -1,10 +1,9 @@
 import os
-from os.path import abspath, join, isabs, normpath, exists, splitext, dirname
-import ycm_core
+import os.path as p
+import sys
 
-####
-# Global lists for the flags and file detection
-####
+# The directory where the current script is located.
+SCRIPT_PATH = p.dirname(p.realpath(__file__))
 
 ##
 # This is the list of default flags.
@@ -18,12 +17,6 @@ default_flags = [
     '-fexceptions',
     '-ferror-limit=10000',
 ]
-
-
-def IsHeaderFile(filename):
-    extension = os.path.splitext(filename)[1]
-    return extension in ['.h', '.hxx', '.hpp', '.hh']
-
 
 ##
 # C header extensions
@@ -42,7 +35,6 @@ c_additional_flags = [
     # Tell clang that this is a C file.
     "-x",
     "c",
-
     # Use the latest standard if possible.
     "-std=c11",
 ]
@@ -74,6 +66,10 @@ cpp_source_extensions = [
     ".c++",
 ]
 
+# objc/ objcpp source extensions
+objc_source_extensions = ['.m', '.mm']
+
+
 ##
 # CPP additional flags
 ##
@@ -84,10 +80,14 @@ cpp_additional_flags = [
     "-std=c++14",
 ]
 
+####
+# Helper functions
+####
 
 def MakeRelativePathsInFlagsAbsolute(flags, working_directory):
     if not working_directory:
         return list(flags)
+
     new_flags = []
     make_next_absolute = False
     path_flags = ['-isystem', '-I', '-iquote', '--sysroot=']
@@ -113,9 +113,16 @@ def MakeRelativePathsInFlagsAbsolute(flags, working_directory):
             new_flags.append(new_flag)
     return new_flags
 
-####
-# Helper functions
-####
+
+def FindCorrespondingSourceFile(filename):
+    if is_header(filename):
+        basename = p.splitext(filename)[0]
+        for extension in cpp_source_extensions + cpp_source_extensions + objc_source_extensions:
+            replacement_file = basename + extension
+            if p.exists(replacement_file):
+                return replacement_file
+    return filename
+
 
 ##
 # Methods for file system interaction
@@ -140,23 +147,23 @@ def find_file_recursively(file_name, start_dir=os.getcwd(), stop_dir=None):
     :rtype: str
     :return: The file path where the file was first found.
     """
-    cur_dir = abspath(start_dir) if not isabs(start_dir) else start_dir
+    cur_dir = p.abspath(start_dir) if not p.isabs(start_dir) else start_dir
 
     while True:
-        if exists(join(cur_dir, file_name)):
+        if p.exists(p.join(cur_dir, file_name)):
             # The file of interest exists in the current directory
             # so return it.
-            return join(cur_dir, file_name)
+            return p.join(cur_dir, file_name)
 
         # The file was not found yet so try in the parent directory.
-        parent_dir = dirname(cur_dir)
+        parent_dir = p.dirname(cur_dir)
 
-        if parent_dir == cur_dir or parent_dir == stop_dir:
+        if parent_dir in (cur_dir, stop_dir):
             # We are either at the root directory or reached the stop
             # directory.
             return None
-        else:
-            cur_dir = parent_dir
+
+        cur_dir = parent_dir
 
 
 def file_exists(file_name, start_dir=os.getcwd()):
@@ -188,20 +195,10 @@ def make_path_absolute(path, base_dir=os.getcwd()):
     :rtype: str
     :return: The absolute path.
     """
-    if isabs(path):
+    if p.isabs(path):
         return path
-    else:
-        return join(base_dir, path)
 
-
-def script_directory():
-    """
-    Returns the directory where the current script is located.
-
-    :rtype: str
-    :return: The directory where the current script is located.
-    """
-    return dirname(__file__)
+    return p.join(base_dir, path)
 
 
 ##
@@ -229,7 +226,7 @@ def is_c_header(file_path):
     :rtype: bool
     :return: True if the file is a C header or False if not.
     """
-    (_, extension) = splitext(file_path)
+    (_, extension) = p.splitext(file_path)
 
     return extension in c_header_extensions
 
@@ -243,7 +240,7 @@ def is_cpp_header(file_path):
     :rtype: bool
     :return: True if the file is a CPP header or False if not.
     """
-    (_, extension) = splitext(file_path)
+    (_, extension) = p.splitext(file_path)
 
     return extension in cpp_header_extensions
 
@@ -257,7 +254,7 @@ def is_source(file_path):
     :rtype: bool
     :return: True if the file is a source file or False if not.
     """
-    return is_c_source(file_path) or is_cpp_source(file_path)
+    return is_c_source(file_path) or is_cpp_source(file_path) or is_objcpp_source(file_path)
 
 
 def is_c_source(file_path):
@@ -269,7 +266,7 @@ def is_c_source(file_path):
     :rtype: bool
     :return: True if the file is a C source file or False if not.
     """
-    (_, extension) = splitext(file_path)
+    (_, extension) = p.splitext(file_path)
 
     return extension in c_source_extensions
 
@@ -283,9 +280,14 @@ def is_cpp_source(file_path):
     :rtype: bool
     :return: True if the file is a CPP source file or False if not.
     """
-    (_, extension) = splitext(file_path)
+    (_, extension) = p.splitext(file_path)
 
     return extension in cpp_source_extensions
+
+
+def is_objcpp_source(file_path):
+    (_, extension) = p.splitext(file_path)
+    return extension in objc_source_extensions
 
 
 def is_c_file(file_path):
@@ -369,7 +371,6 @@ def make_absolute_flags(flags, base_dir):
                 # flag and one with the path.
                 updated_flags.append(f)
                 updated_flag = make_path_absolute(path, base_dir)
-
                 break
 
         # Check for flags which expect a path as argument.
@@ -377,7 +378,6 @@ def make_absolute_flags(flags, base_dir):
             if flag.startswith(f):
                 path = flag[len(f):].lstrip()
                 updated_flag = f + make_path_absolute(path, base_dir)
-
                 break
 
         updated_flags.append(updated_flag)
@@ -423,8 +423,8 @@ def make_final_flags(file_name, flags, base_dir=os.getcwd()):
         final = save_add_flags(absolute, c_additional_flags)
     else:
         final = absolute
-
-    return create_result(final)
+    return create_result(final, override_filename=file_name,
+                         include_paths_relative_to_dir=SCRIPT_PATH)
 
 
 def save_add_flags(old_flags, additional_flags):
@@ -452,17 +452,15 @@ def save_add_flags(old_flags, additional_flags):
 
     :param old_flags: The list of compilation flags which should be extended.
     :type old_flags: list[str]
-    :param additional_flags: The list of compilation flags which should be
-                             added to the other list.
+    :param additional_flags: The list of compilation flags which should be added to the other list.
     :type additional_flags: list[str]
     :rtype: list[str]
     :return: The properly merged result list.
     """
+
     skip_next_af = False
-
-    for j in range(len(additional_flags)):
-        af = additional_flags[j].strip()
-
+    for j, af in enumerate(additional_flags):
+        af = af.strip()
         argument_type = "none"
         to_add = True
 
@@ -473,13 +471,11 @@ def save_add_flags(old_flags, additional_flags):
             continue
 
         # First check if the flag has an argument as next flag.
-        if len(additional_flags) > j + 1 and \
-                not additional_flags[j+1].startswith("-"):
+        if len(additional_flags) > j + 1 and not additional_flags[j+1].startswith("-"):
             # There is a flag after the current one which does not start with
             # "-". So assume that this is an argument for the current flag.
             argument_type = "next"
             skip_next_af = True
-
             af_arg = additional_flags[j+1].strip()
 
         # Next check if the flag has an argument separated by a " ".
@@ -487,7 +483,6 @@ def save_add_flags(old_flags, additional_flags):
             # The argument for the current flag is separated by a space
             # character.
             pos = af.find(" ")
-
             argument_type = "next"
             af_arg = af[pos+1:].strip()
             af = af[:pos]
@@ -497,7 +492,6 @@ def save_add_flags(old_flags, additional_flags):
             # The argument for the current flag is separated by a equal
             # sign.
             pos = af.find("=")
-
             argument_type = "same"
             af_arg = af[pos+1:].strip()
             af = af[:pos]
@@ -506,25 +500,20 @@ def save_add_flags(old_flags, additional_flags):
         # list.
         skip_next_of = False
 
-        for i in range(len(old_flags)):
-            of = old_flags[i].strip()
+        for i, of in enumerate(old_flags):
+            of = of.strip()
 
-            if skip_next_of:
-                # The current flag is an argument for the previous one. Skip
-                # it.
+            if skip_next_of: # The current flag is an argument for the previous one. Skip it.
                 skip_next_of = False
                 continue
 
-            # If there is no argument for this flag, check for simple
-            # equality.
+            # If there is no argument for this flag, check for simple equality.
             if argument_type == "none":
-                if of == af:
-                    # The flag is already in the list. So do not add it.
+                if of == af: # The flag is already in the list. So do not add it.
                     to_add = False
                     break
 
             # The flag is with argument. Check for these cases.
-
             elif argument_type == "next":
                 # The argument is normally given as next argument. So three
                 # cases have to be checked:
@@ -586,8 +575,7 @@ def save_add_flags(old_flags, additional_flags):
                         break
 
                     # 3
-                    elif len(of) == len(af) and len(old_flags) > i + 1 \
-                            and old_flags[i+1].strip().startswith("="):
+                    elif len(of) == len(af) and len(old_flags) > i + 1 and old_flags[i+1].strip().startswith("="):
                         # The argument is given in the next flag and the "="
                         # sign is also in that flag. So don't add the flag to
                         # the list.
@@ -599,10 +587,8 @@ def save_add_flags(old_flags, additional_flags):
         if to_add:
             if argument_type == "none":
                 old_flags.append(af)
-
             elif argument_type == "next":
                 old_flags.extend([af, af_arg])
-
             elif argument_type == "same":
                 old_flags.append("{}={}".format(af, af_arg))
 
@@ -612,7 +598,6 @@ def save_add_flags(old_flags, additional_flags):
 ##
 # Methods to create the correct return format wanted by YCM
 ##
-
 def create_result(flags, do_cache=True, **kwargs):
     """
     Create the correct return value for YCM.
@@ -635,7 +620,6 @@ def create_result(flags, do_cache=True, **kwargs):
 ##
 # Methods to parse the different formats supported by this script
 ##
-
 def parse_compile_commands(file_name, search_base=os.getcwd()):
     """
     Parse the clang compile database generated by cmake. This database
@@ -653,26 +637,27 @@ def parse_compile_commands(file_name, search_base=os.getcwd()):
     :rtype: dict[str,object]
     :returns: The flags found in the database in the format wanted by YCM.
     """
-    database_path = dirname(find_file_recursively("compile_commands.json",
-                                                  search_base))
+    import ycm_core
 
+    database_path = p.dirname(find_file_recursively("compile_commands.json",
+                                                    search_base))
     database = ycm_core.CompilationDatabase(database_path)
 
     # As headers are not in the database, we have to use the corresponding
     # source file.
     if is_header(file_name):
-        (name, _) = splitext(file_name)
+        (name, _) = p.splitext(file_name)
 
-        # Try out all C and CPP extensions for the corresponding source file.
-        for ext in (c_source_extensions + cpp_source_extensions):
+        # Try out all C, CPP, objc, objcpp extensions for the corresponding source file.
+        for ext in c_source_extensions + cpp_source_extensions + objc_source_extensions:
             alternative_name = name + ext
 
-            if exists(alternative_name):
+            if p.exists(alternative_name):
                 compilation_info = database.GetCompilationInfoForFile(
                     alternative_name)
 
                 # In the database we found flags for the alternative name
-                if (compilation_info.compiler_flags_):
+                if compilation_info.compiler_flags_:
                     return make_final_flags(file_name, compilation_info.compiler_flags_,
                                             compilation_info.compiler_working_dir_)
 
@@ -680,7 +665,7 @@ def parse_compile_commands(file_name, search_base=os.getcwd()):
         compilation_info = database.GetCompilationInfoForFile(file_name)
 
         # We found flags for the file in the database
-        if (compilation_info.compiler_flags_):
+        if compilation_info.compiler_flags_:
             return make_final_flags(file_name, compilation_info.compiler_flags_,
                                     compilation_info.compiler_working_dir_)
 
@@ -705,11 +690,10 @@ def parse_clang_complete(file_name, search_base=os.getcwd()):
     :returns: The flags found in the file in the format wanted by YCM.
     """
     config = find_file_recursively(".clang_complete", search_base)
-    config_path = dirname(config)
+    config_path = p.dirname(config)
 
     with open(config, "r") as config_file:
         flags = config_file.read().splitlines()
-
         return make_final_flags(file_name, flags, config_path)
 
 
@@ -718,35 +702,36 @@ def parse_default_flags(file_name):
     Parse and clean the default flags to use them as result for YCM.
 
     :param file_name: The file for which flags should be created.
-    :type file_name: str
-    :rtype: dict[str,object]
     :returns: The default flags in the format wanted by YCM.
     """
-    return make_final_flags(file_name, default_flags, script_directory())
+    return make_final_flags(file_name, default_flags, SCRIPT_PATH)
 
-####
+
 # Entry point for the YouCompleteMe plugin
-####
-
-
-def FlagsForFile(file_name, **kwargs):
+def Settings(**kwargs):
     """
     This method is the entry point for the YCM plugin. It is called by the
     plugin to get the all necessary compiler flags to parse a specific file
     given as argument.
 
-    :file_name: The path to the file for which YouCompleteMe likes to do
-                      auto completion.
+    :file_name: The path to the file for which YouCompleteMe likes to do auto completion.
     :kwargs: Additional key word arguments.
 
     :return: The compilation flags for the file in the format wanted by YCM.
     """
+    language = kwargs['language']
+    if language != 'cfamily':
+        return {}
+
     # First check for a compile_commands.json file.
-    search_base = dirname(file_name)
+    file_name = kwargs['filename']
+    search_base = p.dirname(file_name)
+    file_name = FindCorrespondingSourceFile(file_name)
 
     if file_exists("compile_commands.json", search_base):
         # There exists a compile_commands.json file. Try to use this one.
-        return parse_compile_commands(file_name, search_base)
+        # return parse_compile_commands(file_name, search_base)
+        return {}
 
     if file_exists(".clang_complete", search_base):
         # There exists a .clang_complete file. Try to use this one.
@@ -754,3 +739,6 @@ def FlagsForFile(file_name, **kwargs):
 
     # No files exists. Use the default flags.
     return parse_default_flags(file_name)
+
+if __name__ == '__main__':
+    print(Settings(language='cfamily', filename=sys.argv[1]))

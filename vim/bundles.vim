@@ -34,7 +34,7 @@ Plug 'tmhedberg/matchit'
 Plug 'AndrewRadev/splitjoin.vim'
 
 Plug 'scrooloose/nerdtree'
-Plug 'ctrlpvim/ctrlp.vim'
+" Plug 'ctrlpvim/ctrlp.vim'
 Plug 'liuchengxu/vim-clap'
 if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
   Plug '/usr/local/opt/fzf'
@@ -42,7 +42,6 @@ if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
 endif
 
 Plug 'wesleyche/SrcExpl'
-" Plug 'ervandew/supertab'
 Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
@@ -55,8 +54,8 @@ Plug 'xolox/vim-easytags'
 Plug 'nathanaelkane/vim-indent-guides'
 
 Plug 'xolox/vim-misc'
-Plug 'terryma/vim-multiple-cursors'
 Plug 'xolox/vim-session'
+Plug 'terryma/vim-multiple-cursors'
 Plug 'kshenoy/vim-signature'
 Plug 'jez/vim-superman'
 Plug 'majutsushi/tagbar'
@@ -81,14 +80,9 @@ Plug 'vim-scripts/DrawIt'
 Plug 'gyim/vim-boxdraw'
 Plug 'vim-scripts/sketch.vim'
 
-
 " Auto Completion 
-if g:use_ycm
-  Plug 'ycm-core/YouCompleteMe'
-endif
-if g:use_coc
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
-endif
+Plug 'ycm-core/YouCompleteMe'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -117,9 +111,6 @@ Plug 'isRuslan/vim-es6'
 Plug 'moll/vim-node'
 Plug 'geekjuice/vim-mocha'
 
-Plug 'marijnh/tern_for_vim'
-
-Plug 'kchmck/vim-coffee-script'
 Plug 'pangloss/vim-javascript'
 Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
@@ -162,11 +153,10 @@ Plug 'farconics/victionary'
 
 Plug 'rhysd/vim-grammarous'
 
+" C/C++ build
 Plug 'vhdirk/vim-cmake'
 
 " Plug 'sheerun/vim-polyglot'
-
-Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 
 " vimdoc - Chinese version
 Plug 'yianwillis/vimcdoc'

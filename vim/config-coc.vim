@@ -1,20 +1,23 @@
-let g:coc_conf_loaded = 0 
-
 augroup coc_config
   autocmd!
   autocmd BufRead,BufNewFile * call s:init_coc() 
 augroup END 
 
 function! s:init_coc()
-  if (index(['c','cpp', 'objc', 'objcpp'], &filetype) >= 0)
+  if index(g:filetype_use_ycm, &filetype) >= 0
+    :CocDisable
     return
   endif
 
-  let g:coc_conf_loaded = 1
+  :CocEnable
+  echomsg "Using COC"
 
   if index(['typescript', 'json'], &filetype) >= 0
     setlocal formatexpr=CocAction('formatSelected')
   endif
+
+  " Use K to show documentation in preview window
+  nnoremap <buffer> <silent> K :call <SID>show_documentation()<CR>
 
   " Use tab for trigger completion with characters ahead and navigate.
   " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
@@ -44,8 +47,8 @@ function! s:init_coc()
   nmap <buffer> <leader>rn <Plug>(coc-rename)
 
   " Remap for format selected region
-  xmap <buffer> <leader>f  <Plug>(coc-format-selected)
-  nmap <buffer> <leader>f  <Plug>(coc-format-selected)
+  xmap <buffer> <leader>fs  <Plug>(coc-format-selected)
+  nmap <buffer> <leader>fs  <Plug>(coc-format-selected)
 
   " Update signature help on jump placeholder
   autocmd User CocJumpPlaceholder <buffer> call CocActionAsync('showSignatureHelp')
@@ -90,18 +93,11 @@ function! s:check_back_space() abort
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Use K to show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     silent! execute 'h '.expand('<cword>')
     return
   endif
 
-  if (g:coc_conf_loaded) 
-    call CocAction('doHover')
-  else
-    silent! execute 'Man '.expand('<cword>')
-  endif
+  call CocAction('doHover')
 endfunction

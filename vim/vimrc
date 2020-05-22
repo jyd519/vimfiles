@@ -8,22 +8,14 @@ filetype off                  " required
 
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
 set rtp^=$VIMFILES
+
 set nocscopeverbose
 
 if filereadable(expand("~/.vimrc.before"))
   source ~/.vimrc.before
 endif
 
-if $VIM_MODE =~ 'ycm'
-  let g:use_ycm = 1
-  let g:use_coc = 0
-else
-  let g:use_ycm = 0
-  let g:use_coc = 1
-endif
-
 if $VIM_MODE =~ 'man'
-  let g:use_coc = 0
   source $VIMFILES/bundles-man.vim
 else
   source $VIMFILES/bundles.vim
@@ -180,7 +172,7 @@ endfunction
 " autocmd! vimrc InsertLeave,WinEnter * call SetCursorLine()
 " autocmd! vimrc InsertEnter,WinLeave * call SetNoCursorLine()
 
-call SetCursorLine()
+" call SetCursorLine()
 
 " set default help language to zh_CN
 " set helplang=cn
@@ -200,26 +192,24 @@ syntax sync minlines=256
 set synmaxcol=300
 
 let g:PaperColor_Theme_Options = {
-  \   'theme': {
-  \     'default.light': {
-  \       'transparent_background': 1
-  \     },
-  \     'default.dark': {
-  \       'transparent_background': 0
-  \     }
-  \   },
-  \   'language': {
-  \     'python': {
-  \       'highlight_builtins' : 1
-  \     },
-  \     'cpp': {
-  \       'highlight_standard_library': 1
-  \     },
-  \     'c': {
-  \       'highlight_builtins' : 1
-  \     }
-  \   }
-  \ }
+      \   'theme': {
+      \     'default': {
+      \       'allow_bold': 1,
+      \       'allow_italic': 0
+      \     }
+      \   },
+      \   'language': {
+      \     'python': {
+      \       'highlight_builtins' : 1
+      \     },
+      \     'cpp': {
+      \       'highlight_standard_library': 1
+      \     },
+      \     'c': {
+      \       'highlight_builtins' : 1
+      \     }
+      \   }
+      \ }
 
 set background=light
 color PaperColor
@@ -239,10 +229,10 @@ if has("gui_running")
   let s:fontbase="Bitstream_Vera_Sans_Mono"
   if has("mac")
     " let s:fontbase="PT_Mono"
-    " let s:fontbase="FiraCode-Light"
+    let s:fontbase="FiraCode-Light"
     " let s:fontbase="SourceCodePro-Light"
-    let s:fontbase="SF_Mono"
-    let s:fontwide="Hei"
+    " let s:fontbase="SF_Mono"
+    let s:fontwide="PingFangSC-Light"
   else
     " let s:fontbase="Ubuntu_Mono"
     " let s:fontbase="Anonymous_Pro"
@@ -315,7 +305,7 @@ map <leader>tm :tabmove
 
 "quick switch to normal mode
 imap jj <ESC>
-imap kk <ESC>
+imap jk <ESC>
 
 "Move to begin of line / end to line
 inoremap <C-e> <Esc>A
@@ -358,15 +348,8 @@ let g:tern_show_signature_in_pum=1
 "vim-json
 let g:vim_json_syntax_conceal = 0
 
-"html
-"--------------------------------------------------------------------------------
-"au FileType html set equalprg=tidy\ -utf8\ --indent\ yes\ -q\ -f\ err.txt
-command! Thtml :%!tidy -utf8 --indent yes -q -f tidyerr.txt
-
-"SuperTab
-"--------------------------------------------------------------------------------
-" let g:SuperTabDefaultCompletionType = "context"
-let g:SuperTabDefaultCompletionType='<c-x><c-u><c-p>'
+"emmet-vim
+let g:user_emmet_leader_key=','
 
 "python
 "--------------------------------------------------------------------------------
@@ -473,13 +456,16 @@ let g:livedown_open = 1
 
 "ALE
 "--------------------------------------------------------------------------------
-let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['eslint', 'tslint', 'tsserver'], 'go': ['gofmt']}
+let g:ale_linters = {'javascript': ['eslint'], 'typescript': ['eslint', 'tslint', 'tsserver'],
+    \ 'go': ['gofmt'],
+    \ 'python': []
+    \}
+
 let g:ale_pattern_options = {
       \ '\.min.js$': {'ale_enabled': 0},
       \ '\v\.(m|mm|cpp|cxx|cc|h|hpp)$': {'ale_enabled': 0},
-      \ '\v\.py$': {'ale_linters': ['flake8', 'pylint'], 'ale_fixers': ['autopep8', 'yapf']}
+      \ '\v\.py$': {'ale_enabled': 0 }
       \}
-let g:ale_python_pylint_options = "--init-hook='import sys; sys.path.append(\".\")'"
 
 
 " Editing a protected file as 'sudo'
@@ -582,7 +568,7 @@ if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
   nnoremap <leader>fb :Buffers<CR>
   nnoremap <leader>b :Buffers<CR>
   nnoremap <leader>fh :History<CR>
-else 
+else
   nnoremap <leader>b :CtrlPBuffer<CR>
 endif
 
@@ -728,37 +714,27 @@ autocmd vimrc Filetype go command! -buffer -bang AV call go#alternate#Switch(<ba
 autocmd vimrc Filetype go command! -buffer -bang AS call go#alternate#Switch(<bang>0, 'split')
 autocmd vimrc Filetype go command! -buffer -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
-" Use K to show documentation in preview window
-function! s:show_documentation()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    exec 'Man '.expand('<cword>')
-  endif
-endfunction
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
 " clang_format
 let g:clang_format#style_options = {
             \ "ColumnLimit": 0,
             \ "AllowShortIfStatementsOnASingleLine" : "true",
             \ "AlwaysBreakTemplateDeclarations" : "true",
-            \ "Standard" : "C++11"}
+            \ "Standard" : "C++17"}
 
 " let g:clang_format#command='/usr/local/bin/clang-format'
 autocmd vimrc FileType c,cpp,objc,objcpp nnoremap <buffer> <Leader>cf :<C-u>ClangFormat<CR>
 autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangFormat<CR>
 autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
 
+
+" whitelist for YCM
+let g:filetype_use_ycm = ["c", "cpp", "objc", "objcpp",  "go"]
+
 " coc.nvim
-if g:use_coc
-  runtime! config-coc.vim
-endif
+runtime! config-coc.vim
 
 " ycm
-if g:use_ycm
-  runtime! config-ycm.vim
-endif
+runtime! config-ycm.vim
 
 " victionary
 let g:victionary#map_defaults = 0
@@ -773,6 +749,7 @@ map <leader>tsk :call ToggleSketch()<CR>
 " any-jump
 " =======================================================
 let g:any_jump_disable_default_keybindings = 1
+let g:any_jump_search_prefered_engine = 'ag'
 
 " Jump to definition under cursore
 nnoremap gs :AnyJump<CR>
@@ -781,6 +758,9 @@ nnoremap gs :AnyJump<CR>
 xnoremap gs :AnyJumpVisual<CR>
 " open last closed search window again
 nnoremap gl :AnyJumpLastResults<CR>
+
+
+
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))
