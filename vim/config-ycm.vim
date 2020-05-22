@@ -93,36 +93,37 @@ function! Multiple_cursors_after()
     let g:ycm_auto_trigger = 1
 endfunction
 
-
-let s:lsp = '~/vimgit/lsp-examples'
-let g:ycm_language_server = [
-  \   {
-  \     'name': 'bash',
-  \     'cmdline': [ 'node', expand( s:lsp . '/bash/node_modules/.bin/bash-language-server' ), 'start' ],
-  \     'filetypes': [ 'sh', 'bash' ],
-  \   },
-  \   {
-  \     'name': 'yaml',
-  \     'cmdline': [ 'node', expand( s:lsp . '/yaml/node_modules/.bin/yaml-language-server' ), '--stdio' ],
-  \     'filetypes': [ 'yaml' ],
-  \   },
-  \   {
-  \     'name': 'json',
-  \     'cmdline': [ 'node', expand( s:lsp . '/json/node_modules/.bin/vscode-json-languageserver' ), '--stdio' ],
-  \     'filetypes': [ 'json' ],
-  \   },
-  \   { 'name': 'docker',
-  \     'filetypes': [ 'dockerfile' ], 
-  \     'cmdline': [ expand( s:lsp . '/docker/node_modules/.bin/docker-langserver' ), '--stdio' ]
-  \   },
-  \   { 'name': 'vim',
-  \     'filetypes': [ 'vim' ],
-  \     'cmdline': [ expand( s:lsp . '/viml/node_modules/.bin/vim-language-server' ), '--stdio' ]
-  \   },
-  \   { 'name': 'rust',
-  \     'filetypes': [ 'rust' ],
-  \     'cmdline': [ expand( s:lsp .  '/rust/rust-analyzer/target/release/rust-analyzer' ) ],
-  \     'project_root_files': [ 'Cargo.toml' ],
-  \   },
-  \ ]
-
+" Config lsp
+let s:lsp = expand('$VIMFILES/../lsp-examples')
+if isdirectory(s:lsp)
+  let g:ycm_language_server = [
+        \   {
+        \     'name': 'bash',
+        \     'cmdline': [ 'node', expand( s:lsp . '/bash/node_modules/.bin/bash-language-server' ), 'start' ],
+        \     'filetypes': [ 'sh', 'bash' ],
+        \   },
+        \   {
+        \     'name': 'yaml',
+        \     'cmdline': [ 'node', expand( s:lsp . '/yaml/node_modules/.bin/yaml-language-server' ), '--stdio' ],
+        \     'filetypes': [ 'yaml' ],
+        \   },
+        \   {
+        \     'name': 'json',
+        \     'cmdline': [ 'node', expand( s:lsp . '/json/node_modules/.bin/vscode-json-languageserver' ), '--stdio' ],
+        \     'filetypes': [ 'json' ],
+        \   },
+        \   { 'name': 'docker',
+        \     'filetypes': [ 'dockerfile' ], 
+        \     'cmdline': [ expand( s:lsp . '/docker/node_modules/.bin/docker-langserver' ), '--stdio' ]
+        \   },
+        \   { 'name': 'vim',
+        \     'filetypes': [ 'vim' ],
+        \     'cmdline': [ expand( s:lsp . '/viml/node_modules/.bin/vim-language-server' ), '--stdio' ]
+        \   },
+        \   { 'name': 'rust',
+        \     'filetypes': [ 'rust' ],
+        \     'cmdline': [ expand( s:lsp .  '/rust/rust-analyzer/target/release/rust-analyzer' ) ],
+        \     'project_root_files': [ 'Cargo.toml' ],
+        \   },
+        \ ]
+endif
