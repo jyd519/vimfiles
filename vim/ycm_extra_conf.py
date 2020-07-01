@@ -66,10 +66,6 @@ cpp_source_extensions = [
     ".c++",
 ]
 
-# objc/ objcpp source extensions
-objc_source_extensions = ['.m', '.mm']
-
-
 ##
 # CPP additional flags
 ##
@@ -78,6 +74,18 @@ cpp_additional_flags = [
     "-x", "c++",
     # Use the latest standard if possible.
     "-std=c++14",
+]
+
+# objc/ objcpp source extensions
+objc_source_extensions = ['.m', '.mm']
+
+
+##
+# objc additional flags
+##
+objc_additional_flags = [
+    # Tell clang that this file is a objective cpp file.
+    "-x", "objective-c++",
 ]
 
 ####
@@ -421,6 +429,8 @@ def make_final_flags(file_name, flags, base_dir=os.getcwd()):
         final = save_add_flags(absolute, cpp_additional_flags)
     elif is_c_file(file_name):
         final = save_add_flags(absolute, c_additional_flags)
+    elif is_objcpp_source(file_name):
+        final = save_add_flags(absolute, objc_additional_flags)
     else:
         final = absolute
     return create_result(final, override_filename=file_name,

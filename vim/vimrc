@@ -178,12 +178,8 @@ endfunction
 " set helplang=cn
 " language message zh_CN.utf-8
 
-if has("win32")
-  if has('termencoding')
-    set termencoding=gb2312
-  endif
-  source $VIMRUNTIME/delmenu.vim
-  source $VIMRUNTIME/menu.vim
+if has("win32") && has('termencoding')
+  set termencoding=gb2312
 endif
 
 " enable syntax highlighting
@@ -726,9 +722,8 @@ autocmd vimrc FileType c,cpp,objc,objcpp nnoremap <buffer> <Leader>cf :<C-u>Clan
 autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangFormat<CR>
 autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
 
-
 " whitelist for YCM
-let g:filetype_use_ycm = ["c", "cpp", "objc", "objcpp",  "go"]
+let g:filetype_use_ycm = ["javascript", "c", "cpp", "objc", "objcpp"]
 
 " coc.nvim
 runtime! config-coc.vim
@@ -758,9 +753,6 @@ nnoremap gs :AnyJump<CR>
 xnoremap gs :AnyJumpVisual<CR>
 " open last closed search window again
 nnoremap gl :AnyJumpLastResults<CR>
-
-
-
 
 " Load machine specific configurations
 if filereadable(expand("~/.vimrc.after"))

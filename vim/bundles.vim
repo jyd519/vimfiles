@@ -163,5 +163,8 @@ Plug 'yianwillis/vimcdoc'
 
 Plug 'pechorin/any-jump.vim'
 
+" peg / pigeon 
+Plug 'jasontbradshaw/pigeon.vim'
+
 Plug 'mhinz/vim-rfc'
 call plug#end() 
