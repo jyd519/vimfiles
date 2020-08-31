@@ -3,6 +3,8 @@ if exists('b:did_markdown_vim')
   finish
 endif
 
+let b:did_markdown_vim = 1
+
 "Markdown preview
 function! PreviewMarkdown()
   execute ":silent !open -a \"Typora.app\" \"%:p\""
@@ -34,4 +36,3 @@ nmap <buffer> <LocalLeader>4 :call setline('.', substitute(getline('.'), '^#* *'
 nmap <buffer> <LocalLeader>5 :call setline('.', substitute(getline('.'), '^#* *', '##### ', ''))<cr>
 nmap <buffer> <LocalLeader>6 :call setline('.', substitute(getline('.'), '^#* *', '###### ', ''))<cr>
 
-let b:did_markdown_vim = 1

@@ -1,7 +1,6 @@
 "--------------------------------------------------------------------------------
 " Configurations for Vim ( +lua, +python )
 " Jyd  2019-12-31 12:50
-"
 "--------------------------------------------------------------------------------
 set nocompatible              " be iMproved, required
 filetype off                  " required
@@ -34,7 +33,7 @@ set nowrap
 set hlsearch
 set incsearch
 set number
-" set relativenumber
+set relativenumber
 set ignorecase smartcase " Only be case sensitive when search contains uppercase
 set nocursorcolumn
 set hidden " allow we leave from the current modified buffer
@@ -48,34 +47,28 @@ set cmdheight=2
 set history=100
 " enable mouse
 set mouse=a
-
 " Smaller updatetime for CursorHold & CursorHoldI
 set updatetime=300
 " don't give |ins-completion-menu| messages.
 set shortmess+=c
 " always show signcolumns
 set signcolumn=yes
-
-"Fold
+set foldlevelstart=3 "Open most of the folds by default. If set to 0, all folds will be closed. 
+set foldnestmax=10 "Folds can be nested. Setting a max value protects you from too many folds.
 set foldmethod=manual "fold based on indent
-set foldnestmax=3       "deepest fold is 3 levels
-set nofoldenable        "dont fold by default
-
 " Eliminating delays on ESC
 set timeoutlen=1000 ttimeoutlen=30
-
 set scrolloff=2
 set guioptions-=T
 set encoding=utf-8
-
 set fileencodings=ucs-bom,utf-8,gb2312,cp936,gbk,gb18030
 set wildmenu " show a navigable menu for tab completion
 set wildmode=list:longest,full
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
 set wildignore+=*DS_Store
-
 set completeopt=menuone,longest,preview
+
 if has("gui_running") && !has('gui_vimr')
   set ballooneval
   set balloondelay=100
@@ -98,11 +91,57 @@ set path=.,./include/**/*,/usr/local/include,/usr/include
 " Default sh is Bash
 let g:bash_is_sh=1
 
-" define a group `vimrc` and initialize.
+" define a group `vimrc` and initialize it.
 augroup vimrc
   autocmd!
 augroup END
 
+"persistent undo
+set undodir=$HOME/undodir
+set undolevels=1000 "maximum number of set changes that can be undone
+set undoreload=10000 "maximum number lines to save for undo on a buffer reload
+set undofile
+
+" copy & paste
+set clipboard+=unnamed
+vnoremap p "_dP
+
+"define leader char
+let g:mapleader = ","
+let g:maplocalleader = ","
+
+"status line
+set statusline=\ %F%m%r%h\ %w\ %y\ %{getcwd()}\ \ \ Line:\ %l/%L:%c
+set laststatus=2
+
+" set default help language to zh_CN
+" set helplang=cn
+" language message zh_CN.utf-8
+
+if has("win32") && has('termencoding')
+  set termencoding=gb2312
+endif
+
+" enable syntax highlighting
+syntax on
+syntax sync minlines=256
+set synmaxcol=300
+
+if has("win32")
+  source $VIMRUNTIME/mswin.vim
+endif
+
+if has('directx')
+  set renderoptions=type:directx,level:0.75,gamma:1.25,contrast:0.5,
+                        \geom:1,renmode:5,taamode:1
+endif
+
+" Editing a protected file as 'sudo'
+"cmap W w !sudo tee % >/dev/null
+command! W w !sudo tee % > /dev/null
+
+" easytags: slow
+"--------------------------------------------------------------------------------
 " look tags in directory the current file in, and working directory,
 " and looking up and up until /
 set tags=./tags,tags;/
@@ -118,20 +157,8 @@ function! UpdateTags()
 endfunction
 command! CTags :call UpdateTags()
 
-"persistent undo
-set undodir=$HOME/undodir
-set undolevels=1000 "maximum number of set changes that can be undone
-set undoreload=10000 "maximum number lines to save for undo on a buffer reload
-set undofile
-
-" copy & paste
-set clipboard+=unnamed
-vnoremap p "_dP
-
-"status line
-set statusline=\ %F%m%r%h\ %w\ %y\ %{getcwd()}\ \ \ Line:\ %l/%L:%c
-set laststatus=2
-
+" IME settings
+"--------------------------------------------------------------------------------
 "On mac os x, disable IME when we enter normal mode
 function! Ime_en()
   let input_status = system('im-select')
@@ -158,38 +185,11 @@ if has("mac")
   au! vimrc InsertEnter * call Ime_zh()
 endif
 
-" Enable / disable cusorline between insert mode and non-insert mode
-function! SetCursorLine()
-  set cursorline
-  " hi cursorline cterm=none term=none
-  " hi CursorLine guibg=lightCyan ctermbg=229
-endfunction
-
-function! SetNoCursorLine()
-  set nocursorline
-endfunction
-
-" autocmd! vimrc InsertLeave,WinEnter * call SetCursorLine()
-" autocmd! vimrc InsertEnter,WinLeave * call SetNoCursorLine()
-
-" call SetCursorLine()
-
-" set default help language to zh_CN
-" set helplang=cn
-" language message zh_CN.utf-8
-
-if has("win32") && has('termencoding')
-  set termencoding=gb2312
-endif
-
-" enable syntax highlighting
-syntax on
-syntax sync minlines=256
-set synmaxcol=300
 
 let g:PaperColor_Theme_Options = {
       \   'theme': {
-      \     'default': {
+      \     'default.light': {
+      \       'transparent_background': 1,
       \       'allow_bold': 1,
       \       'allow_italic': 0
       \     }
@@ -207,25 +207,25 @@ let g:PaperColor_Theme_Options = {
       \   }
       \ }
 
-set background=light
+" Set background according to iterm.app's profile
+if $ITERM_PROFILE ==# "dark"
+  set background=dark
+else 
+  set background=light
+endif
 color PaperColor
 
-" Windows size
-if has("win32")
-  autocmd GUIEnter * simalt ~x
+if &background ==# 'light'
+  exec 'hi SignColumn guibg=#eeeeee'
 endif
-
-"define leader char
-let g:mapleader = ","
-let g:maplocalleader = ","
 
 "font
 if has("gui_running")
-  let s:font_size=16
+  let s:font_size=17
   let s:fontbase="Bitstream_Vera_Sans_Mono"
   if has("mac")
     " let s:fontbase="PT_Mono"
-    let s:fontbase="FiraCode-Light"
+    let s:fontbase="Iosevka-Fixed"
     " let s:fontbase="SourceCodePro-Light"
     " let s:fontbase="SF_Mono"
     let s:fontwide="PingFangSC-Light"
@@ -260,25 +260,17 @@ function! s:DecFontSize()
   echom s:font_size
 endfunction
 
-if has('directx')
-  set renderoptions=type:directx,level:0.75,gamma:1.25,contrast:0.5,
-                        \geom:1,renmode:5,taamode:1
-endif
-
 "insert a blank line
 imap <C-Return> <CR><CR><C-o>k<Tab>
 
-"quick editing myvimrc
+" Quick editing myvimrc
+"--------------------------------------------------------------------------------
 if !exists("$MYVIMRC")
   let $MYVIMRC = expand("<sfile>:p")
 endif
 map <leader>ev :e! $MYVIMRC<CR>
 map <leader>eb :e! $VIMFILES/bundles.vim<CR>
 map <leader>s :source %<CR>
-
-if has("win32")
-  source $VIMRUNTIME/mswin.vim
-endif
 
 "Smart way to move btw. windows
 nnoremap <C-j> <C-W>j
@@ -319,24 +311,14 @@ if has("mac")
   nmap <leader>ch :update<cr>:silent !open -a "Google Chrome" "file://%:p"<cr>:redraw!<cr>
 endif
 
-"xml configuration
-"--------------------------------------------------------------------------------
-"let g:xml_syntax_folding = 1
-"au BufReadPost *.xsd,*.xml,*.xslt set foldmethod=syntax
-"au vimrc FileType xml setlocal ep=xmllint\ --format\ --encode\ utf-8\ -
 
 "pascal configuration
 "--------------------------------------------------------------------------------
 autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
-"Perl
-"--------------------------------------------------------------------------------
-"au vimrc BufReadPost *.pl so $VIM\perltidy.vim
-
 "javascript
 "--------------------------------------------------------------------------------
 autocmd vimrc FileType javascript,typescript setlocal dictionary=$VIMFILES\dict\javascript.dict
-autocmd vimrc FileType javascript,typescript setlocal foldmethod=indent
 let g:tern_map_keys=1
 let g:tern_show_argument_hints='on_hold'
 let g:tern_show_signature_in_pum=1
@@ -355,24 +337,6 @@ let g:pydiction_menu_height = 20
 "FindFile
 "--------------------------------------------------------------------------------
 let g:FindFileIgnore = ['*.o', '*.pyc', '*/tmp/*', '.svn', '.git', '*.exe', '*.dll']
-
-"Toggle [\], [/]
-"--------------------------------------------------------------------------------
-function! ToggleSlash(independent) range
-  let from = ''
-  for lnum in range(a:firstline, a:lastline)
-    let line = getline(lnum)
-    let first = matchstr(line, '[/\\]')
-    if !empty(first)
-      if a:independent || empty(from)
-        let from = first
-      endif
-      let opposite = (from == '/' ? '\' : '/')
-      call setline(lnum, substitute(line, from, opposite, 'g'))
-    endif
-  endfor
-endfunction
-command! -bang -range ToggleSlash <line1>,<line2>call ToggleSlash(<bang>1)
 
 " UltiSnips
 "--------------------------------------------------------------------------------
@@ -400,7 +364,7 @@ let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_max_files = 5000
 let g:ctrlp_max_depth = 20
 
-"cmake
+" cmake
 "--------------------------------------------------------------------------------
 autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
 autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
@@ -408,10 +372,12 @@ let g:cmake_build_type='Debug'
 let g:cmake_export_compile_commands=1
 let g:cmake_ycm_symlinks=1
 
-"vim-surroud: wrapping code
+" vim-surroud
+"--------------------------------------------------------------------------------
 let g:surround_indent = 0 " Disable indenting for surrounded text
+let g:surround_{char2nr("r")} = "💥 \r 💥"
 
-"markdown
+" markdown
 "--------------------------------------------------------------------------------
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_toc_autofit = 1
@@ -423,6 +389,7 @@ let g:instant_markdown_slow = 1
 let g:mdip_imgdir = 'images'
 " let g:mdip_imgname = 'image'
 let s:mdctags_path = expand('$VIMFILES').'/tools/markdown2ctags.py'
+
 let g:tagbar_type_markdown = {
             \ 'ctagsbin'  : s:mdctags_path,
             \ 'ctagsargs' : '-f - --sort=yes',
@@ -464,17 +431,13 @@ let g:ale_pattern_options = {
       \}
 
 
-" Editing a protected file as 'sudo'
-"cmap W w !sudo tee % >/dev/null
-command! W w !sudo tee % > /dev/null
-
-
 " tcomment
 "--------------------------------------------------------------------------------
 let g:tcomment#options_comments = {'whitespace': 'left'}
 let g:tcomment#options_commentstring = {'whitespace': 'left'}
 
 " nerdcommenter
+"--------------------------------------------------------------------------------
 " Add spaces after comment delimiters by default
 let g:NERDSpaceDelims = 1
 
@@ -501,6 +464,7 @@ let g:NERDToggleCheckAllLines = 1
 
 
 " jedi settings
+"--------------------------------------------------------------------------------
 let g:jedi#completions_enabled=0
 
 " tagbar settings
@@ -524,31 +488,33 @@ let g:airline_section_b = '' "'%-20{getcwd()}'
 let g:airline#extensions#tmuxline#enabled = 0
 let g:airline#extensions#coc#enabled = 1
 
-"%-0{minwid}.{maxwid}{item}
-"jsbeautify settings
+
+" Search the selected text
 "--------------------------------------------------------------------------------
-function! s:JBeautify()
-  if &ft ==? 'css'
-    call CSSBeautify()
-  elseif &ft ==? 'html' || &ft ==? 'xhtml'
-    call HtmlBeautify()
-  elseif &ft =~ 'javascript'
-    call JsBeautify()
-  elseif &ft ==? 'json'
-    call JsonBeautify()
-  else
-     echom 'JSBeautify: ' . &ft . ' is not supported'
-  endif
+function! s:getSelectedText()
+  let l:old_reg = getreg('"')
+  let l:old_regtype = getregtype('"')
+  norm gvy
+  let l:ret = getreg('"')
+  call setreg('"', l:old_reg, l:old_regtype)
+  exe "norm \<Esc>"
+  return l:ret
 endfunction
+vnoremap <silent> * :call setreg("/",
+    \ substitute(<SID>getSelectedText(),
+    \ '\_s\+',
+    \ '\\_s\\+', 'g')
+    \ )<Cr>n
 
-nnoremap <leader>jb :call <SID>JBeautify()<CR>
-autocmd vimrc FileType javascript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
-autocmd vimrc FileType json vnoremap <buffer> <c-f> :call RangeJsonBeautify()<cr>
-autocmd vimrc FileType jsx vnoremap <buffer> <c-f> :call RangeJsxBeautify()<cr>
-autocmd vimrc FileType html vnoremap <buffer> <c-f> :call RangeHtmlBeautify()<cr>
-autocmd vimrc FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>
+vnoremap <silent> # :call setreg("?",
+    \ substitute(<SID>getSelectedText(),
+    \ '\_s\+',
+    \ '\\_s\\+', 'g')
+    \ )<Cr>n
+"--------------------------------------------------------------------------------
 
-" File searching
+" fzf: File searching
+"--------------------------------------------------------------------------------
 if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
   let g:fzf_action = {
     \ 'ctrl-t': 'tab split',
@@ -558,12 +524,32 @@ if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
 
   let g:ctrlp_map = ''
 
+  if has('nvim-0.4.0') || has("patch-8.2.0191")
+      let g:fzf_layout = { 'window': {
+                  \ 'width': 0.9,
+                  \ 'height': 0.7,
+                  \ 'highlight': 'Comment',
+                  \ 'rounded': v:false } }
+  else
+      let g:fzf_layout = { "window": "silent botright 16split enew" }
+  endif
+
   " fzf binding
   nnoremap <C-P> :Files<CR>
   nnoremap <leader>ff :Files<CR>
   nnoremap <leader>fb :Buffers<CR>
   nnoremap <leader>b :Buffers<CR>
   nnoremap <leader>fh :History<CR>
+
+  function! s:search_template(arg, bang)
+    let all = len(&ft) == 0 || a:arg =~ 'a'
+    call fzf#vim#files((all? $SNIPPETS : $SNIPPETS . '/' . &ft), 
+          \ fzf#vim#with_preview({'sink': 'r'}),
+          \ a:bang)
+  endfunction
+
+  command! -bang -nargs=? Ft call s:search_template(<q-args>, <bang>0)
+  nmap <leader>ft :Ft<CR>
 else
   nnoremap <leader>b :CtrlPBuffer<CR>
 endif
@@ -609,24 +595,14 @@ if filereadable(expand("~/.vimrc.local"))
     source ~/.vimrc.local
 endif
 
-" Learn to use follow keys
-"-------------------------------------------------------------------------------
-" ` # $ % ^ * ( ) 0 _ - + w
-" W e E t T I o O { } [[ [] ][ ]] [m [M ]m ]M [( ]) [{ ]} | A f F ge gE gg G g0 g^
-" g$ g, g; gj gk gI h H j k l L ; ' z. z<CR> z- zz zt zb b B n N M , / ?
-"
-" Conflicts with DrawIt plugin
-" nmap <silent> <RIGHT> :cnext<CR>
-" nmap <silent> <LEFT> :cprev<CR>
-
 "Convert selected text to javascript string
 "--------------------------------------------------------------------------------
 function! s:ToJS(sep, first_line, last_line)
     let i = a:first_line
-    while i<a:last_line
+    while i<=a:last_line
       let l = getline(i)
       let l = substitute(l, a:sep, "\\\\".a:sep, "g")
-      if i==a:last_line - 1
+      if i==a:last_line
         call setline(i, a:sep . l . a:sep . ";" )
       else
         call setline(i, a:sep . l . a:sep . " + " )
@@ -637,6 +613,7 @@ endfunction
 command!  -nargs=1 -range ToJs call s:ToJS(<q-args>, <line1>, <line2>)
 
 "Apply macro on selected lines
+"--------------------------------------------------------------------------------
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
 function! ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
@@ -644,11 +621,13 @@ function! ExecuteMacroOverVisualRange()
 endfunction
 
 "NERDTree
+"--------------------------------------------------------------------------------
 noremap <F3> :NERDTreeToggle<cr>
 noremap <leader>nf :NERDTreeFind<cr>
 let g:NERDTreeWinSize=40
 
 " Quick unescape xml entities
+"--------------------------------------------------------------------------------
 function! XmlUnescape()
   silent! execute ':%s/&lt;/</g'
   silent! execute ':%s/&gt;/>/g'
@@ -658,12 +637,27 @@ command! -nargs=0 XmlUnescape :call XmlUnescape()
 nnoremap <leader>xf :call XmlUnescape()
 
 " Unescape \uXXXX sequences in selected lines
+"--------------------------------------------------------------------------------
 function! UnescapeUnicode() range
   let cmd = a:firstline . "," . a:lastline . 's/\\u\(\x\{4\}\)/\=nr2char("0x".submatch(1),1)/g'
   silent! execute cmd
 endfunction
 command! -nargs=0 -range=% UnescapeUnicode :<line1>,<line2>call UnescapeUnicode()
 
+" Convert rows of numbers or text (as if pasted from excel column) to a tuple
+"--------------------------------------------------------------------------------
+function! ToTupleFunction() range
+    silent execute a:firstline . "," . a:lastline . "s/^/'/"
+    silent execute a:firstline . "," . a:lastline . "s/$/',/"
+    silent execute a:firstline . "," . a:lastline . "join"
+    silent execute "normal I("
+    silent execute "normal $xa)"
+    silent execute "normal ggVGYY"
+endfunction
+command! -range ToTuple <line1>,<line2> call ToTupleFunction()
+
+" Dot
+"--------------------------------------------------------------------------------
 function! Dot(bang, format)
     let fmt = a:format
     if empty(fmt)
@@ -685,6 +679,7 @@ let g:WMGraphviz_output = "svg"
 let g:previm_open_cmd = 'open -a "google chrome"'
 
 " vim-go / golang
+"--------------------------------------------------------------------------------
 let g:go_fmt_fail_silently = 1
 " let g:go_highlight_structs=0
 " let g:go_highlight_interfaces = 0
@@ -698,8 +693,6 @@ let g:go_highlight_extra_types = 1
 let g:go_highlight_build_constraints = 1
 let g:go_snippet_engine='ultisnips'
 " let g:go_autodetect_gopath=1
-" let g:go_def_mode='guru'
-" let g:go_info_mode='guru'
 let g:go_doc_popup_window = 1
 
 " abbrev
@@ -711,6 +704,7 @@ autocmd vimrc Filetype go command! -buffer -bang AS call go#alternate#Switch(<ba
 autocmd vimrc Filetype go command! -buffer -bang AT call go#alternate#Switch(<bang>0, 'tabe')
 
 " clang_format
+"--------------------------------------------------------------------------------
 let g:clang_format#style_options = {
             \ "ColumnLimit": 0,
             \ "AllowShortIfStatementsOnASingleLine" : "true",
@@ -722,27 +716,39 @@ autocmd vimrc FileType c,cpp,objc,objcpp nnoremap <buffer> <Leader>cf :<C-u>Clan
 autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangFormat<CR>
 autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
 
+" YCM & Coc.nvim
+"--------------------------------------------------------------------------------
 " whitelist for YCM
-let g:filetype_use_ycm = ["javascript", "c", "cpp", "objc", "objcpp"]
+let g:filetype_use_ycm = ["c", "cpp", "objc", "objcpp"]
+if exists("$YCM_FILES") 
+  let g:filetype_use_ycm = split(expand("$YCM_FILES"), ",")
+endif
 
-" coc.nvim
-runtime! config-coc.vim
+if $VIM_MODE =~ 'ycm'
+  " ycm
+  source $VIMFILES/config-ycm.vim
+else
+  " ycm
+  source $VIMFILES/config-ycm.vim
 
-" ycm
-runtime! config-ycm.vim
+  " coc.nvim
+  source $VIMFILES/config-coc.vim
+endif
 
 " victionary
+"--------------------------------------------------------------------------------
 let g:victionary#map_defaults = 0
 
 " Polyglot
+"--------------------------------------------------------------------------------
 let g:polyglot_disabled=['typescript', 'go']
 
 " Draw ascii box
+"--------------------------------------------------------------------------------
 map <leader>tsk :call ToggleSketch()<CR>
 
-" =======================================================
-" any-jump
-" =======================================================
+" Any-jump
+"--------------------------------------------------------------------------------
 let g:any_jump_disable_default_keybindings = 1
 let g:any_jump_search_prefered_engine = 'ag'
 
@@ -754,7 +760,32 @@ xnoremap gs :AnyJumpVisual<CR>
 " open last closed search window again
 nnoremap gl :AnyJumpLastResults<CR>
 
+" Disable tmux navigator when zooming the Vim pane
+"--------------------------------------------------------------------------------
+let g:tmux_navigator_disable_when_zoomed = 1
+
+
+" EasyMotion 
+"--------------------------------------------------------------------------------
+let g:EasyMotion_do_mapping = 0 " Disable default mappings
+
+" Jump to anywhere you want with minimal keystrokes, with just one key binding.
+" `s{char}{label}`
+nmap s <Plug>(easymotion-overwin-f)
+" or
+" `s{char}{char}{label}`
+" Need one more keystroke, but on average, it may be more comfortable.
+nmap s <Plug>(easymotion-overwin-f2)
+
+" Turn on case-insensitive feature
+let g:EasyMotion_smartcase = 1
+
+" JK motions: Line motions
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+
 " Load machine specific configurations
+"--------------------------------------------------------------------------------
 if filereadable(expand("~/.vimrc.after"))
   source ~/.vimrc.after
 endif

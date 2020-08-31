@@ -104,6 +104,10 @@ call <SID>AddAlternateExtensionMapping('aspx.cs', 'aspx')
 call <SID>AddAlternateExtensionMapping('aspx.vb', 'aspx')
 call <SID>AddAlternateExtensionMapping('aspx', 'aspx.cs,aspx.vb')
 
+" angular
+call <SID>AddAlternateExtensionMapping('html', 'ts')
+call <SID>AddAlternateExtensionMapping('ts', 'html')
+
 " Setup default search path, unless the user has specified
 " a path in their [._]vimrc. 
 if (!exists('g:alternateSearchPath'))

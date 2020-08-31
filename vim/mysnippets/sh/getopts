@@ -1,0 +1,30 @@
+if [[ -z $1 ]]; then
+  echo "usage: pubdoc [-h host] [-d remote_dir][-h] [-n name] files..."  
+  exit 1
+fi
+
+target=jenkins
+remote_dir=/var/ata/docs/
+name=basename ${filename}
+
+while getopts "h:d:n:" arg; do
+  case $arg in
+    h)
+      target=$OPTARG
+      ;;
+
+    n)
+      name=$OPTARG
+      ;;
+
+    d)
+      remote_dir=$OPTARG
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+for filename in "$@"; do
+  scp $filename ${target}:${remote_dir}${name}
+done

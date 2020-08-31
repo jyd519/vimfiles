@@ -17,13 +17,14 @@ endfunction
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
-Plug 'flazz/vim-colorschemes'
+" Plug 'flazz/vim-colorschemes'
+Plug 'NLKNguyen/papercolor-theme'
 
 " efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
 Plug 'easymotion/vim-easymotion'
-Plug 'justinmk/vim-sneak'
+" Plug 'justinmk/vim-sneak'
 Plug 'mattn/emmet-vim'
 
 Plug 'chiedojohn/vim-case-convert'
@@ -35,7 +36,7 @@ Plug 'AndrewRadev/splitjoin.vim'
 
 Plug 'scrooloose/nerdtree'
 " Plug 'ctrlpvim/ctrlp.vim'
-Plug 'liuchengxu/vim-clap'
+" Plug 'liuchengxu/vim-clap'
 if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
   Plug '/usr/local/opt/fzf'
   Plug 'junegunn/fzf.vim'
@@ -81,8 +82,12 @@ Plug 'gyim/vim-boxdraw'
 Plug 'vim-scripts/sketch.vim'
 
 " Auto Completion 
+if $VIM_MODE =~ 'ycm'
+Plug 'ycm-core/YouCompleteMe'
+else
 Plug 'ycm-core/YouCompleteMe'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
 
 " Git
 Plug 'tpope/vim-fugitive'
