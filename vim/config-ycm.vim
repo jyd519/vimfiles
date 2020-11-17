@@ -36,13 +36,13 @@ augroup ycm_confg
 augroup END
 
 function! s:init_ycm()
-  if index(g:filetype_use_ycm, &filetype) >= 0
-    let g:ycm_auto_trigger = 1 
-    echomsg "Using YCM"
-  else
-    let g:ycm_auto_trigger = 0 
-    return
-  endif
+  " if index(g:filetype_use_ycm, &filetype) >= 0
+  "   let g:ycm_auto_trigger = 1 
+  "   echomsg "Using YCM"
+  " else
+  "   let g:ycm_auto_trigger = 0 
+  "   return
+  " endif
 
   nmap <buffer> gd :YcmCompleter GoTo<CR>
   nmap <buffer> <leader>jt :YcmCompleter GoToDefinition<CR>

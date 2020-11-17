@@ -12,7 +12,7 @@ function! s:JBeautify()
     call CSSBeautify()
   elseif &ft ==? 'html' || &ft ==? 'xhtml'
     call HtmlBeautify()
-  elseif &ft =~ 'javascript'
+  elseif &ft =~ 'javascript' || &ft =~ 'typescript'
     call JsBeautify()
   elseif &ft ==? 'json'
     call JsonBeautify()
@@ -26,6 +26,7 @@ nnoremap <leader>jb :call <SID>JBeautify()<CR>
 augroup beautify
   autocmd!
   autocmd FileType javascript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
+  autocmd FileType typescript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
   autocmd FileType json vnoremap <buffer> <c-f> :call RangeJsonBeautify()<cr>
   autocmd FileType jsx vnoremap <buffer> <c-f> :call RangeJsxBeautify()<cr>
   autocmd FileType html vnoremap <buffer> <c-f> :call RangeHtmlBeautify()<cr>

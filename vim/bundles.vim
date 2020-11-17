@@ -23,7 +23,7 @@ Plug 'NLKNguyen/papercolor-theme'
 " efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
-Plug 'easymotion/vim-easymotion'
+" Plug 'easymotion/vim-easymotion'
 " Plug 'justinmk/vim-sneak'
 Plug 'mattn/emmet-vim'
 
@@ -52,6 +52,7 @@ Plug 'w0rp/ale'
 
 Plug 'bling/vim-airline'
 Plug 'xolox/vim-easytags'
+Plug 'brookhong/cscope.vim'
 Plug 'nathanaelkane/vim-indent-guides'
 
 Plug 'xolox/vim-misc'
@@ -82,12 +83,8 @@ Plug 'gyim/vim-boxdraw'
 Plug 'vim-scripts/sketch.vim'
 
 " Auto Completion 
-if $VIM_MODE =~ 'ycm'
-Plug 'ycm-core/YouCompleteMe'
-else
 Plug 'ycm-core/YouCompleteMe'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
-endif
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -145,6 +142,8 @@ Plug 'ekalinin/Dockerfile.vim'
 
 " unicode characters
 Plug 'chrisbra/unicode.vim'
+
+Plug 'junegunn/vim-emoji'
 
 " python
 Plug 'rkulla/pydiction', { 'for': 'python' }

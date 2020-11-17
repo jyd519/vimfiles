@@ -17,7 +17,18 @@ endif
 if $VIM_MODE =~ 'man'
   source $VIMFILES/bundles-man.vim
 else
-  source $VIMFILES/bundles.vim
+  if $VIM_MODE =~ 'ycm'
+    let g:did_coc_loaded = 1  " Disable COC
+  else
+    let $VIM_MODE = 'coc'
+    let g:loaded_youcompleteme = 1  " Disable YCM
+  endif
+
+  if exists('g:vscode')
+    source $VIMFILES/vscode.vim
+  else
+    source $VIMFILES/bundles.vim
+  endif
 endif
 
 set rtp+=$VIMFILES/after
@@ -159,6 +170,8 @@ command! CTags :call UpdateTags()
 
 " IME settings
 "--------------------------------------------------------------------------------
+set noimd
+set ims=1
 "On mac os x, disable IME when we enter normal mode
 function! Ime_en()
   let input_status = system('im-select')
@@ -295,6 +308,11 @@ map <leader>tm :tabmove
 imap jj <ESC>
 imap jk <ESC>
 
+" Delete current line without yanking the line breaks
+nnoremap dil ^d$
+" Yank current line without the line breaks
+nnoremap yil ^y$
+
 "Move to begin of line / end to line
 inoremap <C-e> <Esc>A
 inoremap <C-a> <Esc>I
@@ -429,7 +447,9 @@ let g:ale_pattern_options = {
       \ '\v\.(m|mm|cpp|cxx|cc|h|hpp)$': {'ale_enabled': 0},
       \ '\v\.py$': {'ale_enabled': 0 }
       \}
-
+let g:ale_fixers = {}
+let g:ale_fixers.javascript = ['eslint']
+let g:ale_fixers.typescript = ['eslint']
 
 " tcomment
 "--------------------------------------------------------------------------------
@@ -544,7 +564,7 @@ if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
   function! s:search_template(arg, bang)
     let all = len(&ft) == 0 || a:arg =~ 'a'
     call fzf#vim#files((all? $SNIPPETS : $SNIPPETS . '/' . &ft), 
-          \ fzf#vim#with_preview({'sink': 'r'}),
+          \ fzf#vim#with_preview({'sink': 'r', 'options': [ '--info=inline']}),
           \ a:bang)
   endfunction
 
@@ -719,20 +739,16 @@ autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAut
 " YCM & Coc.nvim
 "--------------------------------------------------------------------------------
 " whitelist for YCM
-let g:filetype_use_ycm = ["c", "cpp", "objc", "objcpp"]
+let g:filetype_use_ycm = []
 if exists("$YCM_FILES") 
+  " let g:filetype_use_ycm = ["c", "cpp", "objc", "objcpp"]
   let g:filetype_use_ycm = split(expand("$YCM_FILES"), ",")
 endif
 
 if $VIM_MODE =~ 'ycm'
-  " ycm
-  source $VIMFILES/config-ycm.vim
+source $VIMFILES/config-ycm.vim
 else
-  " ycm
-  source $VIMFILES/config-ycm.vim
-
-  " coc.nvim
-  source $VIMFILES/config-coc.vim
+source $VIMFILES/config-coc.vim
 endif
 
 " victionary
@@ -764,6 +780,8 @@ nnoremap gl :AnyJumpLastResults<CR>
 "--------------------------------------------------------------------------------
 let g:tmux_navigator_disable_when_zoomed = 1
 
+" vim-emoji
+set completefunc=emoji#complete
 
 " EasyMotion 
 "--------------------------------------------------------------------------------

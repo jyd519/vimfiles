@@ -4,13 +4,13 @@ augroup coc_config
 augroup END 
 
 function! s:init_coc()
-  if index(g:filetype_use_ycm, &filetype) >= 0
-    :CocDisable
-    return
-  endif
-
-  :CocEnable
-  echomsg "Using COC"
+  " if index(g:filetype_use_ycm, &filetype) >= 0
+  "   :CocDisable
+  "   return
+  " endif
+  "
+  " :CocEnable
+  " echomsg "Using COC"
 
   if index(['typescript', 'json'], &filetype) >= 0
     setlocal formatexpr=CocAction('formatSelected')
@@ -86,6 +86,40 @@ function! s:init_coc()
 
   " Add status line support, for integration with other plugin, checkout `:h coc-status`
   " setlocal statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+
+  " Mappings for CoCList
+  " Show all diagnostics.
+  nnoremap <buffer><silent><nowait> <leader>ca  :<C-u>CocList diagnostics<cr>
+  " Manage extensions.
+  nnoremap <buffer><silent><nowait> <leader>ce  :<C-u>CocList extensions<cr>
+  " Show commands.
+  nnoremap <buffer><silent><nowait> <leader>cc  :<C-u>CocList commands<cr>
+  " Find symbol of current document.
+  nnoremap <buffer><silent><nowait> <leader>co  :<C-u>CocList outline<cr>
+  " Search workspace symbols.
+  " nnoremap <buffer><silent><nowait> <space>s  :<C-u>CocList -I symbols<cr>
+  " Do default action for next item.
+  nnoremap <buffer><silent><nowait> <leader>cj  :<C-u>CocNext<CR>
+  " Do default action for previous item.
+  nnoremap <buffer><silent><nowait> <leader>ck  :<C-u>CocPrev<CR>
+  " Resume latest coc list.
+  nnoremap <buffer><silent><nowait> <leader>cp  :<C-u>CocListResume<CR>
+
+    " coc-jest
+  " Run jest for current project
+  command! -buffer -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
+
+  " Run jest for current file
+  command! -buffer -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
+
+  " Run jest for current test
+  nnoremap <buffer><leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+
+  " Init jest in current cwd, require global jest command exists
+  command! -buffer JestInit :call CocAction('runCommand', 'jest.init')
+
+  " Coc-Prettier
+  command! -buffer -nargs=0 Prettier :CocCommand prettier.formatFile
 endfunction
 
 function! s:check_back_space() abort
