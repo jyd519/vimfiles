@@ -19,6 +19,7 @@ call plug#begin('$VIMFILES/plugged')
 Plug 'mhinz/vim-startify'
 " Plug 'flazz/vim-colorschemes'
 Plug 'NLKNguyen/papercolor-theme'
+Plug 'morhetz/gruvbox'
 
 " efficient
 Plug 'jyd519/ListToggle'
@@ -26,6 +27,9 @@ Plug 'vim-scripts/bufkill.vim'
 " Plug 'easymotion/vim-easymotion'
 " Plug 'justinmk/vim-sneak'
 Plug 'mattn/emmet-vim'
+
+" Unit-Testing
+Plug 'vim-test/vim-test'
 
 Plug 'chiedojohn/vim-case-convert'
 Plug 'thinca/vim-quickrun'
@@ -35,12 +39,8 @@ Plug 'tmhedberg/matchit'
 Plug 'AndrewRadev/splitjoin.vim'
 
 Plug 'scrooloose/nerdtree'
-" Plug 'ctrlpvim/ctrlp.vim'
-" Plug 'liuchengxu/vim-clap'
-if filereadable('/usr/local/opt/fzf/plugin/fzf.vim')
-  Plug '/usr/local/opt/fzf'
-  Plug 'junegunn/fzf.vim'
-endif
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 Plug 'wesleyche/SrcExpl'
 Plug 'junegunn/vim-easy-align'
@@ -48,15 +48,17 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tomtom/tcomment_vim'
 
-Plug 'w0rp/ale'
+Plug 'dense-analysis/ale'
 
-Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
 Plug 'xolox/vim-easytags'
+Plug 'ludovicchabant/vim-gutentags'
 Plug 'brookhong/cscope.vim'
 Plug 'nathanaelkane/vim-indent-guides'
 
 Plug 'xolox/vim-misc'
-Plug 'xolox/vim-session'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'kshenoy/vim-signature'
 Plug 'jez/vim-superman'
@@ -75,12 +77,10 @@ Plug 'mhartington/vim-angular2-snippets'
 " Markdown, reStructuredText, textile
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
-Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() } }
 Plug 'jyd519/md-img-paste.vim'
 Plug 'dhruvasagar/vim-table-mode'
 Plug 'vim-scripts/DrawIt'
 Plug 'gyim/vim-boxdraw'
-Plug 'vim-scripts/sketch.vim'
 
 " Auto Completion 
 Plug 'ycm-core/YouCompleteMe'
@@ -100,9 +100,9 @@ Plug 'tpope/vim-dispatch'
 
 " Graphviz+UML
 Plug 'aklt/plantuml-syntax'
-Plug 'wannesm/wmgraphviz.vim'
 Plug 'tyru/open-browser.vim'
 Plug 'weirongxu/plantuml-previewer.vim'
+Plug 'wannesm/wmgraphviz.vim'
 
 " EditorConfig
 " Plug 'editorconfig/editorconfig-vim'
@@ -116,7 +116,6 @@ Plug 'geekjuice/vim-mocha'
 Plug 'pangloss/vim-javascript'
 Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json'
-Plug 'Shutnik/jshint2.vim'
 
 " typescript
 Plug 'leafgarland/typescript-vim'
@@ -142,12 +141,12 @@ Plug 'ekalinin/Dockerfile.vim'
 
 " unicode characters
 Plug 'chrisbra/unicode.vim'
-
 Plug 'junegunn/vim-emoji'
 
 " python
 Plug 'rkulla/pydiction', { 'for': 'python' }
 Plug 'tell-k/vim-autopep8', { 'for': 'python' }
+Plug 'jupyter-vim/jupyter-vim', { 'for': 'python' }
 
 " toml
 Plug 'cespare/vim-toml', {'for': 'toml'}
@@ -158,9 +157,8 @@ Plug 'farconics/victionary'
 Plug 'rhysd/vim-grammarous'
 
 " C/C++ build
-Plug 'vhdirk/vim-cmake'
-
-" Plug 'sheerun/vim-polyglot'
+"Plug 'cdelledonne/vim-cmake'
+Plug 'ilyachur/cmake4vim'
 
 " vimdoc - Chinese version
 Plug 'yianwillis/vimcdoc'
@@ -170,5 +168,14 @@ Plug 'pechorin/any-jump.vim'
 " peg / pigeon 
 Plug 'jasontbradshaw/pigeon.vim'
 
+" Plug 'puremourning/vimspector'
+"
 Plug 'mhinz/vim-rfc'
+
+if has('nvim')
+  " treesitter 
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  
+  Plug 'nvim-treesitter/nvim-treesitter-refactor'
+endif
+
 call plug#end() 

@@ -4,14 +4,6 @@ augroup coc_config
 augroup END 
 
 function! s:init_coc()
-  " if index(g:filetype_use_ycm, &filetype) >= 0
-  "   :CocDisable
-  "   return
-  " endif
-  "
-  " :CocEnable
-  " echomsg "Using COC"
-
   if index(['typescript', 'json'], &filetype) >= 0
     setlocal formatexpr=CocAction('formatSelected')
   endif

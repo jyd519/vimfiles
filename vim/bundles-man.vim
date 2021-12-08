@@ -10,6 +10,7 @@ endif
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'flazz/vim-colorschemes'
+Plug 'NLKNguyen/papercolor-theme'
 Plug 'easymotion/vim-easymotion'
 Plug 'bling/vim-airline'
 Plug 'jez/vim-superman'

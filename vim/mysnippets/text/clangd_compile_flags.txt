@@ -1,0 +1,16 @@
+-x
+c++
+-I 
+.
+-std=gnu++11
+-DQT_CORE_LIB
+-DQT_GUI_LIB
+-DQT_NETWORK_LIB
+-DQT_SQL_LIB
+-DQT_WIDGETS_LIB
+-DQT_XML_LIB
+-I/usr/local/Cellar/qt/5.15.2/lib/QtWidgets.framework/Headers
+-I/usr/local/Cellar/qt/5.15.2/lib/QtGui.framework/Headers
+-I/usr/local/Cellar/qt/5.15.2/lib/QtCore.framework/Headers
+-I/usr/local/Cellar/qt/5.15.2/mkspecs/macx-clang
+-F/usr/local/opt/qt/Frameworks/

@@ -1,9 +1,14 @@
 " Jyd
 if exists('b:did_markdown_vim')
-  finish
+"  finish
 endif
 
 let b:did_markdown_vim = 1
+
+" hi link mkdLineBreak  CursorLineNr
+hi link mkdLineBreak Underlined
+
+setlocal foldlevel=2
 
 "Markdown preview
 function! PreviewMarkdown()
@@ -36,3 +41,59 @@ nmap <buffer> <LocalLeader>4 :call setline('.', substitute(getline('.'), '^#* *'
 nmap <buffer> <LocalLeader>5 :call setline('.', substitute(getline('.'), '^#* *', '##### ', ''))<cr>
 nmap <buffer> <LocalLeader>6 :call setline('.', substitute(getline('.'), '^#* *', '###### ', ''))<cr>
 
+function! AddLineBreak() range
+    let m = visualmode()
+    if m ==# 'v'
+        echo 'character-wise visual'
+    elseif m == 'V'
+        for line in range(a:firstline, a:lastline)
+          call setline(line, substitute(getline(line), ' *$', '  ', ''))
+        endfor
+    elseif m == "\<C-V>"
+        echo 'block-wise visual'
+    endif
+endfunction
+
+command! -nargs=0 -range=% Mbr :<line1>,<line2>call AddLineBreak()
+
+function! ToUnorderList() range
+  let m = visualmode()
+  if m ==# 'V'
+    for line in range(a:firstline, a:lastline)
+      call setline(line, '+ ' . getline(line))
+    endfor
+  endif
+endfunction
+
+command! -nargs=0 -range=% Ml :<line1>,<line2>call ToUnorderList()
+
+function! ToOrderList() range
+  let m = visualmode()
+  if m ==# 'V'
+    let i = 1
+    for line in range(a:firstline, a:lastline)
+      call setline(line, i . '. ' . getline(line))
+      let i+=1
+    endfor
+  endif
+endfunction
+
+command! -nargs=0 -range=% Mol :<line1>,<line2>call ToOrderList()
+
+function! s:clearLineBreak() range
+  let m = visualmode()
+  if m ==# 'V'
+    for line in range(a:firstline, a:lastline)
+      call setline(line, substitute(getline(line), ' *$', '', ''))
+    endfor
+  endif
+endfunction
+
+command! -nargs=0 -range=% Mnobr :<line1>,<line2>call s:clearLineBreak()
+
+function! PubDoc(...)
+  let args = join(a:000, " ")
+  echo system('pubdoc ' . args . " ". expand('%') )
+endfunction
+
+command! -buffer -nargs=* PubDoc call PubDoc(<q-args>)
