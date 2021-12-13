@@ -22,14 +22,3 @@ function! s:JBeautify()
 endfunction
 
 nnoremap <leader>jb :call <SID>JBeautify()<CR>
-
-augroup beautify
-  autocmd!
-  autocmd FileType javascript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
-  autocmd FileType typescript vnoremap <buffer>  <c-f> :call RangeJsBeautify()<cr>
-  autocmd FileType json vnoremap <buffer> <c-f> :call RangeJsonBeautify()<cr>
-  autocmd FileType jsx vnoremap <buffer> <c-f> :call RangeJsxBeautify()<cr>
-  autocmd FileType html vnoremap <buffer> <c-f> :call RangeHtmlBeautify()<cr>
-  autocmd FileType css vnoremap <buffer> <c-f> :call RangeCSSBeautify()<cr>
-augroup END
-

@@ -5,9 +5,10 @@
 "   T *     load snippets
 "   TS xxx  save selection as xxx
 "
-if exists('g:did_t_vim') || &cp || version < 700
+if has('nvim') || exists('g:did_t_vim') || &cp || version < 700
   finish
 endif
+
 let g:did_t_vim = 1
 
 if !(has('pythonx') || has('python3'))
