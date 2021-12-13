@@ -36,7 +36,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tomtom/tcomment_vim'
 
 Plug 'xolox/vim-misc'
-Plug 'xolox/vim-session'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'kshenoy/vim-signature'
 Plug 'jez/vim-superman'
@@ -55,11 +54,9 @@ Plug 'rhysd/vim-clang-format'
 " unicode characters
 Plug 'chrisbra/unicode.vim'
 
-
 Plug 'pechorin/any-jump.vim'
 
 call plug#end() 
-
 
 "" Better Navigation
 nnoremap <silent> <C-j> :call VSCodeNotify('workbench.action.navigateDown')<CR>
@@ -70,5 +67,3 @@ nnoremap <silent> <C-h> :call VSCodeNotify('workbench.action.navigateLeft')<CR>
 xnoremap <silent> <C-h> :call VSCodeNotify('workbench.action.navigateLeft')<CR>
 nnoremap <silent> <C-l> :call VSCodeNotify('workbench.action.navigateRight')<CR>
 xnoremap <silent> <C-l> :call VSCodeNotify('workbench.action.navigateRight')<CR>
-
-

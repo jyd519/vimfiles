@@ -1,7 +1,6 @@
 import os
 import os.path
 import logging
-import ycm_core
 
 C_BASE_FLAGS = [
     '-Wall',
@@ -187,6 +186,7 @@ def Settings(filename, **kwargs):
     if compilation_db_flags:
         final_flags = compilation_db_flags
     else:
+        final_flags = []
         if IsSourceFile(filename):
             extension = os.path.splitext(filename)[1]
             if extension in C_SOURCE_EXTENSIONS:

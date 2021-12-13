@@ -10,11 +10,14 @@ endif
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
-Plug 'NLKNguyen/papercolor-theme'
-Plug 'Mofiqul/vscode.nvim'
-" Plug 'morhetz/gruvbox'
-" Plug 'marko-cerovac/material.nvim'
+if g:is_nvim
+  Plug 'Mofiqul/vscode.nvim'
+  Plug 'marko-cerovac/material.nvim'
+else
+  Plug 'NLKNguyen/papercolor-theme'
+endif
 Plug 'kyazdani42/nvim-web-devicons'
+
 " efficient
 Plug 'jyd519/ListToggle'
 Plug 'vim-scripts/bufkill.vim'
@@ -43,12 +46,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tomtom/tcomment_vim'
 
 Plug 'dense-analysis/ale'
-
-if has("nvim")
-Plug 'nvim-lualine/lualine.nvim'
-else
-Plug 'vim-airline/vim-airline'
-endif
 
 " Plug 'xolox/vim-easytags'
 " Plug 'ludovicchabant/vim-gutentags'
@@ -165,12 +162,18 @@ Plug 'jasontbradshaw/pigeon.vim', {'for': 'peg'}
 "
 Plug 'mhinz/vim-rfc'
 
-if has('nvim')
+Plug 'tweekmonster/startuptime.vim'
+
+if g:is_nvim
   " treesitter 
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  
   Plug 'nvim-treesitter/nvim-treesitter-refactor'
 
   Plug 'rcarriga/nvim-notify'
+  Plug 'nvim-lualine/lualine.nvim'
+  Plug 'nathom/filetype.nvim'
+else
+  Plug 'vim-airline/vim-airline'
 endif
 
 call plug#end() 

@@ -1,13 +1,12 @@
-" YCM configurations
+" YCM (YouCompleteMe) 
 "--------------------------------------------------------------------------------
-
-" let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_use_ultisnips_completer = 1
 let g:ycm_filepath_completion_use_working_dir = 0
 let g:ycm_collect_identifiers_from_tags_files = 0
 let g:ycm_key_invoke_completion = ''
-let g:ycm_global_ycm_extra_conf = expand('$VIMFILES/ycm_extra_conf.py')
+let g:ycm_global_ycm_extra_conf = expand('$VIMFILES/scripts/ycm_extra_conf.py')
+" let g:ycm_min_num_of_chars_for_completion = 2
 
 if !exists("g:ycm_semantic_triggers")
   let g:ycm_semantic_triggers = {}
@@ -80,44 +79,9 @@ let g:ycm_filetype_blacklist = {
 
 " Multiple_cursors and YCM
 function! Multiple_cursors_before()
-    let g:ycm_auto_trigger = 0
+  let g:ycm_auto_trigger = 0
 endfunction
 
 function! Multiple_cursors_after()
-    let g:ycm_auto_trigger = 1
+  let g:ycm_auto_trigger = 1
 endfunction
-
-" Config lsp
-let s:lsp = expand('$VIMFILES/../lsp-examples')
-if isdirectory(s:lsp)
-  let g:ycm_language_server = [
-        \   {
-        \     'name': 'bash',
-        \     'cmdline': [ 'node', expand( s:lsp . '/bash/node_modules/.bin/bash-language-server' ), 'start' ],
-        \     'filetypes': [ 'sh', 'bash' ],
-        \   },
-        \   {
-        \     'name': 'yaml',
-        \     'cmdline': [ 'node', expand( s:lsp . '/yaml/node_modules/.bin/yaml-language-server' ), '--stdio' ],
-        \     'filetypes': [ 'yaml' ],
-        \   },
-        \   {
-        \     'name': 'json',
-        \     'cmdline': [ 'node', expand( s:lsp . '/json/node_modules/.bin/vscode-json-languageserver' ), '--stdio' ],
-        \     'filetypes': [ 'json' ],
-        \   },
-        \   { 'name': 'docker',
-        \     'filetypes': [ 'dockerfile' ], 
-        \     'cmdline': [ expand( s:lsp . '/docker/node_modules/.bin/docker-langserver' ), '--stdio' ]
-        \   },
-        \   { 'name': 'vim',
-        \     'filetypes': [ 'vim' ],
-        \     'cmdline': [ expand( s:lsp . '/viml/node_modules/.bin/vim-language-server' ), '--stdio' ]
-        \   },
-        \   { 'name': 'rust',
-        \     'filetypes': [ 'rust' ],
-        \     'cmdline': [ expand( s:lsp .  '/rust/rust-analyzer/target/release/rust-analyzer' ) ],
-        \     'project_root_files': [ 'Cargo.toml' ],
-        \   },
-        \ ]
-endif

@@ -7,7 +7,7 @@
 local vim = vim
 
 local M = {}
-local pathJoin = require('utils.pathjoin').pathJoin
+local pathJoin = require('my.utils.pathjoin').pathJoin
 
 local snippets_dir = vim.g.mysnippets_dir
 if snippets_dir == "" then
@@ -15,7 +15,7 @@ if snippets_dir == "" then
 end
 
 if snippets_dir == "" then
-  snippets_dir = vim.api.nvim_eval('expand("~/mysnippets")')
+  snippets_dir = vim.fn.expand("~/mysnippets")
 end
 
 function M.insert_tpl(file)
