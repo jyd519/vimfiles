@@ -3,27 +3,34 @@
 "--------------------------------------------------------------------------------
 if empty(glob($VIMFILES . '/autoload/plug.vim'))
   silent !curl -fLo $VIMFILES/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
+Plug 'kyazdani42/nvim-web-devicons'
+
 if g:is_nvim
   Plug 'Mofiqul/vscode.nvim'
   Plug 'marko-cerovac/material.nvim'
 else
   Plug 'NLKNguyen/papercolor-theme'
 endif
-Plug 'kyazdani42/nvim-web-devicons'
 
-" efficient
-Plug 'jyd519/ListToggle'
+" efficient editing
+Plug 'jyd519/ListToggle'          " toggle quickfix/location window
 Plug 'vim-scripts/bufkill.vim'
-" Plug 'easymotion/vim-easymotion'
-" Plug 'justinmk/vim-sneak'
+" Plug 'easymotion/vim-easymotion'  " slow
+Plug 'justinmk/vim-sneak'
 Plug 'mattn/emmet-vim'
+Plug 'jiangmiao/auto-pairs'
+Plug 'tmhedberg/matchit'
+Plug 'AndrewRadev/splitjoin.vim'
+Plug 'junegunn/vim-easy-align'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
 
 " Unit-Testing
 Plug 'vim-test/vim-test'
@@ -31,19 +38,11 @@ Plug 'vim-test/vim-test'
 Plug 'chiedojohn/vim-case-convert'
 Plug 'thinca/vim-quickrun'
 
-Plug 'jiangmiao/auto-pairs'
-Plug 'tmhedberg/matchit'
-Plug 'AndrewRadev/splitjoin.vim'
-
 Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
 Plug 'wesleyche/SrcExpl', { 'on': 'SrcExpl' }
-Plug 'junegunn/vim-easy-align'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-repeat'
-Plug 'tomtom/tcomment_vim'
 
 Plug 'dense-analysis/ale'
 
@@ -51,16 +50,15 @@ Plug 'dense-analysis/ale'
 " Plug 'ludovicchabant/vim-gutentags'
 Plug 'brookhong/cscope.vim'
 " Plug 'nathanaelkane/vim-indent-guides'
+Plug 'jyd519/a.vim', { 'on': ['A', 'AS', 'AV', 'AT', 'IH', 'IHS']}
 
 Plug 'xolox/vim-misc'
 Plug 'terryma/vim-multiple-cursors'
-Plug 'kshenoy/vim-signature'
-Plug 'jez/vim-superman'
-" Plug 'majutsushi/tagbar'
+" Plug 'kshenoy/vim-signature'
+Plug 'chentau/marks.nvim'
 Plug 'liuchengxu/vista.vim'
 
 " tmux
-Plug 'edkolev/tmuxline.vim'
 Plug 'christoomey/vim-tmux-navigator'
 
 " snippets
@@ -86,27 +84,27 @@ Plug 'airblade/vim-gitgutter'
 
 " Gist
 Plug 'mattn/webapi-vim'
-Plug 'mattn/gist-vim'
+Plug 'mattn/gist-vim', { 'on': ['Gist'] }
 
 " async
 Plug 'skywind3000/asyncrun.vim'
 Plug 'tpope/vim-dispatch'
 
-" Graphviz+UML
+" Graphviz+UML+Dot
 Plug 'aklt/plantuml-syntax', { 'for': 'plantuml' }
 Plug 'tyru/open-browser.vim', { 'for': 'plantuml' }
 Plug 'weirongxu/plantuml-previewer.vim', { 'for': 'plantuml' }
-Plug 'wannesm/wmgraphviz.vim'
+Plug 'wannesm/wmgraphviz.vim', { 'for': 'dot' }
 
 " EditorConfig
 " Plug 'editorconfig/editorconfig-vim'
-Plug 'rhysd/vim-clang-format', { 'for': ['cpp', 'c'] }
+" Plug 'rhysd/vim-clang-format', { 'for': ['cpp', 'c'] }
+Plug 'sbdchd/neoformat'
 
 "js & node
 Plug 'isRuslan/vim-es6', { 'for': ['javascript', 'typescript'] }
 Plug 'moll/vim-node', { 'for': ['javascript', 'typescript'] }
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'typescript'] }
-Plug 'maksimr/vim-jsbeautify'
 Plug 'elzr/vim-json', {'for': 'json'}
 
 " typescript
@@ -136,15 +134,13 @@ Plug 'chrisbra/unicode.vim'
 Plug 'junegunn/vim-emoji'
 
 " python
-Plug 'rkulla/pydiction', { 'for': 'python' }
-Plug 'tell-k/vim-autopep8', { 'for': 'python' }
 Plug 'jupyter-vim/jupyter-vim', { 'for': 'python' }
 
 " toml
 Plug 'cespare/vim-toml', {'for': 'toml'}
 
 " Grammar checker
-Plug 'rhysd/vim-grammarous'
+Plug 'rhysd/vim-grammarous', { 'on': ['GrammarousCheck'] }
 
 " C/C++ build
 "Plug 'cdelledonne/vim-cmake'
@@ -152,15 +148,13 @@ Plug 'ilyachur/cmake4vim'
 
 " vimdoc - Chinese version
 Plug 'yianwillis/vimcdoc'
-
-Plug 'pechorin/any-jump.vim'
+" reading rfc
+Plug 'mhinz/vim-rfc'
 
 " peg / pigeon 
 Plug 'jasontbradshaw/pigeon.vim', {'for': 'peg'}
 
 " Plug 'puremourning/vimspector'
-"
-Plug 'mhinz/vim-rfc'
 
 Plug 'tweekmonster/startuptime.vim'
 
@@ -172,8 +166,10 @@ if g:is_nvim
   Plug 'rcarriga/nvim-notify'
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'nathom/filetype.nvim'
+  Plug 'numToStr/Comment.nvim'
 else
   Plug 'vim-airline/vim-airline'
+  Plug 'tomtom/tcomment_vim'
 endif
 
 call plug#end() 

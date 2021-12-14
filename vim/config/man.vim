@@ -23,7 +23,9 @@ if empty(glob($VIMFILES . '/autoload/plug.vim'))
 endif
 
 call plug#begin('$VIMFILES/plugged')
-
+if g:is_nvim
+  Plug 'nathom/filetype.nvim'
+endif
 Plug 'Mofiqul/vscode.nvim'
 Plug 'easymotion/vim-easymotion'
 Plug 'bling/vim-airline'

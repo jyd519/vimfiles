@@ -111,6 +111,7 @@ let g:livedown_open = 1
 " ALE
 "--------------------------------------------------------------------------------
 let g:ale_enabled = 1
+let g:ale_maximum_file_size=512000 " 500KB
 let g:ale_disable_lsp = 1 " use lsp with coc-nvim instead
 let g:ale_linters = {
       \ 'javascript': ['eslint', 'prettier'],
@@ -141,33 +142,6 @@ let g:ale_fixers = {
 "--------------------------------------------------------------------------------
 let g:tcomment#options_comments = {'whitespace': 'left'}
 let g:tcomment#options_commentstring = {'whitespace': 'left'}
-
-" nerdcommenter
-"--------------------------------------------------------------------------------
-" Add spaces after comment delimiters by default
-let g:NERDSpaceDelims = 1
-
-" Use compact syntax for prettified multi-line comments
-let g:NERDCompactSexyComs = 1
-
-" Align line-wise comment delimiters flush left instead of following code indentation
-let g:NERDDefaultAlign = 'left'
-
-" Set a language to use its alternate delimiters by default
-let g:NERDAltDelims_java = 1
-
-" Add your own custom formats or override the defaults
-let g:NERDCustomDelimiters = { 'c': { 'left': '/**','right': '*/' } }
-
-" Allow commenting and inverting empty lines (useful when commenting a region)
-let g:NERDCommentEmptyLines = 1
-
-" Enable trimming of trailing whitespace when uncommenting
-let g:NERDTrimTrailingWhitespace = 1
-
-" Enable NERDCommenterToggle to check all selected lines is commented or not
-let g:NERDToggleCheckAllLines = 1
-
 
 "--------------------------------------------------------------------------------
 " tagbar/vista settings
@@ -267,9 +241,10 @@ let g:fzf_layout = { 'down': '50%' }
 " key binding
 nnoremap <C-P> :Files<CR>
 nnoremap <leader>ff :Files<CR>
+nnoremap <leader>fm :Marks<CR>
+nnoremap <leader>fh :History<CR>
 nnoremap <leader>fb :Buffers<CR>
 nnoremap <leader>b :Buffers<CR>
-nnoremap <leader>fh :History<CR>
 
 "--------------------------------------------------------------------------------
 " settings for t.vim
@@ -294,8 +269,10 @@ if executable('ag')
 
   " Ag command
   command! -nargs=+ -complete=file -bar Ag silent! grep! <args>|cwindow|redraw!
-endif
 
+  " Jump to definition under cursore
+  nnoremap gs :Ag <cword><CR>
+endif
 
 "Man
 "--------------------------------------------------------------------------------
@@ -431,6 +408,11 @@ autocmd vimrc FileType c,cpp,objc,objcpp nnoremap <buffer> <Leader>cf :<C-u>Clan
 autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangFormat<CR>
 autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
 
+" Neoformat
+"--------------------------------------------------------------------------------
+" prequirements: npm i -g prettier js-beautify ... 
+let g:neoformat_try_node_exe = 1
+
 " YCM & Coc.nvim
 "--------------------------------------------------------------------------------
 if $VIM_MODE =~ 'ycm'
@@ -447,43 +429,36 @@ let g:victionary#map_defaults = 0
 "--------------------------------------------------------------------------------
 map <leader>tsk :call ToggleSketch()<CR>
 
-" Any-jump
-"--------------------------------------------------------------------------------
-let g:any_jump_disable_default_keybindings = 1
-let g:any_jump_search_prefered_engine = 'ag'
-
-" Jump to definition under cursore
-nnoremap gs :AnyJump<CR>
-
-" Visual mode: jump to selected text in visual mode
-xnoremap gs :AnyJumpVisual<CR>
-" open last closed search window again
-nnoremap gl :AnyJumpLastResults<CR>
-
 " Disable tmux navigator when zooming the Vim pane
 "--------------------------------------------------------------------------------
 let g:tmux_navigator_disable_when_zoomed = 1
 
 " EasyMotion
 "--------------------------------------------------------------------------------
-let g:EasyMotion_do_mapping = 0 " Disable default mappings
+" let g:EasyMotion_do_mapping = 0 " Disable default mappings
+" let g:EasyMotion_smartcase = 1 " Turn on case-insensitive feature
+"
+" " Jump to anywhere you want with minimal keystrokes.
+" " `s{char}{char}{label}`
+" nmap s <Plug>(easymotion-overwin-f2)
+"
+" " JK motions: Line motions
+" nmap <Leader><Leader>j <Plug>(easymotion-j)
+" nmap <Leader><Leader>k <Plug>(easymotion-k)
+" " Move to a word
+" nmap <Leader><Leader>w <Plug>(easymotion-w)
+" " Move to line
+" map <Leader>L <Plug>(easymotion-bd-jk)
+" nmap <Leader>L <Plug>(easymotion-overwin-line)
 
-" Jump to anywhere you want with minimal keystrokes, with just one key binding.
-" `s{char}{label}`
-nmap s <Plug>(easymotion-overwin-f)
-" or
-" `s{char}{char}{label}`
-" Need one more keystroke, but on average, it may be more comfortable.
-nmap s <Plug>(easymotion-overwin-f2)
+" Sneak
+"--------------------------------------------------------------------------------
+let g:sneak#label = 1
+let g:sneak#use_ic_scs = 1
 
-" Turn on case-insensitive feature
-let g:EasyMotion_smartcase = 1
-
-" JK motions: Line motions
-map <Leader>j <Plug>(easymotion-j)
-map <Leader>k <Plug>(easymotion-k)
 
 " vimspector
+"--------------------------------------------------------------------------------
 let g:vimspector_enable_mappings = 'HUMAN'
 
 " rust

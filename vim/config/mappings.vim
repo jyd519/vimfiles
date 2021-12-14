@@ -49,6 +49,13 @@ if has("mac")
   nmap <leader>o :update<cr>:silent !open -a "Google Chrome" "%:p"<cr>:redraw!<cr>
 endif
 
+if g:is_nvim
+  augroup YankHighlight
+    autocmd!
+    autocmd TextYankPost * silent! lua vim.highlight.on_yank()
+  augroup end
+endif
+
 vnoremap p "_dP
 
 " Terminal
