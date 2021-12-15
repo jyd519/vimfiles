@@ -15,6 +15,10 @@ vim.cmd('set packpath+=' .. VIMFILES)
 g.mysnippets_dir=VIMFILES .. '/mysnippets'
 g.did_load_filetypes=1
 
+if fn.filereadable('~/.vimrc.local') == 0 then
+  vim.cmd('source ~/.vimrc.local')
+end
+
 -- load plugins
 require('myrc.plugins')
 require('myrc.packer_compiled')
@@ -28,6 +32,5 @@ for _, s in pairs(scripts) do
   vim.cmd('source ' .. VIMFILES .. '/' .. s)
 end
 
-vim.cmd([[
-colorscheme vscode
-]])
+-- colorscheme
+vim.cmd([[colorscheme vscode]])
