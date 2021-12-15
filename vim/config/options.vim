@@ -84,7 +84,6 @@ let g:maplocalleader = ","
 set laststatus=2
 
 " enable syntax highlighting
-syntax on
 syntax sync minlines=256
 set synmaxcol=300
 

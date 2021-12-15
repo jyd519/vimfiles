@@ -54,8 +54,6 @@ Plug 'jyd519/a.vim', { 'on': ['A', 'AS', 'AV', 'AT', 'IH', 'IHS']}
 
 Plug 'xolox/vim-misc'
 Plug 'terryma/vim-multiple-cursors'
-" Plug 'kshenoy/vim-signature'
-Plug 'chentau/marks.nvim'
 Plug 'liuchengxu/vista.vim'
 
 " tmux
@@ -163,6 +161,7 @@ if g:is_nvim
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  
   Plug 'nvim-treesitter/nvim-treesitter-refactor'
 
+  Plug 'chentau/marks.nvim'
   Plug 'rcarriga/nvim-notify'
   Plug 'nvim-lualine/lualine.nvim'
   Plug 'nathom/filetype.nvim'
@@ -170,6 +169,8 @@ if g:is_nvim
 else
   Plug 'vim-airline/vim-airline'
   Plug 'tomtom/tcomment_vim'
+  Plug 'kshenoy/vim-signature'
+  Plug '$VIMFILS/locals/vim-a'
 endif
 
 call plug#end() 

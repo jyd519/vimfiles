@@ -8,13 +8,34 @@
 
 2. Create symbol links
 
+
 ```sh
 ~/.vimgit/install.sh
 ```
 
+or edit vimrc
+
++ neovim
+
+```
+so ~/.vimgit/init.lua
+```
+
++ vim 
+
+```
+so ~/.vimgit/init.vim
+```
+
 3. Install plugins
 
++ vim-plug
+
 `vim -c "PlugInstall"`
+
++ packer.nvim
+
+`vim -c "PackerSync"`
 
 
 ## Dependencies

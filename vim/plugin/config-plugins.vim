@@ -1,72 +1,17 @@
-"--------------------------------------------------------------------------------
-" Configurations for Vim/Neovim ( +lua, +python )
-" Jyd  Last-Modified: 2021-12-13
-"--------------------------------------------------------------------------------
-set nocompatible " Disable compatibility with vi 
-let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
-
-if has('nvim')
-  source $VIMFILES/init.lua
-  finish
-end
-
-set rtp^=$VIMFILES 
-set rtp+=$VIMFILES/after
-" set packpath^=$VIMFILES
-
-let $MYVIMRC=expand("$VIMFILES/init.vim")
-
-if $VIM_MODE =~ 'man'
-  source $VIMFILES/config/man.vim
-  finish
-endif
-
-" load local customized script
-if filereadable(expand("~/.vimrc.local"))
-  source ~/.vimrc.local
-endif
-
-let s:configs = [ 
-      \ 'config/globals.vim',
-      \ 'config/options.vim',
-      \ 'config/mappings.vim',
-      \ 'config/ctags.vim',
-      \ ]
-
-for s in s:configs 
-  execute printf('source %s/%s', $VIMFILES, s)
-endfor
-
-
-" Source required plugins
-if $VIM_MODE =~ 'ycm'
-  let g:did_coc_loaded = 1        " Disable COC
-else
-  let $VIM_MODE = 'coc'
-  let g:loaded_youcompleteme = 1  " Disable YCM
-endif
-if exists('g:vscode')
-  source $VIMFILES/config/vscode.vim
-  finish
-else
-  source $VIMFILES/config/bundles.vim
-endif
-
-source $VIMFILES/config/color.vim
-
 " Pascal configuration
 "--------------------------------------------------------------------------------
 autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
 " vim-json
+"--------------------------------------------------------------------------------
 let g:vim_json_syntax_conceal = 0
 
 " emmet-vim
+"--------------------------------------------------------------------------------
 let g:user_emmet_leader_key=','
 
 " UltiSnips
 "--------------------------------------------------------------------------------
-" Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<C-k>"
 let g:UltiSnipsListSnippets="<C-l>"
 let g:UltiSnipsJumpForwardTrigger="<C-k>"
@@ -74,10 +19,6 @@ let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 let g:UltiSnipsEditSplit='horizontal'
 let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
-set rtp+=$VIMFILES/mysnippets
-
-" t.vim
-let g:mysnippets_dir = expand("$VIMFILES/mysnippets")
 
 " cmake
 "--------------------------------------------------------------------------------
@@ -101,13 +42,7 @@ let g:vim_markdown_toc_autofit = 1
 let g:vim_markdown_folding = 3
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
-
-let g:mdip_imgdir = 'images'
-let s:mdctags_path = expand('$VIMFILES').'/tools/markdown2ctags.py'
-
-" gulp
-"--------------------------------------------------------------------------------
-autocmd vimrc BufRead,BufNewFile gulpfile.js setlocal errorformat=%-G[%.%#,%f:%m,%-G%p,%-G%n%perror
+let g:mdip_imgdir='images'
 
 " livedown
 "--------------------------------------------------------------------------------
@@ -181,14 +116,12 @@ set statusline+=%{NearestMethodOrFunction()}
 map <leader>t :Vista!!<CR>
 autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
 
-"--------------------------------------------------------------------------------
 " vim-session settings
 "--------------------------------------------------------------------------------
 let g:session_autosave='prompt'
 let g:session_autoload='no'
 let g:session_autosave_periodic=0
 
-"--------------------------------------------------------------------------------
 " airline settings
 "--------------------------------------------------------------------------------
 let g:airline#extensions#ale#enabled = 1
@@ -197,31 +130,6 @@ let g:airline#extensions#tagbar#enabled = 0
 let g:airline#extensions#tmuxline#enabled = 0
 let g:airline_section_b = '' "'%-20{getcwd()}'
 
-"--------------------------------------------------------------------------------
-" Search the selected text
-"--------------------------------------------------------------------------------
-function! s:getSelectedText()
-  let l:old_reg = getreg('"')
-  let l:old_regtype = getregtype('"')
-  norm gvy
-  let l:ret = getreg('"')
-  call setreg('"', l:old_reg, l:old_regtype)
-  exe "norm \<Esc>"
-  return l:ret
-endfunction
-vnoremap <silent> * :call setreg("/",
-      \ substitute(<SID>getSelectedText(),
-      \ '\_s\+',
-      \ '\\_s\\+', 'g')
-      \ )<Cr>n
-
-vnoremap <silent> # :call setreg("?",
-      \ substitute(<SID>getSelectedText(),
-      \ '\_s\+',
-      \ '\\_s\\+', 'g')
-      \ )<Cr>n
-
-"--------------------------------------------------------------------------------
 " fzf: File searching
 "--------------------------------------------------------------------------------
 " An action can be a reference to a function that processes selected lines
@@ -247,9 +155,7 @@ nnoremap <leader>ff :Files<CR>
 nnoremap <leader>fm :Marks<CR>
 nnoremap <leader>fh :History<CR>
 nnoremap <leader>fb :Buffers<CR>
-nnoremap <leader>b :Buffers<CR>
 
-"--------------------------------------------------------------------------------
 " settings for t.vim
 "--------------------------------------------------------------------------------
 function! s:search_template(arg, bang)
@@ -262,7 +168,7 @@ endfunction
 command! -bang -nargs=? Ft call s:search_template(<q-args>, <bang>0)
 nmap <leader>ft :Ft<CR>
 
-"--------------------------------------------------------------------------------
+
 " The Silver Searcher
 "--------------------------------------------------------------------------------
 if executable('ag')
@@ -288,24 +194,6 @@ xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
 
-
-"Convert selected text to javascript string
-"--------------------------------------------------------------------------------
-function! s:ToJS(sep, first_line, last_line)
-  let i = a:first_line
-  while i<=a:last_line
-    let l = getline(i)
-    let l = substitute(l, a:sep, "\\\\".a:sep, "g")
-    if i==a:last_line
-      call setline(i, a:sep . l . a:sep . ";" )
-    else
-      call setline(i, a:sep . l . a:sep . " + " )
-    endif
-    let i=i+1
-  endwhile
-endfunction
-command!  -nargs=1 -range ToJs call s:ToJS(<q-args>, <line1>, <line2>)
-
 " Apply macro on selected lines
 "--------------------------------------------------------------------------------
 xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
@@ -320,56 +208,9 @@ let g:NERDTreeWinSize=40
 noremap <F3> :NERDTreeToggle<cr>
 noremap <leader>nf :NERDTreeFind<cr>
 
-" Quick unescape xml entities
+" Graphviz
 "--------------------------------------------------------------------------------
-function! XmlUnescape()
-  silent! execute ':%s/&lt;/</g'
-  silent! execute ':%s/&gt;/>/g'
-  silent! execute ':%s/&amp;/\&/g'
-endfunction
-command! -nargs=0 XmlUnescape :call XmlUnescape()
-nnoremap <leader>xf :call XmlUnescape()
-
-" Unescape \uXXXX sequences in selected lines
-"--------------------------------------------------------------------------------
-function! UnescapeUnicode() range
-  let cmd = a:firstline . "," . a:lastline . 's/\\u\(\x\{4\}\)/\=nr2char("0x".submatch(1),1)/g'
-  silent! execute cmd
-endfunction
-command! -nargs=0 -range=% UnescapeUnicode :<line1>,<line2>call UnescapeUnicode()
-
-" Convert rows of numbers or text (as if pasted from excel column) to a tuple
-"--------------------------------------------------------------------------------
-function! ToTupleFunction() range
-  silent execute a:firstline . "," . a:lastline . "s/^/'/"
-  silent execute a:firstline . "," . a:lastline . "s/$/',/"
-  silent execute a:firstline . "," . a:lastline . "join"
-  silent execute "normal I("
-  silent execute "normal $xa)"
-  silent execute "normal ggVGYY"
-endfunction
-command! -range ToTuple <line1>,<line2> call ToTupleFunction()
-
-" Dot
-"--------------------------------------------------------------------------------
-function! Dot(bang, format)
-  let fmt = a:format
-  if empty(fmt)
-    let fmt = 'png'
-  endif
-  let cmd = '!dot'
-  let opt = ' -T' . fmt . ' -o '
-  let currfile = expand('%:p')
-  let outfile = expand('%:p:r') . '.' . fmt
-  echom opt
-  silent execute cmd . ' "' . currfile . '" '. opt . ' "' . outfile . '" '
-  if a:bang
-    call system('open ' . outfile)
-  endif
-endfunction
-command! -nargs=* -bang Dot :call Dot(<bang>0, <q-args>)|redraw!
 let g:WMGraphviz_output = "svg"
-
 let g:previm_open_cmd = 'open -a "google chrome"'
 
 " vim-go / golang
@@ -418,11 +259,7 @@ let g:neoformat_try_node_exe = 1
 
 " YCM & Coc.nvim
 "--------------------------------------------------------------------------------
-if $VIM_MODE =~ 'ycm'
-  source $VIMFILES/config/plugins/ycm.vim
-elseif $VIM_MODE =~ 'coc'
-  source $VIMFILES/config/plugins/coc.vim
-endif
+source $VIMFILES/config/plugins/coc.vim
 
 " victionary
 "--------------------------------------------------------------------------------
@@ -436,24 +273,6 @@ map <leader>tsk :call ToggleSketch()<CR>
 "--------------------------------------------------------------------------------
 let g:tmux_navigator_disable_when_zoomed = 1
 
-" EasyMotion
-"--------------------------------------------------------------------------------
-" let g:EasyMotion_do_mapping = 0 " Disable default mappings
-" let g:EasyMotion_smartcase = 1 " Turn on case-insensitive feature
-"
-" " Jump to anywhere you want with minimal keystrokes.
-" " `s{char}{char}{label}`
-" nmap s <Plug>(easymotion-overwin-f2)
-"
-" " JK motions: Line motions
-" nmap <Leader><Leader>j <Plug>(easymotion-j)
-" nmap <Leader><Leader>k <Plug>(easymotion-k)
-" " Move to a word
-" nmap <Leader><Leader>w <Plug>(easymotion-w)
-" " Move to line
-" map <Leader>L <Plug>(easymotion-bd-jk)
-" nmap <Leader>L <Plug>(easymotion-overwin-line)
-
 " Sneak
 "--------------------------------------------------------------------------------
 let g:sneak#label = 1
@@ -465,9 +284,11 @@ let g:sneak#use_ic_scs = 1
 let g:vimspector_enable_mappings = 'HUMAN'
 
 " rust
+"--------------------------------------------------------------------------------
 let g:rustfmt_autosave = 1
 
 " vim-test
+"--------------------------------------------------------------------------------
 if g:is_nvim
   let g:test#strategy = "neovim"
 endif
@@ -480,6 +301,7 @@ endfunction
 nmap <silent> t<C-d> :call DebugNearest()<CR>
 
 " quickrun
+"--------------------------------------------------------------------------------
 let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
 autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
 autocmd vimrc Filetype lua noremap <buffer> <f9> :QuickRun<cr>

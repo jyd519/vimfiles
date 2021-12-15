@@ -1,11 +1,9 @@
 " mysnippets template
-"
 " Author: jyd119@qq.com
 " Supports two commands:
 "   T *     load snippets
 "   TS xxx  save selection as xxx
-"
-if has('nvim') || exists('g:did_t_vim') || &cp || version < 700
+if has('nvim') || exists('g:did_t_vim')
   finish
 endif
 
@@ -17,10 +15,8 @@ if !(has('pythonx') || has('python3'))
 endif
 
 if (!exists('g:mysnippets_dir'))
-  let g:mysnippets_dir = expand("$SNIPPETS_DIR") 
-  if empty(g:mysnippets_dir)
-    let g:mysnippets_dir = expand("~/mysnippets")
-  endif
+  echom "Error: T.vim requires g:mysnippets_dir"
+  finish
 endif
 
 pyx << EOF

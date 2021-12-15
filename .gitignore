@@ -5,3 +5,5 @@ tags
 vim/sessions
 vim/plugged
 vim/undodir
+vim/pack
+vim/lua/myrc/packer_compiled.lua

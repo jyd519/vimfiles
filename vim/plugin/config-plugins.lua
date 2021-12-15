@@ -1,19 +1,22 @@
 local vim = vim
+local execute = vim.api.nvim_exec
 
-function _G.dump(...)
+function _G.put(...)
   local objects = vim.tbl_map(vim.inspect, {...})
   print(unpack(objects))
 end
+_G.dump = _G.put
 
-function _G.put(...)
-  local objects = {}
-  for i = 1, select('#', ...) do
-    local v = select(i, ...)
-    table.insert(objects, vim.inspect(v, {newline =' '}))
-  end
+-- Highlight on yank
+execute([[
+  augroup YankHighlight
+    autocmd!
+    autocmd TextYankPost * silent! lua vim.highlight.on_yank()
+  augroup end
+]], false)
 
-  print(table.concat(objects, '\n'))
-  return ...
+if vim.fn.exists("g:plugs") == 1 then
+  return -- Using vim-plug
 end
 
 -- treesitter
@@ -34,9 +37,6 @@ require'nvim-treesitter.configs'.setup {
     },
   },
 }
-
--- t
-require("t")
 
 -- notify
 require("notify").setup({

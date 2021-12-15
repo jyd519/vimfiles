@@ -7,15 +7,12 @@
 local vim = vim
 
 local M = {}
-local pathJoin = require('my.utils.pathjoin').pathJoin
+local pathJoin = require('myrc.utils.pathjoin').pathJoin
 
 local snippets_dir = vim.g.mysnippets_dir
 if snippets_dir == "" then
-  snippets_dir = vim.env.SNIPPETS_DIR or ""
-end
-
-if snippets_dir == "" then
-  snippets_dir = vim.fn.expand("~/mysnippets")
+  print("Error: [t]: no snippets directory specified")
+  return
 end
 
 function M.insert_tpl(file)
@@ -93,14 +90,6 @@ function M.populate_files(pattern, _, _)
   return res
 end
 
--- command! -nargs=1 -range -complete=customlist,s:snippet_files TS call SaveTemplate(<q-args>)
--- command! -nargs=1 -bang -complete=customlist,s:snippet_files T call InsertTemplate(<q-args>)
-vim.cmd([[
-  command! -nargs=1 -bang -complete=customlist,v:lua.require't'.populate_files T lua require("t").insert_tpl(<f-args>)
-  command! -nargs=1 -range -complete=customlist,v:lua.require't'.populate_files TS lua require("t").save_tpl(<f-args>)
-]])
-
 -- print(vim.inspect(M.populate_files('')))
 
 return M
-

@@ -4,14 +4,14 @@ augroup vimrc
 augroup END
 
 " Quick switch to normal mode
-imap jj <ESC>   
+imap jj <ESC>
 " Insert a blank line
 imap <C-Return> <CR><CR><C-o>k<Tab>
 
 " Quick editing myvimrc
 "--------------------------------------------------------------------------------
 if !exists("$MYVIMRC")
-  let $MYVIMRC = expand("<sfile>:p")
+  let $MYVIMRC = expand("<sfile>:p:h/init.vim")
 endif
 map <leader>ev :e! $MYVIMRC<CR>
 map <leader>ss :source %<cr>
