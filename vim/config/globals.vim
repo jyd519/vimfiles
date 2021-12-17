@@ -25,6 +25,7 @@ let g:loaded_netrwFileHandlers = 1
 let g:vimsyn_embed = 'lP'
 
 if g:is_nvim
+  " nvim use filetypes.nvim
   let g:did_load_filetypes=1
 endif
 

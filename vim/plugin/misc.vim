@@ -63,3 +63,27 @@ function! Dot(bang, format)
   endif
 endfunction
 command! -nargs=* -bang Dot :call Dot(<bang>0, <q-args>)|redraw!
+
+
+" set path
+" - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+function! s:SetPath()
+  if !executable('fd') 
+    echom "AddPath: executable `fd` not found!"
+    return
+  endif
+  let list = systemlist("fd . --type d --hidden -E .git -E .yarn")
+  let list += systemlist("fd --type f --max-depth 1")  
+  let p = join(list, ",") 
+  execute("set path=" . p)
+endfunction
+command! -nargs=0 AddPath :call s:SetPath()
+
+" Apply macro on selected lines
+"--------------------------------------------------------------------------------
+xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
+function! ExecuteMacroOverVisualRange()
+  echo "@".getcmdline()
+  execute ":'<,'>normal @".nr2char(getchar())
+endfunction
+

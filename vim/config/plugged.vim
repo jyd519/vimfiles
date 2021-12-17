@@ -10,9 +10,9 @@ endif
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
-Plug 'kyazdani42/nvim-web-devicons'
 
 if g:is_nvim
+  Plug 'kyazdani42/nvim-web-devicons'
   Plug 'Mofiqul/vscode.nvim'
   Plug 'marko-cerovac/material.nvim'
 else
@@ -24,7 +24,7 @@ Plug 'jyd519/ListToggle'          " toggle quickfix/location window
 Plug 'vim-scripts/bufkill.vim'
 " Plug 'easymotion/vim-easymotion'  " slow
 Plug 'justinmk/vim-sneak'
-Plug 'mattn/emmet-vim'
+Plug 'mattn/emmet-vim', { 'for': ['html', 'jsx', 'vue'] }
 Plug 'jiangmiao/auto-pairs'
 Plug 'tmhedberg/matchit'
 Plug 'AndrewRadev/splitjoin.vim'
@@ -96,7 +96,6 @@ Plug 'wannesm/wmgraphviz.vim', { 'for': 'dot' }
 
 " EditorConfig
 " Plug 'editorconfig/editorconfig-vim'
-" Plug 'rhysd/vim-clang-format', { 'for': ['cpp', 'c'] }
 Plug 'sbdchd/neoformat'
 
 "js & node
@@ -141,7 +140,6 @@ Plug 'cespare/vim-toml', {'for': 'toml'}
 Plug 'rhysd/vim-grammarous', { 'on': ['GrammarousCheck'] }
 
 " C/C++ build
-"Plug 'cdelledonne/vim-cmake'
 Plug 'ilyachur/cmake4vim'
 
 " vimdoc - Chinese version
@@ -151,8 +149,6 @@ Plug 'mhinz/vim-rfc'
 
 " peg / pigeon 
 Plug 'jasontbradshaw/pigeon.vim', {'for': 'peg'}
-
-" Plug 'puremourning/vimspector'
 
 Plug 'tweekmonster/startuptime.vim'
 

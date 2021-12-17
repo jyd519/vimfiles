@@ -24,7 +24,13 @@ set cmdheight=2
 set history=100
 set updatetime=300  " Smaller updatetime for CursorHold & CursorHoldI
 set shortmess+=c    " don't give |ins-completion-menu| messages.
-set signcolumn=yes  " always show signcolumns
+set signcolumn=yes " always show signcolumns
+" if has("nvim-0.5.0") || has("patch-8.1.1564")
+"   " Recently vim can merge signcolumn and number column into one
+"   set signcolumn=number
+" else
+"   set signcolumn=yes " always show signcolumns
+" endif
 
 set foldmethod=indent
 set foldlevelstart=0
@@ -80,7 +86,6 @@ let g:maplocalleader = ","
 
 " status line
 "--------------------------------------------------------------------------------
-" set statusline=\ %F%m%r%h\ %w\ %y\ %{getcwd()}\ \ \ Line:\ %l/%L:%c
 set laststatus=2
 
 " enable syntax highlighting
@@ -97,7 +102,7 @@ if has("win32")
   endif
 endif
 
-" ctags/gtags
+" ctags
 "--------------------------------------------------------------------------------
 " look ctags in directory the current file in, and working directory,
 " and looking up and up until /

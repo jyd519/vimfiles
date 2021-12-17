@@ -29,23 +29,16 @@ let g:ycm_semantic_triggers =  {
       \   'haskell' : ['.', 're!.']
       \ }
 
-augroup ycm_confg 
-  autocmd!
-  autocmd BufRead,BufNewFile * call s:init_ycm() 
-augroup END
-
-function! s:init_ycm()
-  nmap <buffer> gd :YcmCompleter GoTo<CR>
-  nmap <buffer> <leader>jt :YcmCompleter GoToDefinition<CR>
-  nmap <buffer> gD :YcmCompleter GetDoc<CR>
-  nmap <buffer> <leader>jf :YcmCompleter GoToInclude<CR>
-  nmap <buffer> <leader>jI :YcmCompleter GoToImplementation<CR>
-  nmap <buffer> <leader>jr :YcmCompleter GoToReferences<CR>
-  nmap <buffer> <leader>rn :YcmCompleter RefactorRename
-  nnoremap <buffer> <silent> K :call <SID>show_documentation()<CR>
-  ca <buffer> yc YcmCompleter
-  ca <buffer> Yc YcmCompleter
-endfunction
+nmap gd :YcmCompleter GoTo<CR>
+nmap <leader>jt :YcmCompleter GoToDefinition<CR>
+nmap gD :YcmCompleter GetDoc<CR>
+nmap <leader>jf :YcmCompleter GoToInclude<CR>
+nmap <leader>jI :YcmCompleter GoToImplementation<CR>
+nmap <leader>jr :YcmCompleter GoToReferences<CR>
+nmap <leader>rn :YcmCompleter RefactorRename
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+ca yc YcmCompleter
+ca Yc YcmCompleter
 
 " Use K to show documentation in preview window
 function! s:show_documentation()

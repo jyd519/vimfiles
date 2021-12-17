@@ -1,16 +1,11 @@
-" Pascal configuration
-"--------------------------------------------------------------------------------
-autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
+" Plugins shared between neovim and vim8
 
-" vim-json
-"--------------------------------------------------------------------------------
-let g:vim_json_syntax_conceal = 0
-
-" emmet-vim
+" emmet-vim {{{
 "--------------------------------------------------------------------------------
 let g:user_emmet_leader_key=','
+" }}}
 
-" UltiSnips
+" UltiSnips {{{
 "--------------------------------------------------------------------------------
 let g:UltiSnipsExpandTrigger="<C-k>"
 let g:UltiSnipsListSnippets="<C-l>"
@@ -19,8 +14,9 @@ let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 let g:UltiSnipsEditSplit='horizontal'
 let g:UltiSnipsSnippetDirectories = ["UltiSnips"]
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
+" }}}
 
-" cmake
+" cmake {{{
 "--------------------------------------------------------------------------------
 autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
 autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
@@ -29,13 +25,15 @@ let g:cmake_build_type='Debug'
 let g:cmake_export_compile_commands=1
 let g:cmake_compile_commands=1
 let g:cmake_ycm_symlinks=1
+" }}}
 
-" vim-surroud
+" vim-surroud {{{
 "--------------------------------------------------------------------------------
 let g:surround_indent = 0 " Disable indenting for surrounded text
 let g:surround_{char2nr("r")} = "💥 \r 💥"
+" }}}
 
-" markdown
+" markdown {{{
 "--------------------------------------------------------------------------------
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_toc_autofit = 1
@@ -43,15 +41,9 @@ let g:vim_markdown_folding = 3
 let g:instant_markdown_autostart = 0
 let g:instant_markdown_slow = 1
 let g:mdip_imgdir='images'
+" }}}
 
-" livedown
-"--------------------------------------------------------------------------------
-let g:livedown_autorun = 0
-
-" should the browser window pop-up upon previewing
-let g:livedown_open = 1
-
-" ALE
+" ALE {{{
 "--------------------------------------------------------------------------------
 let g:ale_enabled = 1
 let g:ale_maximum_file_size=512000 " 500KB
@@ -80,14 +72,9 @@ let g:ale_fixers = {
       \ 'typescript': ['eslint'],
       \ 'python': ['autopep8', 'yapf'],
       \}
+" }}}
 
-" tcomment
-"--------------------------------------------------------------------------------
-let g:tcomment#options_comments = {'whitespace': 'left'}
-let g:tcomment#options_commentstring = {'whitespace': 'left'}
-
-"--------------------------------------------------------------------------------
-" vista settings
+" vista settings {{{
 "--------------------------------------------------------------------------------
 let g:vista_fzf_preview = ['right:50%']
 let g:vista#renderer#enable_icon = 1
@@ -115,22 +102,16 @@ endfunction
 set statusline+=%{NearestMethodOrFunction()}
 map <leader>t :Vista!!<CR>
 autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
+" }}}
 
-" vim-session settings
+" vim-session settings {{{
 "--------------------------------------------------------------------------------
 let g:session_autosave='prompt'
 let g:session_autoload='no'
 let g:session_autosave_periodic=0
+" }}}
 
-" airline settings
-"--------------------------------------------------------------------------------
-let g:airline#extensions#ale#enabled = 1
-let g:airline#extensions#coc#enabled = 1
-let g:airline#extensions#tagbar#enabled = 0
-let g:airline#extensions#tmuxline#enabled = 0
-let g:airline_section_b = '' "'%-20{getcwd()}'
-
-" fzf: File searching
+" fzf: File searching {{{
 "--------------------------------------------------------------------------------
 " An action can be a reference to a function that processes selected lines
 function! s:build_quickfix_list(lines)
@@ -155,9 +136,13 @@ nnoremap <leader>ff :Files<CR>
 nnoremap <leader>fm :Marks<CR>
 nnoremap <leader>fh :History<CR>
 nnoremap <leader>fb :Buffers<CR>
+" }}}
 
-" settings for t.vim
+" t.vim {{{
 "--------------------------------------------------------------------------------
+let g:mysnippets_dir = expand("$VIMFILES/mysnippets")
+
+" integrate with fzf 
 function! s:search_template(arg, bang)
   let all = len(&ft) == 0 || a:arg =~ 'a'
   call fzf#vim#files((all? g:mysnippets_dir : g:mysnippets_dir . '/' . &ft),
@@ -167,13 +152,14 @@ endfunction
 
 command! -bang -nargs=? Ft call s:search_template(<q-args>, <bang>0)
 nmap <leader>ft :Ft<CR>
+" }}}
 
-
-" The Silver Searcher
+" The Silver Searcher {{{
 "--------------------------------------------------------------------------------
 if executable('ag')
   " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor\ --column
+  " set grepprg=ag\ --nogroup\ --nocolor\ --column
+  set grepprg=ag\ --vimgrep\ $*
   set grepformat=%f:%l:%c%m
 
   " Ag command
@@ -182,38 +168,35 @@ if executable('ag')
   " Jump to definition under cursore
   nnoremap gs :Ag <cword><CR>
 endif
+" }}}
 
-"Man
+"Man {{{
 "--------------------------------------------------------------------------------
 runtime ftplugin/man.vim
+"}}}
 
-"vim-easy-align
+"vim-easy-align {{{
 "--------------------------------------------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vipga)
 xmap ga <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
 nmap ga <Plug>(EasyAlign)
+"}}}
 
-" Apply macro on selected lines
-"--------------------------------------------------------------------------------
-xnoremap @ :<C-u>call ExecuteMacroOverVisualRange()<CR>
-function! ExecuteMacroOverVisualRange()
-  echo "@".getcmdline()
-  execute ":'<,'>normal @".nr2char(getchar())
-endfunction
-
-" NERDTree
+" NERDTree {{{
 "--------------------------------------------------------------------------------
 let g:NERDTreeWinSize=40
 noremap <F3> :NERDTreeToggle<cr>
 noremap <leader>nf :NERDTreeFind<cr>
+" }}}
 
-" Graphviz
+" Graphviz {{{
 "--------------------------------------------------------------------------------
 let g:WMGraphviz_output = "svg"
 let g:previm_open_cmd = 'open -a "google chrome"'
+" }}}
 
-" vim-go / golang
+" vim-go / golang {{{
 "--------------------------------------------------------------------------------
 let g:go_fmt_fail_silently = 1
 let g:go_snippet_engine='ultisnips'
@@ -237,26 +220,42 @@ autocmd vimrc Filetype go command! -buffer -bang A call go#alternate#Switch(<ban
 autocmd vimrc Filetype go command! -buffer -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
 autocmd vimrc Filetype go command! -buffer -bang AS call go#alternate#Switch(<bang>0, 'split')
 autocmd vimrc Filetype go command! -buffer -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+" }}}
 
-
-" clang_format
-"--------------------------------------------------------------------------------
-let g:clang_format#style_options = {
-      \ "ColumnLimit": 0,
-      \ "AllowShortIfStatementsOnASingleLine" : "true",
-      \ "AlwaysBreakTemplateDeclarations" : "true",
-      \ "Standard" : "C++17"}
-
-" let g:clang_format#command='/usr/local/bin/clang-format'
-autocmd vimrc FileType c,cpp,objc,objcpp nnoremap <buffer> <Leader>cf :<C-u>ClangFormat<CR>
-autocmd vimrc FileType c,cpp,objc,objcpp vnoremap <buffer> <Leader>cf :ClangFormat<CR>
-autocmd vimrc FileType c,cpp,objc,objcpp nmap <buffer> <Leader>C :ClangFormatAutoToggle<CR>
-
-" Neoformat
+" Neoformat {{{
 "--------------------------------------------------------------------------------
 " prequirements: npm i -g prettier js-beautify ... 
 let g:neoformat_try_node_exe = 1
+" Enable alignment globally
+let g:neoformat_basic_format_align = 1
+" Enable tab to spaces conversion globally
+let g:neoformat_basic_format_retab = 1
+" Enable trimmming of trailing whitespace globally
+let g:neoformat_basic_format_trim = 1
+" }}}
 
+" vim-test {{{
+"--------------------------------------------------------------------------------
+if g:is_nvim
+  let g:test#strategy = "neovim"
+endif
+nmap <silent> t<C-n> :TestNearest<CR>
+function! DebugNearest()
+  let g:test#go#runner = 'delve'
+  TestNearest
+  unlet g:test#go#runner
+endfunction
+nmap <silent> t<C-d> :call DebugNearest()<CR>
+" }}}
+
+" quickrun {{{
+"--------------------------------------------------------------------------------
+let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
+autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
+autocmd vimrc Filetype lua noremap <buffer> <f9> :QuickRun<cr>
+" }}}
+
+" others {{{
 " YCM & Coc.nvim
 "--------------------------------------------------------------------------------
 source $VIMFILES/config/plugins/coc.vim
@@ -269,7 +268,7 @@ let g:victionary#map_defaults = 0
 "--------------------------------------------------------------------------------
 map <leader>tsk :call ToggleSketch()<CR>
 
-" Disable tmux navigator when zooming the Vim pane
+" tmux_navigator: Disable tmux navigator when zooming the Vim pane
 "--------------------------------------------------------------------------------
 let g:tmux_navigator_disable_when_zoomed = 1
 
@@ -278,7 +277,6 @@ let g:tmux_navigator_disable_when_zoomed = 1
 let g:sneak#label = 1
 let g:sneak#use_ic_scs = 1
 
-
 " vimspector
 "--------------------------------------------------------------------------------
 let g:vimspector_enable_mappings = 'HUMAN'
@@ -286,22 +284,6 @@ let g:vimspector_enable_mappings = 'HUMAN'
 " rust
 "--------------------------------------------------------------------------------
 let g:rustfmt_autosave = 1
-
-" vim-test
+"
 "--------------------------------------------------------------------------------
-if g:is_nvim
-  let g:test#strategy = "neovim"
-endif
-nmap <silent> t<C-n> :TestNearest<CR>
-function! DebugNearest()
-  let g:test#go#runner = 'delve'
-  TestNearest
-  unlet g:test#go#runner
-endfunction
-nmap <silent> t<C-d> :call DebugNearest()<CR>
-
-" quickrun
-"--------------------------------------------------------------------------------
-let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
-autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
-autocmd vimrc Filetype lua noremap <buffer> <f9> :QuickRun<cr>
+" vim: set fdm=marker fen: }}}
