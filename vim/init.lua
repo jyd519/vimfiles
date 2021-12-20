@@ -13,7 +13,7 @@ g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
 env.MYVIMRC=VIMFILES .. '/init.lua'
 g.did_load_filetypes=1
 
-if fn.filereadable('~/.vimrc.local') == 0 then
+if fn.filereadable(fn.expand('~/.vimrc.local')) == 1 then
   vim.cmd('source ~/.vimrc.local')
 end
 

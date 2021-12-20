@@ -34,6 +34,7 @@ set signcolumn=yes " always show signcolumns
 
 set foldmethod=indent
 set foldlevelstart=0
+set foldcolumn=3
 set nofoldenable
 
 set scrolloff=2
@@ -107,3 +108,16 @@ endif
 " look ctags in directory the current file in, and working directory,
 " and looking up and up until /
 set tags=./tags,tags,./.tags,.tags
+
+" Set GUI VIM Font
+if has("gui_running")
+  if has("mac")
+    set guifont=Hack_Nerd_Font_Mono:h17
+    set guifontwide=PingFangSC-Light:h17
+  else
+    set guifont=Hack_Nerd_Font_Mono:h17
+    set guifontwide=NSimSun:h17
+  endif
+endif
+
+

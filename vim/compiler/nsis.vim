@@ -12,4 +12,4 @@ endif
 " default errorformat
 CompilerSet errorformat&
 
-CompilerSet makeprg=D:\tools\setup\NSIS\makensis\ /v2\ $*\ %
+CompilerSet makeprg=$NSIS\makensis\ /v2\ $*\ %

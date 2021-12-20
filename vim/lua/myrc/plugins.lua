@@ -69,6 +69,7 @@ return require("packer").startup(
         -- Local plugins
         use {g.VIMFILES .. "/locals/t.nvim"}
         use {g.VIMFILES .. "/locals/vim-a", opt = true, cmd = {"A", "AH"}}
+        use {g.VIMFILES .. "/locals/nvim-projectconfig"}
 
         -- snippets
         use "SirVer/ultisnips"
@@ -96,6 +97,7 @@ return require("packer").startup(
         use {"preservim/nerdtree", cmd = {"NERDTreeToggle", "NERDTreeFind", "NERDTreeFromBookmark"}}
         use {"junegunn/fzf", run = "fzf#install()"}
         use "junegunn/fzf.vim"
+
 
         -- Treesitter
         use {"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"}

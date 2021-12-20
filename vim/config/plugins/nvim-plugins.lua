@@ -1,17 +1,12 @@
 -- globals {{{1
 local vim = vim
 
-if vim.g.plugs then
-  return  -- skip when vim-plug used
-end
-
 -- put {{{2
 function _G.put(...)
   local objects = vim.tbl_map(vim.inspect, {...})
   print(unpack(objects))
 end
 _G.dump = _G.put
--- }}}
 
 -- treesitter {{{1
 require'nvim-treesitter.configs'.setup {
@@ -103,7 +98,10 @@ require('marks').setup {
   mappings = {}
 }
 
--- gitsigns {{{1
+-- windwp/nvim-projectconfig -- {{{1
+require('nvim-projectconfig').setup({silent = false})
+
+-- gitsigns -- {{{1
 -- https://github.com/lewis6991/gitsigns.nvim
 require('gitsigns').setup {
   signs = {
