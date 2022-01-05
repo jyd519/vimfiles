@@ -9,6 +9,8 @@ let b:did_markdown_vim = 1
 hi link mkdLineBreak Underlined
 
 setlocal foldlevel=2
+setlocal foldlevelstart=2
+set textwidth=120
 
 "Markdown preview
 function! PreviewMarkdown()

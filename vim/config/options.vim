@@ -1,19 +1,14 @@
-set ruler
-set showcmd
-
 set shiftwidth=2
 set tabstop=2
 set expandtab
 
 set nowrap
-set hlsearch
-set incsearch
 set number
 " set relativenumber
 set ignorecase smartcase " Only be case sensitive when search contains uppercase
 set hidden " allow we leave from the current modified buffer
-set autoindent
 set smartindent
+set hlsearch
 
 set nobackup nowb noswf
 set nowritebackup
@@ -31,11 +26,11 @@ set signcolumn=yes " always show signcolumns
 " else
 "   set signcolumn=yes " always show signcolumns
 " endif
-
-set foldmethod=indent
+if &foldmethod == "manual"
+  set foldmethod=indent
+end
 set foldlevelstart=0
 set foldcolumn=3
-set nofoldenable
 
 set scrolloff=2
 set guioptions-=T
@@ -72,12 +67,11 @@ let g:bash_is_sh=1
 
 " Persistent undo
 "--------------------------------------------------------------------------------
-set undolevels=1000 "maximum number of set changes that can be undone
 set undofile
 if has('nvim')
-  set undodir=$HOME/undodir
+  set undodir=$HOME/undo-nvim
 else
-  set undodir=$HOME/undodir8
+  set undodir=$HOME/undo-vim
 endif
 
 " define leader char
@@ -119,5 +113,4 @@ if has("gui_running")
     set guifontwide=NSimSun:h17
   endif
 endif
-
 

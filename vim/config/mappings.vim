@@ -13,7 +13,7 @@ imap <C-Return> <CR><CR><C-o>k<Tab>"
 " Quick editing myvimrc{{{
 "--------------------------------------------------------------------------------
 nmap <leader>ev :e! $MYVIMRC<CR>
-nmap <leader>ss :source %<cr>"
+nmap <leader>ss :source %<cr>
 "}}}
 
 " Smart way to move btw. windows{{{

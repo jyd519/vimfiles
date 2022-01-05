@@ -1,20 +1,19 @@
 local execute = vim.api.nvim_command
 local fn = vim.fn
 local g = vim.g
-local util = require("packer.util")
 
 -- Packer.nvim {{{
 
 -- install packer.nvim {{{ 2 --
 local install_path = g.VIMFILES .. "/pack/packer/start/packer.nvim"
 if fn.empty(fn.glob(install_path)) > 0 then
-    execute("!git clone https://github.com/wbthomason/packer.nvim " .. install_path)
+    PACKER_BOOTSTRAP = execute("!git clone https://github.com/wbthomason/packer.nvim " .. install_path)
     execute "packadd packer.nvim"
 end
 
 -- Auto compile when there are changes in plugins.lua
 -- vim.cmd "autocmd BufWritePost $VIMFILES/lua/myrc/plugins.lua source <afile> | PackerCompile"
-
+local util = require("packer.util")
 require("packer").init(
     {
         package_root = util.join_paths(g.VIMFILES, "pack"),
@@ -28,10 +27,12 @@ return require("packer").startup(
     function(use)
         -- Packer can manage itself as an optional plugin
         use "wbthomason/packer.nvim"
+        use "nvim-lua/plenary.nvim" -- some useful lua functions
 
         use "mhinz/vim-startify"
         use "kyazdani42/nvim-web-devicons"
         use "Mofiqul/vscode.nvim"
+        use "NLKNguyen/papercolor-theme"
 
         use "rcarriga/nvim-notify"
         use "nathom/filetype.nvim"
@@ -52,12 +53,16 @@ return require("packer").startup(
 
         use "sbdchd/neoformat"
 
+        -- AI Coding
+        use {"github/copilot.vim"}
+
         -- Go
         use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries"}
 
         -- Markdown, reStructuredText, textile
-        use {"godlygeek/tabular", branch = "master", cmd = {"Tabularize", "AddTabularPattern"}}
-        use {"plasticboy/vim-markdown", ft = "markdown", branch = "master"}
+        use {"godlygeek/tabular", ft = "markdown"}
+        use {"plasticboy/vim-markdown", ft = "markdown"}
+        -- use "tpope/vim-markdown"
         use {"jyd519/md-img-paste.vim", ft = "markdown", branch = "master"}
 
         use "tweekmonster/startuptime.vim"
@@ -79,28 +84,27 @@ return require("packer").startup(
         -- tmux
         use "christoomey/vim-tmux-navigator"
 
+        -- Completion Engine
         use {"neoclide/coc.nvim", branch = "release"}
 
         -- git
-        use {
-            "lewis6991/gitsigns.nvim",
-            requires = {
-                "nvim-lua/plenary.nvim"
-            }
-        }
+        use { "lewis6991/gitsigns.nvim" }
 
         -- Gist
         use "mattn/webapi-vim"
         use {"mattn/gist-vim", cmd = {"Gist"}}
 
         -- File explorer
-        use {"preservim/nerdtree", cmd = {"NERDTreeToggle", "NERDTreeFind", "NERDTreeFromBookmark"}}
+        use {"preservim/nerdtree", cmd = {"NERDTree", "NERDTreeToggle", "NERDTreeFind", "NERDTreeFromBookmark"}}
         use {"junegunn/fzf", run = "fzf#install()"}
         use "junegunn/fzf.vim"
 
-
         -- Treesitter
         use {"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"}
+
+        if PACKER_BOOTSTRAP then
+          require("packer").sync();
+        end
     end
 )
 

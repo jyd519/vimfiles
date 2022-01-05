@@ -13,7 +13,16 @@ require'nvim-treesitter.configs'.setup {
   ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   highlight = {
     enable = true,              -- false will disable the whole extension
-    disable = { "godot_resource" },  -- list of language that will be disabled
+    disable = { "godot_resource", "markdown" },  -- list of language that will be disabled
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    },
   },
   refactor = {
     highlight_definitions = { enable = true },
@@ -26,6 +35,18 @@ require'nvim-treesitter.configs'.setup {
     },
   },
 }
+
+vim.cmd([[
+function! SetTreeSitterFolding()
+  setlocal foldmethod=expr
+  setlocal foldexpr=nvim_treesitter#foldexpr()
+endfunction
+
+augroup Folding
+  au!
+  autocmd FileType cpp,c,vim,typescript,lua call SetTreeSitterFolding() 
+augroup END
+]])
 
 -- notify {{{1
 require("notify").setup({

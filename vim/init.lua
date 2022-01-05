@@ -33,4 +33,8 @@ for _, s in pairs(scripts) do
 end
 
 -- colorscheme
-vim.cmd([[colorscheme vscode]])
+if g.colorscheme == nil then
+  g.colorscheme = 'vscode'
+end
+vim.cmd('colorscheme ' .. g.colorscheme)
+-- vim.cmd([[colorscheme PaperColor]])

@@ -35,12 +35,17 @@ let g:surround_{char2nr("r")} = "💥 \r 💥"
 
 " markdown {{{
 "--------------------------------------------------------------------------------
+" " let g:markdown_folding=1
 let g:vim_markdown_folding_disabled=0
-let g:vim_markdown_toc_autofit = 1
-let g:vim_markdown_folding = 3
+let g:vim_markdown_folding_style_pythonic=1
+let g:vim_markdown_toc_autofit =1
 let g:instant_markdown_autostart = 0
-let g:instant_markdown_slow = 1
+let g:instant_markdown_slow=1
 let g:mdip_imgdir='images'
+
+let g:markdown_fenced_languages = ['bash=sh', 'js=javascript', 'ts=typescript']
+let g:markdown_syntax_conceal = 0
+let g:markdown_minlines = 100
 " }}}
 
 " ALE {{{
