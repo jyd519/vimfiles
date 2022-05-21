@@ -26,7 +26,7 @@ local scripts = {'config/globals.vim',
                  'config/options.vim',
                  'config/mappings.vim',
                  'config/plugins/shared.vim',
-                 'config/plugins/nvim-plugins.lua',
+                 'lua/myrc/plugins_config.lua',
                }
 for _, s in pairs(scripts) do
   vim.cmd('source ' .. VIMFILES .. '/' .. s)
