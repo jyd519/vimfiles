@@ -10,7 +10,7 @@ _G.dump = _G.put
 
 -- treesitter {{{1
 require'nvim-treesitter.configs'.setup {
-  ensure_installed = "maintained", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   highlight = {
     enable = true,              -- false will disable the whole extension
     disable = { "godot_resource", "markdown" },  -- list of language that will be disabled
@@ -150,6 +150,7 @@ require('gitsigns').setup {
     ['v <leader>hr'] = ':Gitsigns reset_hunk<CR>',
     ['n <leader>hR'] = '<cmd>Gitsigns reset_buffer<CR>',
     ['n <leader>hp'] = '<cmd>Gitsigns preview_hunk<CR>',
+    ['n <leader>hB'] = '<cmd>Gitsigns toggle_current_line_blame<CR>',
     ['n <leader>hb'] = '<cmd>lua require"gitsigns".blame_line{full=true}<CR>',
     ['n <leader>hS'] = '<cmd>Gitsigns stage_buffer<CR>',
     ['n <leader>hU'] = '<cmd>Gitsigns reset_buffer_index<CR>',
@@ -177,5 +178,19 @@ require('gitsigns').setup {
   },
   yadm = { enable = false },
 }
+
+-- filetype.nvim -- {{{1
+-- https://github.com/nathom/filetype.nvim/blob/main/README.md
+require("filetype").setup({
+    overrides = {
+        extensions = {
+            mm = "objcpp",
+        },
+        complex = {
+            -- Set the filetype of any full filename matching the regex to gitconfig
+            [".*git/config"] = "gitconfig", -- Included in the plugin
+        },
+    },
+})
 
 -- vim: set fdm=marker fen: }}}

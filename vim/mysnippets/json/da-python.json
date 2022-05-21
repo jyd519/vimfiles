@@ -1,0 +1,21 @@
+{
+  "configurations": {
+    "Python: Run current script": {
+      "adapter": "debugpy",
+      "configuration": {
+        "request": "launch",
+        "program": "${file}",
+        "args": [],
+        "cwd": "${fileDirname}",
+        "stopOnEntry": true 
+      },
+      "breakpoints": {
+        "exception": {
+          "raised": "N",
+          "uncaught": "",
+          "userUnhandled": ""
+        }
+      }
+    }
+  }
+}

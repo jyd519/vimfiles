@@ -48,10 +48,11 @@ return require("packer").startup(
         use "tpope/vim-surround"
         use "tpope/vim-repeat"
         use "chiedojohn/vim-case-convert"
-        use "chentau/marks.nvim"
+        use "chentoast/marks.nvim"
         use {"numToStr/Comment.nvim"}
 
         use "sbdchd/neoformat"
+        use "puremourning/vimspector"
 
         -- AI Coding
         use {"github/copilot.vim"}
@@ -66,7 +67,6 @@ return require("packer").startup(
         use {"jyd519/md-img-paste.vim", ft = "markdown", branch = "master"}
 
         use "tweekmonster/startuptime.vim"
-
         use "nvim-lualine/lualine.nvim"
         use "dense-analysis/ale"
         use "liuchengxu/vista.vim"

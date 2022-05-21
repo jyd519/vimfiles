@@ -6,4 +6,3 @@ setlocal smarttab
 setlocal expandtab
 setlocal equalprg=autopep8\ -
 
-nmap <buffer> <f9> :!python %<CR>

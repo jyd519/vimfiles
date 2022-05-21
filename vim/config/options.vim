@@ -1,6 +1,7 @@
 set shiftwidth=2
 set tabstop=2
 set expandtab
+set modeline
 
 set nowrap
 set number
@@ -29,7 +30,7 @@ set signcolumn=yes " always show signcolumns
 if &foldmethod == "manual"
   set foldmethod=indent
 end
-set foldlevelstart=0
+set foldlevelstart=99
 set foldcolumn=3
 
 set scrolloff=2
@@ -69,9 +70,9 @@ let g:bash_is_sh=1
 "--------------------------------------------------------------------------------
 set undofile
 if has('nvim')
-  set undodir=$HOME/undo-nvim
+  set undodir=$HOME/undodir/nvim
 else
-  set undodir=$HOME/undo-vim
+  set undodir=$HOME/undodir/vim
 endif
 
 " define leader char
@@ -86,6 +87,7 @@ set laststatus=2
 " enable syntax highlighting
 syntax sync minlines=256
 set synmaxcol=300
+set redrawtime=10000
 
 if has("win32")
   if has('termencoding')
@@ -104,13 +106,13 @@ endif
 set tags=./tags,tags,./.tags,.tags
 
 " Set GUI VIM Font
-if has("gui_running")
+if has("gui_running") && !has("vimr_running")
   if has("mac")
-    set guifont=Hack_Nerd_Font_Mono:h17
-    set guifontwide=PingFangSC-Light:h17
+    set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
+    set guifontwide=PingFangSC-Light:h16
   else
-    set guifont=Hack_Nerd_Font_Mono:h17
-    set guifontwide=NSimSun:h17
+    set guifont=Hack_Nerd_Font_Mono:h14
+    set guifontwide=NSimSun:h14
   endif
 endif
 

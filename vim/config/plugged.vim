@@ -37,6 +37,7 @@ Plug 'vim-test/vim-test'
 
 Plug 'chiedojohn/vim-case-convert'
 Plug 'thinca/vim-quickrun'
+Plug 'puremourning/vimspector'
 
 Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -60,7 +61,10 @@ Plug 'liuchengxu/vista.vim'
 Plug 'christoomey/vim-tmux-navigator'
 
 " snippets
-Plug 'SirVer/ultisnips'
+if has('python')
+  Plug 'SirVer/ultisnips'
+endif
+
 Plug 'honza/vim-snippets'
 Plug 'mhartington/vim-angular2-snippets', { 'for': 'typescript' }
 

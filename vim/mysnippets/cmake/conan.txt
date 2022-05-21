@@ -1,0 +1,21 @@
+# vim: set ft=cmake :
+set(CMAKE_CXX_STANDARD 17)
+
+# basic
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup()
+
+# targets approach
+#include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+# conan_basic_setup(TARGETS KEEP_RPATHS)
+# target_link_libraries(myTarget
+#   PUBLIC CONAN_PKG::boost_filesystem
+# )
+
+add_executable(conan_example
+    main.cpp
+)
+
+message(STATUS "CONAN_LIBS = ${CONAN_LIBS}")
+
+target_link_libraries(conan_example PRIVATE ${CONAN_LIBS})
