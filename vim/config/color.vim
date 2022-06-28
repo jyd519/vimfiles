@@ -23,7 +23,7 @@ set background=light
 
 " color gruvbox
 if g:is_nvim
-  color vscode 
+  color vscode
 else
   color PaperColor
 endif
@@ -31,4 +31,3 @@ endif
 if &background ==# 'light'
   exec 'hi SignColumn guibg=#eeeeee'
 endif
-
