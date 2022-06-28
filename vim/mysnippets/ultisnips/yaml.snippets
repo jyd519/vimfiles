@@ -1,0 +1,20 @@
+snippet fancyhdr "setup fancy hdr for converting markdown to pdf" b
+---	
+header-includes: |
+    \usepackage{fancyhdr}
+    \usepackage{graphics,graphicx}
+    \pagestyle{fancy}
+    \fancyhf{}
+    \setlength{\headheight}{1cm}
+    \renewcommand{\headrulewidth}{0pt}
+    \geometry{includehead=true, includefoot=true}
+    \fancyhead[L]{\includegraphics[width=1cm]{ata-logo}}
+    \fancyhead[C]{}
+    \fancyhead[R]{\rightmark}
+    \fancyfoot[LO,LE]{\today}
+    \fancyfoot[C]{\textcopyright 2022 ata}
+    \fancyfoot[R]{\thepage}
+    \renewcommand{\headrulewidth}{0.4pt}
+    \renewcommand{\footrulewidth}{0.4pt}
+---
+endsnippet
