@@ -1,6 +1,12 @@
 -- globals {{{1
 local vim = vim
 
+local function prequire(m)
+  local ok, err = pcall(require, m)
+  if not ok then return nil, err end
+  return err
+end
+
 -- put {{{2
 function _G.put(...)
   local objects = vim.tbl_map(vim.inspect, {...})
@@ -9,44 +15,47 @@ end
 _G.dump = _G.put
 
 -- treesitter {{{1
-require'nvim-treesitter.configs'.setup {
-  ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-  highlight = {
-    enable = true,              -- false will disable the whole extension
-    disable = { "godot_resource", "markdown" },  -- list of language that will be disabled
-  },
-  incremental_selection = {
-    enable = true,
-    keymaps = {
-      init_selection = "gnn",
-      node_incremental = "grn",
-      scope_incremental = "grc",
-      node_decremental = "grm",
+local mod = prequire("nvim-treesitter.configs")
+if mod then
+  mod.setup {
+    ensure_installed = "all", -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+    highlight = {
+      enable = true,              -- false will disable the whole extension
+      disable = { "godot_resource", "markdown" },  -- list of language that will be disabled
     },
-  },
-  refactor = {
-    highlight_definitions = { enable = true },
-    highlight_current_scope = { enable = true },
-    smart_rename = {
+    incremental_selection = {
       enable = true,
       keymaps = {
-        smart_rename = "grr",
+        init_selection = "gnn",
+        node_incremental = "grn",
+        scope_incremental = "grc",
+        node_decremental = "grm",
       },
     },
-  },
-}
+    refactor = {
+      highlight_definitions = { enable = true },
+      highlight_current_scope = { enable = true },
+      smart_rename = {
+        enable = true,
+        keymaps = {
+          smart_rename = "grr",
+        },
+      },
+    },
+  }
 
-vim.cmd([[
-function! SetTreeSitterFolding()
-  setlocal foldmethod=expr
-  setlocal foldexpr=nvim_treesitter#foldexpr()
-endfunction
+  vim.cmd([[
+  function! SetTreeSitterFolding()
+    setlocal foldmethod=expr
+    setlocal foldexpr=nvim_treesitter#foldexpr()
+  endfunction
 
-augroup Folding
-  au!
-  autocmd FileType cpp,c,vim,typescript,lua call SetTreeSitterFolding() 
-augroup END
-]])
+  augroup Folding
+    au!
+    autocmd FileType cpp,c,vim,typescript,lua call SetTreeSitterFolding() 
+  augroup END
+  ]])
+end
 
 -- notify {{{1
 require("notify").setup({
@@ -192,5 +201,12 @@ require("filetype").setup({
         },
     },
 })
+
+-- indent_blankline -- {{{1
+require("indent_blankline").setup {
+    -- for example, context is off by default, use this to turn it on
+    show_current_context = true,
+    show_current_context_start = true,
+}
 
 -- vim: set fdm=marker fen: }}}

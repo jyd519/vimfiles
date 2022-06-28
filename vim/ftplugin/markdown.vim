@@ -47,6 +47,7 @@ nmap <buffer> <LocalLeader>3 :call setline('.', substitute(getline('.'), '^#* *'
 nmap <buffer> <LocalLeader>4 :call setline('.', substitute(getline('.'), '^#* *', '#### ', ''))<cr>
 nmap <buffer> <LocalLeader>5 :call setline('.', substitute(getline('.'), '^#* *', '##### ', ''))<cr>
 nmap <buffer> <LocalLeader>6 :call setline('.', substitute(getline('.'), '^#* *', '###### ', ''))<cr>
+nmap <buffer> <LocalLeader>i :call setline('.', substitute(getline('.'), '\v!\[(.*)\]\((.*)\)', '<img alt="\1" src="\2" style="zoom:0.5" />', ''))<cr>
 
 function! AddLineBreak() range
     let m = visualmode()

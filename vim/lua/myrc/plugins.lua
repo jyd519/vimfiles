@@ -1,4 +1,3 @@
-local execute = vim.api.nvim_command
 local fn = vim.fn
 local g = vim.g
 
@@ -7,8 +6,9 @@ local g = vim.g
 -- install packer.nvim {{{ 2 --
 local install_path = g.VIMFILES .. "/pack/packer/start/packer.nvim"
 if fn.empty(fn.glob(install_path)) > 0 then
-    PACKER_BOOTSTRAP = execute("!git clone https://github.com/wbthomason/packer.nvim " .. install_path)
-    execute "packadd packer.nvim"
+    print("installing packer.nvim ...")
+    PACKER_BOOTSTRAP = fn.system("!git clone --depth 1 https://github.com/wbthomason/packer.nvim " .. install_path)
+    fn.execute "packadd packer.nvim"
 end
 
 -- Auto compile when there are changes in plugins.lua
@@ -52,7 +52,10 @@ return require("packer").startup(
         use {"numToStr/Comment.nvim"}
 
         use "sbdchd/neoformat"
-        use "puremourning/vimspector"
+        use {"puremourning/vimspector", cond = fn.executable("pip3") ~= 0}
+
+        use "pearofducks/ansible-vim"
+        use "lukas-reineke/indent-blankline.nvim"
 
         -- AI Coding
         use {"github/copilot.vim"}
@@ -60,13 +63,16 @@ return require("packer").startup(
         -- Go
         use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries"}
 
+        use { 'dart-lang/dart-vim-plugin' }
+
         -- Markdown, reStructuredText, textile
         use {"godlygeek/tabular", ft = "markdown"}
         use {"plasticboy/vim-markdown", ft = "markdown"}
         -- use "tpope/vim-markdown"
         use {"jyd519/md-img-paste.vim", ft = "markdown", branch = "master"}
 
-        use "tweekmonster/startuptime.vim"
+        use {"tweekmonster/startuptime.vim", cmd="StartupTime"}
+
         use "nvim-lualine/lualine.nvim"
         use "dense-analysis/ale"
         use "liuchengxu/vista.vim"
@@ -77,7 +83,7 @@ return require("packer").startup(
         use {g.VIMFILES .. "/locals/nvim-projectconfig"}
 
         -- snippets
-        use "SirVer/ultisnips"
+        {use "SirVer/ultisnips", cond = fn.executable("pip3") ~= 0}
         use "honza/vim-snippets"
         use {"mhartington/vim-angular2-snippets", ft = "typescript"}
         --
@@ -85,10 +91,10 @@ return require("packer").startup(
         use "christoomey/vim-tmux-navigator"
 
         -- Completion Engine
-        use {"neoclide/coc.nvim", branch = "release"}
+        use {"neoclide/coc.nvim", commit= "f4cd929466071d60e6126932f71731c4fca7c4e3", cond = fn.executable("node") ~= 0}
 
         -- git
-        use { "lewis6991/gitsigns.nvim" }
+        use { "lewis6991/gitsigns.nvim"}
 
         -- Gist
         use "mattn/webapi-vim"
@@ -103,6 +109,7 @@ return require("packer").startup(
         use {"nvim-treesitter/nvim-treesitter", run = ":TSUpdate"}
 
         if PACKER_BOOTSTRAP then
+          print("installing plugins ...")
           require("packer").sync();
         end
     end

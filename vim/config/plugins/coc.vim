@@ -1,9 +1,16 @@
+if executable('node') == 0
+   echo "coc.nvim required nodejs"
+   finish
+endif
+
 augroup cocAug
   autocmd!
   " Setup formatexpr specified filetype(s).
   autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
   " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+  " Setup coc-jest for javascript
+  autocmd FileType typescript,javascript call s:setupJest()
 augroup end
 
 " Use K to show documentation in preview window
@@ -44,8 +51,8 @@ autocmd User CocJumpPlaceholder  call CocActionAsync('showSignatureHelp')
 autocmd CursorHold  silent call CocActionAsync('highlight')
 
 " Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-xmap  <leader>a  <Plug>(coc-codeaction-selected)
-nmap  <leader>a  <Plug>(coc-codeaction-selected)
+xmap  <leader>as  <Plug>(coc-codeaction-selected)
+nmap  <leader>as  <Plug>(coc-codeaction-selected)
 
 " Remap for do codeAction of current line
 nmap  <leader>ac  <Plug>(coc-codeaction)
@@ -84,9 +91,9 @@ command! -nargs=0 Format :call CocAction('format')
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
 
 " use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
+command! -nargs=0 OR   :silent call     CocAction('runCommand', 'editor.action.organizeImport')
 
-" Mappings for CoCList: Show all diagnostics.
+" Mappings for CocList: Show all diagnostics.
 nnoremap <silent><nowait> <space>d  :<C-u>CocList diagnostics<cr>
 " Manage extensions.
 nnoremap <silent><nowait> <space>e  :<C-u>CocList extensions<cr>
@@ -106,22 +113,19 @@ nnoremap <silent><nowait> <space>p  :<C-u>CocListResume<CR>
 " -------------------------------
 " coc-jest
 " -------------------------------
-" Run jest for current project
-command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
+function! s:setupJest()
+  " Run jest for current project
+  command! -nargs=0 Jest :call  CocAction('runCommand', 'jest.projectTest')
 
-" Run jest for current file
-command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
+  " Run jest for current file
+  command! -nargs=0 JestCurrent :call  CocAction('runCommand', 'jest.fileTest', ['%'])
 
-" Run jest for current test
-nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
+  " Run jest for current test
+  nnoremap <leader>te :call CocAction('runCommand', 'jest.singleTest')<CR>
 
-" Init jest in current cwd, require global jest command exists
-command! JestInit :call CocAction('runCommand', 'jest.init')
-
-" -------------------------------
-" Coc-Prettier
-" -------------------------------
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
+  " Init jest in current cwd, require global jest command exists
+  command! JestInit :call CocAction('runCommand', 'jest.init')
+endfunction
 
 function! s:check_back_space() abort
   let col = col('.') - 1
@@ -137,3 +141,7 @@ function! s:show_documentation()
     execute '!' . &keywordprg . " " . expand('<cword>')
   endif
 endfunction
+
+let g:coc_filetype_map = {
+  \ 'yaml.ansible': 'ansible',
+  \ }
