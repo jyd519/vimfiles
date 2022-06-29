@@ -1,3 +1,7 @@
+if !exists("g:did_coc_loaded") || g:did_coc_loaded == 0 
+  finish
+endif
+
 augroup cocAug
   autocmd!
   " Setup formatexpr specified filetype(s).

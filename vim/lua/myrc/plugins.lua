@@ -105,7 +105,20 @@ return packer.startup(
         use "christoomey/vim-tmux-navigator"
 
         -- Completion Engine
-        use {"neoclide/coc.nvim", commit= "f4cd929466071d60e6126932f71731c4fca7c4e3", disable = no_lsp }
+        if not no_lsp then
+          use "williamboman/nvim-lsp-installer"
+          use { 'hrsh7th/nvim-cmp',
+                requires = {
+                  { 'hrsh7th/cmp-nvim-lsp' },
+                  { 'neovim/nvim-lspconfig', after = 'nvim-cmp' },
+                  { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
+                  { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
+                  { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
+                  { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
+                  { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
+                },
+                config = [[require "myrc.config.cmp"]] }
+        end
 
         -- git
         use { "lewis6991/gitsigns.nvim", config = [[require "myrc.config.gitsigns"]]}
