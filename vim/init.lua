@@ -27,6 +27,7 @@ function _G.put(...)
 end
 _G.dump = _G.put
 
+prequire('impatient')
 
 if fn.filereadable(fn.expand('~/.vimrc.local', 1, 0)) == 1 then
   vim.cmd('source ~/.vimrc.local')
@@ -35,7 +36,7 @@ end
 -- load plugins
 require('myrc.plugins')
 if PACKER_BOOTSTRAP then
-  vim.cmd('echom "plugins installed, you need restart vim to take effect."')
+  print("plugins installed, you need restart vim to take effect.")
   vim.cmd('sleep 2')
   return
 end

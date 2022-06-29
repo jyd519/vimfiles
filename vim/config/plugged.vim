@@ -10,19 +10,11 @@ endif
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
+Plug 'NLKNguyen/papercolor-theme'
 
-if g:is_nvim
-  Plug 'kyazdani42/nvim-web-devicons'
-  Plug 'Mofiqul/vscode.nvim'
-  Plug 'marko-cerovac/material.nvim'
-else
-  Plug 'NLKNguyen/papercolor-theme'
-endif
-
-" efficient editing
+" Efficient editing
 Plug 'jyd519/ListToggle'          " toggle quickfix/location window
 Plug 'vim-scripts/bufkill.vim'
-" Plug 'easymotion/vim-easymotion'  " slow
 Plug 'justinmk/vim-sneak'
 Plug 'mattn/emmet-vim', { 'for': ['html', 'jsx', 'vue'] }
 Plug 'jiangmiao/auto-pairs'
@@ -31,54 +23,54 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'junegunn/vim-easy-align'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
-
-" Unit-Testing
-Plug 'vim-test/vim-test'
-
 Plug 'chiedojohn/vim-case-convert'
-Plug 'thinca/vim-quickrun'
-Plug 'puremourning/vimspector'
+Plug 'tomtom/tcomment_vim'
+Plug $VIMFILES . '/locals/vim-a'
 
+Plug 'vim-test/vim-test'    " Unit-Testing
+Plug 'thinca/vim-quickrun'
+Plug 'tweekmonster/startuptime.vim'
 Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
-Plug 'wesleyche/SrcExpl', { 'on': 'SrcExpl' }
+if g:use_heavy_plugin
+  Plug 'puremourning/vimspector'
+endif
+
 
 Plug 'dense-analysis/ale'
-
-" Plug 'xolox/vim-easytags'
-" Plug 'ludovicchabant/vim-gutentags'
 Plug 'brookhong/cscope.vim'
-" Plug 'nathanaelkane/vim-indent-guides'
-Plug 'jyd519/a.vim', { 'on': ['A', 'AS', 'AV', 'AT', 'IH', 'IHS']}
-
+Plug 'nathanaelkane/vim-indent-guides'
 Plug 'xolox/vim-misc'
-Plug 'terryma/vim-multiple-cursors'
-Plug 'liuchengxu/vista.vim'
 
 " tmux
 Plug 'christoomey/vim-tmux-navigator'
 
 " snippets
-if has('python')
+if g:use_heavy_plugin && has('python3') 
   Plug 'SirVer/ultisnips'
+  Plug 'honza/vim-snippets'
+  Plug 'mhartington/vim-angular2-snippets', { 'for': 'typescript' }
+
+  Plug 'liuchengxu/vista.vim'
 endif
 
-Plug 'honza/vim-snippets'
-Plug 'mhartington/vim-angular2-snippets', { 'for': 'typescript' }
-
-" Markdown, reStructuredText, textile
-Plug 'godlygeek/tabular', { 'on': ['Tabularize', 'AddTabularPattern'] }
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-Plug 'jyd519/md-img-paste.vim', { 'for': 'markdown' }
-Plug 'dhruvasagar/vim-table-mode'
-Plug 'vim-scripts/DrawIt'
-Plug 'gyim/vim-boxdraw'
+" async
+Plug 'skywind3000/asyncrun.vim'
+Plug 'tpope/vim-dispatch'
 
 " Auto Completion 
-Plug 'ycm-core/YouCompleteMe'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+if g:use_heavy_plugin
+  Plug 'ycm-core/YouCompleteMe'
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
+endif
+
+" Statusline
+Plug 'vim-airline/vim-airline'
+
+" Code formatter
+Plug 'sbdchd/neoformat'
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -88,27 +80,25 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim', { 'on': ['Gist'] }
 
-" async
-Plug 'skywind3000/asyncrun.vim'
-Plug 'tpope/vim-dispatch'
-
 " Graphviz+UML+Dot
 Plug 'aklt/plantuml-syntax', { 'for': 'plantuml' }
 Plug 'tyru/open-browser.vim', { 'for': 'plantuml' }
 Plug 'weirongxu/plantuml-previewer.vim', { 'for': 'plantuml' }
 Plug 'wannesm/wmgraphviz.vim', { 'for': 'dot' }
 
-" EditorConfig
-" Plug 'editorconfig/editorconfig-vim'
-Plug 'sbdchd/neoformat'
+" Markdown, reStructuredText, textile
+Plug 'godlygeek/tabular', { 'on': ['Tabularize', 'AddTabularPattern'] }
+Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+Plug 'jyd519/md-img-paste.vim', { 'for': 'markdown' }
+Plug 'dhruvasagar/vim-table-mode'
+Plug 'vim-scripts/DrawIt'
+Plug 'gyim/vim-boxdraw'
 
-"js & node
+"js, ts, node
 Plug 'isRuslan/vim-es6', { 'for': ['javascript', 'typescript'] }
 Plug 'moll/vim-node', { 'for': ['javascript', 'typescript'] }
 Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'typescript'] }
 Plug 'elzr/vim-json', {'for': 'json'}
-
-" typescript
 Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
 
 " nginx
@@ -118,11 +108,15 @@ Plug 'chr4/nginx.vim'
 Plug 'kelan/gyp.vim', { 'for': 'gyp' }
 
 " Go
-Plug 'fatih/vim-go', { 'for': 'go', 'do': ':GoUpdateBinaries' }
+if g:use_heavy_plugin
+  Plug 'fatih/vim-go', { 'for': 'go', 'do': ':GoUpdateBinaries' }
+endif
 
 " Rust
-Plug 'rust-lang/rust.vim', { 'for': 'rust' }
-Plug 'racer-rust/vim-racer', { 'for': 'rust' }
+if g:use_heavy_plugin && executable('rust') != 0
+  Plug 'rust-lang/rust.vim', { 'for': 'rust' }
+  Plug 'racer-rust/vim-racer', { 'for': 'rust' }
+endif
 
 " Google GN
 Plug 'c0nk/vim-gn', { 'for': 'gn' }
@@ -135,7 +129,9 @@ Plug 'chrisbra/unicode.vim'
 Plug 'junegunn/vim-emoji'
 
 " python
-Plug 'jupyter-vim/jupyter-vim', { 'for': 'python' }
+if g:use_heavy_plugin
+  Plug 'jupyter-vim/jupyter-vim', { 'for': 'python' }
+endif
 
 " toml
 Plug 'cespare/vim-toml', {'for': 'toml'}
@@ -153,24 +149,5 @@ Plug 'mhinz/vim-rfc'
 
 " peg / pigeon 
 Plug 'jasontbradshaw/pigeon.vim', {'for': 'peg'}
-
-Plug 'tweekmonster/startuptime.vim'
-
-if g:is_nvim
-  " treesitter 
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}  
-  Plug 'nvim-treesitter/nvim-treesitter-refactor'
-
-  Plug 'chentau/marks.nvim'
-  Plug 'rcarriga/nvim-notify'
-  Plug 'nvim-lualine/lualine.nvim'
-  Plug 'nathom/filetype.nvim'
-  Plug 'numToStr/Comment.nvim'
-else
-  Plug 'vim-airline/vim-airline'
-  Plug 'tomtom/tcomment_vim'
-  Plug 'kshenoy/vim-signature'
-  Plug '$VIMFILS/locals/vim-a'
-endif
 
 call plug#end() 

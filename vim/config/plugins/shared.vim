@@ -82,36 +82,6 @@ let g:ale_fixers = {
       \}
 " }}}
 
-" vista settings {{{
-"--------------------------------------------------------------------------------
-let g:vista_fzf_preview = ['right:50%']
-let g:vista#renderer#enable_icon = 1
-let g:vista_executive_for = {
-      \ 'vim': 'coc',
-      \ 'typescript': 'coc',
-      \ 'javascript': 'coc',
-      \ 'cpp': 'coc',
-      \ 'c': 'coc',
-      \ 'markdown': 'toc',
-      \ }
-let g:vista#renderer#icons = {
-      \   "function": "\uf794",
-      \   "variable": "\uf71b",
-      \   "prototype": "\uf013",
-      \   "macro": "\uf00b",
-      \  }
-let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
-let g:vista_default_executive = "coc"
-
-function! NearestMethodOrFunction() abort
-  return get(b:, 'vista_nearest_method_or_function', '')
-endfunction
-
-set statusline+=%{NearestMethodOrFunction()}
-map <leader>t :Vista!!<CR>
-autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
-" }}}
-
 " vim-session settings {{{
 "--------------------------------------------------------------------------------
 let g:session_autosave='prompt'
@@ -347,7 +317,11 @@ augroup END
 " others {{{
 " YCM & Coc.nvim
 "--------------------------------------------------------------------------------
-source $VIMFILES/config/plugins/coc.vim
+if executable('node') == 0
+  echomsg "coc.nvim required nodejs"
+else
+  source $VIMFILES/config/plugins/coc.vim
+endif
 
 " victionary
 "--------------------------------------------------------------------------------

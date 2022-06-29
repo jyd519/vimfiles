@@ -8,7 +8,6 @@
 
 2. Create symbol links
 
-
 ```sh
 ~/.vimgit/install.sh
 ```
@@ -35,8 +34,7 @@ so ~/.vimgit/init.vim
 
 + packer.nvim
 
-`vim -c "PackerSync"`
-
+`nvim -c "PackerSync"`
 
 ## Dependencies
 
@@ -47,11 +45,7 @@ https://github.com/universal-ctags/ctags
 +  MacOS: `brew install ctags`
 +  Windows: https://github.com/universal-ctags/ctags-win32/releases
 
-2. jsctags(optional)
-
-`npm install -g git://github.com/ramitos/jsctags.git`
-
-3. The_Silver_Searcher:
+2. The_Silver_Searcher:
 
 https://github.com/ggreer/the_silver_searcher
 
@@ -59,6 +53,6 @@ https://github.com/ggreer/the_silver_searcher
 + Linux: `apt-get install silversearcher-ag`
 + Windows: https://github.com/k-takata/the_silver_searcher-win32
 
-4. clang-foramt
+3. clang-foramt
 
 + MacOS: `brew install clang-format`

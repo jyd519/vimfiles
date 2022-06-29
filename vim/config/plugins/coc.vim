@@ -1,8 +1,3 @@
-if executable('node') == 0
-   echo "coc.nvim required nodejs"
-   finish
-endif
-
 augroup cocAug
   autocmd!
   " Setup formatexpr specified filetype(s).

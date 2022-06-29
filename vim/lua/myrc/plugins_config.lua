@@ -48,10 +48,11 @@ require("filetype").setup({
 })
 
 -- indent_blankline -- {{{1
+local treesitter_enabled = packer_plugins["nvim-treesitter"] ~= nil
 require("indent_blankline").setup {
     -- for example, context is off by default, use this to turn it on
-    show_current_context = true,
-    show_current_context_start = true,
+    show_current_context = treesitter_enabled,
+    show_current_context_start = treesitter_enabled,
 }
 
 -- vim: set fdm=marker fen: }}}

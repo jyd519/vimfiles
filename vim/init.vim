@@ -1,9 +1,20 @@
 "--------------------------------------------------------------------------------
 " Configurations for Vim/Neovim ( +lua, +python )
+" Use vim-plug to install plugins
 " Jyd  Last-Modified: 2021-12-13
 "--------------------------------------------------------------------------------
 set nocompatible
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
+
+if !exists("g:use_heavy_plugin") 
+  let g:use_heavy_plugin = 0
+endif
+if !exists("g:use_lsp_plugin") 
+  let g:use_lsp_plugin = 0
+endif
+if g:use_heavy_plugin
+  let g:use_lsp_plugin = 1
+endif
 
 if has('nvim')
   source $VIMFILES/init.lua
