@@ -82,9 +82,11 @@ return packer.startup(
         -- AI Coding
         use {"github/copilot.vim"}
 
-        -- Go/dart
+        -- Go/dart/rust/cpp
         use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries", disable = use_basic_only or fn.executable("go") == 0}
         use {"dart-lang/dart-vim-plugin", disable = use_basic_only or fn.executable("dart") == 0}
+        use {"simrat39/rust-tools.nvim", config = [[ require('myrc.config.rust') ]]}
+        use {"p00f/clangd_extensions.nvim", config = [[require("myrc.config.clangd")]]}
 
         -- Markdown, reStructuredText, textile
         use {"godlygeek/tabular", ft = "markdown"}
@@ -106,18 +108,25 @@ return packer.startup(
 
         -- Completion Engine
         if not no_lsp then
-          use "williamboman/nvim-lsp-installer"
-          use { 'hrsh7th/nvim-cmp',
-                requires = {
-                  { 'hrsh7th/cmp-nvim-lsp' },
-                  { 'neovim/nvim-lspconfig', after = 'nvim-cmp' },
-                  { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
-                  { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
-                  { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
-                  { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
-                  { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
-                },
-                config = [[require "myrc.config.cmp"]] }
+          use {"williamboman/nvim-lsp-installer", config = function ()
+              require("nvim-lsp-installer").setup {
+                automatic_installation = false,
+              }
+            end,
+          }
+          use {
+            'hrsh7th/nvim-cmp',
+            requires = {
+              { 'hrsh7th/cmp-nvim-lsp', config = [[ require "myrc.config.lsp" ]] },
+              { 'neovim/nvim-lspconfig', after = 'nvim-cmp' },
+              { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
+              { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
+              { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
+              { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
+              { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
+            },
+            config = [[require "myrc.config.cmp"]],
+          }
         end
 
         -- git
