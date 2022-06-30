@@ -105,7 +105,7 @@ return packer.startup(
         use "christoomey/vim-tmux-navigator"
 
         -- Completion Engine
-        use {"neoclide/coc.nvim", commit= "f4cd929466071d60e6126932f71731c4fca7c4e3", disable = no_lsp }
+        use {"neoclide/coc.nvim", branch = "release", disable = no_lsp }
 
         -- git
         use { "lewis6991/gitsigns.nvim", config = [[require "myrc.config.gitsigns"]]}
