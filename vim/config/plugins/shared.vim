@@ -114,6 +114,11 @@ nnoremap <leader>ff :Files<CR>
 nnoremap <leader>fm :Marks<CR>
 nnoremap <leader>fh :History<CR>
 nnoremap <leader>fb :Buffers<CR>
+
+if has("nvim")
+  " Allow to press esc key to close fzf window
+  autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
+endif
 " }}}
 
 " t.vim {{{

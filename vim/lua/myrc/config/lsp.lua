@@ -8,8 +8,11 @@
 local api = vim.api
 local fn = vim.fn
 
+-- Setup $PATH for nvim-lsp-installer managed language servers
+require("nvim-lsp-installer").setup {}
+
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
--- vim.lsp.set_log_level("debug")
+vim.lsp.set_log_level("debug")
 
 local lsp_defaults = {
   flags = { debounce_text_changes = 150, },
@@ -82,7 +85,7 @@ lspconfig.util.default_config = vim.tbl_deep_extend(
 -- Setup LSP Server
 --
 
-local servers = { 'cmake', 'bashls', 'pyright', 'tsserver', 'jsonls', 'cssls', 'ansiblels' }
+local servers = { 'cmake', 'bashls', 'pyright', 'tsserver', 'cssls', 'ansiblels' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = function(client, bufnr)
@@ -90,6 +93,16 @@ for _, lsp in ipairs(servers) do
     end,
   }
 end
+
+-- jsonls
+lspconfig.jsonls.setup {
+  settings = {
+    json = {
+      schemas = require('schemastore').json.schemas(),
+      validate = { enable = true },
+    },
+  },
+}
 
 -- angularls
 local nodeRoot="/Users/jiyongdong/.nvm/versions/node/v12.22.12/"

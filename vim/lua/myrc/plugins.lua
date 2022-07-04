@@ -76,6 +76,8 @@ return packer.startup(
 
         -- Debugging
         use {"puremourning/vimspector", disable = use_basic_only}
+        use { 'thinca/vim-quickrun' }
+        use { 'vim-test/vim-test' } -- Unit-Testing
 
         use "pearofducks/ansible-vim"
 
@@ -108,12 +110,7 @@ return packer.startup(
 
         -- Completion Engine
         if not no_lsp then
-          use {"williamboman/nvim-lsp-installer", config = function ()
-              require("nvim-lsp-installer").setup {
-                automatic_installation = false,
-              }
-            end,
-          }
+          use {"williamboman/nvim-lsp-installer"}
           use {
             'hrsh7th/nvim-cmp',
             requires = {
@@ -124,6 +121,7 @@ return packer.startup(
               { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
               { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
+              { 'b0o/schemastore.nvim' }
             },
             config = [[require "myrc.config.cmp"]],
           }
