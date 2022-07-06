@@ -123,8 +123,8 @@ endif
 
 " t.vim {{{
 "--------------------------------------------------------------------------------
-let g:mysnippets_dir = expand("$VIMFILES/mysnippets")
-let $mysnippets_dir = expand("$VIMFILES/mysnippets")
+let g:mysnippets_dir = expand("$VIMFILES/mysnippets/codesnippets")
+let $mysnippets_dir = expand("$VIMFILES/mysnippets/codesnippets")
 
 " integrate with fzf 
 function! s:search_template(arg, bang)
@@ -162,9 +162,9 @@ runtime ftplugin/man.vim
 "vim-easy-align {{{
 "--------------------------------------------------------------------------------
 " Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap ga <Plug>(EasyAlign)
+xmap <leader>a <Plug>(EasyAlign)
 " Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap ga <Plug>(EasyAlign)
+nmap <leader>a <Plug>(EasyAlign)
 "}}}
 
 " NERDTree {{{
@@ -322,11 +322,11 @@ augroup END
 " others {{{
 " YCM & Coc.nvim
 "--------------------------------------------------------------------------------
-if executable('node') == 0
-  echomsg "coc.nvim required nodejs"
-else
-  source $VIMFILES/config/plugins/coc.vim
-endif
+" if executable('node') == 0
+"   echomsg "coc.nvim required nodejs"
+" else
+"   source $VIMFILES/config/plugins/coc.vim
+" endif
 
 " victionary
 "--------------------------------------------------------------------------------

@@ -12,7 +12,7 @@ local fn = vim.fn
 require("nvim-lsp-installer").setup {}
 
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
-vim.lsp.set_log_level("debug")
+vim.lsp.set_log_level("info")
 
 local lsp_defaults = {
   flags = { debounce_text_changes = 150, },
@@ -54,14 +54,17 @@ api.nvim_create_autocmd('User', {
     bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
 
     -- Displays a function's signature information
-    bufmap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+    bufmap('n', '<leader>gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
 
     -- Renames all references to the symbol under the cursor
     bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
+    bufmap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>')
 
     -- Selects a code action available at the current cursor position
     bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
     bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
+    bufmap('n', 'gx', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+    bufmap('x', 'gx', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
 
     -- Show diagnostics in a floating window
     bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
@@ -82,10 +85,16 @@ lspconfig.util.default_config = vim.tbl_deep_extend(
   lsp_defaults
 )
 
+local buf_map = function(bufnr, mode, lhs, rhs, opts)
+  vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
+    silent = true,
+  })
+end
+
 -- Setup LSP Server
 --
 
-local servers = { 'cmake', 'bashls', 'pyright', 'tsserver', 'cssls', 'ansiblels' }
+local servers = { 'cmake', 'bashls', 'pyright', 'cssls', 'ansiblels' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = function(client, bufnr)
@@ -94,6 +103,33 @@ for _, lsp in ipairs(servers) do
   }
 end
 
+local null_ls = require("null-ls")
+null_ls.setup({
+    sources = {
+        null_ls.builtins.diagnostics.eslint,
+        null_ls.builtins.code_actions.eslint,
+        null_ls.builtins.formatting.prettier
+    },
+    on_attach = function (client, bufnr)
+      lspconfig.util.default_config.on_attach(client, bufnr)
+    end
+})
+
+-- tsserver
+lspconfig.tsserver.setup({
+    on_attach = function(client, bufnr)
+        client.resolved_capabilities.document_formatting = false
+        client.resolved_capabilities.document_range_formatting = false
+        local ts_utils = require("nvim-lsp-ts-utils")
+        ts_utils.setup({})
+        ts_utils.setup_client(client)
+
+        -- buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
+        -- buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
+        buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+        lspconfig.util.default_config.on_attach(client, bufnr)
+    end,
+})
 -- jsonls
 lspconfig.jsonls.setup {
   settings = {
@@ -136,6 +172,36 @@ lspconfig.gopls.setup{
 }
 
 -- lua lsp
+local function get_lua_library()
+  local library = {}
+
+  local path = vim.split(package.path, ";")
+
+  -- this is the ONLY correct way to setup your path
+  table.insert(path, "lua/?.lua")
+  table.insert(path, "lua/?/init.lua")
+
+  local function add(lib)
+    for _, p in pairs(vim.fn.expand(lib, false, true)) do
+      p = vim.loop.fs_realpath(p)
+      library[p] = true
+    end
+  end
+
+  -- add runtime
+  add("$VIMRUNTIME/lua")
+
+  -- add your config
+  add("$VIMFILES/lua")
+
+  -- add plugins
+  add("$VIMFILES/pack/packer/start/plenary.nvim/lua")
+  add("$VIMFILES/pack/packer/start/nvim-cmp/lua")
+  add("$VIMFILES/pack/packer/opt/nvim-lspconfig/lua")
+  add("$VIMFILES/pack/packer/opt/lua-dev.nvim/types")
+  return library
+end
+
 lspconfig['sumneko_lua'].setup{
   single_file_support = true,
   on_attach = function(client, bufnr)
@@ -152,11 +218,13 @@ lspconfig['sumneko_lua'].setup{
       },
       diagnostics = {
         -- Get the language server to recognize the `vim` global
-        globals = {'vim'},
+        globals = {'vim', 'hs'},
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
-        library = vim.api.nvim_get_runtime_file("", true),
+        library = get_lua_library(),
+        maxPreload = 1000,
+        preloadFileSize = 150,
       },
       -- Do not send telemetry data containing a randomized but unique identifier
       telemetry = {

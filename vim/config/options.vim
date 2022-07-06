@@ -106,7 +106,7 @@ endif
 set tags=./tags,tags,./.tags,.tags
 
 " Set GUI VIM Font
-if has("gui_running") && !has("vimr_running")
+if has("gui_running") && !has("gui_vimr")
   if has("mac")
     set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
     set guifontwide=PingFangSC-Light:h16

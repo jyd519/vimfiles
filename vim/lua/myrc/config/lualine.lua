@@ -8,8 +8,8 @@ require('lualine').setup {
     lualine_b = {'branch', 'diff', {
       'diagnostics', sources = {'coc', 'ale'}}
     },
-    lualine_c = {{'filename', path=1}},
-    lualine_x = {'g:coc_status', 'encoding', 'fileformat', 'filetype'},
+    lualine_c = {{'filename', path=1}, 'lsp_progress'},
+    lualine_x = {'encoding', 'fileformat', 'filetype'},
     lualine_y = {'progress'},
     lualine_z = {'location'}
   },

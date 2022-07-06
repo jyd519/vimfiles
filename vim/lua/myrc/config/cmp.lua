@@ -1,14 +1,47 @@
 -- Setup auto completion
 local cmp = require('cmp')
+local luasnip = require('luasnip')
+
+-- Setup nvim-cmp {{{1
+
+-- Source Kind Icons {{{2
+local kind_icons = {
+	Text = "",
+	Method = "m",
+	Function = "",
+	Constructor = "",
+	Field = "",
+	Variable = "",
+	Class = "",
+	Interface = "",
+	Module = "",
+	Property = "",
+	Unit = "",
+	Value = "",
+	Enum = "",
+	Keyword = "",
+	Snippet = "",
+	Color = "",
+	File = "",
+	Reference = "",
+	Folder = "",
+	EnumMember = "",
+	Constant = "",
+	Struct = "",
+	Event = "",
+	Operator = "",
+	TypeParameter = "",
+}
+-- }}}
 
 cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
     expand = function(args)
       -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
-      -- require('luasnip').lsp_expand(args.body) -- For `luasnip` users.
+      luasnip.lsp_expand(args.body) -- For `luasnip` users.
       -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
-      vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
+      -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
     end,
   },
   window = {
@@ -27,8 +60,8 @@ cmp.setup({
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
-      -- elseif luasnip.expand_or_jumpable() then
-      --   luasnip.expand_or_jump()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
       else
         fallback()
       end
@@ -36,26 +69,45 @@ cmp.setup({
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      -- elseif luasnip.jumpable(-1) then
-      --   luasnip.jump(-1)
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
       else
         fallback()
       end
     end, { 'i', 's' }),
   }),
+	formatting = {
+		fields = { "kind", "abbr", "menu" },
+		format = function(entry, vim_item)
+			-- Kind icons
+			vim_item.kind = string.format("%s", kind_icons[vim_item.kind])
+			-- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
+			vim_item.menu = ({
+				copilot = "[Copilot]",
+				luasnip = "LuaSnip",
+				nvim_lua = "[NVim Lua]",
+				nvim_lsp = "[LSP]",
+				buffer = "[Buffer]",
+				path = "[Path]",
+			})[entry.source.name]
+			return vim_item
+		end,
+	},
   sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
+    { name = 'nvim_lua' },
+    { name = 'nvim_lsp', max_item_count = 6 },
     -- { name = 'vsnip' }, -- For vsnip users.
-    -- { name = 'luasnip' }, -- For luasnip users.
-    { name = 'ultisnips' }, -- For ultisnips users.
+    { name = 'luasnip' }, -- For luasnip users.
+    -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
+    { name = "copilot" },
     { name = "path" },
   }, {
-    { name = 'buffer' },
+    { name = 'buffer', max_item_count = 6 },
   })
 })
 
--- Set configuration for specific filetype.
+-- Set configuration for specific filetype {{{2
 cmp.setup.filetype('gitcommit', {
   sources = cmp.config.sources({
     { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
@@ -77,8 +129,96 @@ cmp.setup.cmdline(':', {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'path' }
+    { name = 'path', option = { trailing_slash = false } }
   }, {
     { name = 'cmdline' }
   })
 })
+
+
+-- Setup luasnip {{{1
+
+-- Use existing vs-code style snippets from a plugin (eg. rafamadriz/friendly-snippets)
+require("luasnip.loaders.from_vscode").lazy_load()
+
+-- snipmate format
+--    https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#from_snipmate
+require("luasnip.loaders.from_snipmate").lazy_load()
+
+-- luasnip format
+require("luasnip.loaders.from_lua").load({paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets")})
+vim.api.nvim_create_user_command("SnipEdit", ':lua require("luasnip.loaders").edit_snippet_files()', {})
+
+-- Virtual Text {{{2
+local types = require("luasnip.util.types")
+luasnip.config.set_config({
+	history = true, --keep around last snippet local to jump back
+	updateevents = "TextChanged,TextChangedI", --update changes as you type
+	enable_autosnippets = true,
+	ext_opts = {
+		[types.choiceNode] = {
+			active = {
+				virt_text = { { "●", "GruvboxOrange" } },
+			},
+		},
+		-- [types.insertNode] = {
+		-- 	active = {
+		-- 		virt_text = { { "●", "GruvboxBlue" } },
+		-- 	},
+		-- },
+	},
+}) --}}}
+
+-- Key Mapping --{{{2
+vim.keymap.set({ "i", "s" }, "<c-u>", '<cmd>lua require("luasnip.extras.select_choice")()<cr><C-c><C-c>')
+
+vim.keymap.set({ "i", "s" }, "<a-p>", function()
+	if luasnip.expand_or_jumpable() then
+		luasnip.expand()
+	end
+end, { silent = true })
+-- vim.keymap.set({ "i", "s" }, "<C-k>", function()
+-- 	if luasnip.expand_or_jumpable() then
+-- 		luasnip.expand_or_jump()
+-- 	end
+-- end, { silent = true })
+-- vim.keymap.set({ "i", "s" }, "<C-j>", function()
+-- 	if luasnip.jumpable() then
+-- 		luasnip.jump(-1)
+-- 	end
+-- end, { silent = true })
+
+vim.keymap.set({ "i", "s" }, "<A-y>", "<Esc>o", { silent = true })
+
+vim.keymap.set({ "i", "s" }, "<a-k>", function()
+	if luasnip.jumpable(1) then
+		luasnip.jump(1)
+	end
+end, { silent = true })
+vim.keymap.set({ "i", "s" }, "<a-j>", function()
+	if luasnip.jumpable(-1) then
+		luasnip.jump(-1)
+	end
+end, { silent = true })
+
+vim.keymap.set({ "i", "s" }, "<a-l>", function()
+	if luasnip.choice_active() then
+		luasnip.change_choice(1)
+	else
+		-- print current time
+		local t = os.date("*t")
+		local time = string.format("%02d:%02d:%02d", t.hour, t.min, t.sec)
+		print(time)
+	end
+end)
+vim.keymap.set({ "i", "s" }, "<a-h>", function()
+	if luasnip.choice_active() then
+		luasnip.change_choice(-1)
+	end
+end)
+
+-- vim.keymap.set("n", "<Leader><CR>", "<cmd>LuaSnipEdit<cr>", { silent = true, noremap = true })
+vim.cmd([[autocmd BufEnter */mysnippets/luasnip/*.lua nnoremap <silent> <buffer> <CR> /-- End Refactoring --<CR>O<Esc>O]])
+--
+-- }}}
+-- vim: set fdm=marker fen fdl=0: }}}

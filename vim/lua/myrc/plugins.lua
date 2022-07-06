@@ -105,12 +105,18 @@ return packer.startup(
         use "honza/vim-snippets"
         use {"mhartington/vim-angular2-snippets", ft = "typescript"}
 
+        use {'L3MON4D3/LuaSnip'} -- Snippets plugin
+        use { 'rafamadriz/friendly-snippets' }
+
         -- tmux
         use "christoomey/vim-tmux-navigator"
 
         -- Completion Engine
         if not no_lsp then
           use {"williamboman/nvim-lsp-installer"}
+          use { 'jose-elias-alvarez/null-ls.nvim' }
+          use { 'jose-elias-alvarez/nvim-lsp-ts-utils' }
+          use { 'arkav/lualine-lsp-progress' }
           use {
             'hrsh7th/nvim-cmp',
             requires = {
@@ -119,13 +125,20 @@ return packer.startup(
               { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
+              { 'hrsh7th/cmp-nvim-lua', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
-              { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
+              {
+                'quangnguyen30192/cmp-nvim-tags',
+                ft = { 'c', 'cpp' }
+              },
+              -- { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
               { 'b0o/schemastore.nvim' }
             },
             config = [[require "myrc.config.cmp"]],
           }
         end
+        use {'saadparwaiz1/cmp_luasnip'}
+        use { 'folke/lua-dev.nvim', opt = true }
 
         -- git
         use { "lewis6991/gitsigns.nvim", config = [[require "myrc.config.gitsigns"]]}
