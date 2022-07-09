@@ -197,7 +197,7 @@ local function get_lua_library()
   -- add plugins
   add("$VIMFILES/pack/packer/start/plenary.nvim/lua")
   add("$VIMFILES/pack/packer/start/nvim-cmp/lua")
-  add("$VIMFILES/pack/packer/opt/nvim-lspconfig/lua")
+  add("$VIMFILES/pack/packer/start/nvim-lspconfig/lua")
   add("$VIMFILES/pack/packer/opt/lua-dev.nvim/types")
   return library
 end

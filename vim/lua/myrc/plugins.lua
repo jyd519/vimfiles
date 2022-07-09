@@ -113,7 +113,8 @@ return packer.startup(
 
         -- Completion Engine
         if not no_lsp then
-          use {"williamboman/nvim-lsp-installer"}
+          use { 'williamboman/nvim-lsp-installer' }
+          use { 'neovim/nvim-lspconfig' }
           use { 'jose-elias-alvarez/null-ls.nvim' }
           use { 'jose-elias-alvarez/nvim-lsp-ts-utils' }
           use { 'arkav/lualine-lsp-progress' }
@@ -121,7 +122,6 @@ return packer.startup(
             'hrsh7th/nvim-cmp',
             requires = {
               { 'hrsh7th/cmp-nvim-lsp', config = [[ require "myrc.config.lsp" ]] },
-              { 'neovim/nvim-lspconfig', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
