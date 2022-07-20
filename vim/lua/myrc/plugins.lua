@@ -79,7 +79,7 @@ return packer.startup(
         use { 'thinca/vim-quickrun' }
         use { 'vim-test/vim-test' } -- Unit-Testing
 
-        use "pearofducks/ansible-vim"
+        use {"pearofducks/ansible-vim"}
 
         -- AI Coding
         use {"github/copilot.vim"}
@@ -124,20 +124,16 @@ return packer.startup(
               { 'hrsh7th/cmp-nvim-lsp', config = [[ require "myrc.config.lsp" ]] },
               { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
-              { 'hrsh7th/cmp-cmdline', after = 'nvim-cmp' },
+              { 'jyd519/cmp-cmdline', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-nvim-lua', after = 'nvim-cmp' },
               { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
-              {
-                'quangnguyen30192/cmp-nvim-tags',
-                ft = { 'c', 'cpp' }
-              },
-              -- { 'quangnguyen30192/cmp-nvim-ultisnips', after = 'nvim-cmp' },
+              { 'quangnguyen30192/cmp-nvim-tags', ft = { 'c', 'cpp' } },
+              { 'saadparwaiz1/cmp_luasnip' },
               { 'b0o/schemastore.nvim' }
             },
             config = [[require "myrc.config.cmp"]],
           }
         end
-        use {'saadparwaiz1/cmp_luasnip'}
         use { 'folke/lua-dev.nvim', opt = true }
 
         -- git

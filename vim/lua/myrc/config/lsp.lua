@@ -12,7 +12,7 @@ local fn = vim.fn
 require("nvim-lsp-installer").setup {}
 
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
-vim.lsp.set_log_level("info")
+vim.lsp.set_log_level("warn")
 
 local lsp_defaults = {
   flags = { debounce_text_changes = 150, },

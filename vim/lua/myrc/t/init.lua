@@ -54,6 +54,9 @@ function M.save_tpl(name)
 
   if string.find(name, '.', 1, true) == nil then
     local ext = vim.fn.expand("%:p:e")
+    if ext == "" then
+      ext = ft
+    end
     name = name .. "." .. ext
   end
 

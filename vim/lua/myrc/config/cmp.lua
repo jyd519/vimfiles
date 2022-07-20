@@ -2,7 +2,7 @@
 local cmp = require('cmp')
 local luasnip = require('luasnip')
 
--- Setup nvim-cmp {{{1
+-- Setup nvim-cmp {{{
 
 -- Source Kind Icons {{{2
 local kind_icons = {
@@ -51,7 +51,9 @@ cmp.setup({
   mapping = cmp.mapping.preset.insert({
     ['<C-d>'] = cmp.mapping.scroll_docs(-4),
     ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-x><C-o>'] = cmp.mapping(function()
+        cmp.complete()
+      end, {'i', 's', 'c'}),
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm{
       behavior = cmp.ConfirmBehavior.Replace,
@@ -107,7 +109,7 @@ cmp.setup({
   })
 })
 
--- Set configuration for specific filetype {{{2
+-- Set configuration for specific filetype {{{1
 cmp.setup.filetype('gitcommit', {
   sources = cmp.config.sources({
     { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
@@ -129,8 +131,11 @@ cmp.setup.cmdline(':', {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'path', option = { trailing_slash = false } }
+    { name = 'path', option = { trailing_slash = true } }
   }, {
+    -- Do not show completion for words starting with 'Man'
+    -- https://github.com/hrsh7th/cmp-cmdline/issues/47
+    -- { name = 'cmdline', keyword_pattern = [[^\@<!Man\s]] }
     { name = 'cmdline' }
   })
 })
@@ -144,6 +149,7 @@ require("luasnip.loaders.from_vscode").lazy_load()
 -- snipmate format
 --    https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#from_snipmate
 require("luasnip.loaders.from_snipmate").lazy_load()
+require("luasnip.loaders.from_snipmate").lazy_load({paths = vim.fn.expand("$VIMFILES/mysnippets/snippets")})
 
 -- luasnip format
 require("luasnip.loaders.from_lua").load({paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets")})
@@ -177,16 +183,16 @@ vim.keymap.set({ "i", "s" }, "<a-p>", function()
 		luasnip.expand()
 	end
 end, { silent = true })
--- vim.keymap.set({ "i", "s" }, "<C-k>", function()
--- 	if luasnip.expand_or_jumpable() then
--- 		luasnip.expand_or_jump()
--- 	end
--- end, { silent = true })
--- vim.keymap.set({ "i", "s" }, "<C-j>", function()
--- 	if luasnip.jumpable() then
--- 		luasnip.jump(-1)
--- 	end
--- end, { silent = true })
+vim.keymap.set({ "i", "s" }, "<C-k>", function()
+	if luasnip.expand_or_jumpable() then
+		luasnip.expand_or_jump()
+	end
+end, { silent = true })
+vim.keymap.set({ "i", "s" }, "<C-j>", function()
+	if luasnip.jumpable() then
+		luasnip.jump(-1)
+	end
+end, { silent = true })
 
 vim.keymap.set({ "i", "s" }, "<A-y>", "<Esc>o", { silent = true })
 
@@ -218,7 +224,7 @@ vim.keymap.set({ "i", "s" }, "<a-h>", function()
 end)
 
 -- vim.keymap.set("n", "<Leader><CR>", "<cmd>LuaSnipEdit<cr>", { silent = true, noremap = true })
-vim.cmd([[autocmd BufEnter */mysnippets/luasnip/*.lua nnoremap <silent> <buffer> <CR> /-- End Refactoring --<CR>O<Esc>O]])
+vim.cmd([[autocmd BufEnter */mysnippets/luasnippets/*.lua nnoremap <silent> <buffer> <CR> /-- End SNIPPETS --<CR>kI<Esc>O]])
 --
 -- }}}
 -- vim: set fdm=marker fen fdl=0: }}}

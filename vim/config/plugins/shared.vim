@@ -7,10 +7,12 @@ let g:user_emmet_leader_key=','
 
 " UltiSnips {{{
 "--------------------------------------------------------------------------------
-let g:UltiSnipsExpandTrigger="<C-k>"
+if !g:is_nvim 
+  let g:UltiSnipsExpandTrigger="<C-k>"
+  let g:UltiSnipsJumpForwardTrigger="<C-k>"
+  let g:UltiSnipsJumpBackwardTrigger="<C-p>"
+endif
 let g:UltiSnipsListSnippets="<C-l>"
-let g:UltiSnipsJumpForwardTrigger="<C-k>"
-let g:UltiSnipsJumpBackwardTrigger="<C-p>"
 let g:UltiSnipsEditSplit='horizontal'
 let g:UltiSnipsSnippetsDir=expand('$VIMFILES/mysnippets/ultisnips')
 let g:UltiSnipsSnippetDirectories = [g:UltiSnipsSnippetsDir, "UltiSnips"]
@@ -348,6 +350,8 @@ let g:sneak#use_ic_scs = 1
 " rust
 "--------------------------------------------------------------------------------
 let g:rustfmt_autosave = 1
-"
+
+let g:ansible_unindent_after_newline = 1
+
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}

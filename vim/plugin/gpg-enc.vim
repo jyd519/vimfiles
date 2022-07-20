@@ -3,7 +3,11 @@ if exists('did_gpg_enc_vim') || &cp || version < 700
 endif
 let did_gpg_enc_vim = 1
 
-let g:gpg_input_passphrase = 1
+let g:gpg_input_passphrase = 0
+
+if !exists("g:gpg_recipient") 
+  let g:gpg_recipient = 'jyd119@163.com'
+endif
 
 function! GpgDec(...) range
   let passphrase = a:0 > 0 ? a:1 : ""
@@ -11,8 +15,10 @@ function! GpgDec(...) range
     let passphrase = inputsecret("Passphrase: ")
   endif
   let extra = ""
-  if !empty(passphrase)
-    let extra = " --batch --passphrase " . passphrase
+  if empty(passphrase)
+    let extra .= '-r "' . g:gpg_recipient . '"'
+  else
+    let extra .= "--batch --passphrase " . passphrase
   endif
   if a:lastline != a:firstline
     call GpgDecAll(extra)
@@ -57,7 +63,7 @@ function! GpgDecAll(extra)
     elseif getline(i) =~ '^ *-----END PGP MESSAGE'
       let e = i
       if e > b 
-         silent! execute(b . ',' . e . '!gpg -da' . a:extra . ' 2>/dev/null')
+         silent! execute(b . ',' . e . '!gpg -da ' . a:extra . ' 2>/dev/null')
       endif
     endif
     let i += 1
@@ -65,20 +71,9 @@ function! GpgDecAll(extra)
 endfunction
 
 function! GpgEnc(...) range
-  let passphrase = a:0 > 0 ? a:1 : ""
-  let comment = a:0 > 1 ? a:2 : ""
-  if empty(passphrase) && g:gpg_input_passphrase
-    let passphrase = inputsecret("Passphrase: ")
-  endif
-  let extra = ""
-  if !empty(passphrase)
-    let extra = " --batch --passphrase " . passphrase
-  endif
-  if !empty(comment) 
-    let extra .= " --comment " . shellescape(comment)
-  endif
-
-  silent! execute(a:firstline . ',' . a:lastline . '!gpg -ca' . extra)
+  let extra = '--batch -r "' . g:gpg_recipient . '"'
+  echom '!gpg -ea ' . extra
+  silent! execute(a:firstline . ',' . a:lastline . '!gpg -ea ' . extra)
 endfunction
 
 command! -nargs=* -range GpgEnc <line1>,<line2>call GpgEnc(<f-args>) 
