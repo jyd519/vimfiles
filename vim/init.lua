@@ -14,6 +14,9 @@ env.MYVIMRC=VIMFILES .. '/init.lua'
 g.did_load_filetypes=1
 g.do_filetype_lua = 1
 
+g.mapleader = ","
+g.maplocalleader = ","
+
 local function prequire(m)
   local ok, err = pcall(require, m)
   if not ok then return nil, err end

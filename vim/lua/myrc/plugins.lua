@@ -53,9 +53,7 @@ return packer.startup(
 
         use "rcarriga/nvim-notify"
         use "nathom/filetype.nvim"
-
-        use "jyd519/ListToggle" -- toggle quickfix/location window
-        use "vim-scripts/bufkill.vim"
+        use "qpkorr/vim-bufkill"
         use "justinmk/vim-sneak"
         use {"mattn/emmet-vim", ft = {"html", "jsx", "vue"}}
         use "jiangmiao/auto-pairs"
@@ -75,7 +73,25 @@ return packer.startup(
         use {g.VIMFILES .. "/locals/nvim-projectconfig"}
 
         -- Debugging
-        use {"puremourning/vimspector", disable = use_basic_only}
+        use {
+          "mfussenegger/nvim-dap",
+          opt = true,
+          event = "BufReadPre",
+          module = { "dap" },
+          requires = {
+            "theHamsta/nvim-dap-virtual-text",
+            "rcarriga/nvim-dap-ui",
+            "mfussenegger/nvim-dap-python",
+            "nvim-telescope/telescope-dap.nvim",
+            { "leoluz/nvim-dap-go", module = "dap-go" },
+            { "jbyuki/one-small-step-for-vimkind", module = "osv" },
+          },
+          config = function()
+            require("myrc.config.dap")
+          end,
+        }
+        use { 'mxsdev/nvim-dap-vscode-js' }
+
         use { 'thinca/vim-quickrun' }
         use { 'vim-test/vim-test' } -- Unit-Testing
 
@@ -112,29 +128,34 @@ return packer.startup(
         use "christoomey/vim-tmux-navigator"
 
         -- Completion Engine
+        use {
+          'hrsh7th/nvim-cmp',
+          requires = {
+            { 'hrsh7th/cmp-nvim-lsp', config = [[ require "myrc.config.lsp" ]] },
+            { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
+            { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
+            { 'jyd519/cmp-cmdline', after = 'nvim-cmp' },
+            { 'hrsh7th/cmp-nvim-lua', after = 'nvim-cmp' },
+            { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
+            { 'quangnguyen30192/cmp-nvim-tags', ft = { 'c', 'cpp' } },
+            { 'saadparwaiz1/cmp_luasnip' },
+            { 'b0o/schemastore.nvim' }
+          },
+          config = [[require "myrc.config.cmp"]],
+        }
+        if use_all then
+          use {'tzachar/cmp-tabnine', run= './install.sh', config = [[require "myrc.config.tabnine"]]}
+        end
+
+        -- LSP
         if not no_lsp then
           use { 'williamboman/nvim-lsp-installer' }
           use { 'neovim/nvim-lspconfig' }
           use { 'jose-elias-alvarez/null-ls.nvim' }
           use { 'jose-elias-alvarez/nvim-lsp-ts-utils' }
           use { 'arkav/lualine-lsp-progress' }
-          use {
-            'hrsh7th/nvim-cmp',
-            requires = {
-              { 'hrsh7th/cmp-nvim-lsp', config = [[ require "myrc.config.lsp" ]] },
-              { 'hrsh7th/cmp-buffer', after = 'nvim-cmp' },
-              { 'hrsh7th/cmp-path', after = 'nvim-cmp' },
-              { 'jyd519/cmp-cmdline', after = 'nvim-cmp' },
-              { 'hrsh7th/cmp-nvim-lua', after = 'nvim-cmp' },
-              { 'hrsh7th/cmp-nvim-lsp-document-symbol', after = 'nvim-cmp' },
-              { 'quangnguyen30192/cmp-nvim-tags', ft = { 'c', 'cpp' } },
-              { 'saadparwaiz1/cmp_luasnip' },
-              { 'b0o/schemastore.nvim' }
-            },
-            config = [[require "myrc.config.cmp"]],
-          }
+          use { 'folke/lua-dev.nvim', opt = true }
         end
-        use { 'folke/lua-dev.nvim', opt = true }
 
         -- git
         use { "lewis6991/gitsigns.nvim", config = [[require "myrc.config.gitsigns"]]}
@@ -150,11 +171,16 @@ return packer.startup(
           cmd = { "Gist" },
         }
 
-        -- File explorer
+        -- File explorer/Fuzzy Finder
         use {"preservim/nerdtree", cmd = {"NERDTree", "NERDTreeToggle", "NERDTreeFind", "NERDTreeFromBookmark"}}
         use {"junegunn/fzf", run = "fzf#install()"}
-        use "junegunn/fzf.vim"
-
+        use {"junegunn/fzf.vim"}
+        use {"nvim-telescope/telescope.nvim", tag = "0.1.0", config = [[ require"myrc.config.telescope" ]]}
+        use { "folke/which-key.nvim",
+          config = function()
+            require("which-key").setup {}
+          end
+        }
         -- Treesitter
         use {"nvim-treesitter/nvim-treesitter", config= [[require('myrc.config.treesitter')]], run = ":TSUpdate", disable = use_basic_only }
 

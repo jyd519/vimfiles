@@ -26,17 +26,36 @@ local lsp_defaults = {
   end
 }
 
+local bufmap = function(mode, lhs, rhs, opts)
+  local options = { buffer = true }
+  if opts then
+      options = vim.tbl_extend("force", options, opts)
+  end
+  vim.keymap.set(mode, lhs, rhs, options)
+end
+
+local buf_map = function(bufnr, mode, lhs, rhs, opts)
+  if bufnr ~= vim.fn.bufnr() then
+    print("buf_map>>> bufnr != current buffer")
+  end
+
+  vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
+    silent = true,
+  })
+end
+
 api.nvim_create_autocmd('User', {
   pattern = 'LspAttached',
   desc = 'LSP actions',
   callback = function()
-    local bufmap = function(mode, lhs, rhs)
-      local opts = {buffer = true}
-      vim.keymap.set(mode, lhs, rhs, opts)
-    end
-
     -- Displays hover information about the symbol under the cursor
-    bufmap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>')
+    bufmap('n', 'K', function ()
+      if dap.session() then
+        require"dapui".eval()
+      else
+        vim.lsp.buf.hover()
+      end
+    end, {desc = 'dap eval or lsp.buf.hover'})
 
     -- Jump to the definition
     bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
@@ -85,12 +104,6 @@ lspconfig.util.default_config = vim.tbl_deep_extend(
   lsp_defaults
 )
 
-local buf_map = function(bufnr, mode, lhs, rhs, opts)
-  vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
-    silent = true,
-  })
-end
-
 -- Setup LSP Server
 --
 
@@ -123,10 +136,23 @@ lspconfig.tsserver.setup({
         local ts_utils = require("nvim-lsp-ts-utils")
         ts_utils.setup({})
         ts_utils.setup_client(client)
-
         -- buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
         -- buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
-        buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+        -- buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+        --
+        --
+        vim.api.nvim_buf_create_user_command(bufnr, "Organize", ":TSLspOrganize", {
+            nargs = 0,
+            desc = "TSLspOrganize",
+        })
+        vim.api.nvim_buf_create_user_command(bufnr, "RenameFile", ":TSLspRenameFile", {
+            nargs = 0,
+            desc = "TSLspRenameFile",
+        })
+        vim.api.nvim_buf_create_user_command(bufnr, "Ips", ":TSLspImportAll", {
+            nargs = 0,
+            desc = "TSLspImportAll",
+        })
         lspconfig.util.default_config.on_attach(client, bufnr)
     end,
 })
@@ -237,10 +263,10 @@ lspconfig['sumneko_lua'].setup{
 require('rust-tools').setup{
 	server = {
     on_attach = function(client, bufnr)
-      print("rust-tools attached")
-      vim.api.nvim_buf_set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
-      vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-      vim.api.nvim_buf_set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
+      local set_option = vim.api.nvim_buf_set_option
+      set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
+      set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+      set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
       lspconfig.util.default_config.on_attach(client, bufnr)
     end,
 	}

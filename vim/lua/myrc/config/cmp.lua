@@ -57,8 +57,9 @@ cmp.setup({
     ['<C-e>'] = cmp.mapping.abort(),
     ['<CR>'] = cmp.mapping.confirm{
       behavior = cmp.ConfirmBehavior.Replace,
-      select = true
-    }, -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+      select = false,
+    },
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -86,7 +87,8 @@ cmp.setup({
 			-- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
 			vim_item.menu = ({
 				copilot = "[Copilot]",
-				luasnip = "LuaSnip",
+				luasnip = "[LuaSnip]",
+				cmp_tabnine = "[TN]",
 				nvim_lua = "[NVim Lua]",
 				nvim_lsp = "[LSP]",
 				buffer = "[Buffer]",
@@ -98,11 +100,12 @@ cmp.setup({
   sources = cmp.config.sources({
     { name = 'nvim_lua' },
     { name = 'nvim_lsp', max_item_count = 6 },
-    -- { name = 'vsnip' }, -- For vsnip users.
+    { name = "copilot" },
+    { name = 'cmp_tabnine' },
     { name = 'luasnip' }, -- For luasnip users.
+    -- { name = 'vsnip' }, -- For vsnip users.
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
-    { name = "copilot" },
     { name = "path" },
   }, {
     { name = 'buffer', max_item_count = 6 },
@@ -167,46 +170,33 @@ luasnip.config.set_config({
 				virt_text = { { "●", "GruvboxOrange" } },
 			},
 		},
-		-- [types.insertNode] = {
-		-- 	active = {
-		-- 		virt_text = { { "●", "GruvboxBlue" } },
-		-- 	},
-		-- },
+		[types.insertNode] = {
+			active = {
+				virt_text = { { "●", "GruvboxBlue" } },
+			},
+		},
 	},
 }) --}}}
 
 -- Key Mapping --{{{2
 vim.keymap.set({ "i", "s" }, "<c-u>", '<cmd>lua require("luasnip.extras.select_choice")()<cr><C-c><C-c>')
 
-vim.keymap.set({ "i", "s" }, "<a-p>", function()
-	if luasnip.expand_or_jumpable() then
-		luasnip.expand()
-	end
-end, { silent = true })
-vim.keymap.set({ "i", "s" }, "<C-k>", function()
-	if luasnip.expand_or_jumpable() then
-		luasnip.expand_or_jump()
-	end
-end, { silent = true })
-vim.keymap.set({ "i", "s" }, "<C-j>", function()
-	if luasnip.jumpable() then
-		luasnip.jump(-1)
-	end
-end, { silent = true })
-
-vim.keymap.set({ "i", "s" }, "<A-y>", "<Esc>o", { silent = true })
-
-vim.keymap.set({ "i", "s" }, "<a-k>", function()
-	if luasnip.jumpable(1) then
-		luasnip.jump(1)
-	end
-end, { silent = true })
-vim.keymap.set({ "i", "s" }, "<a-j>", function()
-	if luasnip.jumpable(-1) then
-		luasnip.jump(-1)
-	end
-end, { silent = true })
-
+-- vim.keymap.set({ "i", "s" }, "<C-k>", function()
+-- 	if luasnip.expand_or_jumpable() then
+-- 		luasnip.expand_or_jump()
+-- 	end
+-- end, { silent = true })
+--
+-- vim.keymap.set({ "i", "s" }, "<a-k>", function()
+-- 	if luasnip.jumpable(1) then
+-- 		luasnip.jump(1)
+-- 	end
+-- end, { silent = true })
+-- vim.keymap.set({ "i", "s" }, "<a-j>", function()
+-- 	if luasnip.jumpable(-1) then
+-- 		luasnip.jump(-1)
+-- 	end
+-- end, { silent = true })
 vim.keymap.set({ "i", "s" }, "<a-l>", function()
 	if luasnip.choice_active() then
 		luasnip.change_choice(1)
@@ -217,13 +207,13 @@ vim.keymap.set({ "i", "s" }, "<a-l>", function()
 		print(time)
 	end
 end)
+
 vim.keymap.set({ "i", "s" }, "<a-h>", function()
 	if luasnip.choice_active() then
 		luasnip.change_choice(-1)
 	end
 end)
 
--- vim.keymap.set("n", "<Leader><CR>", "<cmd>LuaSnipEdit<cr>", { silent = true, noremap = true })
 vim.cmd([[autocmd BufEnter */mysnippets/luasnippets/*.lua nnoremap <silent> <buffer> <CR> /-- End SNIPPETS --<CR>kI<Esc>O]])
 --
 -- }}}

@@ -22,7 +22,28 @@ end, {
     nargs = "*",
     desc = "Say hi to someone",
 })
+vim.api.nvim_buf_create_user_command(0, "SayHelloBuf", function(args)
+    print("Hello " .. args.args)
+end, {
+    nargs = "*",
+    desc = "Say hi to someone",
+})
 
+-- Pros of keymap.set
+--   It can accept either a string or a Lua function as its 3rd argument.
+--   It sets noremap by default, as this is what users want 99% of the time.
 vim.keymap.set("n", "<leader>H", function() print("Hello world!") end)
+
+-- autogroup
+local au_id = vim.api.nvim_create_augroup("autest", {clear = true})
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"},{
+    group = au_id, -- or "autest",
+    pattern = {"*.lua"},
+    callback = function ()
+      vim.defer_fn(function()
+        print(">>> read a lua file")
+      end, 100)
+    end,
+})
 
 -- print(vim.lsp.get_log_path())

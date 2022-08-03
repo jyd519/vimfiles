@@ -223,14 +223,13 @@ let g:neoformat_enabled_yaml= ['prettier']
 "--------------------------------------------------------------------------------
 if g:is_nvim
   let g:test#strategy = "neovim"
+  let g:test#neovim#start_normal = 0 " 1: enter normal mode
+  tnoremap <C-o> <C-\><C-n>
 endif
-nmap <silent> t<C-n> :TestNearest<CR>
-function! DebugNearest()
-  let g:test#go#runner = 'delve'
-  TestNearest
-  unlet g:test#go#runner
-endfunction
-nmap <silent> t<C-d> :call DebugNearest()<CR>
+
+autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>rt :TestNearest<cr>
+autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>tt :TestNearest<cr>
+autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>tf :TestFile<cr>
 " }}}
 
 " quickrun {{{
@@ -341,7 +340,13 @@ map <leader>tsk :call ToggleSketch()<CR>
 " tmux_navigator: Disable tmux navigator when zooming the Vim pane
 "--------------------------------------------------------------------------------
 let g:tmux_navigator_disable_when_zoomed = 1
+let g:tmux_navigator_no_mappings = 1
 
+nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+1
 " Sneak
 "--------------------------------------------------------------------------------
 let g:sneak#label = 1
@@ -351,7 +356,10 @@ let g:sneak#use_ic_scs = 1
 "--------------------------------------------------------------------------------
 let g:rustfmt_autosave = 1
 
-let g:ansible_unindent_after_newline = 1
+" miscs
+"--------------------------------------------------------------------------------
+let g:ansible_unindent_after_newline = 1  " ansible
+let g:BufKillCreateMappings = 0  " bufkill.vim
 
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}

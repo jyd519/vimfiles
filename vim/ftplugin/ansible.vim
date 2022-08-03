@@ -21,5 +21,7 @@ function! FindAnsibleRoleUnderCursor()
   endif
 endfunction
 
+setlocal keywordprg=ansible-doc
+
 nnoremap <leader>gr :call FindAnsibleRoleUnderCursor()<CR>
 vnoremap <leader>gr :call FindAnsibleRoleUnderCursor()<CR>

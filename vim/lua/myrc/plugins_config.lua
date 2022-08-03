@@ -55,4 +55,5 @@ require("indent_blankline").setup {
     show_current_context_start = treesitter_enabled,
 }
 
+
 -- vim: set fdm=marker fen fdl=0: }}}
