@@ -24,6 +24,8 @@ nvim_set_keymap('n', '<leader>dd', ':lua require"telescope.builtin".diagnostics{
 nvim_set_keymap('n', '<leader>qf', ':lua require"telescope.builtin".quickfix{bufnr=0}<CR>', { noremap = true, silent = true })
 
 
+vim.keymap.set("n" , "<leader>fo", ":Telescope oldfiles<CR>", {desc = "Find in oldfiles"})
+
 vim.keymap.set("n" , "<leader>fg", function()
   local opts = {}
   local ok = pcall(require"telescope.builtin".git_files, opts)

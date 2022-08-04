@@ -2,8 +2,7 @@
 -- Jyd  Last-Modified: 2021-12-17
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
-
-local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p', 0, 0)), ':h')
+local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
 
 vim.cmd('set rtp^=' .. VIMFILES)
 vim.cmd('set rtp+=' .. VIMFILES .. '/after')
@@ -62,4 +61,3 @@ if g.colorscheme == nil then
   g.colorscheme = 'vscode'
 end
 vim.cmd('colorscheme ' .. g.colorscheme)
--- vim.cmd([[colorscheme PaperColor]])

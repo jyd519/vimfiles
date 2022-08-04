@@ -119,15 +119,31 @@ function! s:getSelectedText()
 endfunction
 
 vnoremap <silent> * :call setreg("/",
-    \ substitute(<SID>getSelectedText(),
-    \ '\_s\+',
-    \ '\\_s\\+', 'g')
-    \ )<Cr>n
+      \ substitute(<SID>getSelectedText(),
+      \ '\_s\+',
+      \ '\\_s\\+', 'g')
+      \ )<Cr>n
 
 vnoremap <silent> # :call setreg("?",
-    \ substitute(<SID>getSelectedText(),
-    \ '\_s\+',
-    \ '\\_s\\+', 'g')
-    \ )<Cr>n
+      \ substitute(<SID>getSelectedText(),
+      \ '\_s\+',
+      \ '\\_s\\+', 'g')
+      \ )<Cr>n
+
+
+" Zoom / Restore window {{{1
+function! s:ZoomToggle() abort
+  if exists('t:zoomed') && t:zoomed
+    execute t:zoom_winrestcmd
+    let t:zoomed = 0
+  else
+    let t:zoom_winrestcmd = winrestcmd()
+    resize
+    vertical resize
+    let t:zoomed = 1
+  endif
+endfunction
+command! ZoomToggle call s:ZoomToggle()
+nnoremap <silent> <leader>z :ZoomToggle<CR>
 
 " vim: set fdm=marker fen:

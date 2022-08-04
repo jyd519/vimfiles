@@ -99,10 +99,27 @@ return packer.startup(
 
         -- AI Coding
         use {"github/copilot.vim"}
+        use {
+          "zbirenbaum/copilot.lua",
+          event = "InsertEnter",
+          config = function ()
+            vim.schedule(function() require("copilot").setup({
+              cmp = {
+                enabled = true,
+                method = "getCompletionsCycling",
+              },
+              ft_disable = { "markdown", "terraform" },
+                }) end)
+          end,
+        }
+        use {
+          "zbirenbaum/copilot-cmp",
+          module = "copilot_cmp",
+        }
 
         -- Go/dart/rust/cpp
         use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries", disable = use_basic_only or fn.executable("go") == 0}
-        use {"dart-lang/dart-vim-plugin", disable = use_basic_only or fn.executable("dart") == 0}
+        use {"dart-lang/dart-vim-plugin", ft="dart", disable = use_basic_only or fn.executable("dart") == 0}
         use {"simrat39/rust-tools.nvim", config = [[ require('myrc.config.rust') ]]}
         use {"p00f/clangd_extensions.nvim", config = [[require("myrc.config.clangd")]]}
 
@@ -149,7 +166,8 @@ return packer.startup(
 
         -- LSP
         if not no_lsp then
-          use { 'williamboman/nvim-lsp-installer' }
+          use { 'williamboman/mason.nvim' }
+          use { 'williamboman/mason-lspconfig.nvim' }
           use { 'neovim/nvim-lspconfig' }
           use { 'jose-elias-alvarez/null-ls.nvim' }
           use { 'jose-elias-alvarez/nvim-lsp-ts-utils' }

@@ -18,7 +18,7 @@ local dap_breakpoint = {
         numhl = ""
     },
     stopped = {
-        text = "⭐️",
+        text = "🟢",
         texthl = "LspDiagnosticsSignInformation",
         linehl = "DiagnosticUnderlineInfo",
         numhl = "LspDiagnosticsSignInformation"
@@ -119,7 +119,7 @@ local function DebugTest()
         end
     elseif ft == "typescript" or ft == "javascript" then
         if string.match(file, ".*test%.[jt]s") then
-            require("dap-jest").debug()
+            require("myrc.dap-jest").debug()
             do
                 return
             end

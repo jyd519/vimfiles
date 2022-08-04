@@ -1,15 +1,12 @@
 -- Setup lspconfig.
 --
--- jsonls  cssls
---    install: npm i -g vscode-langservers-extracted
---
 -- Reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 --
 local api = vim.api
 local fn = vim.fn
 
--- Setup $PATH for nvim-lsp-installer managed language servers
-require("nvim-lsp-installer").setup {}
+require("mason").setup()
+require("mason-lspconfig").setup()
 
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
 vim.lsp.set_log_level("warn")
@@ -32,16 +29,6 @@ local bufmap = function(mode, lhs, rhs, opts)
       options = vim.tbl_extend("force", options, opts)
   end
   vim.keymap.set(mode, lhs, rhs, options)
-end
-
-local buf_map = function(bufnr, mode, lhs, rhs, opts)
-  if bufnr ~= vim.fn.bufnr() then
-    print("buf_map>>> bufnr != current buffer")
-  end
-
-  vim.api.nvim_buf_set_keymap(bufnr, mode, lhs, rhs, opts or {
-    silent = true,
-  })
 end
 
 api.nvim_create_autocmd('User', {
@@ -172,7 +159,7 @@ local languageServerPath = nodeRoot .. "lib"
 local cmd = {nodeRoot .. "bin/node", languageServerPath.."/node_modules/@angular/language-server/index.js", "--stdio", "--tsProbeLocations", languageServerPath, "--ngProbeLocations", languageServerPath}
 require'lspconfig'.angularls.setup{
   cmd = cmd,
-  on_new_config = function(new_config, new_root_dir)
+  on_new_config = function(new_config--[[ , new_root_dir ]])
     new_config.cmd = cmd
   end,
 }
