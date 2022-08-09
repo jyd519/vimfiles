@@ -1,0 +1,13 @@
+- name: use find to get the files list which you want to copy/fetch
+  find: 
+    paths: /etc/
+    patterns: ".*passwd$"
+    use_regex: True   
+  register: file_2_fetch
+
+- name: use fetch to get the files
+  fetch:
+    src: "{{ item.path }}"
+    dest: /tmp/
+    flat: yes
+  with_items: "{{ file_2_fetch.files }}"

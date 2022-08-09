@@ -51,7 +51,7 @@ let s:configs = [
       \ 'config/mappings.vim',
       \ 'config/plugins/shared.vim',
       \ 'config/plugins/vim_only.vim',
-      \ 'config/plugins/ctags.vim', 
+      \ 'config/plugins/ctags.vim',
       \ ]
 for s in s:configs 
   execute printf('source %s/%s', $VIMFILES, s)

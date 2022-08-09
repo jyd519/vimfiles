@@ -55,4 +55,26 @@ require("indent_blankline").setup {
     show_current_context_start = treesitter_enabled,
 }
 
+-- refactoring -- {{{1
+-- load refactoring Telescope extension
+-- https://github.com/ThePrimeagen/refactoring.nvim#installation
+require('refactoring').setup({})
+require("telescope").load_extension("refactoring")
+
+-- remap to open the Telescope refactoring menu in visual mode
+vim.api.nvim_set_keymap(
+	"v",
+	"<leader>rr",
+	"<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
+	{ noremap = true }
+)
+
+ -- my utils
+vim.api.nvim_set_keymap(
+	"n",
+	"<leader>sl",
+	"<cmd>lua require('myrc.split').splitJsString()<CR>",
+	{ noremap = true }
+)
+
 -- vim: set fdm=marker fen fdl=0: }}}

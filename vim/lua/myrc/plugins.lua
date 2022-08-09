@@ -68,6 +68,12 @@ return packer.startup(
         use "sbdchd/neoformat"
         use "lukas-reineke/indent-blankline.nvim"
 
+        use { 'thinca/vim-quickrun' }
+        use { 'vim-test/vim-test' } -- Unit-Testing
+        use { 'ThePrimeagen/refactoring.nvim' }
+
+        use {"pearofducks/ansible-vim"}
+
         use {g.VIMFILES .. "/locals/t.nvim"}
         use {g.VIMFILES .. "/locals/vim-a", opt = true, cmd = {"A", "AH"}}
         use {g.VIMFILES .. "/locals/nvim-projectconfig"}
@@ -91,11 +97,6 @@ return packer.startup(
           end,
         }
         use { 'mxsdev/nvim-dap-vscode-js' }
-
-        use { 'thinca/vim-quickrun' }
-        use { 'vim-test/vim-test' } -- Unit-Testing
-
-        use {"pearofducks/ansible-vim"}
 
         -- AI Coding
         use {"github/copilot.vim"}

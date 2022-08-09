@@ -11,18 +11,6 @@ require("mason-lspconfig").setup()
 vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
 vim.lsp.set_log_level("warn")
 
-local lsp_defaults = {
-  flags = { debounce_text_changes = 150, },
-  capabilities = require('cmp_nvim_lsp').update_capabilities(
-    vim.lsp.protocol.make_client_capabilities()
-  ),
-  -- Callback function that will be executed when a language server is attached to a buffer
-  ---@diagnostic disable-next-line: unused-local
-  on_attach = function(client, bufnr)
-    api.nvim_exec_autocmds('User', {pattern = 'LspAttached'})
-  end
-}
-
 local bufmap = function(mode, lhs, rhs, opts)
   local options = { buffer = true }
   if opts then
@@ -31,11 +19,9 @@ local bufmap = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
-api.nvim_create_autocmd('User', {
-  pattern = 'LspAttached',
-  desc = 'LSP actions',
-  callback = function()
-    -- Displays hover information about the symbol under the cursor
+local function setup_client(client, bufnr)
+  -- Displays hover information about the symbol under the cursor
+  if client.server_capabilities.hoverProvider and client.name ~= "null-ls" then
     bufmap('n', 'K', function ()
       if dap.session() then
         require"dapui".eval()
@@ -43,6 +29,76 @@ api.nvim_create_autocmd('User', {
         vim.lsp.buf.hover()
       end
     end, {desc = 'dap eval or lsp.buf.hover'})
+  end
+
+  -- Jump to the definition
+  bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
+
+  -- Jump to declaration
+  bufmap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
+
+  -- Lists all the implementations for the symbol under the cursor
+  bufmap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>')
+
+  -- Jumps to the definition of the type symbol
+  bufmap('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
+
+  -- Lists all the references
+  bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
+
+  -- Displays a function's signature information
+  bufmap('n', '<leader>gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+
+  -- Renames all references to the symbol under the cursor
+  bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
+  bufmap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>')
+
+  -- Selects a code action available at the current cursor position
+  bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+  bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
+  bufmap('n', 'gx', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+  bufmap('x', 'gx', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
+
+  -- Show diagnostics in a floating window
+  bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
+
+  -- Move to the previous diagnostic
+  bufmap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
+
+  -- Move to the next diagnostic
+  bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
+end
+
+local lsp_defaults = {
+  flags = { debounce_text_changes = 150, },
+  capabilities = require('cmp_nvim_lsp').update_capabilities(
+    vim.lsp.protocol.make_client_capabilities()
+  ),
+  -- Callback function that will be executed when a language server is attached to a buffer
+  ---@diagnostic disable-next-line: unused-local
+  on_attach = function(client, bufnr)
+    -- nvim 0.7 nvim_exec_autocmds's functionality's is limited
+    -- api.nvim_exec_autocmds('User', {pattern = 'LspAttached', data=client.id})
+    setup_client(client, bufnr)
+  end
+}
+
+api.nvim_create_autocmd('User', {
+  pattern = 'LspAttached',
+  desc = 'LSP actions',
+  callback = function(args)
+    put(args)
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client.server_capabilities.hoverProvider then
+      -- Displays hover information about the symbol under the cursor
+      bufmap('n', 'K', function ()
+        if dap.session() then
+          require"dapui".eval()
+        else
+          vim.lsp.buf.hover()
+        end
+      end, {desc = 'dap eval or lsp.buf.hover'})
+    end
 
     -- Jump to the definition
     bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
@@ -108,6 +164,7 @@ null_ls.setup({
     sources = {
         null_ls.builtins.diagnostics.eslint,
         null_ls.builtins.code_actions.eslint,
+        null_ls.builtins.code_actions.gitsigns,
         null_ls.builtins.formatting.prettier
     },
     on_attach = function (client, bufnr)
