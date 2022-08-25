@@ -229,7 +229,8 @@ endif
 
 autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>rt :TestNearest<cr>
 autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>tt :TestNearest<cr>
-autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>tf :TestFile<cr>
+autocmd vimrc Filetype go noremap <buffer> <leader>tt :TestNearest -v<cr>
+autocmd vimrc Filetype javascript,typescript,go noremap <buffer> <leader>tf :TestFile<cr>
 " }}}
 
 " quickrun {{{

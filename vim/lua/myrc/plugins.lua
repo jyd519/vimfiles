@@ -99,24 +99,24 @@ return packer.startup(
         use { 'mxsdev/nvim-dap-vscode-js' }
 
         -- AI Coding
-        use {"github/copilot.vim"}
-        use {
-          "zbirenbaum/copilot.lua",
-          event = "InsertEnter",
-          config = function ()
-            vim.schedule(function() require("copilot").setup({
-              cmp = {
-                enabled = true,
-                method = "getCompletionsCycling",
-              },
-              ft_disable = { "markdown", "terraform" },
-                }) end)
-          end,
-        }
-        use {
-          "zbirenbaum/copilot-cmp",
-          module = "copilot_cmp",
-        }
+        -- use {"github/copilot.vim"}
+        -- use {
+        --   "zbirenbaum/copilot.lua",
+        --   event = "InsertEnter",
+        --   config = function ()
+        --     vim.schedule(function() require("copilot").setup({
+        --       cmp = {
+        --         enabled = true,
+        --         method = "getCompletionsCycling",
+        --       },
+        --       ft_disable = { "markdown", "terraform" },
+        --         }) end)
+        --   end,
+        -- }
+        -- use {
+        --   "zbirenbaum/copilot-cmp",
+        --   module = "copilot_cmp",
+        -- }
 
         -- Go/dart/rust/cpp
         use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries", disable = use_basic_only or fn.executable("go") == 0}
