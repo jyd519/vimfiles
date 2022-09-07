@@ -2,10 +2,7 @@ local fn = vim.fn
 local g = vim.g
 
  -- Conditional load heavy plugins
-local use_lsp = g.use_heavy_plugin or g.use_lsp_plugin
-local no_lsp = not use_lsp
-local use_all = g.use_heavy_plugin
-local use_basic_only = not use_all
+local use_heavy = g.use_heavy_plugin
 
 -- Packer.nvim {{{
 
@@ -119,8 +116,8 @@ return packer.startup(
         -- }
 
         -- Go/dart/rust/cpp
-        use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries", disable = use_basic_only or fn.executable("go") == 0}
-        use {"dart-lang/dart-vim-plugin", ft="dart", disable = use_basic_only or fn.executable("dart") == 0}
+        use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries", disable = fn.executable("go") == 0}
+        use {"dart-lang/dart-vim-plugin", ft="dart", disable = fn.executable("dart") == 0}
         use {"simrat39/rust-tools.nvim", config = [[ require('myrc.config.rust') ]]}
         use {"p00f/clangd_extensions.nvim", config = [[require("myrc.config.clangd")]]}
 
@@ -135,7 +132,7 @@ return packer.startup(
         use "dense-analysis/ale"
 
         -- snippets
-        use {"SirVer/ultisnips", disable = use_basic_only }
+        use {"SirVer/ultisnips", disable = fn.executable("python3") == 0}
         use "honza/vim-snippets"
         use {"mhartington/vim-angular2-snippets", ft = "typescript"}
 
@@ -161,12 +158,12 @@ return packer.startup(
           },
           config = [[require "myrc.config.cmp"]],
         }
-        if use_all then
+        if use_heavy then
           use {'tzachar/cmp-tabnine', run= './install.sh', config = [[require "myrc.config.tabnine"]]}
         end
 
         -- LSP
-        if not no_lsp then
+        if use_heavy then
           use { 'williamboman/mason.nvim' }
           use { 'williamboman/mason-lspconfig.nvim' }
           use { 'neovim/nvim-lspconfig' }
@@ -185,7 +182,7 @@ return packer.startup(
           "mattn/vim-gist",
           requires = "mattn/webapi-vim",
           config = function()
-            vim.g.gist_per_page_limit = 100
+            g.gist_per_page_limit = 100
           end,
           cmd = { "Gist" },
         }
@@ -200,8 +197,11 @@ return packer.startup(
             require("which-key").setup {}
           end
         }
+
         -- Treesitter
-        use {"nvim-treesitter/nvim-treesitter", config= [[require('myrc.config.treesitter')]], run = ":TSUpdate", disable = use_basic_only }
+        if g.use_treesitter then
+          use {"nvim-treesitter/nvim-treesitter", config= [[require('myrc.config.treesitter')]], run = ":TSUpdate"}
+        end
 
         if PACKER_BOOTSTRAP then
           print("installing plugins ...")

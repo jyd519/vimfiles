@@ -1,5 +1,17 @@
 -- My Neovim configuration
 -- Jyd  Last-Modified: 2021-12-17
+--
+-- let g:loaded_python_provider = 0
+-- let g:python_host_prog = '~/.pyenv/versions/2.7.18/bin/python2'
+-- let g:python3_host_prog = '~/.pyenv/versions/3.10.2/bin/python3.10'
+-- let g:node_host_prog = '/usr/local/bin/neovim-node-host'
+-- let g:copilot_node_command='~/.nvm/versions/node/v16.10.0/bin/node'
+--
+-- let g:use_heavy_plugin = 1
+-- let g:use_treesitter = 0
+--
+-- set background="light"
+-- let g:colorscheme='vscode'
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
