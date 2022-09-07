@@ -1,0 +1,4 @@
+    - name: Check if '-limit/-l' argument is provided
+      fail:
+        msg: "you must provides the -limit/-l argument to run this playbook"
+      when: ansible_limit is not defined
