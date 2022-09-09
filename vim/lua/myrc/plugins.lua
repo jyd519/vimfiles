@@ -28,6 +28,7 @@ packer.init(
     {
         package_root = util.join_paths(g.VIMFILES, "pack"),
         compile_path = util.join_paths(g.VIMFILES, "lua/myrc/packer_compiled.lua"),
+        max_jobs = 5,
         display = {auto_clean = false}
     }
 )
@@ -41,12 +42,11 @@ return packer.startup(
         use "nvim-lua/plenary.nvim" -- some useful lua functions
         use {"lewis6991/impatient.nvim"}
 
-
         -- Basic plugins
         use "mhinz/vim-startify"
         use "kyazdani42/nvim-web-devicons"
-        use "Mofiqul/vscode.nvim"
-        use "NLKNguyen/papercolor-theme"
+        use { "Mofiqul/vscode.nvim" }
+        use { "NLKNguyen/papercolor-theme" }
 
         use "rcarriga/nvim-notify"
         use "nathom/filetype.nvim"

@@ -12,6 +12,7 @@
 --
 -- set background="light"
 -- let g:colorscheme='vscode'
+-- source path/to/init.lua
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
@@ -43,10 +44,6 @@ _G.dump = _G.put
 
 prequire('impatient')
 
-if fn.filereadable(fn.expand('~/.vimrc.local', 1, 0)) == 1 then
-  vim.cmd('source ~/.vimrc.local')
-end
-
 -- load plugins
 require('myrc.plugins')
 if PACKER_BOOTSTRAP then
@@ -55,14 +52,14 @@ if PACKER_BOOTSTRAP then
   return
 end
 
-pcall(require, 'myrc.packer_compiled')
+prequire('myrc.packer_compiled')
 
 -- load options
 local scripts = {'config/globals.vim',
                  'config/options.vim',
                  'config/mappings.vim',
                  'config/plugins/shared.vim',
-                 'lua/myrc/plugins_config.lua',
+                 'lua/myrc/config/common.lua',
                }
 for _, s in pairs(scripts) do
   vim.cmd('source ' .. VIMFILES .. '/' .. s)

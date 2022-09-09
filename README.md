@@ -16,6 +16,8 @@ or edit vimrc
 
 + neovim
 
+~/.config/nvim/init.vim
+
 ```
 so ~/.vimgit/init.lua
 ```
@@ -38,21 +40,29 @@ so ~/.vimgit/init.vim
 
 ## Dependencies
 
-1. ctags
+### The_Silver_Searcher
+
++ https://github.com/ggreer/the_silver_searcher
+
+1. MacOS: `brew install the_silver_searcher`
+2. Linux: `apt-get install silversearcher-ag`
+3. Windows: `winget install "The Silver Searcher"`
+
+### fd
+
++ https://github.com/sharkdp/fd/releases/
+
+### ripgrep
+
++ https://github.com/BurntSushi/ripgrep/releases
+
+### llvm
+
++ https://github.com/llvm/llvm-project/releases
+
+### ctags
 
 https://github.com/universal-ctags/ctags
 
 +  MacOS: `brew install ctags`
 +  Windows: https://github.com/universal-ctags/ctags-win32/releases
-
-2. The_Silver_Searcher:
-
-https://github.com/ggreer/the_silver_searcher
-
-+ MacOS: `brew install the_silver_searcher`
-+ Linux: `apt-get install silversearcher-ag`
-+ Windows: https://github.com/k-takata/the_silver_searcher-win32
-
-3. clang-foramt
-
-+ MacOS: `brew install clang-format`

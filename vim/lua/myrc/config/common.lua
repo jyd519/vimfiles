@@ -48,26 +48,28 @@ require("filetype").setup({
 })
 
 -- indent_blankline -- {{{1
-local treesitter_enabled = packer_plugins and packer_plugins["nvim-treesitter"] ~= nil
+local treesitter_enabled = packer_plugins and packer_plugins["nvim-treesitter"] and packer_plugins["nvim-treesitter"].loaded
 require("indent_blankline").setup {
     -- for example, context is off by default, use this to turn it on
     show_current_context = treesitter_enabled,
     show_current_context_start = treesitter_enabled,
 }
 
--- refactoring -- {{{1
--- load refactoring Telescope extension
--- https://github.com/ThePrimeagen/refactoring.nvim#installation
-require('refactoring').setup({})
-require("telescope").load_extension("refactoring")
+if treesitter_enabled then
+  -- refactoring -- {{{1
+  -- load refactoring Telescope extension
+  -- https://github.com/ThePrimeagen/refactoring.nvim#installation
+  require('refactoring').setup({})
+  require("telescope").load_extension("refactoring")
 
--- remap to open the Telescope refactoring menu in visual mode
-vim.api.nvim_set_keymap(
-	"v",
-	"<leader>rr",
-	"<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
-	{ noremap = true }
-)
+  -- remap to open the Telescope refactoring menu in visual mode
+  vim.api.nvim_set_keymap(
+    "v",
+    "<leader>rr",
+    "<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
+    { noremap = true }
+  )
+end
 
  -- my utils
 vim.api.nvim_set_keymap(

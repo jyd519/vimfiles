@@ -1,5 +1,5 @@
 "--------------------------------------------------------------------------------
-" Configurations for Vim/Neovim ( +lua, +python )
+" Configurations for Vim( +lua, +python )
 " Use vim-plug to install plugins
 " Jyd  Last-Modified: 2021-12-13
 "--------------------------------------------------------------------------------
@@ -32,9 +32,9 @@ else
 endif
 
 " load local customized script
-if filereadable(expand("~/.vimrc.local"))
-  source ~/.vimrc.local
-endif
+" if filereadable(expand("~/.vimrc.local"))
+"   source ~/.vimrc.local
+" endif
 
 let $MYVIMRC=expand("$VIMFILES/init.vim")
 
