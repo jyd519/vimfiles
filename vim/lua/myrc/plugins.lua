@@ -1,12 +1,12 @@
+-- Globals: Conditional load heavy plugins
 local fn = vim.fn
 local g = vim.g
-
- -- Conditional load heavy plugins
 local use_heavy = g.use_heavy_plugin
 
--- Packer.nvim {{{
+-- Packer.nvim {{{1
 
--- install packer.nvim {{{ 2 --
+-- install packer.nvim {{{
+
 local install_path = g.VIMFILES .. "/pack/packer/start/packer.nvim"
 if fn.empty(fn.glob(install_path)) > 0 then
     print("installing packer.nvim ...")
@@ -32,8 +32,10 @@ packer.init(
         display = {auto_clean = false}
     }
 )
--- end install packer }}}
 packer.reset()
+-- end install packer }}}
+
+-- Plugins {{{1
 return packer.startup(
     function(use)
         -- Packer can manage itself as an optional plugin
@@ -62,11 +64,11 @@ return packer.startup(
         use "chiedojohn/vim-case-convert"
         use {"chentoast/marks.nvim", config = [[require "myrc.config.marks"]]}
         use {"numToStr/Comment.nvim"}
-        use "sbdchd/neoformat"
+        use {"sbdchd/neoformat", opt = true, event = "VimEnter" }
         use "lukas-reineke/indent-blankline.nvim"
 
         use { 'thinca/vim-quickrun' }
-        use { 'vim-test/vim-test' } -- Unit-Testing
+        use { 'vim-test/vim-test', opt=true, event="VimEnter" } -- Unit-Testing
         use { 'ThePrimeagen/refactoring.nvim' }
 
         use {"pearofducks/ansible-vim"}
@@ -96,29 +98,41 @@ return packer.startup(
         use { 'mxsdev/nvim-dap-vscode-js' }
 
         -- AI Coding
-        -- use {"github/copilot.vim"}
-        -- use {
-        --   "zbirenbaum/copilot.lua",
-        --   event = "InsertEnter",
-        --   config = function ()
-        --     vim.schedule(function() require("copilot").setup({
-        --       cmp = {
-        --         enabled = true,
-        --         method = "getCompletionsCycling",
-        --       },
-        --       ft_disable = { "markdown", "terraform" },
-        --         }) end)
-        --   end,
-        -- }
-        -- use {
-        --   "zbirenbaum/copilot-cmp",
-        --   module = "copilot_cmp",
-        -- }
+        use {"github/copilot.vim", disable =true}
+        use {
+          "zbirenbaum/copilot.lua",
+          disable = true,
+          event = "InsertEnter",
+          config = function ()
+            vim.schedule(function() require("copilot").setup({
+              cmp = {
+                enabled = true,
+                method = "getCompletionsCycling",
+              },
+              ft_disable = { "markdown", "terraform" },
+                }) end)
+          end,
+        }
+        use {
+          "zbirenbaum/copilot-cmp",
+          disable = true,
+          module = "copilot_cmp",
+        }
 
         -- Go/dart/rust/cpp
         use {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries", disable = fn.executable("go") == 0}
         use {"dart-lang/dart-vim-plugin", ft="dart", disable = fn.executable("dart") == 0}
-        use {"simrat39/rust-tools.nvim", config = [[ require('myrc.config.rust') ]]}
+        use {
+             "rust-lang/rust.vim", config = function()
+                vim.g.rustfmt_autosave = 1
+             end,
+        }
+        use {"simrat39/rust-tools.nvim"}
+        use {
+            'saecki/crates.nvim', tag = 'v0.2.1', config = function()
+                require('crates').setup()
+            end,
+        }
         use {"p00f/clangd_extensions.nvim", config = [[require("myrc.config.clangd")]]}
 
         -- Markdown, reStructuredText, textile
@@ -129,7 +143,7 @@ return packer.startup(
         use {"tweekmonster/startuptime.vim", cmd="StartupTime"}
 
         use { "nvim-lualine/lualine.nvim", config = [[require "myrc.config.lualine"]] }
-        use "dense-analysis/ale"
+        use { "dense-analysis/ale", opt = true, event = "VimEnter" }
 
         -- snippets
         use {"SirVer/ultisnips", disable = fn.executable("python3") == 0}
@@ -192,6 +206,7 @@ return packer.startup(
         use {"junegunn/fzf", run = "fzf#install()"}
         use {"junegunn/fzf.vim"}
         use {"nvim-telescope/telescope.nvim", tag = "0.1.0", config = [[ require"myrc.config.telescope" ]]}
+				use {'nvim-telescope/telescope-ui-select.nvim' }
         use { "folke/which-key.nvim",
           config = function()
             require("which-key").setup {}
@@ -210,4 +225,4 @@ return packer.startup(
     end
 )
 
--- vim: set fdm=marker fen fdl=1: }}}
+-- vim: set fdm=marker fen fdl=0: }}}

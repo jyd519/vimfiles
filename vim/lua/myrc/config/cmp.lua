@@ -60,6 +60,58 @@ cmp.setup({
       -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
       select = false,
     },
+
+    -- jump backward
+    ['<C-h>'] = cmp.mapping(function(fallback)
+      if luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      elseif vim.call("UltiSnips#CanJumpBackwards") == 1 then
+        vim.call("UltiSnips#JumpBackwards")
+      else
+        fallback()
+      end
+    end, {'i', 's'}),
+
+    -- expand or jump forward
+    ['<C-k>'] = cmp.mapping(function(fallback)
+      if luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      elseif vim.call("UltiSnips#CanJumpForwards") == 1 then
+        vim.call("UltiSnips#JumpForwards")
+      else
+        -- fallback()
+      end
+    end, {'i', 's'}),
+
+    -- choose alternatives
+    ['<C-l>'] = cmp.mapping(function(fallback)
+      if luasnip.choice_active() then
+        luasnip.change_choice(1)
+      else
+        fallback()
+      end
+    end, {'i', 's'}),
+
+    -- select next item
+    ['<C-n>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.choice_active() then
+        luasnip.change_choice(-1)
+      else
+        fallback()
+      end
+    end, {'i', 's'}),
+
+    -- choose with vim.ui.select
+    ['<C-u>'] = cmp.mapping(function(fallback)
+      if luasnip.choice_active() then
+        require("luasnip.extras.select_choice")()
+      else
+        fallback()
+      end
+    end, {'i', 's'}),
+
     ['<Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
@@ -72,8 +124,6 @@ cmp.setup({
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
-      elseif luasnip.jumpable(-1) then
-        luasnip.jump(-1)
       else
         fallback()
       end
@@ -100,13 +150,14 @@ cmp.setup({
   sources = cmp.config.sources({
     { name = 'nvim_lua' },
     { name = 'nvim_lsp', max_item_count = 6 },
-    { name = "copilot" },
-    { name = 'cmp_tabnine' },
     { name = 'luasnip' }, -- For luasnip users.
     -- { name = 'vsnip' }, -- For vsnip users.
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
     { name = "path" },
+    { name = "copilot" },
+    { name = "crates" },
+    { name = 'cmp_tabnine' },
   }, {
     { name = 'buffer', max_item_count = 6 },
   })
@@ -152,69 +203,50 @@ require("luasnip.loaders.from_vscode").lazy_load()
 -- snipmate format
 --    https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#from_snipmate
 require("luasnip.loaders.from_snipmate").lazy_load()
-require("luasnip.loaders.from_snipmate").lazy_load({paths = vim.fn.expand("$VIMFILES/mysnippets/snippets")})
 
 -- luasnip format
+---@diagnostic disable-next-line: missing-parameter
 require("luasnip.loaders.from_lua").load({paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets")})
-vim.api.nvim_create_user_command("SnipEdit", ':lua require("luasnip.loaders").edit_snippet_files()', {})
+
+vim.api.nvim_create_user_command("EditSnippet", function(args)
+  local typ = args.args;
+  if typ == "" then
+    typ = vim.bo.filetype
+  end
+  if typ == "" then
+    typ  = "all"
+  end
+---@diagnostic disable-next-line: missing-parameter
+  local snippet_file = vim.fn.expand("$VIMFILES/snippets/" .. typ .. ".snippets")
+  if typ == "lua2" then
+---@diagnostic disable-next-line: missing-parameter
+    snippet_file = vim.fn.expand("$VIMFILES/mysnippets/luasnippets/all.lua")
+  end
+  vim.cmd("e " .. snippet_file)
+end, {nargs="?"})
 
 -- Virtual Text {{{2
 local types = require("luasnip.util.types")
 luasnip.config.set_config({
-	history = true, --keep around last snippet local to jump back
+	-- history = true, --keep around last snippet local to jump back
 	updateevents = "TextChanged,TextChangedI", --update changes as you type
-	enable_autosnippets = true,
+	-- enable_autosnippets = true,
 	ext_opts = {
 		[types.choiceNode] = {
 			active = {
-				virt_text = { { "●", "GruvboxOrange" } },
+				virt_text = { { "⛏️ ", "GruvboxOrange" } },
 			},
 		},
 		[types.insertNode] = {
 			active = {
-				virt_text = { { "●", "GruvboxBlue" } },
+				virt_text = { { "✍️ ", "GruvboxBlue" } },
 			},
 		},
 	},
 }) --}}}
 
 -- Key Mapping --{{{2
-vim.keymap.set({ "i", "s" }, "<c-u>", '<cmd>lua require("luasnip.extras.select_choice")()<cr><C-c><C-c>')
-
--- vim.keymap.set({ "i", "s" }, "<C-k>", function()
--- 	if luasnip.expand_or_jumpable() then
--- 		luasnip.expand_or_jump()
--- 	end
--- end, { silent = true })
---
--- vim.keymap.set({ "i", "s" }, "<a-k>", function()
--- 	if luasnip.jumpable(1) then
--- 		luasnip.jump(1)
--- 	end
--- end, { silent = true })
--- vim.keymap.set({ "i", "s" }, "<a-j>", function()
--- 	if luasnip.jumpable(-1) then
--- 		luasnip.jump(-1)
--- 	end
--- end, { silent = true })
-vim.keymap.set({ "i", "s" }, "<a-l>", function()
-	if luasnip.choice_active() then
-		luasnip.change_choice(1)
-	else
-		-- print current time
-		local t = os.date("*t")
-		local time = string.format("%02d:%02d:%02d", t.hour, t.min, t.sec)
-		print(time)
-	end
-end)
-
-vim.keymap.set({ "i", "s" }, "<a-h>", function()
-	if luasnip.choice_active() then
-		luasnip.change_choice(-1)
-	end
-end)
-
 vim.cmd([[autocmd BufEnter */mysnippets/luasnippets/*.lua nnoremap <silent> <buffer> <CR> /-- End SNIPPETS --<CR>kI<Esc>O]])
---
+
 -- }}}
 -- vim: set fdm=marker fen fdl=0: }}}

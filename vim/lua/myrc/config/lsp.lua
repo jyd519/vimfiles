@@ -19,18 +19,47 @@ local bufmap = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
-local function setup_client(client, bufnr)
-  -- Displays hover information about the symbol under the cursor
-  if client.server_capabilities.hoverProvider and client.name ~= "null-ls" then
-    bufmap('n', 'K', function ()
-      if dap.session() then
-        require"dapui".eval()
-      else
-        vim.lsp.buf.hover()
-      end
-    end, {desc = 'dap eval or lsp.buf.hover'})
-  end
+local function show_documentation()
+  if dap.session() then
+    require"dapui".eval()
+  else
+    local filetype = vim.bo.filetype
+    if vim.tbl_contains({ 'markdown' }, filetype) then
+      local clients = {"Vim", "Man"}
+      vim.ui.select(clients, {
+        prompt = 'Select a action:',
+        format_item = function(client)
+          return string.lower(client)
+        end,
+      }, function(item)
+        if item == "Vim" then
+          vim.cmd('h ' .. fn.expand('<cword>'))
+        elseif item == "Man" then
+          vim.cmd('Man ' .. fn.expand('<cword>'))
+        end
+      end)
+      return
+    end
 
+    if vim.tbl_contains({ 'vim','help' }, filetype) then
+---@diagnostic disable-next-line: missing-parameter
+      vim.cmd('h '.. fn.expand('<cword>'))
+    elseif vim.tbl_contains({ 'man' }, filetype) then
+---@diagnostic disable-next-line: missing-parameter
+      vim.cmd('Man '..fn.expand('<cword>'))
+---@diagnostic disable-next-line: missing-parameter
+    elseif fn.expand('%:t') == 'Cargo.toml' then
+      require('crates').show_popup()
+    elseif filetype == 'rust' then
+      vim.cmd('RustHoverActions')
+    else
+      vim.lsp.buf.hover()
+    end
+  end
+end
+vim.keymap.set('n', 'K', show_documentation, { noremap = true, silent = true, desc="show document for underline word" })
+
+local function setup_client(client, bufnr)
   -- Jump to the definition
   bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
 
@@ -87,17 +116,10 @@ api.nvim_create_autocmd('User', {
   pattern = 'LspAttached',
   desc = 'LSP actions',
   callback = function(args)
-    put(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client.server_capabilities.hoverProvider then
       -- Displays hover information about the symbol under the cursor
-      bufmap('n', 'K', function ()
-        if dap.session() then
-          require"dapui".eval()
-        else
-          vim.lsp.buf.hover()
-        end
-      end, {desc = 'dap eval or lsp.buf.hover'})
+      bufmap('n', 'K', show_documentation, {desc = 'dap eval or lsp.buf.hover'})
     end
 
     -- Jump to the definition
@@ -162,9 +184,10 @@ end
 local null_ls = require("null-ls")
 null_ls.setup({
     sources = {
-        null_ls.builtins.diagnostics.eslint,
+        null_ls.builtins.code_actions.refactoring,
         null_ls.builtins.code_actions.eslint,
         null_ls.builtins.code_actions.gitsigns,
+        null_ls.builtins.diagnostics.eslint,
         null_ls.builtins.formatting.prettier
     },
     on_attach = function (client, bufnr)
@@ -313,5 +336,8 @@ require('rust-tools').setup{
       set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
       lspconfig.util.default_config.on_attach(client, bufnr)
     end,
+    dap = {
+      adapter = require('dap').adapters.codelldb
+    }
 	}
 }

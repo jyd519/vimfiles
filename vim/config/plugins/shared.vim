@@ -227,9 +227,10 @@ if g:is_nvim
   tnoremap <C-o> <C-\><C-n>
 endif
 
-autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>rt :TestNearest<cr>
-autocmd vimrc Filetype javascript,typescript noremap <buffer> <leader>tt :TestNearest<cr>
-autocmd vimrc Filetype go noremap <buffer> <leader>tt :TestNearest -v<cr>
+let test#rust#cargotest#options = '-- --nocapture'
+let test#go#test#options = '-v'
+autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>rt :TestNearest<cr>
+autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>tt :TestNearest<cr>
 autocmd vimrc Filetype javascript,typescript,go noremap <buffer> <leader>tf :TestFile<cr>
 " }}}
 

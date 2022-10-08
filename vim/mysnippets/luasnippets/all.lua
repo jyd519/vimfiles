@@ -11,10 +11,12 @@ end
 --
 --
 -- Begin SNIPPETS --
+-- examples
+ss(parse({trig = "lspc"}, "$1 is ${2|hard,easy,challenging|}"))
 
-ss(parse({trig = "lsp"}, "$1 is ${2|hard,easy,challenging|}"))
-
-ss(s("aaa", t("hello aaaa")))
+-- add vim modeline
+ss(s("modeline", t("vim:set et sw=2 ts=2:")))
+ss(s("modl", t("vim:set et sw=2 ts=2:")))
 
 -- End SNIPPETS --
 --

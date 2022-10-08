@@ -1,4 +1,5 @@
 " Jyd
+" https://dev.to/iggredible/learning-vim-regex-26ep
 if exists('b:did_markdown_vim')
 "  finish
 endif
@@ -28,7 +29,7 @@ let g:surround_{char2nr("I")} = "_\r_"
 let g:surround_{char2nr('c')}="```\r```"
 let g:surround_{char2nr('C')}="```\1lang:\1\r```"
 
-nmap <buffer> <LocalLeader>r :update<cr>:call PreviewMarkdown()<cr>
+" nmap <buffer> <LocalLeader>r :update<cr>:call PreviewMarkdown()<cr>
 nmap <buffer> <LocalLeader>m :update<cr>:call PreviewMindmap()<cr>
 
 "Key Mapings
@@ -47,7 +48,7 @@ nmap <buffer> <LocalLeader>3 :call setline('.', substitute(getline('.'), '^#* *'
 nmap <buffer> <LocalLeader>4 :call setline('.', substitute(getline('.'), '^#* *', '#### ', ''))<cr>
 nmap <buffer> <LocalLeader>5 :call setline('.', substitute(getline('.'), '^#* *', '##### ', ''))<cr>
 nmap <buffer> <LocalLeader>6 :call setline('.', substitute(getline('.'), '^#* *', '###### ', ''))<cr>
-nmap <buffer> <LocalLeader>i :call setline('.', substitute(getline('.'), '\v!\[(.*)\]\((.*)\)', '<img alt="\1" src="\2" style="zoom:0.5" />', ''))<cr>
+
 
 function! AddLineBreak() range
     let m = visualmode()
@@ -85,7 +86,6 @@ function! ToOrderList() range
     endfor
   endif
 endfunction
-
 command! -nargs=0 -range=% Mol :<line1>,<line2>call ToOrderList()
 
 function! s:clearLineBreak() range
@@ -99,9 +99,37 @@ endfunction
 
 command! -nargs=0 -range=% Mnobr :<line1>,<line2>call s:clearLineBreak()
 
+" replace image to <img> tag
+function! s:toImg() range
+  for line in range(a:firstline, a:lastline)
+    let text = getline(line)
+    if text =~ '([^)]*)' 
+      call setline(line, substitute(text, '\[\([^\]]*\)\](\([^)]*\))', '<img src="\2" style="zoom: 0.5" />', ''))
+    endif
+  endfor
+endfunction
+command! -nargs=0 -range Img :<line1>,<line2>call s:toImg()
+nmap <buffer> <LocalLeader>i :Img<cr>
+
+" to link
+function! s:toLink() range
+  for line in range(a:firstline, a:lastline)
+    let text = getline(line)
+    if text =~ 'http*' 
+      " .{-}  <== non greedy match
+      " call setline(line, substitute(text, '\v(\+|\-)?\s*(.{-})\s*(http.*)', '\1 [\2](\3)', ''))
+      " or
+      call setline(line, substitute(text, '\v(\+|\-)?\s*(.*)(http.*)', '\=submatch(1) . " [" . trim(submatch(2)) . "](" . submatch(3) .")"', ''))
+    endif
+  endfor
+endfunction
+command! -nargs=0 -range Link :<line1>,<line2>call s:toLink()
+nmap <buffer> <LocalLeader>l :Link<cr>
+vmap <buffer> <LocalLeader>l :'<,'>Link<cr>
+
+" publish markdown
 function! PubDoc(...)
   let args = join(a:000, " ")
   echo system('pubdoc ' . args . " ". expand('%') )
 endfunction
-
 command! -buffer -nargs=* PubDoc call PubDoc(<q-args>)

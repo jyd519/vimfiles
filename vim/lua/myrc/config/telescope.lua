@@ -1,7 +1,11 @@
 local actions = require("telescope.actions")
 local nvim_set_keymap = vim.api.nvim_set_keymap
 
-require('telescope').setup{
+local telescope = require('telescope')
+telescope.setup{
+	extensions = {
+			["ui-select"] = { require("telescope.themes").get_dropdown {} }
+	},
   mappings = {
     i = {
       ["<esc>"] = actions.close
@@ -19,13 +23,12 @@ require('telescope').setup{
   },
 }
 
+telescope.load_extension("ui-select")
+
 nvim_set_keymap('n', '<leader>da', ':lua require"telescope.builtin".diagnostics{}<CR>', { noremap = true, silent = true, desc = "Show LSP diagnostics" })
 nvim_set_keymap('n', '<leader>dd', ':lua require"telescope.builtin".diagnostics{bufnr=0}<CR>', { noremap = true, silent = true })
 nvim_set_keymap('n', '<leader>qf', ':lua require"telescope.builtin".quickfix{bufnr=0}<CR>', { noremap = true, silent = true })
-
-
 vim.keymap.set("n" , "<leader>fo", ":Telescope oldfiles<CR>", {desc = "Find in oldfiles"})
-
 vim.keymap.set("n" , "<leader>fg", function()
   local opts = {}
   local ok = pcall(require"telescope.builtin".git_files, opts)
@@ -35,7 +38,6 @@ end, {desc = "Find in git files"})
 vim.keymap.set("n" , "<leader>b", function()
   require"telescope.builtin".buffers{}
 end, { desc = "List buffers" })
-
 
 vim.cmd([[
 com! Maps :Telescope keymaps

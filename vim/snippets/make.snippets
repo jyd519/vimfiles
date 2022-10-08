@@ -1,0 +1,4 @@
+# vim:set ft=snippets et sw=2 ts=2:
+
+snippet root  root directory
+	ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))

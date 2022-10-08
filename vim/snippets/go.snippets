@@ -1,0 +1,392 @@
+snippet urljoin "join url paths"
+	func urlJoin(base, elem ...string) string {
+		u, _ := url.Parse(base)
+		u.Path = path.Join(append([]string{u.Path}, elem...)...)
+		return u.String()
+	}
+
+snippet httpPost "httpPost"
+		func httpPostForm() error {
+			resp, err := http.PostForm("url",
+				url.Values{"key": {"Value"}, "id": {"123"}})
+			if err != nil {
+				return err
+			}
+
+			defer resp.Body.Close()
+			body, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println(string(body))
+		}
+
+snippet httpDo "http more customizable"
+	func httpDo() {
+		client := &http.Client{}
+
+		req, err := http.NewRequest("POST", 
+			"http://www.01happy.com/demo/accept.php",
+			strings.NewReader("name=cjb"))
+		if err != nil {
+			// handle error
+		}
+
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Cookie", "name=anny")
+
+		resp, err := client.Do(req)
+
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			// handle error
+		}
+
+		fmt.Println(string(body))
+	}
+
+snippet uploadFile "upload file with multiform data"
+	func uploadFile(url, filename, path, deviceType, deviceId string, filePath string) error {
+		file, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println("error opening file")
+			return err
+		}
+
+		defer file.Close()
+
+		bodyBuf := &bytes.Buffer{}
+		bodyWriter := multipart.NewWriter(bodyBuf)
+
+		//设置文件的上传参数叫uploadfile, 文件名是filename,
+		fileWriter, err := bodyWriter.CreateFormFile("uploadfile", filename)
+		if err != nil {
+			fmt.Println("error writing to buffer")
+			return err
+		}
+
+		_, err = io.Copy(fileWriter, file)
+		if err != nil {
+			return err
+		}
+
+		//获取上传文件的类型,multipart/form-data; boundary=...
+		contentType := bodyWriter.FormDataContentType()
+
+		//这个很关键,必须这样写关闭,不能使用defer关闭,不然会导致错误
+		bodyWriter.Close()
+
+		//其他参数设置
+		params := map[string]string{
+			"filename" : filename,
+				"path" : path,
+				"deviceType" : deviceType,
+				"deviceId" : deviceId,
+		}
+		for key, val := range params {
+			_ = bodyWriter.WriteField(key, val)
+		}
+
+		//发送请求
+		resp, err := http.Post(url, contentType, bodyBuf)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+		resp_body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(resp.Status, string(resp_body))
+		return nil
+	}
+
+snippet httpstatic "static assets handler"
+	//static file handler.
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+
+snippet uploadfile  "newfileUploadRequest"
+// Creates a new file upload http request with optional extra params
+func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	fi, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	file.Close()
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+	part, err := writer.CreateFormFile(paramName, fi.Name())
+	if err != nil {
+		return nil, err
+	}
+	part.Write(fileContents)
+
+	for key, val := range params {
+		_ = writer.WriteField(key, val)
+	}
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	request := http.NewRequest("POST", uri, body)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+	return request, err
+}
+
+snippet assertEqual "assertEqual"
+func assertEqual(t *testing.T, val interface{}, exp interface{}) {
+	if val != exp {
+		t.Errorf("Expected %v, got %v.", exp, val)
+	}
+}
+
+snippet assertLib "testify/assert"
+//import "github.com/stretchr/testify/assert"
+func TestAssert(t *testing.T) {
+	var a string = "Hello"
+	var b string = "Hello"
+
+	assert.Equal(t, a, b, "The two words should be the same.")
+	assert.Contains(t, "Hello World", "World")
+	assert.Empty(t, nil)
+	assert.InDeltaf(t, math.Pi, (22 / 7.0, "error message %s", "formatted"), 0.01)
+	assert.JSONEqf(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, "error message %s", "formatted")
+	actualObj, err := SomeFunction()
+	if assert.Error(t, err) {
+		assert.Equal(t, expectedError, err)
+	}
+}
+
+snippet usage "flag.Usage"
+	flag.Usage = func() {
+	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+	flag.PrintDefaults()
+}
+
+snippet usage "GzippedText "
+type GzippedText []byte
+
+func (g GzippedText) Value() (driver.Value, error) {
+	b := make([]byte, 0, len(g))
+	buf := bytes.NewBuffer(b)
+	w := gzip.NewWriter(buf)
+	w.Write(g)
+	w.Close()
+	return buf.Bytes(), nil
+}
+
+func (g *GzippedText) Scan(src interface{}) error {
+	var source []byte // let's support string and []byte
+	switch src.(type) {
+	case string:
+		source = []byte(src.(string))
+	case []byte:
+		source = src.([]byte)
+	default:
+		return errors.New("Incompatible type for GzippedText")
+	}
+	reader, _ := gzip.NewReader(bytes.NewReader(source))
+	defer reader.Close()
+	b, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return err
+	}
+	*g = GzippedText(b)
+	return nil
+}
+
+snippet decode "decode http body"
+req := struct {
+	$1
+}{}
+if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	log.Println("json parsing error:", err)
+	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+	return
+}
+
+snippet imerrors "add errors package"
+"github.com/pkg/errors"
+
+
+snippet imtestify "add testify package"
+"github.com/stretchr/testify/assert"
+
+snippet imgin "add gin package"
+	"github.com/gin-gonic/gin"
+
+snippet imtoml "add toml package"
+	"github.com/BurntSushi/toml"
+
+
+snippet IndexFunc "Index function"
+func Index(vs []string, t string) int {
+		for i, v := range vs {
+				if v == t {
+						return i
+				}
+		}
+		return -1
+}
+
+snippet FilterFunc "Filter function"
+	func Filter(vs []string, f func(string) bool) []string {
+			vsf := make([]string, 0)
+			for _, v := range vs {
+					if f(v) {
+							vsf = append(vsf, v)
+					}
+			}
+			return vsf
+	}
+
+snippet AnyFunc "Any function"
+	func Any(vs []string, f func(string) bool) bool {
+			for _, v := range vs {
+					if f(v) {
+							return true
+					}
+			}
+			return false
+	}
+
+snippet MapFunc "Map function"
+	func Map(vs []string, f func(string) string) []string {
+			vsm := make([]string, len(vs))
+			for i, v := range vs {
+					vsm[i] = f(v)
+			}
+			return vsm
+	}
+
+snippet AllFunc "All function"
+	func All(vs []string, f func(string) bool) bool {
+			for _, v := range vs {
+					if !f(v) {
+							return false
+					}
+			}
+			return true
+	}
+
+snippet fileNotExists "check if file not exists"
+	if _, err := os.Stat(${1:p}); os.IsNotExist(err) {
+		// does not exist
+		$2
+	}
+
+snippet fileExists "check if file exists"
+	if _, err := os.Stat(${1:p}); err == nil {
+		// exists
+		$2
+	}
+
+snippet timeformat "time.Now().Format(...)"
+	time.Now().Format("2006-01-02 15:04:05")
+	tm.Format("2006-01-02 15:04:05")
+
+
+snippet sig_usr1 "handle signal"
+		func toggleOutput(c chan os.Signal) {
+			for {
+				// This line will block until the signal is received
+				<-c
+
+				// Whenver the signal is received toggle the target writer. If it's stdout swap it with ioutil.Discard and vice versa.
+				mutex.Lock()
+				if writeTo == os.Stdout {
+					writeTo = ioutil.Discard
+				} else {
+					writeTo = os.Stdout
+				}
+				mutex.Unlock()
+			}
+		}
+
+		c := make(chan os.Signal, 1)
+		// Send to channel c whenver you receive a SIGUSR1 signal.
+		signal.Notify(c, syscall.SIGUSR1)
+		go toggleOutput(c)
+
+
+snippet hfm "handler func with receiver" w
+	func (s *$1) $2(w http.ResponseWriter, r *http.Request) {
+	$3
+	}
+
+snippet hfe "handler func embedded" w
+	func (w http.ResponseWriter, r *http.Request) {
+	$1
+	}
+
+snippet he500 "http error 500"
+	if err != nil {
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+
+snippet he400 "http error 400"
+	if err != nil {
+		http.Error(w, http.StatusText(400), 400)
+		return
+	}
+
+snippet fors "for range slice"
+	for _, v := range $1 {
+		$2
+	}
+
+
+snippet form "for range map"
+	for k, v := range $1 {
+		$2
+	}
+
+
+snippet isMultipartForm "check content-type if multipart/formdata"
+	func isMultipartForm(r *http.Request) bool {
+		t := strings.ToLower(r.Header.Get("Content-Type"))
+		if strings.HasPrefix(t, "multipart/form-data") {
+			return true
+		}
+		return false
+	}
+
+
+snippet Batch "batch db operations"
+	$1.Batch(func(tx store.Tx) error {
+		$2
+		return nil
+	})
+
+snippet actor "actor loop"
+	func (r *Service) runLoop() {
+		for {
+			select {
+			case fn := <-r.actions:
+				fn()
+			}
+		}
+	}
+
+snippet actor_send "actor_send_msg"
+		done := make(chan struct{})
+		s.actions <- func() {
+			defer close(done)
+			$1
+		}
+		<-done
