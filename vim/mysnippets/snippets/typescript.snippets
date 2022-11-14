@@ -1,0 +1,77 @@
+snippet ng2-component "ng2-component"
+		import { Component, OnInit } from '@angular/core';
+		@Component({
+			moduleId: module.id,
+			selector: '${1:#:selector}',
+			templateUrl: '${2:#:name}.component.html'
+		})
+		export class ${1:#:ComponentName}Component implements OnInit {
+			constructor() { }
+			ngOnInit() { }
+			${0}
+		}
+
+
+snippet ng2-pipe "ng2-pipe"
+		import { Pipe, PipeTransform } from '@angular/core';
+		@Pipe({
+			name: '${name}'
+		})
+		export class ${1:#:PipeName}Pipe implements PipeTransform {
+			transform(value: any, args: any[]): any {
+				${0}
+			}
+		}
+
+snippet ng2-route-path "ng2-route-path"
+		{ path: '/${1:#:path}', component: ${2:#:Component} }${0}
+
+snippet ng2-subscribe "ng2-subscribe"
+		this.${1:#:service}.${2:#:function}
+		.subscribe(${3:#:arg} => this.${4:#:property} = ${5:#:arg});
+		${0}
+		endsnippet
+
+snippet ng2-component-root "ng2-component-root"
+		import { Component } from '@angular/core';
+		import { HTTP_PROVIDERS } from '@angular/http';
+		import { Routes, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from '@angular/router';
+		import 'rxjs/Rx'; // load the full rxjs
+		@Component({
+			moduleId: module.id,
+			selector: '${1:#:selector}',
+			templateUrl: '${2:#:name}.component.html',
+			directives: [ROUTER_DIRECTIVES],
+			providers: [
+				HTTP_PROVIDERS,
+				ROUTER_PROVIDERS
+			]
+		})
+		@Routes([
+			${0}
+		])
+		export class AppComponent {}
+		endsnippet
+
+
+snippet myerrore "Custom Error(extends)" b
+		export class ${1:HttpError} extends Error {
+			static name: string;
+			constructor(public code: number, message: string) {
+				super(message);
+				Object.setPrototypeOf(this, new.target.prototype); // restore prototype chain
+				// V8 only
+				Error.captureStackTrace(this, this.constructor);
+				this.name = '$1';
+			}
+		}
+
+snippet myerrorn "Custom Error Func(inherits)" b
+		// import * as util from "util";
+		const ${1:CustomError1} = function(message) {
+				this.name = '$1';
+				this.message = message;
+				// V8 only
+				Error.captureStackTrace && Error.captureStackTrace(this, this.constructor);
+		};
+		util.inherits($1, Error);

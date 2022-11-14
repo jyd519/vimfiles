@@ -79,5 +79,6 @@ function! PreviousCS()
     echo g:colorSchemesDetected[g:current]
 endfunction
 
-nnoremap <F12> :call NextCS() <CR>
-nnoremap <F11> :call PreviousCS() <CR>
+
+" nnoremap <F12> :call NextCS() <CR>
+" nnoremap <F11> :call PreviousCS() <CR>

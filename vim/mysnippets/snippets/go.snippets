@@ -110,121 +110,121 @@ snippet httpstatic "static assets handler"
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 snippet uploadfile  "newfileUploadRequest"
-// Creates a new file upload http request with optional extra params
-func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	fileContents, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-	fi, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-	file.Close()
+	// Creates a new file upload http request with optional extra params
+	func newfileUploadRequest(uri string, params map[string]string, paramName, path string) (*http.Request, error) {
+		file, err := os.Open(path)
+		if err != nil {
+			return nil, err
+		}
+		fileContents, err := ioutil.ReadAll(file)
+		if err != nil {
+			return nil, err
+		}
+		fi, err := file.Stat()
+		if err != nil {
+			return nil, err
+		}
+		file.Close()
 
-	body := new(bytes.Buffer)
-	writer := multipart.NewWriter(body)
-	part, err := writer.CreateFormFile(paramName, fi.Name())
-	if err != nil {
-		return nil, err
-	}
-	part.Write(fileContents)
+		body := new(bytes.Buffer)
+		writer := multipart.NewWriter(body)
+		part, err := writer.CreateFormFile(paramName, fi.Name())
+		if err != nil {
+			return nil, err
+		}
+		part.Write(fileContents)
 
-	for key, val := range params {
-		_ = writer.WriteField(key, val)
-	}
-	err = writer.Close()
-	if err != nil {
-		return nil, err
-	}
+		for key, val := range params {
+			_ = writer.WriteField(key, val)
+		}
+		err = writer.Close()
+		if err != nil {
+			return nil, err
+		}
 
-	request := http.NewRequest("POST", uri, body)
-	request.Header.Add("Content-Type", writer.FormDataContentType())
-	return request, err
-}
+		request := http.NewRequest("POST", uri, body)
+		request.Header.Add("Content-Type", writer.FormDataContentType())
+		return request, err
+	}
 
 snippet assertEqual "assertEqual"
-func assertEqual(t *testing.T, val interface{}, exp interface{}) {
-	if val != exp {
-		t.Errorf("Expected %v, got %v.", exp, val)
+	func assertEqual(t *testing.T, val interface{}, exp interface{}) {
+		if val != exp {
+			t.Errorf("Expected %v, got %v.", exp, val)
+		}
 	}
-}
 
 snippet assertLib "testify/assert"
-//import "github.com/stretchr/testify/assert"
-func TestAssert(t *testing.T) {
-	var a string = "Hello"
-	var b string = "Hello"
+	//import "github.com/stretchr/testify/assert"
+	func TestAssert(t *testing.T) {
+		var a string = "Hello"
+		var b string = "Hello"
 
-	assert.Equal(t, a, b, "The two words should be the same.")
-	assert.Contains(t, "Hello World", "World")
-	assert.Empty(t, nil)
-	assert.InDeltaf(t, math.Pi, (22 / 7.0, "error message %s", "formatted"), 0.01)
-	assert.JSONEqf(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, "error message %s", "formatted")
-	actualObj, err := SomeFunction()
-	if assert.Error(t, err) {
-		assert.Equal(t, expectedError, err)
+		assert.Equal(t, a, b, "The two words should be the same.")
+		assert.Contains(t, "Hello World", "World")
+		assert.Empty(t, nil)
+		assert.InDeltaf(t, math.Pi, (22 / 7.0, "error message %s", "formatted"), 0.01)
+		assert.JSONEqf(t, `{"hello": "world", "foo": "bar"}`, `{"foo": "bar", "hello": "world"}`, "error message %s", "formatted")
+		actualObj, err := SomeFunction()
+		if assert.Error(t, err) {
+			assert.Equal(t, expectedError, err)
+		}
 	}
-}
 
 snippet usage "flag.Usage"
 	flag.Usage = func() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	flag.PrintDefaults()
-}
+		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
+		flag.PrintDefaults()
+	}
 
 snippet usage "GzippedText "
-type GzippedText []byte
+	type GzippedText []byte
 
-func (g GzippedText) Value() (driver.Value, error) {
-	b := make([]byte, 0, len(g))
-	buf := bytes.NewBuffer(b)
-	w := gzip.NewWriter(buf)
-	w.Write(g)
-	w.Close()
-	return buf.Bytes(), nil
-}
+	func (g GzippedText) Value() (driver.Value, error) {
+		b := make([]byte, 0, len(g))
+		buf := bytes.NewBuffer(b)
+		w := gzip.NewWriter(buf)
+		w.Write(g)
+		w.Close()
+		return buf.Bytes(), nil
+	}
 
-func (g *GzippedText) Scan(src interface{}) error {
-	var source []byte // let's support string and []byte
-	switch src.(type) {
-	case string:
-		source = []byte(src.(string))
-	case []byte:
-		source = src.([]byte)
-	default:
-		return errors.New("Incompatible type for GzippedText")
+	func (g *GzippedText) Scan(src interface{}) error {
+		var source []byte // let's support string and []byte
+		switch src.(type) {
+		case string:
+			source = []byte(src.(string))
+		case []byte:
+			source = src.([]byte)
+		default:
+			return errors.New("Incompatible type for GzippedText")
+		}
+		reader, _ := gzip.NewReader(bytes.NewReader(source))
+		defer reader.Close()
+		b, err := ioutil.ReadAll(reader)
+		if err != nil {
+			return err
+		}
+		*g = GzippedText(b)
+		return nil
 	}
-	reader, _ := gzip.NewReader(bytes.NewReader(source))
-	defer reader.Close()
-	b, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return err
-	}
-	*g = GzippedText(b)
-	return nil
-}
 
 snippet decode "decode http body"
-req := struct {
-	$1
-}{}
-if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-	log.Println("json parsing error:", err)
-	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-	return
-}
+	req := struct {
+		$1
+	}{}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println("json parsing error:", err)
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
 
 snippet imerrors "add errors package"
-"github.com/pkg/errors"
+	"github.com/pkg/errors"
 
 
 snippet imtestify "add testify package"
-"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 
 snippet imgin "add gin package"
 	"github.com/gin-gonic/gin"
@@ -234,14 +234,14 @@ snippet imtoml "add toml package"
 
 
 snippet IndexFunc "Index function"
-func Index(vs []string, t string) int {
-		for i, v := range vs {
-				if v == t {
-						return i
-				}
-		}
-		return -1
-}
+	func Index(vs []string, t string) int {
+			for i, v := range vs {
+					if v == t {
+							return i
+					}
+			}
+			return -1
+	}
 
 snippet FilterFunc "Filter function"
 	func Filter(vs []string, f func(string) bool) []string {

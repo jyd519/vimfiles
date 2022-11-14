@@ -1,0 +1,73 @@
+snippet dap_python_local "dap configurations for python"
+		for i=#dap.configurations.python,1,-1 do
+			if dap.configurations.python[i].request == "attach" then
+				table.remove(dap.configurations.python, i)
+			end
+		end
+
+		dap.adapters.pythonServer = {
+				type = "server",
+				host = "127.0.0.1",
+				port = "5678",
+				options = {
+					source_filetype = 'python',
+				}
+		}
+
+		table.insert(
+				require("dap").configurations.python,
+				{
+						-- The first three options are required by nvim-dap
+						type = "pythonServer",
+						request = "attach",
+						name = "Attach Running Process",
+						-- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+						connect = {
+								host = "127.0.0.1",
+								port = 5678,
+						},
+						pathMappings = {
+							{
+								localRoot= "\${workspaceFolder}",
+								remoteRoot= "/home/joycloud/joycloud"
+							}
+						},
+						justMyCode = false,
+				}
+		)
+
+
+snippet autocmd "add new autocommand group"
+		vim.api.nvim_create_augroup('$1', {clear = true})
+		vim.api.nvim_create_autocmd({"BufEnter", "BufNew"}, {
+			group = "$1",
+			pattern = {"*.py"},
+			callback = function()
+					vim.diagnostic.disable(0)
+					vim.cmd('ALEDisableBuffer')
+			end,
+		})
+
+
+snippet lsppyright "configure pyright"
+		-- https://github.com/microsoft/pyright/blob/main/docs/settings.md
+		-- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+		require("lspconfig").pyright.setup{
+				cmd = { "pyright-langserver", "--stdio" },
+				filetypes = { "python" },
+				root_dir = function()
+					return "$1"
+				end,
+				settings = {
+					python = {
+						analysis = {
+							autoSearchPaths = true,
+							diagnosticMode = "workspace",
+							useLibraryCodeForTypes = true,
+							verboseOutput = true,
+							extraPaths = {"./env/lib/python3.9/site-packages"}
+						},
+					},
+				},
+				single_file_support = true
+		}

@@ -18,6 +18,7 @@ vim.api.nvim_create_autocmd("BufEnter", {
 -- Creating a custom user command in 0.7
 vim.api.nvim_create_user_command("SayHello", function(args)
     print("Hello " .. args.args)
+    put(args)
 end, {
     nargs = "*",
     desc = "Say hi to someone",

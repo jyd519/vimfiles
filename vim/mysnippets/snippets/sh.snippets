@@ -1,0 +1,68 @@
+snippet root_path "get root path"
+		__dir="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+		__file="\${__dir}/\$(basename "\${BASH_SOURCE[0]}")"
+		__base="\$(basename \${__file} .sh)"
+		__root="\$(cd "\${__dir}" && pwd)"
+
+
+snippet #! "shebang" b
+		#!/usr/bin/env bash
+		
+		set -o errexit
+		set -o pipefail
+		set -o nounset
+		# set -o xtrace
+		
+		__dir="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+		__file="\${__dir}/\$(basename "\${BASH_SOURCE[0]}")"
+		__base="\$(basename \${__file} .sh)"
+		__root="\$(cd "\$(dirname "\${__dir}")" && pwd)" # <-- change this as it depends on your app
+		
+		arg1="\${1:-}"
+
+snippet SCRIPT_PATH "script path" b
+		SCRIPT_PATH="\$( cd "\$(dirname \$0)" ; pwd -P )"
+
+snippet SCRIPT_PATH2 "script path method2" b
+		FILE=\$\{BASH_SOURCE[0]}
+		pushd \`dirname $FILE\` > /dev/null
+		SCRIPT_PATH=\`pwd -P\`
+		popd > /dev/null
+		SCRIPT_FILE=\`basename \$FILE\`
+
+snippet safe_add "safely append text to the specified file" b
+		function safe-append() {
+				# \$1 filename, \$2 string to append
+				if [ -s "\$1" ] && ! grep -q "\$2" "\$1"; then
+						echo "\$2" >> \$1
+				fi
+		}
+
+snippet args "loop args" b
+		while (( "\$#" )); do
+			if [[ \$(ls "\$1") == "" ]]; then 
+				echo "Empty directory, nothing to be done."
+			else 
+				find "\$1" -type f -a -atime +365 -exec rm -i {} \;
+			fi
+			shift
+		done
+
+
+snippet ostype "case ostype" b
+		case "$OSTYPE" in
+			solaris*) echo "SOLARIS" ;;
+			darwin*)	echo "OSX" ;; 
+			linux*)		echo "LINUX" ;;
+			bsd*)			echo "BSD" ;;
+			msys*)		echo "WINDOWS" ;;
+			*)				echo "unknown: $OSTYPE" ;;
+		esac
+
+snippet ifostuype "check os type" b
+		if [[ "$OSTYPE" =~ ^linux ]]; then
+			echo "linux"
+		fi
+		if [[ "$OSTYPE" =~ ^darwin ]]; then
+			echo "darwin"
+		fi

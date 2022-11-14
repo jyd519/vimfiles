@@ -203,10 +203,15 @@ require("luasnip.loaders.from_vscode").lazy_load()
 -- snipmate format
 --    https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#from_snipmate
 require("luasnip.loaders.from_snipmate").lazy_load()
+require("luasnip.loaders.from_snipmate").lazy_load({paths = vim.fn.expand("$VIMFILES/mysnippets/snippets")})
 
 -- luasnip format
 ---@diagnostic disable-next-line: missing-parameter
 require("luasnip.loaders.from_lua").load({paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets")})
+
+vim.api.nvim_create_user_command("ReloadSnippet", function(args)
+  require("luasnip.loaders.from_snipmate").lazy_load({paths = vim.fn.expand("$VIMFILES/mysnippets/snippets")})
+end, {nargs=0})
 
 vim.api.nvim_create_user_command("EditSnippet", function(args)
   local typ = args.args;
@@ -216,8 +221,12 @@ vim.api.nvim_create_user_command("EditSnippet", function(args)
   if typ == "" then
     typ  = "all"
   end
+  local _, dot = string.find(typ, "%.")
+  if dot ~= nil then
+    typ = string.sub(typ, dot+1, -1)
+  end
 ---@diagnostic disable-next-line: missing-parameter
-  local snippet_file = vim.fn.expand("$VIMFILES/snippets/" .. typ .. ".snippets")
+  local snippet_file = vim.fn.expand("$VIMFILES/mysnippets/snippets/" .. typ .. ".snippets")
   if typ == "lua2" then
 ---@diagnostic disable-next-line: missing-parameter
     snippet_file = vim.fn.expand("$VIMFILES/mysnippets/luasnippets/all.lua")

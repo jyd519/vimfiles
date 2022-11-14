@@ -1,0 +1,33 @@
+###############################################################
+#
+#   snippets for yaml file
+#
+###############################################################
+
+snippet block_keep_newline "block text keeping newline"
+	${1:name}:|
+		${0:long text....}
+
+
+snippet block_folded "block text with newline folding"
+	${1:name}:>
+		${0:long text....}
+
+
+snippet block_folded_plus "keep last newlines"
+	${1:name}:>+
+		${0:long text....}
+
+snippet block_folded_minus "strip all last newlines"
+	${1:name}:>+
+		${0:long text....}
+
+
+snippet vimmode "modeline for vim"
+	  # vim:set et sw=2 ts=2 ft=yaml.ansible:
+
+
+#
+# NONONO
+
+

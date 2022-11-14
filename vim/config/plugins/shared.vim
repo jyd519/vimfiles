@@ -117,6 +117,11 @@ nnoremap <leader>fm :Marks<CR>
 nnoremap <leader>fh :History<CR>
 nnoremap <leader>fb :Buffers<CR>
 
+if exists('g:notes_dir')
+  command! -nargs=? Notes call fzf#run({'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . g:notes_dir , 'sink': 'e'})
+  nnoremap <leader>fn :Notes<CR>
+endif
+
 if has("nvim")
   " Allow to press esc key to close fzf window
   autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
@@ -138,6 +143,7 @@ endfunction
 
 command! -bang -nargs=? Ft call s:search_template(<q-args>, <bang>0)
 nmap <leader>ft :Ft<CR>
+
 " }}}
 
 " The Silver Searcher {{{

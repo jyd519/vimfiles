@@ -1,0 +1,205 @@
+extends yaml
+
+snippet checklimit "check if '--limit' is provided"
+    - name: Check if '-limit/-l' argument is provided
+      fail:
+        msg: "you must provides the -limit/-l argument to run this playbook"
+      when: ansible_limit is not defined
+
+
+snippet unarchive "unarchive files"
+	- name: Extract foo.tgz into /var/lib/foo
+		ansible.builtin.unarchive:
+			copy: false # true if want to copy local file to remote
+			src: foo.tgz
+			dest: /var/lib/foo
+
+
+snippet link "link files"
+  - name: link necessary files
+    ansible.builtin.file:
+      src: "{{item.src}}" 
+      dest: "{{item.dst}}"
+      state: link
+    with_items:
+      - {src: /opt/nvim/share/man/man1/*, dst: /usr/share/man/man1/}
+      - {src: /opt/nvim/bin/nvim, dst: /usr/local/bin/}
+
+snippet copy "copy files"
+  - name: copy files
+    ansible.builtin.copy:
+      remote_src: true
+      src: /tmp/nvim-linux64/
+      dest: /opt/nvim/ 
+      mode: "preserve"
+
+snippet copy_with_glob "copy files matching glob patterns"
+    - name: Copy files
+      copy:
+        src: "{{ item }}"
+        dest: "${1:remote_directory}"  # 结尾的/确保文件复制到目录中
+      with_fileglob:
+        - "*.yml"
+
+
+snippet geturl "download file from web server"
+  - name: Download $1 
+    ansible.builtin.get_url:
+      url: "$2"
+      dest: "$3"
+      checksum: "$4"
+      mode: 0600
+    environment: "{{proxy_env}}"
+    register: $5
+
+
+snippet apt "apt install packages"
+	- name: Update repositories cache and install "$0" package
+		ansible.builtin.apt:
+			name: $1 
+			update_cache: yes
+			cache_valid_time: 3600
+
+
+
+snippet apt_multiples "Install Multiple Packages"
+	- name: Install $0 
+		apt:
+			update_cache: yes
+			pkg:
+				- ${1:supervisor} 
+
+
+snippet block "add block text to somefile"
+	- name: Add mappings to /etc/hosts
+		ansible.builtin.blockinfile:
+			path: /etc/hosts
+			block: |
+				"{{ item.ip }} {{ item.name }}"
+			marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item.name }}"
+		loop:
+			- { name: host1, ip: 10.10.1.10 }
+			- { name: host2, ip: 10.10.1.11 }
+			- { name: host3, ip: 10.10.1.12 }
+
+snippet line_add "ensures a particular line is in a file"
+	- name: $0 
+		ansible.builtin.lineinfile:
+			path: $1 
+			regexp: '^Listen '
+			insertafter: '^#Listen '
+			line: Listen 8080
+
+
+snippet nofile_supervisor "Update nofile limit for supervisor"
+    - name: Update nofile limit for supervisor
+      lineinfile:
+        path: /etc/supervisor/supervisord.conf
+        insertafter: '^\[supervisord\].*$'
+        regexp: '^minfds='
+        line: 'minfds={$1:80000}'
+        state: present
+      notify: Reload supervisor
+
+
+snippet service_start "Controls services on remote hosts"
+	- name: Start service httpd, if not started
+		ansible.builtin.service:
+			name: httpd
+			state: started # restarted / stopped / reloaded
+
+snippet service_start "Controls services on remote hosts"
+	- name: Restart service $1 
+		ansible.builtin.systemd:
+			state: restarted
+			daemon_reload: yes
+			name: $1 
+
+snippet git_checkout "git checkouts of repositories"
+	- name: Git checkout
+		ansible.builtin.git:
+			repo: $1
+			dest: $2 
+			version: ${3:main}
+
+snippet find "find files on remote host"
+    - name: Find $0 
+      find:
+        paths: ${1:/remote/path/}
+        patterns: '${2:*.log,*.log.gz}'
+        recurse: yes
+      register: ${3:find_result}  # find result stored in $3.files {.path}
+
+
+snippet fetch "fetch files on remote host"
+    - name: Fetch $0 
+      fetch:
+        src: "{{ item.path }}"
+        dest: "{{$1:/local/path}}"
+      with_items: 
+			  - "{{ $2:find_result.files }}"
+
+
+snippet sync "sync directory between local and remote"
+    - name: Sync directory $0
+		  synchronize:
+        src: ${1:local_directory} 
+        dest: "${2:remote_directory}"
+        rsync_opts:
+          - '${3:--exclude=.git}'  # exclusive pattern
+
+
+
+snippet debug "debug variables"
+		- name: "Print multiple variable"
+			debug:
+				msg:
+					- "host_role = {{ host_role }}"
+					- "host_environment = {{ host_environment }}"
+
+snippet debug_all "List all known variables and facts"
+	- name: "Ansible | List all known variables and facts"
+		debug:
+			var: hostvars[inventory_hostname]
+
+
+snippet nginx_status "Check if Nginx is running"
+    - name: Check if Nginx is running
+      command: systemctl status nginx
+      failed_when: false
+      changed_when: false
+      register: service_nginx_status
+
+    - name: Report status of Nginx
+      debug:
+        msg: "Nginx is not installed {{service_nginx_status.rc}}"
+      when: service_nginx_status.rc != 0
+
+
+snippet delete_files "remove files"
+	vars:
+		nginx_config_cleanup: true
+		nginx_config_cleanup_paths:
+			- directory:
+					- /etc/nginx/conf.d
+				recurse: false
+		nginx_config_cleanup_files:  # 指定文件
+			- /etc/nginx/conf.d/default.conf
+
+	- name: Find NGINX config files
+		ansible.builtin.find:  # 搜索指定pattern的文件
+			paths: "{{ item.directory }}"
+			patterns: "*.conf"
+			recurse: "{{ item.recurse | default(false) }}"
+		loop: "{{ nginx_config_cleanup_paths }}"
+		when: nginx_config_cleanup_paths is defined
+		register: nginx_config_files
+
+	- name: Remove NGINX config files
+		ansible.builtin.file:
+			path: "{{ item }}"
+			state: absent
+		loop: "{{ nginx_config_files.results | map(attribute='files') | sum(start=[]) | map(attribute='path') | list
+					+ nginx_config_cleanup_files | default('') | list }}"
+		notify: (Handler - NGINX Config) Run NGINX
+

@@ -71,7 +71,7 @@ if treesitter_enabled then
   )
 end
 
- -- my utils
+ -- custom mappings  {{{
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>sl",
@@ -79,4 +79,47 @@ vim.api.nvim_set_keymap(
 	{ noremap = true }
 )
 
+-- Toogle diagnostics
+local diagnostics_active = true
+local toggle_diagnostics = function()
+  diagnostics_active = not diagnostics_active
+  if diagnostics_active then
+    vim.api.nvim_echo({ { "Show diagnostics" } }, false, {})
+    vim.diagnostic.enable(0)
+  else
+    vim.api.nvim_echo({ { "Disable diagnostics" } }, false, {})
+    vim.diagnostic.disable(0)
+  end
+end
+
+vim.keymap.set(
+	"n",
+	"<leader>dt",
+  function()
+    toggle_diagnostics()
+  end
+)
+
+vim.keymap.set(
+	"n",
+	"<leader>dk",
+  function()
+    vim.diagnostic.open_float()
+  end
+)
+
+vim.keymap.set(
+	"n",
+	"<leader>cn",
+  function()
+    vim.cmd("call NextCS()")
+  end
+)
+vim.keymap.set(
+	"n",
+	"<leader>cp",
+  function()
+    vim.cmd("call PreviousCS()")
+  end
+)
 -- vim: set fdm=marker fen fdl=0: }}}

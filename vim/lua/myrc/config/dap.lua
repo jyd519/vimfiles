@@ -3,7 +3,6 @@
 local dap = require "dap"
 _G.dap = dap
 
-local api = vim.api
 local dap_breakpoint = {
     error = {
         text = "🟥",
@@ -37,8 +36,11 @@ vim.fn.sign_define("DapBreakpointRejected", dap_breakpoint.rejected)
 -- vim.fn.sign_define('DapBreakpoint', { text='', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl='DapBreakpoint' })
 -- vim.fn.sign_define('DapBreakpointRejected', { text='', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl= 'DapBreakpoint' })
 -- vim.fn.sign_define('DapStopped', { text='', texthl='DapStopped', linehl='DapStopped', numhl= 'DapStopped' })
-vim.fn.sign_define('DapBreakpointCondition', { text='ﳁ', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl='DapBreakpoint' })
-vim.fn.sign_define('DapLogPoint', { text='', texthl='DapLogPoint', linehl='DapLogPoint', numhl= 'DapLogPoint' })
+vim.fn.sign_define(
+    "DapBreakpointCondition",
+    {text = "ﳁ", texthl = "DapBreakpoint", linehl = "DapBreakpoint", numhl = "DapBreakpoint"}
+)
+vim.fn.sign_define("DapLogPoint", {text = "", texthl = "DapLogPoint", linehl = "DapLogPoint", numhl = "DapLogPoint"})
 
 -- Configure Extensions: daui/dap-virtual-text {{{1
 require("nvim-dap-virtual-text").setup {
@@ -58,9 +60,8 @@ dap.listeners.before.event_terminated["dapui"] = function()
     local ft = vim.bo.filetype
     if ft == "javascript" or ft == "typescript" then
         -- FIXME: typescript/javascript
-        put(dap.status())
         if string.match(dap.status(), "^Running.+") then
-            do return end
+            return
         end
     end
 
@@ -73,39 +74,10 @@ end
 -- }}}
 
 -- Keymaps {{{1
-local whichkey = require "which-key"
--- local keymap_restore = {}
--- local function keymap(lhs, rhs, desc)
---   vim.keymap.set("n", lhs, rhs, { silent = true, desc = desc })
--- end
--- dap.listeners.after["event_initialized"]["me"] = function()
---     for _, buf in pairs(api.nvim_list_bufs()) do
---         local keymaps = api.nvim_buf_get_keymap(buf, "n")
---         for _, keymap in pairs(keymaps) do
---             if keymap.lhs == "K" then
---                 table.insert(keymap_restore, keymap)
---                 api.nvim_buf_del_keymap(buf, "n", "K")
---             end
---         end
---         api.nvim_buf_set_keymap(buf, "n", "K", '<cmd>lua require"dapui".eval()<cr>', {silent = true})
---     end
--- end
---
--- dap.listeners.after["event_terminated"]["me"] = function()
---     for _, keymap in pairs(keymap_restore) do
---         if vim.fn.bufexists(keymap.buffer) == 1 then
---             api.nvim_buf_set_keymap(keymap.buffer, keymap.mode, keymap.lhs, keymap.rhs, {silent = keymap.silent == 1})
---         end
---     end
---     keymap_restore = {}
--- end
-
 local function DebugTest()
     if dap.session() then
         dap.continue()
-        do
-            return
-        end
+        return
     end
 
     local ft = vim.bo.filetype
@@ -113,28 +85,22 @@ local function DebugTest()
     if ft == "go" then
         if string.match(file, ".*_test.go") then
             require("dap-go").debug_test()
-            do
-                return
-            end
+            return
         end
     elseif ft == "typescript" or ft == "javascript" then
         if string.match(file, ".*test%.[jt]s") then
             require("myrc.dap-jest").debug()
-            do
-                return
-            end
+            return
         end
     elseif ft == "python" then
         if string.match(file, ".*_test%.py") or string.match(file, "test_.+%.py") then
             require("dap-python").test_method()
-            do
-                return
-            end
+            return
         end
     end
     if ft == "lua" then
-      require"osv".run_this()
-      do return end
+        require "osv".run_this()
+        return
     end
 
     dap.continue()
@@ -142,81 +108,195 @@ end
 _G.DebugTest = DebugTest
 
 local function setup_keymap()
+    local mapkey = require("keymap-amend")
+
+    mapkey(
+        "n",
+        "<F5>",
+        function()
+            DebugTest()
+        end,
+        {silent = true, desc = "Start Debugging"}
+    )
+
+    mapkey(
+        "n",
+        "<F9>",
+        function(fallback)
+            if dap.session then
+                require "dap".toggle_breakpoint()
+            else
+                fallback()
+            end
+        end,
+        {silent = true, desc = "Toggle Breakpoints/Run"}
+    )
+
+    mapkey(
+        "n",
+        "<F10>",
+        function(fallback)
+            if dap.session then
+                require "dap".step_over()
+            else
+                fallback()
+            end
+        end,
+        {silent = true, desc = "Step Over"}
+    )
+
+    mapkey(
+        "n",
+        "<F11>",
+        function(fallback)
+            if dap.session() then
+                dap.step_into()
+            else
+                fallback()
+            end
+        end,
+        {silent = true, desc = "Step Into"}
+    )
+
+    mapkey(
+        "n",
+        "<F12>",
+        function(fallback)
+            if dap.session() then
+                dap.step_out()
+            else
+                fallback()
+            end
+        end,
+        {silent = true, desc = "Step out"}
+    )
+
     local keymap = {
-        ["<F5>"] = {function()
-                DebugTest()
-            end, "Start"},
-        ["<F9>"] = {"<cmd>lua require'dap'.toggle_breakpoint()<cr>", "Step Over"},
-        ["<F10>"] = {"<cmd>lua require'dap'.step_over()<cr>", "Step Over"},
-        ["<F11>"] = {
+        R = {
             function()
-                if dap.session() == nil then
-                    vim.call("PreviousCS")
-                else
-                    dap.step_into()
-                end
+                require "dap".run_to_cursor()
+            end,
+            "Run to Cursor"
+        },
+        E = {
+            function()
+                require "dapui".eval(vim.fn.input "[Expression] > ")
+            end,
+            "Evaluate Input"
+        },
+        ["cb"] = {
+            function()
+                require "dap".set_breakpoint(vim.fn.input "[Condition] > ")
+            end,
+            "Conditional Breakpoint"
+        },
+        U = {
+            function()
+                require "dapui".toggle()
+            end,
+            "Toggle UI"
+        },
+        c = {
+            function()
+                require "dap".continue()
+            end,
+            "Continue"
+        },
+        e = {
+            function()
+                require "dapui".eval()
+            end,
+            "Evaluate"
+        },
+        ["vs"] = {
+            function()
+                require "dapui".float_element("scopes", {enter = true})
+            end,
+            "Open scopes window"
+        },
+        g = {
+            function()
+                require "dap".session()
+            end,
+            "Get Session"
+        },
+        h = {
+            function()
+                require "dap.ui.widgets".hover()
+            end,
+            "Hover Variables"
+        },
+        S = {
+            function()
+                require "dap.ui.widgets".scopes()
+            end,
+            "Scopes"
+        },
+        i = {
+            function()
+                require "dap".step_into()
             end,
             "Step Into"
         },
-        ["<F12>"] = {
+        o = {
             function()
-                if dap.session() == nil then
-                    vim.call("NextCS")
-                else
-                    dap.step_out()
-                end
+                require "dap".step_over()
             end,
-            "Step Out"
+            "Step Over"
         },
-        ["<leader>d"] = {
-            name = "Debug",
-            R = {"<cmd>lua require'dap'.run_to_cursor()<cr>", "Run to Cursor"},
-            E = {"<cmd>lua require'dapui'.eval(vim.fn.input '[Expression] > ')<cr>", "Evaluate Input"},
-            C = {"<cmd>lua require'dap'.set_breakpoint(vim.fn.input '[Condition] > ')<cr>", "Conditional Breakpoint"},
-            U = {"<cmd>lua require'dapui'.toggle()<cr>", "Toggle UI"},
-            c = {"<cmd>lua require'dap'.continue()<cr>", "Continue"},
-            -- d = { "<cmd>lua require'dap'.disconnect()<cr>", "Disconnect" },
-            e = {"<cmd>lua require'dapui'.eval()<cr>", "Evaluate"},
-            g = {"<cmd>lua require'dap'.session()<cr>", "Get Session"},
-            h = {"<cmd>lua require'dap.ui.widgets'.hover()<cr>", "Hover Variables"},
-            S = {"<cmd>lua require'dap.ui.widgets'.scopes()<cr>", "Scopes"},
-            i = {"<cmd>lua require'dap'.step_into()<cr>", "Step Into"},
-            o = {"<cmd>lua require'dap'.step_over()<cr>", "Step Over"},
-            p = {"<cmd>lua require'dap'.pause.toggle()<cr>", "Pause"},
-            q = { function() dap.close() end, "Quit" },
-            r = {"<cmd>lua require'dap'.repl.toggle()<cr>", "Toggle Repl"},
-            s = {"<cmd>lua require'dap'.continue()<cr>", "Start"},
-            b = {"<cmd>lua require'dap'.toggle_breakpoint()<cr>", "Toggle Breakpoint"},
-            x = {"<cmd>lua require'dap'.terminate()<cr>", "Terminate"}
+        p = {
+            function()
+                require "dap".pause.toggle()
+            end,
+            "Pause"
+        },
+        q = {
+            function()
+                dap.close()
+            end,
+            "Quit"
+        },
+        ["rp"] = {
+            function()
+                require "dap".repl.toggle()
+            end,
+            "Toggle Repl"
+        },
+        s = {
+            function()
+                require "dap".continue()
+            end,
+            "Start"
+        },
+        b = {
+            function()
+                require "dap".toggle_breakpoint()
+            end,
+            "Toggle Breakpoint"
+        },
+        x = {
+            function()
+                require "dap".terminate()
+            end,
+            "Terminate"
         }
     }
 
-    local keymap_v = {
-        name = "Debug",
-        e = {"<cmd>lua require'dapui'.eval()<cr>", "Evaluate"}
-    }
+    for sk, sv in pairs(keymap) do
+        mapkey("n", "<leader>d" .. sk, sv[1], {desc = sv[2]})
+    end
 
-    whichkey.register(
-        keymap,
-        {
-            mode = "n",
-            buffer = nil,
-            silent = true,
-            noremap = true,
-            nowait = false
-        }
-    )
-
-    whichkey.register(
-        keymap_v,
-        {
-            mode = "v",
-            prefix = "<leader>",
-            buffer = nil,
-            silent = true,
-            noremap = true,
-            nowait = false
-        }
+    mapkey(
+        "v",
+        "<leader>e",
+        function(original)
+            if dap.session() then
+                require "dapui".eval()
+            else
+                original()
+            end
+        end,
+        {silent = true, desc = "Evaluate variable"}
     )
 end
 
@@ -253,10 +333,19 @@ dap.adapters.nlua = function(callback, config)
 end
 
 -- python {{{1
+-- require('dap-python').setup('~/.pyenv/versions/3.10.2/bin/python3')
 dap.adapters.python = {
     type = "executable",
     command = vim.fn.expand("~/.pyenv/versions/3.10.2/bin/python3"),
     args = {"-m", "debugpy.adapter"}
+}
+dap.adapters.pythonServer = {
+    type = "server",
+    host = "127.0.0.1",
+    port = "5678",
+    options = {
+      source_filetype = 'python',
+    }
 }
 dap.configurations.python = {
     {
@@ -267,6 +356,30 @@ dap.configurations.python = {
         -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
 
         program = "${file}", -- This configuration will launch the current file if used.
+        pythonPath = function()
+            -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
+            -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
+            -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
+            local cwd = vim.fn.getcwd()
+            if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
+                return cwd .. "/venv/bin/python"
+            elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+                return cwd .. "/.venv/bin/python"
+            else
+                return vim.fn.expand("~/.pyenv/versions/3.10.2/bin/python3")
+            end
+        end
+    },
+    {
+        -- The first three options are required by nvim-dap
+        type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
+        request = "attach",
+        name = "Attach Running Process",
+        -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+        connect = {
+          host = "127.0.0.1",
+          port = 5678,
+        },
         pythonPath = function()
             -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
             -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
