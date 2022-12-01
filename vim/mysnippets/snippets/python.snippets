@@ -225,3 +225,10 @@ snippet loggingInApp "logging in application" b
 
 		logger = logging.getLogger()
 		# logger.debug('often makes a very good meal of %s', 'visiting tourists')
+
+
+snippet py3req  "python interpreter version check"
+		PY_MAJOR, PY_MINOR = sys.version_info[0:2]
+		if not ((PY_MAJOR == 3 and PY_MINOR >= 8) or PY_MAJOR > 3):
+				sys.exit('This scripts requires Python >= 3.8; '
+								 'your version of Python is ' + sys.version)

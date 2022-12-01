@@ -1,0 +1,46 @@
+snippet error "custom error type"
+		/// $1 enumerates all possible errors returned by this library.
+		#[derive(Debug)]
+		enum $1 {
+				/// Represents an empty source. For example, an empty text file being given
+				/// as input to `count_words()`.
+				EmptySource,
+
+				/// Represents a failure to read from input.
+				ReadError { source: std::io::Error },
+
+				/// Represents all other cases of `std::io::Error`.
+				IOError(std::io::Error),
+		}
+
+		impl std::error::Error for $1 {
+				fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+						match *self {
+								$1::EmptySource => None,
+								$1::ReadError { ref source } => Some(source),
+								$1::IOError(_) => None,
+						}
+				}
+		}
+
+		impl std::fmt::Display for $1 {
+				fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+						match *self {
+								$1::EmptySource => {
+										write!(f, "Source contains no data")
+								}
+								$1::ReadError { .. } => {
+										write!(f, "Read error")
+								}
+								$1::IOError(ref err) => {
+										err.fmt(f)
+								}
+						}
+				}
+		}
+
+		impl From<std::io::Error> for $1 {
+				fn from(err: std::io::Error) -> $1 {
+						$1::IOError(err)
+				}
+		}

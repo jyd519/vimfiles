@@ -66,6 +66,7 @@ return packer.startup(
         use {"numToStr/Comment.nvim"}
         use {"sbdchd/neoformat", opt = true, event = "VimEnter" }
         use "lukas-reineke/indent-blankline.nvim"
+        use "gpanders/editorconfig.nvim"
 
         use { 'thinca/vim-quickrun' }
         use { 'vim-test/vim-test', opt=true, event="VimEnter" } -- Unit-Testing

@@ -154,7 +154,7 @@ snippet assertEqual "assertEqual"
 		}
 	}
 
-snippet assertLib "testify/assert"
+snippet utestify "testify/assert"
 	//import "github.com/stretchr/testify/assert"
 	func TestAssert(t *testing.T) {
 		var a string = "Hello"
@@ -177,7 +177,7 @@ snippet usage "flag.Usage"
 		flag.PrintDefaults()
 	}
 
-snippet usage "GzippedText "
+snippet ugzip "GzippedText "
 	type GzippedText []byte
 
 	func (g GzippedText) Value() (driver.Value, error) {
@@ -218,19 +218,6 @@ snippet decode "decode http body"
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
-
-snippet imerrors "add errors package"
-	"github.com/pkg/errors"
-
-
-snippet imtestify "add testify package"
-	"github.com/stretchr/testify/assert"
-
-snippet imgin "add gin package"
-	"github.com/gin-gonic/gin"
-
-snippet imtoml "add toml package"
-	"github.com/BurntSushi/toml"
 
 
 snippet IndexFunc "Index function"
@@ -390,3 +377,146 @@ snippet actor_send "actor_send_msg"
 			$1
 		}
 		<-done
+
+snippet ucli "use cli"
+  // "github.com/darjun/go-daily-lib/cli" 
+	func main() {
+		app := &cli.App{
+			Commands: []*cli.Command{
+				{
+					Name:    "add",
+					Aliases: []string{"a"},
+					Usage:   "add a task to the list",
+					Action: func(c *cli.Context) error {
+						fmt.Println("added task: ", c.Args().First())
+						return nil
+					},
+				},
+				{
+					Name:    "complete",
+					Aliases: []string{"c"},
+					Usage:   "complete a task on the list",
+					Action: func(c *cli.Context) error {
+						fmt.Println("completed task: ", c.Args().First())
+						return nil
+					},
+				},
+				{
+					Name:    "template",
+					Aliases: []string{"t"},
+					Usage:   "options for task templates",
+					Subcommands: []*cli.Command{
+						{
+							Name:  "add",
+							Usage: "add a new template",
+							Action: func(c *cli.Context) error {
+								fmt.Println("new task template: ", c.Args().First())
+								return nil
+							},
+						},
+						{
+							Name:  "remove",
+							Usage: "remove an existing template",
+							Action: func(c *cli.Context) error {
+								fmt.Println("removed task template: ", c.Args().First())
+								return nil
+							},
+						},
+					},
+				},
+			},
+		}
+
+		err := app.Run(os.Args)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+snippet uviper "use viper"
+	// github.com/spf13/viper
+	func LoadConfig(path string) (config Config, err error) {
+		viper.SetConfigName("config") // name of config file (without extension)
+		viper.SetConfigType("yaml") // REQUIRED if the config file does not have the extension in the name
+		viper.AddConfigPath("/etc/$1/")   // path to look for the config file in
+		viper.AddConfigPath("$$HOME/$1")  // call multiple times to add many search paths
+		viper.AddConfigPath(".")               // optionally look for config in the working directory
+		viper.SetDefault("ContentDir", "content")
+		err := viper.ReadInConfig() // Find and read the config file
+		if err != nil { // Handle errors reading the config file
+			panic(fmt.Errorf("fatal error config file: %w", err))
+		}
+
+		if err := viper.ReadInConfig(); err != nil {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+				// Config file not found; ignore error if desired
+			} else {
+				// Config file was found but another error was produced
+			}
+		}
+    err = viper.Unmarshal(&config)
+    return
+	}
+
+# import awesome libraries
+snippet isjson "import sjson (for update json)"
+	"github.com/tidwall/sjson"
+
+	// const json = `{"name":{"first":"li","last":"dj"},"age":18}`
+  // value, _ := sjson.Set(json, "name.last", "dajun")
+
+
+snippet igjson "import gjson (for query json)"
+	"github.com/tidwall/gjson"
+
+	// json := `{"name":{"first":"li","last":"dj"},"age":18}`
+	// lastName := gjson.Get(json, "name.last")
+
+snippet ibufpool "import bytebufferpool"
+	"github.com/valyala/bytebufferpool"
+
+
+snippet izap "import zap logging"
+	 "go.uber.org/zap"
+
+	 // logger, _ := zap.NewProduction()
+	 // defer logger.Sync() // flushes buffer, if any
+	 // sugar := logger.Sugar()
+	 // sugar.Infow("failed to fetch URL",
+	 // 	// Structured context as loosely typed key-value pairs.
+	 // 	"url", url,
+	 // 	"attempt", 3,
+	 // 	"backoff", time.Second,
+	 // )
+	 // sugar.Infof("Failed to fetch URL: %s", url)
+
+snippet imap "import mapstructure"
+	"github.com/mitchellh/mapstructure"
+	// var p Person
+	// mapstructure.Decode(m, &p)
+
+snippet idotenv "import godotenv"
+	"github.com/joho/godotenv"
+
+  // err := godotenv.Load()
+  // if err != nil {
+  //   log.Fatal(err)
+  // }
+
+
+snippet ierrors "import errors package"
+	"github.com/pkg/errors"
+
+snippet itestify "import testify package"
+	"github.com/stretchr/testify/assert"
+
+snippet igin "import gin package"
+	"github.com/gin-gonic/gin"
+
+snippet itoml "import toml package"
+	"github.com/BurntSushi/toml"
+
+snippet icast "import cast package"
+	"github.com/spf13/cast"
+
+

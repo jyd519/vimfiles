@@ -1,3 +1,9 @@
+snippet yargs "import yargs"
+	const yargs = require('yargs/yargs');
+	const {hideBin} = require('yargs/helpers');
+	const argv = yargs(hideBin(process.argv)).argv;
+
+
 snippet dev-server "http static server supporting proxy api requests"
 		/*
 		 *  Install:
