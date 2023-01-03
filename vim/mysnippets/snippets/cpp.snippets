@@ -1,0 +1,98 @@
+snippet uutf8encode "to_wstring/ to_utf8"
+		std::wstring to_wstring(const std::string& str) {
+			std::wstring wstr;
+			int nChars = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), 0, 0);
+			if (nChars > 0) {
+				wstr.resize(nChars);
+				::MultiByteToWideChar(CP_UTF8, 0, str.c_str(), -1,
+															const_cast<wchar_t*>(wstr.c_str()), nChars);
+			}
+			return wstr;
+		}
+
+		std::string to_utf8(const std::wstring& str) {
+			int nChars = ::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str.length(),
+																				 NULL, 0, NULL, NULL);
+			if (nChars == 0) return "";
+
+			std::string newbuffer;
+			newbuffer.resize(nChars);
+			::WideCharToMultiByte(CP_UTF8, 0, str.c_str(), str.length(),
+														const_cast<char*>(newbuffer.c_str()), nChars, NULL,
+														NULL);
+
+			return newbuffer;
+		}
+
+
+snippet uguid "GuidToString"
+	std::string GuidToString(GUID guid) {
+		char guid_cstr[39];
+		snprintf(guid_cstr, sizeof(guid_cstr),
+						 "%08lx-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", guid.Data1,
+						 guid.Data2, guid.Data3, guid.Data4[0], guid.Data4[1], guid.Data4[2],
+						 guid.Data4[3], guid.Data4[4], guid.Data4[5], guid.Data4[6],
+						 guid.Data4[7]);
+
+		return std::string(guid_cstr);
+	}
+
+
+snippet ulangstr "LangStr(LANGID)"
+	std::string LangStr(LANGID lang) {
+		wchar_t szBuf[512];
+		memset(szBuf, 0, sizeof(szBuf));
+		GetLocaleInfoW(MAKELCID(lang, SORT_DEFAULT), LOCALE_SNAME, szBuf,
+									ARRAYSIZE(szBuf));
+		return to_utf8(szBuf);
+	}
+
+
+snippet utf8_arg "convert argv to utf8 encoding"
+		// wmain(int argc, const wchar_t* wargv[])
+		char** argv = static_cast<char**>(malloc(argc * sizeof(char*)));
+		for (int i = 0; i < argc; i++) {
+			argv[i] = _strdup(to_utf8(wargv[i]).c_str());
+		}
+
+snippet utf8_arg2 "CommandLineToArgvW to utf8 encoding"
+	#if defined(_WIN32)
+			LPWSTR* argvw = CommandLineToArgvW(GetCommandLineW(), &argc);
+			for (int i = 0; i < argc; ++i) {
+				argv[i] = u8strdup(argvw[i]);
+			}
+			SetConsoleOutputCP(CP_UTF8);
+	#endif
+
+
+snippet ucli11_example "cli11 example"
+		std::string filename = "";
+		std::string jta_src = "";
+		std::string key_path = "";
+		std::string outdir = "data";
+		std::string password = "";
+		std::string subject = "";
+
+		CLI::App app{"Tool to make joytest demo disk.\nCopyright ATA. 2020\n"};
+		CLI::App* mfs = app.add_subcommand("mfs", "import offline form package");
+		CLI::App* form = app.add_subcommand("form", "import a form");
+		CLI::App* jta = app.add_subcommand("jta", "create demo.jta");
+
+		mfs->add_option("-s,--src", filename, "mfs file");
+		mfs->add_option("-d,--out", outdir, "output directory, default: data");
+		mfs->add_option("-p,--password", password, "password for reading emfs file");
+
+		form->add_option("-f,--form", filename, "form file");
+		form->add_option("-k,--key", key_path, "form key file, eg: key.json");
+		form->add_option("-s,--subject", subject, "subject name");
+		form->add_option("-d,--out", outdir, "output directory, default: data");
+		form->add_option("-p,--password", password, "password for reading form file");
+
+		jta->add_option("-s,--src", jta_src, "jta source file");
+		jta->add_option("-d,--out", outdir, "output directory, default: data");
+
+		app.require_subcommand(1, 1);
+
+		CLI11_PARSE(app, argc, argv);
+
+

@@ -71,7 +71,7 @@ if treesitter_enabled then
   )
 end
 
- -- custom mappings  {{{
+ -- custom mappings  {{{1
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>sl",
@@ -122,4 +122,15 @@ vim.keymap.set(
     vim.cmd("call PreviousCS()")
   end
 )
+
+-- lookup ansible-doc
+vim.api.nvim_create_user_command("Adoc", function(args)
+  vim.cmd("new | setlocal buftype=nofile bufhidden=hide noswapfile ft=man sw=4 |"
+          .. "r !ansible-doc " ..  args.args .. "")
+  vim.defer_fn(function() vim.cmd('exec "norm ggM"') end, 100)
+end, {
+    nargs = "+",
+    desc = "Lookup ansible document",
+})
+
 -- vim: set fdm=marker fen fdl=0: }}}

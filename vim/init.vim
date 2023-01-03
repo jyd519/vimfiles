@@ -18,7 +18,7 @@ end
 set rtp^=$VIMFILES rtp+=$VIMFILES/after
 
 if $VIM_MODE =~ 'man'
-  let $MYVIMRC=expand("$VIMFILES/config/man.vim")
+  let g:MYINITRC=expand("$VIMFILES/config/man.vim")
   source $VIMFILES/config/man.vim
   finish
 endif
@@ -36,7 +36,7 @@ endif
 "   source ~/.vimrc.local
 " endif
 
-let $MYVIMRC=expand("$VIMFILES/init.vim")
+let g:MYINITRC=expand("$VIMFILES/init.vim")
 
 let s:configs = [ 
       \ 'config/globals.vim',

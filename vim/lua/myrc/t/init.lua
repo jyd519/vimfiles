@@ -45,13 +45,10 @@ end
 function M.save_tpl(name)
   local ft = vim.o.ft
   local base_dir = snippets_dir
-  if vim.fn.globpath(snippets_dir, ft) ~= "" then
-    base_dir = pathJoin(snippets_dir, ft)
-    if vim.fn.isdirectory(base_dir) == 0 then
-      vim.fn.mkdir(base_dir, "p")
-    end
+  base_dir = pathJoin(snippets_dir, ft)
+  if vim.fn.isdirectory(base_dir) == 0 then
+    vim.fn.mkdir(base_dir, "p")
   end
-
   if string.find(name, '.', 1, true) == nil then
     local ext = vim.fn.expand("%:p:e")
     if ext == "" then

@@ -1,0 +1,42 @@
+---
+# https://clangd.llvm.org/config.html#compileflags
+CompileFlags:
+  # Treat code as C++, use C++17 standard, enable more warnings.
+  Add:
+    [
+      -xc++,
+      -std=c++17,
+      -Wall,
+      -Wno-missing-prototypes,
+      -isystem/usr/local/include,
+      -isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1,
+      -isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/13.1.6/include,
+      -isystem/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+      -isystem/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include,
+      -I/Users/jiyongdong/dev/cpp/electron-gn/src/,
+      -I/Users/jiyongdong/dev/cpp/electron-gn/src/out/Release/gen,
+      -I/Users/jiyongdong/dev/cpp/electron-gn/src/electron/,
+      -I/Users/jiyongdong/dev/cpp/electron-gn/src/third_party/boringssl/src/include,
+      -I/Users/jiyongdong/dev/cpp/electron-gn/src/third_party/abseil-cpp,
+      -I/Users/jiyongdong/dev/cpp/electron-gn/src/third_party/electron_node,
+    ]
+  # Remove extra warnings specified in compile commands.
+  # Single value is also acceptable, same as "Remove: [-mabi]"
+  Remove: -mabi
+Diagnostics:
+  # Tweak Clang-Tidy checks.
+  ClangTidy:
+    Add: [performance*, modernize*, readability*]
+    Remove: [modernize-use-trailing-return-type]
+    CheckOptions:
+      # readability-identifier-naming.VariableCase: CamelCase
+
+---
+# objcpp
+If:
+  PathMatch: .*mm$
+
+CompileFlags:
+  Remove: -xc++
+
+# vim: ft=yaml:

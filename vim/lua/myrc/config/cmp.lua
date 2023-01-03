@@ -185,7 +185,7 @@ cmp.setup.cmdline(':', {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'path', option = { trailing_slash = true } }
+    { name = 'path', option = { trailing_slash = false, label_trailing_slash = false } }
   }, {
     -- Do not show completion for words starting with 'Man'
     -- https://github.com/hrsh7th/cmp-cmdline/issues/47

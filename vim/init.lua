@@ -2,16 +2,20 @@
 -- Jyd  Last-Modified: 2021-12-17
 --
 -- let g:loaded_python_provider = 0
--- let g:python_host_prog = '~/.pyenv/versions/2.7.18/bin/python2'
--- let g:python3_host_prog = '~/.pyenv/versions/3.10.2/bin/python3.10'
+-- let g:python_host_prog = expand('~/.pyenv/versions/2.7.18/bin/python2')
+-- let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
 -- let g:node_host_prog = '/usr/local/bin/neovim-node-host'
--- let g:copilot_node_command='~/.nvm/versions/node/v16.10.0/bin/node'
+-- let g:copilot_node_command=expand('~/.nvm/versions/node/v16.10.0/bin/node')
 --
 -- let g:use_heavy_plugin = 1
--- let g:use_treesitter = 0
+-- let g:use_treesitter = 1
+--
+-- let g:test#javascript#runner = 'jest'
 --
 -- set background="light"
 -- let g:colorscheme='vscode'
+-- let g:notes_dir = '/Volumes/dev/notes'
+--
 -- source path/to/init.lua
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
@@ -22,10 +26,10 @@ vim.cmd('set rtp+=' .. VIMFILES .. '/after')
 vim.cmd('set packpath+=' .. VIMFILES)
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
-env.MYVIMRC=VIMFILES .. '/init.lua'
+g.MYINITRC=VIMFILES .. '/init.lua'
 g.did_load_filetypes=1
 g.do_filetype_lua = 1
-
+env.MYSNIPPETS = VIMFILES .. '/mysnippets'
 g.mapleader = ","
 g.maplocalleader = ","
 

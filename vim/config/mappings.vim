@@ -12,6 +12,7 @@ imap <C-Return> <CR><CR><C-o>k<Tab>"
 
 " Quick editing myvimrc{{{
 "--------------------------------------------------------------------------------
+nmap <leader>ei :e! <C-r>=g:MYINITRC<CR> <CR>
 nmap <leader>ev :e! $MYVIMRC<CR>
 nmap <leader>ss :source %<cr>
 "}}}

@@ -337,16 +337,32 @@ end
 dap.adapters.python = {
     type = "executable",
     command = vim.fn.expand("~/.pyenv/versions/3.10.2/bin/python3"),
-    args = {"-m", "debugpy.adapter"}
+    args = {"-m", "debugpy.adapter"},
+    -- options = { env = {}, cwd = {}  }
 }
+
 dap.adapters.pythonServer = {
     type = "server",
-    host = "127.0.0.1",
+    host = "0.0.0.0",
     port = "5678",
     options = {
       source_filetype = 'python',
     }
 }
+
+dap.adapters.pythonServerPrompt = {
+    type = "server",
+    host = "0.0.0.0",
+    port = function()
+        local val = tonumber(vim.fn.input("Port: ", "5678"))
+        assert(val, "Please provide a port number")
+        return val
+    end,
+    options = {
+      source_filetype = 'python',
+    }
+}
+
 dap.configurations.python = {
     {
         -- The first three options are required by nvim-dap
@@ -372,13 +388,41 @@ dap.configurations.python = {
     },
     {
         -- The first three options are required by nvim-dap
-        type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
+        type = "pythonServer", -- the type here established the link to the adapter definition: `dap.adapters.python`
         request = "attach",
         name = "Attach Running Process",
         -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
         connect = {
           host = "127.0.0.1",
           port = 5678,
+        },
+        pythonPath = function()
+            -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
+            -- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
+            -- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
+            local cwd = vim.fn.getcwd()
+            if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
+                return cwd .. "/venv/bin/python"
+            elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
+                return cwd .. "/.venv/bin/python"
+            else
+                return vim.fn.expand("~/.pyenv/versions/3.10.2/bin/python3")
+            end
+        end
+    },
+    {
+        -- The first three options are required by nvim-dap
+        type = "pythonServerPrompt", -- the type here established the link to the adapter definition: `dap.adapters.python`
+        request = "attach",
+        name = "Attach Running Process",
+        -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
+        connect = {
+          host = "127.0.0.1",
+          port = function()
+              local val = tonumber(vim.fn.input("Port: ", "5678"))
+              assert(val, "Please provide a port number")
+              return val
+          end,
         },
         pythonPath = function()
             -- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.

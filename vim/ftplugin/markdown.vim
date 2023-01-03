@@ -9,7 +9,11 @@ let b:did_markdown_vim = 1
 " hi link mkdLineBreak  CursorLineNr
 hi link mkdLineBreak Underlined
 
-setlocal foldlevel=1
+" folding
+" setlocal foldlevel=1
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+
 set textwidth=120
 
 "Markdown preview

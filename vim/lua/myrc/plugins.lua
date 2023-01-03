@@ -100,6 +100,10 @@ return packer.startup(
 
         -- AI Coding
         use {"github/copilot.vim", disable =true}
+        use({
+          'terror/chatgpt.nvim',
+          run = 'pip3 install -r requirements.txt'
+        })
         use {
           "zbirenbaum/copilot.lua",
           disable = true,
@@ -138,7 +142,7 @@ return packer.startup(
 
         -- Markdown, reStructuredText, textile
         use {"godlygeek/tabular", ft = "markdown"}
-        use {"plasticboy/vim-markdown", ft = "markdown"}
+        use {"preservim/vim-markdown", ft = "markdown"}
         use {"jyd519/md-img-paste.vim", ft = "markdown", branch = "master"}
 
         use {"tweekmonster/startuptime.vim", cmd="StartupTime"}

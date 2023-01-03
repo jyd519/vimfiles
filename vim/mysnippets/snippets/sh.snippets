@@ -25,7 +25,7 @@ snippet SCRIPT_PATH "script path" b
 
 snippet SCRIPT_PATH2 "script path method2" b
 		FILE=\$\{BASH_SOURCE[0]}
-		pushd \`dirname $FILE\` > /dev/null
+		pushd \`dirname \$FILE\` > /dev/null
 		SCRIPT_PATH=\`pwd -P\`
 		popd > /dev/null
 		SCRIPT_FILE=\`basename \$FILE\`
@@ -50,19 +50,48 @@ snippet args "loop args" b
 
 
 snippet ostype "case ostype" b
-		case "$OSTYPE" in
+		case "\$OSTYPE" in
 			solaris*) echo "SOLARIS" ;;
 			darwin*)	echo "OSX" ;; 
 			linux*)		echo "LINUX" ;;
 			bsd*)			echo "BSD" ;;
 			msys*)		echo "WINDOWS" ;;
-			*)				echo "unknown: $OSTYPE" ;;
+			*)				echo "unknown: \$OSTYPE" ;;
 		esac
 
 snippet ifostuype "check os type" b
-		if [[ "$OSTYPE" =~ ^linux ]]; then
+		if [[ "\$OSTYPE" =~ ^linux ]]; then
 			echo "linux"
 		fi
-		if [[ "$OSTYPE" =~ ^darwin ]]; then
+		if [[ "\$OSTYPE" =~ ^darwin ]]; then
 			echo "darwin"
 		fi
+
+snippet parse_args "parse arguments (no getopts)"
+		CLEAR='\033[0m'
+		RED='\033[0;31m'
+
+		function usage() {
+			if [ -n "\$1" ]; then
+				echo -e "\${RED}👉 \$1\${CLEAR}\n";
+			fi
+			echo "Usage: \$0 [-n number-of-people] [-s section-id] [-c cache-file]"
+			echo "  -n, --number-of-people   The number of people"
+			echo "  -s, --section-id         A sections unique id"
+			echo "  -q, --quiet              Only print result"
+			echo ""
+			echo "Example: \$0 --number-of-people 2 --section-id 1 --cache-file last-known-date.txt"
+			exit 1
+		}
+
+		# parse params
+		while [[ "\$#" > 0 ]]; do case \$1 in
+			-n|--number-of-people) NUMBER_OF_PEOPLE="\$2"; shift;shift;;
+			-s|--section-id) SECTION_ID="\$2";shift;shift;;
+			-v|--verbose) VERBOSE=1;shift;;
+			*) usage "Unknown parameter passed: \$1"; shift; shift;;
+		esac; done
+
+		# verify params
+		if [ -z "\$NUMBER_OF_PEOPLE" ]; then usage "Number of people is not set"; fi;
+		if [ -z "\$SECTION_ID" ]; then usage "Section id is not set."; fi;
