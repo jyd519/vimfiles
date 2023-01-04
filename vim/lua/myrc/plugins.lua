@@ -100,10 +100,6 @@ return packer.startup(
 
         -- AI Coding
         use {"github/copilot.vim", disable =true}
-        use({
-          'terror/chatgpt.nvim',
-          run = 'pip3 install -r requirements.txt'
-        })
         use {
           "zbirenbaum/copilot.lua",
           disable = true,

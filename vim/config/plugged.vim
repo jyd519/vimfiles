@@ -34,7 +34,7 @@ Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 
-if g:use_heavy_plugin
+if g:use_heavy_plugin && has('python3')
   Plug 'puremourning/vimspector'
 endif
 

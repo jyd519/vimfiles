@@ -10,7 +10,7 @@ endif
 let g:did_t_vim = 1
 
 if !(has('pythonx') || has('python3'))
-  echo "Error: T.vim requires vim compiled with +python"
+  " echo "Error: T.vim requires vim compiled with +python"
   finish
 endif
 
