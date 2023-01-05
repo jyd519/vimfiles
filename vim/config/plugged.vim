@@ -27,7 +27,10 @@ Plug 'chiedojohn/vim-case-convert'
 Plug 'tomtom/tcomment_vim'
 Plug $VIMFILES . '/locals/vim-a'
 
-Plug 'vim-test/vim-test'    " Unit-Testing
+if g:use_heavy_plugin
+  Plug 'vim-test/vim-test'    " Unit-Testing
+Plug 'brookhong/cscope.vim'
+endif
 Plug 'thinca/vim-quickrun'
 Plug 'tweekmonster/startuptime.vim'
 Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
@@ -38,14 +41,14 @@ if g:use_heavy_plugin && has('python3')
   Plug 'puremourning/vimspector'
 endif
 
-
 Plug 'dense-analysis/ale'
-Plug 'brookhong/cscope.vim'
 Plug 'nathanaelkane/vim-indent-guides'
 Plug 'xolox/vim-misc'
 
 " tmux
-Plug 'christoomey/vim-tmux-navigator'
+if !has("win32") && executable("tmux")
+  Plug 'christoomey/vim-tmux-navigator'
+endif
 
 " snippets
 if g:use_heavy_plugin && has('python3') 
@@ -80,11 +83,13 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim', { 'on': ['Gist'] }
 
+if g:use_heavy_plugin
 " Graphviz+UML+Dot
 Plug 'aklt/plantuml-syntax', { 'for': 'plantuml' }
 Plug 'tyru/open-browser.vim', { 'for': 'plantuml' }
 Plug 'weirongxu/plantuml-previewer.vim', { 'for': 'plantuml' }
 Plug 'wannesm/wmgraphviz.vim', { 'for': 'dot' }
+endif
 
 " Markdown, reStructuredText, textile
 Plug 'godlygeek/tabular', { 'on': ['Tabularize', 'AddTabularPattern'] }
