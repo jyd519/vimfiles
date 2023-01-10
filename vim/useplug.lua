@@ -29,7 +29,6 @@ g.MYINITRC=VIMFILES .. '/plug.lua'
 vim.cmd('runtime config/globals.vim')
 
 -- load plugins
-prequire('impatient')
 require('myrc.plug')
 
 -- load options, mappings and configurations

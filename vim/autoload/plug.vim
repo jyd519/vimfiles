@@ -710,6 +710,7 @@ function! plug#(repo, ...)
   if a:0 > 1
     return s:err('Invalid number of arguments (1..2)')
   endif
+
   try
     let repo = s:trim(a:repo)
     let opts = a:0 == 1 ? s:parse_options(a:1) : s:base_spec

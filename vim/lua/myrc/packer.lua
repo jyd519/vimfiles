@@ -53,7 +53,7 @@ return packer.startup(
         use {"tmhedberg/matchit"}
         use {"AndrewRadev/splitjoin.vim"}
         use {"junegunn/vim-easy-align"}
-        use {"tpope/vim-surround"}
+        -- use {"tpope/vim-surround"}
         use {"tpope/vim-repeat"}
         use {"chiedojohn/vim-case-convert"}
         use {"chentoast/marks.nvim", config = [[require "myrc.config.marks"]]}

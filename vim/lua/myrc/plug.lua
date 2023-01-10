@@ -12,6 +12,12 @@ Plug {
         vim.cmd("colorscheme vscode")
     end
 }
+Plug {"rcarriga/nvim-notify", config = function ()
+    if vim.fn.has('termguicolors')==1 then
+      vim.cmd("set termguicolors")
+    end
+    require("myrc.config.notify")
+end}
 
 Plug{"nvim-lua/plenary.nvim"} -- some useful lua functions
 Plug{"anuvyklack/keymap-amend.nvim"}
@@ -112,6 +118,7 @@ Plug {
 }
 Plug {"rcarriga/nvim-dap-ui"}
 Plug {"theHamsta/nvim-dap-virtual-text"}
+Plug {"ChristianChiarulli/neovim-codicons"}
 
 -- tmux
 if fn.has("win32") == 0 and fn.executable("tmux") == 1 then

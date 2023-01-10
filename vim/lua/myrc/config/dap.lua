@@ -50,13 +50,27 @@ require("nvim-dap-virtual-text").setup {
 local dapui = require "dapui"
 _G.dapui = dapui
 
-dapui.setup {
-    theme = false
-}
-dap.listeners.after.event_initialized["dapui"] = function()
+dapui.setup({
+ icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
+  controls = {
+    enabled = true,
+    element = "repl",
+    icons = {
+      pause = "",
+      play = "",
+      step_into = "",
+      step_over = "",
+      step_out = "",
+      step_back = "",
+      run_last = "↻",
+      terminate = "ﱢ",
+    },
+  },
+})
+dap.listeners.after.event_initialized["dapui_config"] = function()
     dapui.open()
 end
-dap.listeners.before.event_terminated["dapui"] = function()
+dap.listeners.before.event_terminated["dapui_config"] = function()
     local ft = vim.bo.filetype
     if ft == "javascript" or ft == "typescript" then
         -- FIXME: typescript/javascript
@@ -64,13 +78,11 @@ dap.listeners.before.event_terminated["dapui"] = function()
             return
         end
     end
-
     dapui.close()
 end
-dap.listeners.before.event_exited["dapui"] = function()
+dap.listeners.before.event_exited["dapui_config"] = function()
     dapui.close()
 end
-
 -- }}}
 
 -- Keymaps {{{1

@@ -30,7 +30,6 @@ g.MYINITRC=VIMFILES .. '/init.lua'
 vim.cmd('runtime config/globals.vim')
 
 -- load plugins
-prequire('impatient')
 require('myrc.packer')
 if PACKER_BOOTSTRAP then
   print("plugins installed, you need restart vim to take effect.")
