@@ -1,3 +1,6 @@
+" Requirements: 
+"    im-select (macOS)
+"
 " Empty `vimrc` augroup {{{
 augroup vimrc
   autocmd!
@@ -102,7 +105,7 @@ function! s:Ime_zh()
   endtry
 endfunction
 
-if has("mac")
+if has("mac") && executable("im-select")
   autocmd! vimrc InsertLeave * call <SID>Ime_en()
   autocmd! vimrc InsertEnter * call <SID>Ime_zh()
 endif

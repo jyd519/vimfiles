@@ -1,4 +1,3 @@
--- treesitter {{{1
 local mod = prequire("nvim-treesitter.configs")
 if mod then
     mod.setup {
@@ -28,6 +27,15 @@ if mod then
             }
         }
     }
+
+    -- vim.api.nvim_create_autocmd("FileType", {
+    --   pattern = {"cpp","c","vim","typescript","lua","rust"},
+    --   callback = function()
+    --     print("Entering a C or C++ file")
+    --     vim.o.foldmethod ="expr"
+    --     vim.o.foldexpr= ""
+    --   end,
+    -- })
 
     vim.cmd([[
   function! SetTreeSitterFolding()

@@ -6,8 +6,8 @@
 if exists("loaded_viewoutput") | finish | endif
 let loaded_viewoutput=1
 
-let g:viewoutput_newbuffer="new"
 "   g:viewoutput_newbuffer -- command to create new preview window 
+let g:viewoutput_newbuffer="new"
 "let g:viewoutput_newbuffer="5new"     | " create preview window 5 lines high
 "let g:viewoutput_newbuffer="bot 5new" | " bottom preview window 5 lines high
 "let g:viewoutput_newbuffer="top 5new" | " top preview window 5 lines high

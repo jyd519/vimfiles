@@ -7,7 +7,7 @@
 local vim = vim
 
 local M = {}
-local pathJoin = require('myrc.utils.pathjoin').pathJoin
+local pathJoin = require('t.pathjoin').pathJoin
 
 local snippets_dir = vim.g.mysnippets_dir
 if snippets_dir == "" then

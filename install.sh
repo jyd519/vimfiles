@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# packer.nvim home page
-# ---> git clone --depth=1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/opt/packer.nvim
+# install packer.nvim
+#   git clone --depth=1 https://github.com/wbthomason/packer.nvim ~/.local/share/nvim/site/pack/packer/opt/packer.nvim
+#
+# install plug.vim
+#   curl  -fLo ./vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 SCRIPT_PATH="$( cd "$(dirname $0)" ; pwd -P )"
 
@@ -32,9 +35,9 @@ source $SCRIPT_PATH/vim/init.lua
 END
 )
 
-#----------------------------------------  
+#----------------------------------------
 # vim
-#----------------------------------------  
+#----------------------------------------
 if ! [[ -f ~/.vimrc ]]; then
   echo "Creating ~/.vimrc for vim ..."
   printf "%s\n" "$VIMCONFIG" > ~/.vimrc
@@ -45,15 +48,15 @@ else
   printf "\n%s\n" "$VIMCONFIG"
 fi
 
-#----------------------------------------  
+#----------------------------------------
 # neovim
-#----------------------------------------  
+#----------------------------------------
 # On Linux and macOS, the directory to store configuration is ~/.config/nvim
 NEOVIM_CONFIG_DIR=~/.config/nvim
 if ! [[ -f $NEOVIM_CONFIG_DIR/init.vim ]]; then
   echo "Creating nvim configuration ..."
   if ! [[ -d $NEOVIM_CONFIG_DIR ]]; then
-    mkdir -p $NEOVIM_CONFIG_DIR 
+    mkdir -p $NEOVIM_CONFIG_DIR
   fi
 
   printf "%s\n" "$NVIMCONFIG" > $NEOVIM_CONFIG_DIR/init.vim

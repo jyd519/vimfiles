@@ -41,7 +41,7 @@ set wildmenu " show a navigable menu for tab completion
 set wildmode=list:longest,full
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
-set wildignore+=*DS_Store
+set wildignore+=*DS_Store,*.pyc
 set completeopt=menuone,longest,preview,noselect
 "set t_ti= t_te= Keep screen after vim exited
 
@@ -85,6 +85,7 @@ let g:maplocalleader = ","
 set laststatus=2
 
 " enable syntax highlighting
+syntax on
 syntax sync minlines=256
 set synmaxcol=300
 set redrawtime=10000
@@ -106,13 +107,13 @@ endif
 set tags=./tags,tags,./.tags,.tags
 
 " Set GUI VIM Font
-if has("gui_running") && !has("gui_vimr")
-  if has("mac")
-    set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
-    set guifontwide=PingFangSC-Light:h16
-  else
-    set guifont=Hack_Nerd_Font_Mono:h14
-    set guifontwide=NSimSun:h14
-  endif
-endif
-
+" if has("gui_running") && !has("gui_vimr")
+"   if has("mac")
+"     set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
+"     set guifontwide=PingFangSC-Light:h16
+"   else
+"     set guifont=Hack_Nerd_Font_Mono:h14
+"     set guifontwide=NSimSun:h14
+"   endif
+" endif
+"

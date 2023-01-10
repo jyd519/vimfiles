@@ -1,5 +1,4 @@
 " Plugins shared between neovim and vim8
-
 " emmet-vim {{{
 "--------------------------------------------------------------------------------
 let g:user_emmet_leader_key=','
@@ -7,7 +6,7 @@ let g:user_emmet_leader_key=','
 
 " UltiSnips {{{
 "--------------------------------------------------------------------------------
-if !g:is_nvim 
+if !g:is_nvim
   let g:UltiSnipsExpandTrigger="<C-k>"
   let g:UltiSnipsJumpForwardTrigger="<C-k>"
   let g:UltiSnipsJumpBackwardTrigger="<C-p>"
@@ -87,58 +86,82 @@ let g:session_autoload='no'
 let g:session_autosave_periodic=0
 " }}}
 
-" fzf: File searching {{{
-"--------------------------------------------------------------------------------
-" An action can be a reference to a function that processes selected lines
-function! s:build_quickfix_list(lines)
-  call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-  copen
-  cc
-endfunction
+" fzf/telescopoe {{{1
+if get(g:enabled_plugins, "telescope.nvim", 0)
+  "--------------------------------------------------------------------------------
+  " Find files using Telescope command-line sugar.
+  nnoremap <leader>ff <cmd>Telescope find_files<cr>
+  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+  nnoremap <leader>fb <cmd>Telescope buffers<cr>
+  nnoremap <leader>fh <cmd>Telescope oldfiles<cr>
+  nnoremap <leader>fo <cmd>Telescope oldfiles<cr>
+  nnoremap <C-P> <cmd>Telescope find_files<cr>
+elseif get(g:enabled_plugins, "fzf.vim", 0)
+  "--------------------------------------------------------------------------------
+  " An action can be a reference to a function that processes selected lines
+  function! s:build_quickfix_list(lines)
+    call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
+    copen
+    cc
+  endfunction
 
-let g:fzf_action = {
-      \ 'ctrl-q': function('s:build_quickfix_list'),
-      \ 'ctrl-t': 'tab split',
-      \ 'ctrl-s': 'split',
-      \ 'ctrl-v': 'vsplit'
-      \}
+  let g:fzf_action = {
+        \ 'ctrl-q': function('s:build_quickfix_list'),
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-s': 'split',
+        \ 'ctrl-v': 'vsplit'
+        \}
 
-" Popup window
-let g:fzf_layout = { 'down': '50%' }
+  " Popup window
+  let g:fzf_layout = { 'down': '50%' }
 
-" key binding
-nnoremap <C-P> :Files<CR>
-nnoremap <leader>ff :Files<CR>
-nnoremap <leader>fm :Marks<CR>
-nnoremap <leader>fh :History<CR>
-nnoremap <leader>fb :Buffers<CR>
+  " key binding
+  nnoremap <C-P> :Files<CR>
+  nnoremap <leader>ff :Files<CR>
+  nnoremap <leader>fm :Marks<CR>
+  nnoremap <leader>fh :History<CR>
+  nnoremap <leader>fb :Buffers<CR>
 
-if exists('g:notes_dir')
-  command! -nargs=? Notes call fzf#run({'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . g:notes_dir , 'sink': 'e'})
-  nnoremap <leader>fn :Notes<CR>
-endif
+  function! s:find_notes(sub)
+    let opts = {'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . a:sub, 
+              \ 'sink': 'e', 
+              \ 'down': '50%', 
+              \ 'dir': g:notes_dir,
+              \ 'options': ['--info=inline', '--reverse']} 
+    call fzf#run(opts)
+  endfunction
 
-if has("nvim")
-  " Allow to press esc key to close fzf window
-  autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
-endif
+  if exists('g:notes_dir') && executable("rg")
+    command! -nargs=? Notes call s:find_notes(<q-args>)
+    nnoremap <leader>fn :Notes<CR>
+  endif
+
+  if has("nvim")
+    " Allow to press esc key to close fzf window
+    autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
+  endif
+endif 
 " }}}
 
 " t.vim {{{
 "--------------------------------------------------------------------------------
 let g:mysnippets_dir = expand("$VIMFILES/mysnippets/codesnippets")
-let $mysnippets_dir = expand("$VIMFILES/mysnippets/codesnippets")
+let $mysnippets = g:mysnippets_dir
 
-" integrate with fzf 
-function! s:search_template(arg, bang)
-  let all = len(&ft) == 0 || a:arg =~ 'a'
-  call fzf#vim#files((all? g:mysnippets_dir : g:mysnippets_dir . '/' . &ft),
-        \ fzf#vim#with_preview({'sink': 'r', 'options': [ '--info=inline']}),
-        \ a:bang)
-endfunction
+if get(g:enabled_plugins, "telescope.nvim", 0)
+  " integrate with telescope
+elseif get(g:enabled_plugins, "fzf.vim", 0)
+" integrate with fzf
+  function! s:search_template(arg, bang)
+    let all = len(&ft) == 0 || a:arg =~ 'a'
+    call fzf#vim#files((all? g:mysnippets_dir : g:mysnippets_dir . '/' . &ft),
+          \ fzf#vim#with_preview({'sink': 'r', 'options': [ '--info=inline']}),
+          \ a:bang)
+  endfunction
 
-command! -bang -nargs=? Ft call s:search_template(<q-args>, <bang>0)
-nmap <leader>ft :Ft<CR>
+  command! -bang -nargs=? Ft call s:search_template(<q-args>, <bang>0)
+  nmap <leader>ft :Ft<CR>
+endif
 
 " }}}
 
@@ -165,17 +188,21 @@ runtime ftplugin/man.vim
 
 "vim-easy-align {{{
 "--------------------------------------------------------------------------------
-" Start interactive EasyAlign in visual mode (e.g. vipga)
-xmap <leader>a <Plug>(EasyAlign)
-" Start interactive EasyAlign for a motion/text object (e.g. gaip)
-nmap <leader>a <Plug>(EasyAlign)
+if get(g:enabled_plugins, "vim-easy-align", 0)
+  " Start interactive EasyAlign in visual mode (e.g. vipga)
+  xmap <leader>a <Plug>(EasyAlign)
+  " Start interactive EasyAlign for a motion/text object (e.g. gaip)
+  nmap <leader>a <Plug>(EasyAlign)
+endif
 "}}}
 
 " NERDTree {{{
 "--------------------------------------------------------------------------------
-let g:NERDTreeWinSize=40
-noremap <F3> :NERDTreeToggle<cr>
-noremap <leader>nf :NERDTreeFind<cr>
+if get(g:enabled_plugins, "nerdtree", 0)
+  let g:NERDTreeWinSize=40
+  noremap <F3> :NERDTreeToggle<cr>
+  noremap <leader>nf :NERDTreeFind<cr>
+endif
 " }}}
 
 " Graphviz {{{
@@ -186,31 +213,37 @@ let g:previm_open_cmd = 'open -a "google chrome"'
 
 " vim-go / golang {{{
 "--------------------------------------------------------------------------------
-let g:go_fmt_fail_silently = 1
-let g:go_snippet_engine='ultisnips'
-let g:go_doc_popup_window = 1
+if get(g:enabled_plugins, "vim-go", 0)
+  let g:go_fmt_fail_silently = 1
+  let g:go_snippet_engine='ultisnips'
+  let g:go_doc_popup_window = 1
 
-let g:go_term_mode = "split"
-let g:go_term_enabled = 1
-let g:go_term_reuse = 1
-let g:go_term_width = 80
-let g:go_term_height = 10
-let g:go_term_close_on_exit = 0
+  let g:go_term_mode = "split"
+  let g:go_term_enabled = 1
+  let g:go_term_reuse = 1
+  let g:go_term_width = 80
+  let g:go_term_height = 10
+  let g:go_term_close_on_exit = 0
 
-autocmd vimrc Filetype go noremap <buffer> <leader>rt :GoTestFunc<cr>
-autocmd vimrc Filetype go noremap <buffer> <leader>r :QuickRun<cr>
+  function! s:setupGoMapping()
+    noremap <buffer> <leader>rt :GoTestFunc<cr>
+    noremap <buffer> <leader>r :QuickRun<cr>
 
-" abbrev
-autocmd vimrc Filetype go ca <buffer> ips GoImports
-autocmd vimrc Filetype go command! -buffer -bang A call go#alternate#Switch(<bang>0, 'edit')
-autocmd vimrc Filetype go command! -buffer -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
-autocmd vimrc Filetype go command! -buffer -bang AS call go#alternate#Switch(<bang>0, 'split')
-autocmd vimrc Filetype go command! -buffer -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+    " abbrev
+    ca <buffer> ips GoImports
+    command! -buffer -bang A call go#alternate#Switch(<bang>0, 'edit')
+    command! -buffer -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+    command! -buffer -bang AS call go#alternate#Switch(<bang>0, 'split')
+    command! -buffer -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+  endfunction
+
+  autocmd vimrc FileType go call s:setupGoMapping()
+endif
 " }}}
 
 " Neoformat {{{
 "--------------------------------------------------------------------------------
-" prequirements: npm i -g prettier js-beautify ... 
+" prequirements: npm i -g prettier js-beautify ...
 let g:neoformat_try_node_exe = 1
 " Enable alignment globally
 let g:neoformat_basic_format_align = 1
@@ -229,37 +262,38 @@ if g:is_nvim
   tnoremap <C-o> <C-\><C-n>
 endif
 
-let test#rust#cargotest#options = '-- --nocapture'
-let test#go#test#options = '-v'
-autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>rt :TestNearest<cr>
-autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>tt :TestNearest<cr>
-autocmd vimrc Filetype javascript,typescript,go noremap <buffer> <leader>tf :TestFile<cr>
+if get(g:enabled_plugins, "test", 0)
+  let test#rust#cargotest#options = '-- --nocapture'
+  let test#go#test#options = '-v'
+  autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>rt :TestNearest<cr>
+  autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>tt :TestNearest<cr>
+  autocmd vimrc Filetype javascript,typescript,go noremap <buffer> <leader>tf :TestFile<cr>
+endif
 " }}}
 
 " quickrun {{{
 "--------------------------------------------------------------------------------
-let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
-autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
+if get(g:enabled_plugins, "vim-quickrun", 0) 
+  let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
+  autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
+endif
 " }}}
 
 " victionary
 "--------------------------------------------------------------------------------
 let g:victionary#map_defaults = 0
 
-" Draw ascii box
-"--------------------------------------------------------------------------------
-map <leader>tsk :call ToggleSketch()<CR>
-
 " tmux_navigator: Disable tmux navigator when zooming the Vim pane
 "--------------------------------------------------------------------------------
-let g:tmux_navigator_disable_when_zoomed = 1
-let g:tmux_navigator_no_mappings = 1
+if get(g:enabled_plugins, "vim-tmux-navigator", 0)
+  let g:tmux_navigator_disable_when_zoomed = 1
+  let g:tmux_navigator_no_mappings = 1
+  nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
+  nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
+  nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
+  nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
+endif
 
-nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <c-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
-1
 " Sneak
 "--------------------------------------------------------------------------------
 let g:sneak#label = 1

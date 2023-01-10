@@ -7,14 +7,28 @@ if empty(glob($VIMFILES . '/autoload/plug.vim'))
   autocmd VimEnter * PlugInstall | source $MYVIMRC
 endif
 
+function! s:any(...)
+  for name in a:000
+    if get(g:enabled_plugins, name, 0) | return 1 | endif
+  endfor
+  return 0
+endfunction
+
+function! s:all(...)
+  for name in a:000
+    if get(g:enabled_plugins, name, 0) == 0 | return 0 | endif
+  endfor
+  return 1
+endfunction
+
 call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'NLKNguyen/papercolor-theme'
+Plug 'Mofiqul/vscode.nvim'
 
 " Efficient editing
 Plug 'jyd519/ListToggle'          " toggle quickfix/location window
-Plug 'vim-scripts/bufkill.vim'
 Plug 'justinmk/vim-sneak'
 Plug 'mattn/emmet-vim', { 'for': ['html', 'jsx', 'vue'] }
 Plug 'jiangmiao/auto-pairs'
@@ -27,17 +41,22 @@ Plug 'chiedojohn/vim-case-convert'
 Plug 'tomtom/tcomment_vim'
 Plug $VIMFILES . '/locals/vim-a'
 
-if g:use_heavy_plugin
-  Plug 'vim-test/vim-test'    " Unit-Testing
-Plug 'brookhong/cscope.vim'
+if s:any("test")
+  Plug 'vim-test/vim-test'    " Unit-Testing, requires python
+  Plug 'brookhong/cscope.vim'
 endif
+
 Plug 'thinca/vim-quickrun'
 Plug 'tweekmonster/startuptime.vim'
-Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
 
-if g:use_heavy_plugin && has('python3')
+Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
+
+if get(g:enabled_plugins, "fzf", 0)
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/fzf.vim'
+endif
+
+if get(g:enabled_plugins, "python", 0)
   Plug 'puremourning/vimspector'
 endif
 
@@ -51,21 +70,23 @@ if !has("win32") && executable("tmux")
 endif
 
 " snippets
-if g:use_heavy_plugin && has('python3') 
+if get(g:enabled_plugins, "python", 0)
   Plug 'SirVer/ultisnips'
   Plug 'honza/vim-snippets'
   Plug 'mhartington/vim-angular2-snippets', { 'for': 'typescript' }
-
-  Plug 'liuchengxu/vista.vim'
 endif
 
 " async
-Plug 'skywind3000/asyncrun.vim'
-Plug 'tpope/vim-dispatch'
+if get(g:enabled_plugins, "rare", 0)
+  Plug 'skywind3000/asyncrun.vim'
+  Plug 'tpope/vim-dispatch'
+endif
 
-" Auto Completion 
-if g:use_heavy_plugin
+" Auto Completion
+if get(g:enabled_plugins, "ycm", 0)
   Plug 'ycm-core/YouCompleteMe'
+endif
+if get(g:enabled_plugins, "coc", 0)
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
 endif
 
@@ -83,28 +104,32 @@ Plug 'airblade/vim-gitgutter'
 Plug 'mattn/webapi-vim'
 Plug 'mattn/gist-vim', { 'on': ['Gist'] }
 
-if g:use_heavy_plugin
 " Graphviz+UML+Dot
-Plug 'aklt/plantuml-syntax', { 'for': 'plantuml' }
-Plug 'tyru/open-browser.vim', { 'for': 'plantuml' }
-Plug 'weirongxu/plantuml-previewer.vim', { 'for': 'plantuml' }
-Plug 'wannesm/wmgraphviz.vim', { 'for': 'dot' }
+if s:all("uml", "markdown")
+  Plug 'aklt/plantuml-syntax', { 'for': 'plantuml' }
+  Plug 'tyru/open-browser.vim', { 'for': 'plantuml' }
+  Plug 'weirongxu/plantuml-previewer.vim', { 'for': 'plantuml' }
+  Plug 'wannesm/wmgraphviz.vim', { 'for': 'dot' }
 endif
 
 " Markdown, reStructuredText, textile
-Plug 'godlygeek/tabular', { 'on': ['Tabularize', 'AddTabularPattern'] }
-Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
-Plug 'jyd519/md-img-paste.vim', { 'for': 'markdown' }
-Plug 'dhruvasagar/vim-table-mode'
-Plug 'vim-scripts/DrawIt'
-Plug 'gyim/vim-boxdraw'
+if s:any("markdown")
+  Plug 'godlygeek/tabular', { 'on': ['Tabularize', 'AddTabularPattern'] }
+  Plug 'plasticboy/vim-markdown', { 'for': 'markdown' }
+  Plug 'jyd519/md-img-paste.vim', { 'for': 'markdown' }
+  Plug 'dhruvasagar/vim-table-mode'
+  Plug 'vim-scripts/DrawIt'
+  Plug 'gyim/vim-boxdraw'
+endif
 
 "js, ts, node
-Plug 'isRuslan/vim-es6', { 'for': ['javascript', 'typescript'] }
-Plug 'moll/vim-node', { 'for': ['javascript', 'typescript'] }
-Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'typescript'] }
-Plug 'elzr/vim-json', {'for': 'json'}
-Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
+if s:any("node")
+  Plug 'isRuslan/vim-es6', { 'for': ['javascript', 'typescript'] }
+  Plug 'moll/vim-node', { 'for': ['javascript', 'typescript'] }
+  Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'typescript'] }
+  Plug 'elzr/vim-json', {'for': 'json'}
+  Plug 'leafgarland/typescript-vim', { 'for': 'typescript' }
+endif
 
 " nginx
 Plug 'chr4/nginx.vim'
@@ -113,12 +138,12 @@ Plug 'chr4/nginx.vim'
 Plug 'kelan/gyp.vim', { 'for': 'gyp' }
 
 " Go
-if g:use_heavy_plugin
+if s:any("go")
   Plug 'fatih/vim-go', { 'for': 'go', 'do': ':GoUpdateBinaries' }
 endif
 
 " Rust
-if g:use_heavy_plugin && executable('rust') != 0
+if get(g:enabled_plugins, "rust", 0)
   Plug 'rust-lang/rust.vim', { 'for': 'rust' }
   Plug 'racer-rust/vim-racer', { 'for': 'rust' }
 endif
@@ -132,11 +157,6 @@ Plug 'ekalinin/Dockerfile.vim'
 " unicode characters
 Plug 'chrisbra/unicode.vim'
 Plug 'junegunn/vim-emoji'
-
-" python
-if g:use_heavy_plugin
-  Plug 'jupyter-vim/jupyter-vim', { 'for': 'python' }
-endif
 
 " toml
 Plug 'cespare/vim-toml', {'for': 'toml'}
@@ -152,7 +172,11 @@ Plug 'yianwillis/vimcdoc'
 " reading rfc
 Plug 'mhinz/vim-rfc'
 
-" peg / pigeon 
+" peg / pigeon
 Plug 'jasontbradshaw/pigeon.vim', {'for': 'peg'}
 
-call plug#end() 
+call plug#end()
+
+for [key, value] in items(g:plugs)
+  let g:enabled_plugins[tolower(key)] = 1
+endfor

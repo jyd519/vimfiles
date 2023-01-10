@@ -1,4 +1,5 @@
 " easytags: slow
+" vim: set ft=vim:
 let g:easytags_async=1
 let g:easytags_dynamic_files = 1
 let g:easytags_always_enabled=0

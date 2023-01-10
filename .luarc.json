@@ -8,6 +8,8 @@
         "hs",
         "parse",
         "s",
-        "t"
+        "t",
+        "prequire",
+        "put"
     ]
 }

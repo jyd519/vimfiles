@@ -14,36 +14,23 @@
 -- let g:notes_dir = '/Volumes/dev/notes'
 -- let g:enabled_plugins = {}
 --
--- source path/to/init.lua
+-- source path/to/plug.lua
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
 
 vim.cmd('set rtp^=' .. VIMFILES)
 vim.cmd('set rtp+=' .. VIMFILES .. '/after')
-vim.cmd('set packpath+=' .. VIMFILES)
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
-g.MYINITRC=VIMFILES .. '/init.lua'
+g.MYINITRC=VIMFILES .. '/plug.lua'
 
 -- load global variables
 vim.cmd('runtime config/globals.vim')
 
 -- load plugins
 prequire('impatient')
-require('myrc.packer')
-if PACKER_BOOTSTRAP then
-  print("plugins installed, you need restart vim to take effect.")
-  vim.cmd('sleep 2')
-  return
-end
-prequire('myrc.packer_compiled')
-
-local plugins = g.enabled_plugins
-for name in pairs(packer_plugins) do
-  plugins[string.lower(name)] = 1
-end
-g.enabled_plugins = plugins
+require('myrc.plug')
 
 -- load options, mappings and configurations
 local scripts = {'config/options.vim',

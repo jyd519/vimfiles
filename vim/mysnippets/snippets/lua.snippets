@@ -1,3 +1,7 @@
+snippet scriptdir "script directory"
+		local fn = vim.fn
+		local DIR=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
+
 snippet dap_python_local "dap configurations for python"
 		for i=#dap.configurations.python,1,-1 do
 			if dap.configurations.python[i].request == "attach" then

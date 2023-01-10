@@ -100,7 +100,7 @@ end
 
 local lsp_defaults = {
   flags = { debounce_text_changes = 150, },
-  capabilities = require('cmp_nvim_lsp').update_capabilities(
+  capabilities = require('cmp_nvim_lsp').default_capabilities(
     vim.lsp.protocol.make_client_capabilities()
   ),
   -- Callback function that will be executed when a language server is attached to a buffer
@@ -291,7 +291,7 @@ local function get_lua_library()
   add("$VIMFILES/pack/packer/start/plenary.nvim/lua")
   add("$VIMFILES/pack/packer/start/nvim-cmp/lua")
   add("$VIMFILES/pack/packer/start/nvim-lspconfig/lua")
-  add("$VIMFILES/pack/packer/opt/lua-dev.nvim/types")
+  add("$VIMFILES/pack/packer/opt/neodev.nvim/types")
   return library
 end
 

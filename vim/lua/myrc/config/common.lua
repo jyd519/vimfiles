@@ -1,59 +1,17 @@
 -- globals {{{1
-local vim = vim
-
--- notify {{{1
-require("notify").setup({
-  -- Animation style (see below for details)
-  stages = "fade_in_slide_out",
-
-  -- Function called when a new window is opened, use for changing win settings/config
-  on_open = nil,
-
-  -- Function called when a window is closed
-  on_close = nil,
-
-  -- Render function for notifications. See notify-render()
-  render = "default",
-
-  -- Default timeout for notifications
-  timeout = 5000,
-
-  -- For stages that change opacity this is treated as the highlight behind the window
-  -- Set this to either a highlight group or an RGB hex value e.g. "#000000"
-  background_colour = "#000000",
-  -- Minimum width for notification windows
-  minimum_width = 50,
-})
-
-vim.notify = require("notify")
-
--- numToStr/Comment.nvim {{{1
-require('Comment').setup()
-
--- windwp/nvim-projectconfig -- {{{1
-require('nvim-projectconfig').setup({silent = false})
-
--- filetype.nvim -- {{{1
--- https://github.com/nathom/filetype.nvim/blob/main/README.md
-require("filetype").setup({
-    overrides = {
-        extensions = {
-            mm = "objcpp",
-        },
-        complex = {
-            -- Set the filetype of any full filename matching the regex to gitconfig
-            [".*git/config"] = "gitconfig", -- Included in the plugin
-        },
-    },
-})
+local vim, g = vim, vim.g
+local keymap = vim.keymap
+keymap.amend = require('keymap-amend')
 
 -- indent_blankline -- {{{1
-local treesitter_enabled = packer_plugins and packer_plugins["nvim-treesitter"] and packer_plugins["nvim-treesitter"].loaded
-require("indent_blankline").setup {
-    -- for example, context is off by default, use this to turn it on
-    show_current_context = treesitter_enabled,
-    show_current_context_start = treesitter_enabled,
-}
+local treesitter_enabled = g.enabled_plugins["nvim-treesitter"] == 1
+if g.enabled_plugins["indent_blankline"] == 1 then
+  require("indent_blankline").setup {
+      -- for example, context is off by default, use this to turn it on
+      show_current_context = treesitter_enabled,
+      show_current_context_start = treesitter_enabled,
+  }
+end
 
 if treesitter_enabled then
   -- refactoring -- {{{1
@@ -71,7 +29,14 @@ if treesitter_enabled then
   )
 end
 
- -- custom mappings  {{{1
+-- custom mappings  {{{1
+keymap.amend('n', '<Esc>', function(original)
+   if vim.v.hlsearch and vim.v.hlsearch == 1 then
+      vim.cmd('nohlsearch')
+   end
+   original()
+end, { desc = 'disable search highlight' })
+
 vim.api.nvim_set_keymap(
 	"n",
 	"<leader>sl",
@@ -92,7 +57,7 @@ local toggle_diagnostics = function()
   end
 end
 
-vim.keymap.set(
+keymap.set(
 	"n",
 	"<leader>dt",
   function()
@@ -100,7 +65,7 @@ vim.keymap.set(
   end
 )
 
-vim.keymap.set(
+keymap.set(
 	"n",
 	"<leader>dk",
   function()
@@ -108,14 +73,14 @@ vim.keymap.set(
   end
 )
 
-vim.keymap.set(
+keymap.set(
 	"n",
 	"<leader>cn",
   function()
     vim.cmd("call NextCS()")
   end
 )
-vim.keymap.set(
+keymap.set(
 	"n",
 	"<leader>cp",
   function()
@@ -133,4 +98,4 @@ end, {
     desc = "Lookup ansible document",
 })
 
--- vim: set fdm=marker fen fdl=0: }}}
+-- vim: set fdm=marker fdl=0: }}}

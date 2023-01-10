@@ -258,4 +258,4 @@ luasnip.config.set_config({
 vim.cmd([[autocmd BufEnter */mysnippets/luasnippets/*.lua nnoremap <silent> <buffer> <CR> /-- End SNIPPETS --<CR>kI<Esc>O]])
 
 -- }}}
--- vim: set fdm=marker fen fdl=0: }}}
+-- vim: set fdm=marker fdl=0: }}}
