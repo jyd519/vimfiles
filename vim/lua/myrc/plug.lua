@@ -6,16 +6,8 @@ Plug.begin("~/vimgit/vim/plugged")
 Plug {"lewis6991/impatient.nvim"}
 
 Plug {"mhinz/vim-startify"}
-Plug {
-    "Mofiqul/vscode.nvim",
-    config = function()
-        vim.cmd("colorscheme vscode")
-    end
-}
+Plug {"Mofiqul/vscode.nvim"}
 Plug {"rcarriga/nvim-notify", config = function ()
-    if vim.fn.has('termguicolors')==1 then
-      vim.cmd("set termguicolors")
-    end
     require("myrc.config.notify")
 end}
 
@@ -40,7 +32,7 @@ Plug {
     end
 }
 
-Plug {"nathanaelkane/vim-indent-guides"}
+Plug {"nathanaelkane/vim-indent-guides", on = "VimEnter"}
 Plug {"thinca/vim-quickrun", on = "VimEnter"}
 Plug {"vim-test/vim-test", opt = true, on = "VimEnter"} -- Unit-Testing
 Plug {"dense-analysis/ale", opt = true, on = "VimEnter"}
@@ -51,7 +43,7 @@ if fn.get(g.enabled_plugins, "fzf") == 1 then
     Plug {
         "junegunn/fzf",
         run = function()
-            vim.fn("fzf#install")()
+            -- vim.fn("fzf#install")()
         end
     }
     Plug "junegunn/fzf.vim"
@@ -67,7 +59,7 @@ Plug {
 Plug("nvim-telescope/telescope-ui-select.nvim")
 
 -- snippets
-if fn.executable("python3") == 1 then
+if g.enabled_plugins.python then
   Plug {"SirVer/ultisnips"}
 end
 Plug {"honza/vim-snippets"}
@@ -96,8 +88,7 @@ Plug {"jose-elias-alvarez/null-ls.nvim"}
 Plug {"jose-elias-alvarez/nvim-lsp-ts-utils"}
 Plug {"arkav/lualine-lsp-progress"}
 Plug {"folke/neodev.nvim", opt = true, ft={"lua"}}
-Plug {
-    "simrat39/symbols-outline.nvim",
+Plug {"simrat39/symbols-outline.nvim",
     config = function()
         require("myrc.config.symbols-outline")
     end
@@ -106,11 +97,10 @@ Plug {
 -- Debugging
 Plug {"mfussenegger/nvim-dap-python"}
 Plug {"nvim-telescope/telescope-dap.nvim"}
-Plug {"leoluz/nvim-dap-go", module = "dap-go"}
-Plug {"jbyuki/one-small-step-for-vimkind", module = "osv"}
+Plug {"leoluz/nvim-dap-go"}
+Plug {"jbyuki/one-small-step-for-vimkind"}
 Plug {"mxsdev/nvim-dap-vscode-js"}
-Plug {
-    "mfussenegger/nvim-dap",
+Plug {"mfussenegger/nvim-dap",
     -- event = "BufReadPre",
     config = function()
         require("myrc.config.dap")
@@ -130,8 +120,6 @@ Plug {"nvim-lualine/lualine.nvim", config = [[require "myrc.config.lualine"]]}
 
 -- " Git
 Plug {"lewis6991/gitsigns.nvim", config = [[require "myrc.config.gitsigns"]]}
--- Plug 'tpope/vim-fugitive'
--- Plug 'airblade/vim-gitgutter'
 
 -- Treesitter
 Plug {"nvim-treesitter/nvim-treesitter", config = [[require('myrc.config.treesitter')]], run = ":TSUpdate"}
@@ -141,20 +129,16 @@ Plug {"ThePrimeagen/refactoring.nvim"}
 Plug "sbdchd/neoformat"
 
 -- Go/dart/rust/cpp
-if fn.executable("go") == 1 then
-    Plug {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries"}
-end
+Plug {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries"}
 Plug {"dart-lang/dart-vim-plugin", ft = "dart"}
-Plug {
-    "rust-lang/rust.vim",
+Plug {"rust-lang/rust.vim",
     config = function()
         vim.g.rustfmt_autosave = 1
     end
 }
 Plug {"simrat39/rust-tools.nvim"}
-Plug {
-    "saecki/crates.nvim",
-    ft = "go",
+Plug {"saecki/crates.nvim",
+    ft = "toml",
     tag = "v0.2.1",
     config = function()
         require("crates").setup()

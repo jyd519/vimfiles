@@ -17,18 +17,16 @@ endif
 
 set rtp^=$VIMFILES rtp+=$VIMFILES/after
 
-runtime config/globals.vim
-
 " enable plugins
-let g:enabled_plugins = { "fzf": 1, "node": 1, "go": 1, "rust": 1, "coc": 1 }
+" let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "coc": 0 }
+
+runtime config/globals.vim
 
 let s:configs = [
       \ 'config/plugged.vim',
       \ 'config/options.vim',
       \ 'config/mappings.vim',
       \ 'config/plugins/shared.vim',
-      \ 'config/plugins/vim_only.vim',
-      \ 'config/plugins/ctags.vim',
       \ ]
 for s in s:configs
   execute printf('source %s/%s', $VIMFILES, s)

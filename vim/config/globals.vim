@@ -1,6 +1,10 @@
 let g:is_nvim = has('nvim')
 let g:is_vim8 = v:version >= 800 ? 1 : 0
 
+if !exists("g:enabled_plugins")
+  let g:enabled_plugins = {}
+endif
+
 " Disable Builtin Plugins
 let g:loaded_gzip = 1
 let g:loaded_zip = 1
@@ -16,20 +20,26 @@ let g:loaded_matchit = 1
 let g:loaded_matchparen = 1
 let g:loaded_logiPat = 1
 let g:loaded_rrhelper = 1
-let g:loaded_netrw = 1
-let g:loaded_netrwPlugin = 1
-let g:loaded_netrwSettings = 1
-let g:loaded_netrwFileHandlers = 1
+
+" use netrw?
+if get(g:enabled_plugins, "netrw", 0)
+  let g:netrw_banner = 0
+  let g:netrw_liststyle = 3
+  let g:netrw_browse_split = 0
+  let g:netrw_altv = 1
+  let g:netrw_winsize = 25
+else
+  let g:loaded_netrw = 1
+  let g:loaded_netrwPlugin = 1
+  let g:loaded_netrwSettings = 1
+  let g:loaded_netrwFileHandlers = 1
+endif
 
 " Enable syntax highlight for embeded lua & python code
 let g:vimsyn_embed = 'lP'
 
 let g:mapleader = ","
 let g:maplocalleader = ","
-
-if !exists("g:enabled_plugins")
-  let g:enabled_plugins = {}
-endif
 
 if g:is_nvim
   lua <<END

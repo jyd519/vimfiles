@@ -15,7 +15,7 @@ end
 -- load global variables
 vim.cmd("runtime config/globals.vim")
 
--- load plugins
+-- load plugins {{{1
 local Plug = require("myrc.utils.vimplug")
 Plug.begin("~/vimgit/vim/plugged")
 
@@ -114,3 +114,6 @@ local scripts = {
 for _, s in pairs(scripts) do
     vim.cmd("source " .. VIMFILES .. "/" .. s)
 end
+
+
+-- vim: set fdm=marker fdl=0:

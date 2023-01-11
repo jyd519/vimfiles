@@ -178,5 +178,5 @@ Plug 'jasontbradshaw/pigeon.vim', {'for': 'peg'}
 call plug#end()
 
 for [key, value] in items(g:plugs)
-  let g:enabled_plugins[tolower(key)] = 1
+  let g:enabled_plugins[tolower(key)] = isdirectory(value.dir) 
 endfor

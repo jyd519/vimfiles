@@ -256,13 +256,15 @@ let g:neoformat_enabled_yaml= ['prettier']
 
 " vim-test {{{
 "--------------------------------------------------------------------------------
-if g:is_nvim
-  let g:test#strategy = "neovim"
-  let g:test#neovim#start_normal = 0 " 1: enter normal mode
-  tnoremap <C-o> <C-\><C-n>
-endif
-
 if get(g:enabled_plugins, "test", 0)
+  let g:test#javascript#runner = 'jest'
+
+  if g:is_nvim
+    let g:test#strategy = "neovim"
+    let g:test#neovim#start_normal = 0 " 1: enter normal mode
+    tnoremap <C-o> <C-\><C-n>
+  endif
+
   let test#rust#cargotest#options = '-- --nocapture'
   let test#go#test#options = '-v'
   autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>rt :TestNearest<cr>
@@ -307,6 +309,34 @@ let g:rustfmt_autosave = 1
 "--------------------------------------------------------------------------------
 let g:ansible_unindent_after_newline = 1  " ansible
 let g:BufKillCreateMappings = 0  " bufkill.vim
+
+" vim plugins
+"--------------------------------------------------------------------------------
+if !g:is_nvim
+" Pascal configuration
+"--------------------------------------------------------------------------------
+autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
+
+" vim-json
+"--------------------------------------------------------------------------------
+let g:vim_json_syntax_conceal = 0
+
+" tcomment
+"--------------------------------------------------------------------------------
+let g:tcomment#options_comments = {'whitespace': 'left'}
+let g:tcomment#options_commentstring = {'whitespace': 'left'}
+
+" vim-session settings
+"--------------------------------------------------------------------------------
+let g:session_autosave='prompt'
+let g:session_autoload='no'
+let g:session_autosave_periodic=0
+
+" Graphviz
+"--------------------------------------------------------------------------------
+let g:WMGraphviz_output = "svg"
+let g:previm_open_cmd = 'open -a "google chrome"'
+endif
 
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}
