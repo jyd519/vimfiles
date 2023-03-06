@@ -43,18 +43,22 @@ let g:vim_markdown_conceal = 0
 let g:tex_conceal = ""
 let g:vim_markdown_math = 1
 let g:mdip_imgdir='images'
-let g:markdown_fenced_languages = ['bash=sh', 'js=javascript', 'ts=typescript']
+
+" vim supports fenced code syntax
+"  -> https://vimtricks.com/p/highlight-syntax-inside-markdown/
+let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html",
+      \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
 " }}}
 
 " ALE {{{
 "--------------------------------------------------------------------------------
 let g:ale_enabled = 1
-let g:ale_maximum_file_size=512000 " 500KB
+let g:ale_maximum_file_size=256000 " 256KB
 let g:ale_disable_lsp = 1 " use lsp with coc-nvim instead
 let g:ale_linters = {
-      \ 'javascript': ['eslint', 'prettier'],
-      \ 'typescript': ['eslint', 'prettier'],
-      \ 'python': ['flake8', 'mypy', 'pyright'],
+      \ 'javascript': [],
+      \ 'typescript': [],
+      \ 'python': ['pylint', 'mypy', 'pyright'],
       \ 'cpp': [],
       \ 'c': [],
       \}
@@ -73,8 +77,8 @@ let g:ale_pattern_options = {
       \}
 let g:ale_fixers = {
       \ '*': ['remove_trailing_lines', 'trim_whitespace'],
-      \ 'javascript': ['eslint'],
-      \ 'typescript': ['eslint'],
+      \ 'javascript': [],
+      \ 'typescript': [],
       \ 'python': ['autopep8', 'yapf'],
       \}
 " }}}
@@ -252,6 +256,7 @@ let g:neoformat_basic_format_retab = 1
 " Enable trimmming of trailing whitespace globally
 let g:neoformat_basic_format_trim = 1
 let g:neoformat_enabled_yaml= ['prettier']
+let g:neoformat_enabled_python = ['yapf', 'autopep8']
 " }}}
 
 " vim-test {{{

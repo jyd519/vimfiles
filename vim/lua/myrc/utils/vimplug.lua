@@ -78,5 +78,12 @@ local meta = {
   end
 }
 
+-- https://github.com/junegunn/vim-plug/wiki/tips
+-- augroup load_us_ycm
+--   autocmd!
+--   autocmd InsertEnter * call plug#load('ultisnips', 'YouCompleteMe')
+--                      \| autocmd! load_us_ycm
+-- augroup END
+
 -- Meta-tables are awesome
 return setmetatable(Plug, meta)

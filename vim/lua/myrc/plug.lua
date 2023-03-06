@@ -1,7 +1,7 @@
 local g, fn = vim.g, vim.fn
 local Plug = require("myrc.utils.vimplug")
 
-Plug.begin("~/vimgit/vim/plugged")
+Plug.begin(g.VIMFILES .. "/plugged")
 
 Plug {"lewis6991/impatient.nvim"}
 
@@ -25,6 +25,7 @@ Plug("chiedojohn/vim-case-convert")
 Plug {"chentoast/marks.nvim", config = [[require "myrc.config.marks"]]}
 Plug {"numToStr/Comment.nvim", config = [[require("Comment").setup()]]}
 Plug(g.VIMFILES .. "/locals/vim-a")
+Plug(g.VIMFILES .. "/locals/t.nvim")
 Plug {
     g.VIMFILES .. "/locals/nvim-projectconfig",
     config = function()
@@ -32,10 +33,10 @@ Plug {
     end
 }
 
-Plug {"nathanaelkane/vim-indent-guides", on = "VimEnter"}
-Plug {"thinca/vim-quickrun", on = "VimEnter"}
-Plug {"vim-test/vim-test", opt = true, on = "VimEnter"} -- Unit-Testing
-Plug {"dense-analysis/ale", opt = true, on = "VimEnter"}
+Plug {"lukas-reineke/indent-blankline.nvim"}
+Plug {"thinca/vim-quickrun"}
+Plug {"vim-test/vim-test", opt = true, on = "TestNearest" } -- Unit-Testing
+Plug {"dense-analysis/ale", opt = true}
 
 -- file management
 Plug {"preservim/nerdtree", on = {"NERDTree", "NERDTreeToggle", "NERDTreeFind", "NERDTreeFromBookmark"}}
@@ -77,7 +78,7 @@ Plug {"jyd519/cmp-cmdline", after = "nvim-cmp"}
 Plug {"hrsh7th/cmp-nvim-lua", after = "nvim-cmp", ft = {"lua"}}
 Plug {"hrsh7th/cmp-nvim-lsp-document-symbol", after = "nvim-cmp"}
 Plug {"quangnguyen30192/cmp-nvim-tags", ft = {"c", "cpp"}}
-Plug {"saadparwaiz1/cmp_luasnip", ft = {"lua"}}
+Plug {"saadparwaiz1/cmp_luasnip"}
 Plug {"b0o/schemastore.nvim"}
 
 -- LSP
@@ -85,7 +86,8 @@ Plug {"williamboman/mason.nvim"}
 Plug {"williamboman/mason-lspconfig.nvim"}
 Plug {"neovim/nvim-lspconfig"}
 Plug {"jose-elias-alvarez/null-ls.nvim"}
-Plug {"jose-elias-alvarez/nvim-lsp-ts-utils"}
+-- Plug {"jose-elias-alvarez/nvim-lsp-ts-utils"}
+Plug {"jose-elias-alvarez/typescript.nvim"}
 Plug {"arkav/lualine-lsp-progress"}
 Plug {"folke/neodev.nvim", opt = true, ft={"lua"}}
 Plug {"simrat39/symbols-outline.nvim",
@@ -127,6 +129,8 @@ Plug {"ThePrimeagen/refactoring.nvim"}
 
 -- Code formatter
 Plug "sbdchd/neoformat"
+
+-- markdown
 
 -- Go/dart/rust/cpp
 Plug {"fatih/vim-go", ft = "go", run = ":GoUpdateBinaries"}

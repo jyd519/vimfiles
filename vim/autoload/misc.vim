@@ -62,13 +62,13 @@ endfunction
 " set path
 " - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 function! misc#SetPath()
-  if !executable('fd') 
+  if !executable('fd')
     echom "AddPath: executable `fd` not found!"
     return
   endif
   let list = systemlist("fd . --type d --hidden -E .git -E .yarn")
-  let list += systemlist("fd --type f --max-depth 1")  
-  let p = join(list, ",") 
+  let list += systemlist("fd --type f --max-depth 1")
+  let p = join(list, ",")
   execute("set path=" . p)
 endfunction
 
@@ -78,3 +78,10 @@ function! misc#ExecuteMacroOverVisualRange()
   echo "@".getcmdline()
   execute ":'<,'>normal @".nr2char(getchar())
 endfunction
+
+" Delete trailing whitespaces in a whole buffer
+function! misc#DeleteTrailingWS() abort
+  normal mz
+  %s/\v\s+$//ge
+  normal `z
+endfunc

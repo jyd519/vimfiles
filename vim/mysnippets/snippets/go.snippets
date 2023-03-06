@@ -520,3 +520,15 @@ snippet icast "import cast package"
 	"github.com/spf13/cast"
 
 
+snippet test_cwd "set current working directory for unit test"
+	func init() {
+		rand.Seed(time.Now().UnixNano())
+
+		// change cwd to project root
+		_, filename, _, _ := runtime.Caller(0)
+		dir := path.Join(path.Dir(filename), "../..")
+		err := os.Chdir(dir)
+		if err != nil {
+			panic(err)
+		}
+	}

@@ -5,7 +5,7 @@ vim.cmd("set rtp^=" .. VIMFILES)
 vim.cmd("set rtp+=" .. VIMFILES .. "/after")
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
-g.MYINITRC = VIMFILES .. "/init.lua"
+g.myinitrc = VIMFILES .. "/init.lua"
 env.MYSNIPPETS = VIMFILES .. "/mysnippets"
 
 if g.enabled_plugins == nil then

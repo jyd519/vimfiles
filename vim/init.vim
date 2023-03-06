@@ -9,10 +9,10 @@ if has('nvim')
   echom "To empower nvim featurs, you should source <init.lua>."
 endif
 
-let g:MYINITRC=resolve(expand('<sfile>:p'))
-let $VIMFILES=fnamemodify(g:MYINITRC, ':h')
+let g:myinitrc=resolve(expand('<sfile>:p'))
+let $VIMFILES=fnamemodify(g:myinitrc, ':h')
 if !exists("$MYVIMRC")
-  let $MYVIMRC=g:MYINITRC
+  let $MYVIMRC=g:myinitrc
 endif
 
 set rtp^=$VIMFILES rtp+=$VIMFILES/after

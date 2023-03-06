@@ -7,7 +7,8 @@
 -- let g:loaded_node_provider = 1
 -- let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
 -- let g:node_host_prog = '/usr/local/bin/neovim-node-host'
--- let g:copilot_node_command=expand('~/.nvm/versions/node/v16.10.0/bin/node')
+-- let g:node_path = expand('~/.nvm/versions/node/v16.10.0/bin/node')
+-- let g:copilot_node_command=g:node_path
 -- let g:notes_dir = '/Volumes/dev/notes'
 --
 -- let g:enabled_plugins = {}
@@ -24,7 +25,7 @@ vim.cmd('set rtp^=' .. VIMFILES)
 vim.cmd('set rtp+=' .. VIMFILES .. '/after')
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
-g.MYINITRC=VIMFILES .. '/plug.lua'
+g.myinitrc=VIMFILES .. '/plug.lua'
 
 -- load global variables
 vim.cmd('runtime config/globals.vim')

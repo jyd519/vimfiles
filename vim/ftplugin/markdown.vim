@@ -6,8 +6,31 @@ endif
 
 let b:did_markdown_vim = 1
 
-" hi link mkdLineBreak  CursorLineNr
-hi link mkdLineBreak Underlined
+" adjust syntax highlighting
+function! s:adjustSyntax()
+  " hi link mkdLineBreak  CursorLineNr
+  " https://github.com/preservim/vim-markdown/blob/master/syntax/markdown.vim
+  syn match  mkdLineBreak    /  \+$/
+  syn region mkdBlockquote   start=/^\s*>/                   end=/$/ contains=mkdLineBreak
+  syn match  mkdListItem     /^\s*\%([-*+]\|\d\+\.\)\ze\s\+/
+  syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$" contains=markdownCode
+  " syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$"
+  hi link mkdLineBreak Underlined
+  hi link mkdBlockquote Comment 
+  hi mkdListItem gui=bold
+  hi! markdownH1 guifg=#0451a5 gui=bold 
+  hi! markdownH2 guifg=#0451a5 gui=bold
+  hi! markdownH3 guifg=#0451a5 gui=bold
+  hi! markdownH1Delimiter guifg=#0451a5 gui=bold
+  hi! markdownH2Delimiter guifg=#0451a5 gui=bold
+  hi! markdownH3Delimiter guifg=#0451a5 gui=bold
+  " hi mkdListItemLine gui=bold
+endfunction
+
+augroup mdSyntaxAdjust 
+    autocmd!
+    autocmd BufWinEnter <buffer> call s:adjustSyntax()
+augroup end
 
 " folding
 " setlocal foldlevel=1

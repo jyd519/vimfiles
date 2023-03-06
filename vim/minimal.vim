@@ -7,9 +7,9 @@ set nocompatible
 let $VIMFILES=fnamemodify(resolve(expand('<sfile>:p')), ':h')
 set rtp^=$VIMFILES rtp+=$VIMFILES/after
 
-let g:MYINITRC=resolve(expand('<sfile>:p'))
+let g:myinitrc=resolve(expand('<sfile>:p'))
 if !exists("$MYVIMRC")
-  let $MYVIMRC=g:MYINITRC
+  let $MYVIMRC=g:myinitrc
 endif
 
 let g:enabled_plugins = {"netrw": 1} 

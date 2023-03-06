@@ -1,4 +1,4 @@
-simple=vim/plugged/fzf vim/plugged/fzf.vim vim/plugged/tcomment_vim \
+plugins=vim/plugged/fzf vim/plugged/fzf.vim vim/plugged/tcomment_vim \
 				vim/plugged/nerdtree vim/plugged/papercolor-theme vim/plugged/splitjoin.vim \
 				vim/plugged/coc.nvim
 

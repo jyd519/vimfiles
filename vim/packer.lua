@@ -22,7 +22,7 @@ vim.cmd('set rtp+=' .. VIMFILES .. '/after')
 vim.cmd('set packpath+=' .. VIMFILES)
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
-g.MYINITRC=VIMFILES .. '/init.lua'
+g.myinitrc=VIMFILES .. '/init.lua'
 
 -- load global variables
 vim.cmd('runtime config/globals.vim')

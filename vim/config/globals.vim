@@ -41,6 +41,10 @@ let g:vimsyn_embed = 'lP'
 let g:mapleader = ","
 let g:maplocalleader = ","
 
+if !exists("$HOME")
+  $HOME = expand("~")
+endif
+
 if g:is_nvim
   lua <<END
 local function prequire(m)

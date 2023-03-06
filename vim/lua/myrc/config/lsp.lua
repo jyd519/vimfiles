@@ -8,24 +8,24 @@ local fn = vim.fn
 require("mason").setup()
 require("mason-lspconfig").setup()
 
-vim.opt.completeopt = {'menu', 'menuone', 'noselect'}
-vim.lsp.set_log_level("warn")
+vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
+vim.lsp.set_log_level("info")
 
 local bufmap = function(mode, lhs, rhs, opts)
   local options = { buffer = true }
   if opts then
-      options = vim.tbl_extend("force", options, opts)
+    options = vim.tbl_extend("force", options, opts)
   end
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
 local function show_documentation()
   if dap.session() then
-    require"dapui".eval()
+    require "dapui".eval()
   else
     local filetype = vim.bo.filetype
     if vim.tbl_contains({ 'markdown' }, filetype) then
-      local clients = {"Vim", "Man"}
+      local clients = { "Vim", "Man" }
       vim.ui.select(clients, {
         prompt = 'Select a action:',
         format_item = function(client)
@@ -41,13 +41,13 @@ local function show_documentation()
       return
     end
 
-    if vim.tbl_contains({ 'vim','help' }, filetype) then
----@diagnostic disable-next-line: missing-parameter
-      vim.cmd('h '.. fn.expand('<cword>'))
+    if vim.tbl_contains({ 'vim', 'help' }, filetype) then
+      ---@diagnostic disable-next-line: missing-parameter
+      vim.cmd('h ' .. fn.expand('<cword>'))
     elseif vim.tbl_contains({ 'man' }, filetype) then
----@diagnostic disable-next-line: missing-parameter
-      vim.cmd('Man '..fn.expand('<cword>'))
----@diagnostic disable-next-line: missing-parameter
+      ---@diagnostic disable-next-line: missing-parameter
+      vim.cmd('Man ' .. fn.expand('<cword>'))
+      ---@diagnostic disable-next-line: missing-parameter
     elseif fn.expand('%:t') == 'Cargo.toml' then
       require('crates').show_popup()
     elseif filetype == 'rust' then
@@ -57,7 +57,8 @@ local function show_documentation()
     end
   end
 end
-vim.keymap.set('n', 'K', show_documentation, { noremap = true, silent = true, desc="show document for underline word" })
+
+vim.keymap.set('n', 'K', show_documentation, { noremap = true, silent = true, desc = "show document for underline word" })
 
 local function setup_client(client, bufnr)
   -- Jump to the definition
@@ -81,6 +82,9 @@ local function setup_client(client, bufnr)
   -- Renames all references to the symbol under the cursor
   bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
   bufmap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>')
+
+  -- formatting code
+  bufmap('n', '<leader>cf', '<cmd>lua vim.lsp.buf.format({async = true})<cr>')
 
   -- Selects a code action available at the current cursor position
   bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
@@ -119,7 +123,7 @@ api.nvim_create_autocmd('User', {
     local client = vim.lsp.get_client_by_id(args.data.client_id)
     if client.server_capabilities.hoverProvider then
       -- Displays hover information about the symbol under the cursor
-      bufmap('n', 'K', show_documentation, {desc = 'dap eval or lsp.buf.hover'})
+      bufmap('n', 'K', show_documentation, { desc = 'dap eval or lsp.buf.hover' })
     end
 
     -- Jump to the definition
@@ -168,6 +172,7 @@ lspconfig.util.default_config = vim.tbl_deep_extend(
   lspconfig.util.default_config,
   lsp_defaults
 )
+_G.lspconfig = lspconfig
 
 -- Setup LSP Server
 --
@@ -182,47 +187,79 @@ for _, lsp in ipairs(servers) do
 end
 
 local null_ls = require("null-ls")
+-- local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 null_ls.setup({
-    sources = {
-        null_ls.builtins.code_actions.refactoring,
-        null_ls.builtins.code_actions.eslint,
-        null_ls.builtins.code_actions.gitsigns,
-        null_ls.builtins.diagnostics.eslint,
-        null_ls.builtins.formatting.prettier
-    },
-    on_attach = function (client, bufnr)
-      lspconfig.util.default_config.on_attach(client, bufnr)
-    end
+  debug = true,
+  sources = {
+    null_ls.builtins.code_actions.refactoring,
+    null_ls.builtins.code_actions.eslint,
+    null_ls.builtins.code_actions.gitsigns,
+    null_ls.builtins.diagnostics.eslint,
+    null_ls.builtins.formatting.prettier
+  },
+  on_attach = function(client, bufnr)
+    lspconfig.util.default_config.on_attach(client, bufnr)
+    -- slow
+    -- if client.server_capabilities.documentFormattingProvider then
+    --   vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+    --   vim.api.nvim_create_autocmd("BufWritePre", {
+    --     group = augroup,
+    --     buffer = bufnr,
+    --     callback = function()
+    --       vim.lsp.buf.format()
+    --     end,
+    --   })
+    -- end
+  end
 })
 
 -- tsserver
-lspconfig.tsserver.setup({
-    on_attach = function(client, bufnr)
+-- lspconfig.tsserver.setup({
+--   on_attach = function(client, bufnr)
+--     client.server_capabilities.document_formatting = false
+--     client.server_capabilities.document_range_formatting = false
+--     client.server_capabilities.documentFormattingProvider = false
+--     client.server_capabilities.documentRangeFormattingProvider = false
+--     local ts_utils = require("nvim-lsp-ts-utils")
+--     ts_utils.setup({})
+--     ts_utils.setup_client(client)
+--     -- buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
+--     -- buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
+--     -- buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
+--     --
+--     --
+--     vim.api.nvim_buf_create_user_command(bufnr, "Organize", ":TSLspOrganize", {
+--       nargs = 0,
+--       desc = "TSLspOrganize",
+--     })
+--     vim.api.nvim_buf_create_user_command(bufnr, "RenameFile", ":TSLspRenameFile", {
+--       nargs = 0,
+--       desc = "TSLspRenameFile",
+--     })
+--     vim.api.nvim_buf_create_user_command(bufnr, "Ips", ":TSLspImportAll", {
+--       nargs = 0,
+--       desc = "TSLspImportAll",
+--     })
+--     lspconfig.util.default_config.on_attach(client, bufnr)
+--   end,
+-- })
+require("typescript").setup({
+    disable_commands = false, -- prevent the plugin from creating Vim commands
+    debug = false, -- enable debug logging for commands
+    go_to_source_definition = {
+        fallback = true, -- fall back to standard LSP definition on failure
+    },
+    server = { -- pass options to lspconfig's setup method
+      on_attach = function(client, bufnr)
         client.server_capabilities.document_formatting = false
         client.server_capabilities.document_range_formatting = false
-        local ts_utils = require("nvim-lsp-ts-utils")
-        ts_utils.setup({})
-        ts_utils.setup_client(client)
-        -- buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
-        -- buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
-        -- buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
-        --
-        --
-        vim.api.nvim_buf_create_user_command(bufnr, "Organize", ":TSLspOrganize", {
-            nargs = 0,
-            desc = "TSLspOrganize",
-        })
-        vim.api.nvim_buf_create_user_command(bufnr, "RenameFile", ":TSLspRenameFile", {
-            nargs = 0,
-            desc = "TSLspRenameFile",
-        })
-        vim.api.nvim_buf_create_user_command(bufnr, "Ips", ":TSLspImportAll", {
-            nargs = 0,
-            desc = "TSLspImportAll",
-        })
+        client.server_capabilities.documentFormattingProvider = false
+        client.server_capabilities.documentRangeFormattingProvider = false
         lspconfig.util.default_config.on_attach(client, bufnr)
-    end,
+      end,
+    },
 })
+
 -- jsonls
 lspconfig.jsonls.setup {
   settings = {
@@ -234,18 +271,19 @@ lspconfig.jsonls.setup {
 }
 
 -- angularls
-local nodeRoot="/Users/jiyongdong/.nvm/versions/node/v12.22.12/"
+local nodeRoot = "/Users/jiyongdong/.nvm/versions/node/v12.22.12/"
 local languageServerPath = nodeRoot .. "lib"
-local cmd = {nodeRoot .. "bin/node", languageServerPath.."/node_modules/@angular/language-server/index.js", "--stdio", "--tsProbeLocations", languageServerPath, "--ngProbeLocations", languageServerPath}
-require'lspconfig'.angularls.setup{
+local cmd = { nodeRoot .. "bin/node", languageServerPath .. "/node_modules/@angular/language-server/index.js", "--stdio",
+  "--tsProbeLocations", languageServerPath, "--ngProbeLocations", languageServerPath }
+require 'lspconfig'.angularls.setup {
   cmd = cmd,
-  on_new_config = function(new_config--[[ , new_root_dir ]])
+  on_new_config = function(new_config --[[ , new_root_dir ]])
     new_config.cmd = cmd
   end,
 }
 
 -- GoLang
-lspconfig.gopls.setup{
+lspconfig.gopls.setup {
   on_attach = function(client, bufnr)
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
@@ -295,7 +333,7 @@ local function get_lua_library()
   return library
 end
 
-lspconfig['sumneko_lua'].setup{
+lspconfig['lua_ls'].setup {
   single_file_support = true,
   on_attach = function(client, bufnr)
     lspconfig.util.default_config.on_attach(client, bufnr)
@@ -311,7 +349,7 @@ lspconfig['sumneko_lua'].setup{
       },
       diagnostics = {
         -- Get the language server to recognize the `vim` global
-        globals = {'vim', 'hs'},
+        globals = { 'vim', 'hs' },
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
@@ -327,8 +365,8 @@ lspconfig['sumneko_lua'].setup{
   },
 }
 
-require('rust-tools').setup{
-	server = {
+require('rust-tools').setup {
+  server = {
     on_attach = function(client, bufnr)
       local set_option = vim.api.nvim_buf_set_option
       set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
@@ -339,5 +377,41 @@ require('rust-tools').setup{
     dap = {
       adapter = require('dap').adapters.codelldb
     }
-	}
+  }
 }
+
+-- vue
+local function get_typescript_server_path(root_dir)
+  local global_ts = '~/.npm/lib/node_modules/typescript/lib'
+  -- Alternative location if installed as root:
+  -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
+  local found_ts = ''
+  local function check_dir(path)
+    found_ts =  lspconfig.util.path.join(path, 'node_modules', 'typescript', 'lib')
+    if lspconfig.util.path.exists(found_ts) then
+      return path
+    end
+  end
+  if lspconfig.util.search_ancestors(root_dir, check_dir) then
+    return found_ts
+  else
+    return global_ts
+  end
+end
+
+lspconfig.volar.setup{
+  filetypes = {'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json'},
+  on_attach = function(client, bufnr)
+    lspconfig.util.default_config.on_attach(client, bufnr)
+  end,
+  on_new_config = function(new_config, new_root_dir)
+    new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
+  end,
+}
+
+-- lsp formatting
+vim.api.nvim_create_user_command("Format", function()
+  vim.lsp.buf.format({ async = true })
+end, {
+  desc = "Format the current buffer",
+})

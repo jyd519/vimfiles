@@ -394,7 +394,7 @@ dap.configurations.python = {
             elseif vim.fn.executable(cwd .. "/.venv/bin/python") == 1 then
                 return cwd .. "/.venv/bin/python"
             else
-                return vim.fn.expand("~/.pyenv/versions/3.10.2/bin/python3")
+                return vim.g.python3_host_prog or "python3"
             end
         end
     },
@@ -524,7 +524,7 @@ dap.configurations.rust = dap.configurations.cpp
 -- javascript {{{1
 require("dap-vscode-js").setup(
     {
-        node_path = os.getenv("HOME") .. "/.nvm/versions/node/v16.10.0/bin/node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
+        node_path = vim.g.node_path or "node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
         adapters = {"pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost"}, -- which adapters to register in nvim-dap
         -- Path to vscode-js-debug installation.
         debugger_path = os.getenv("HOME") .. "/dev/tools/vscode-js-debug"

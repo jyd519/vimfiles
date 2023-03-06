@@ -10,6 +10,7 @@
         "s",
         "t",
         "prequire",
-        "put"
+        "put",
+        "USE_VOLAR"
     ]
 }

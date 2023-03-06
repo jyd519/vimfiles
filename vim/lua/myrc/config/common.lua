@@ -5,7 +5,7 @@ keymap.amend = require('keymap-amend')
 
 -- indent_blankline -- {{{1
 local treesitter_enabled = g.enabled_plugins["nvim-treesitter"] == 1
-if g.enabled_plugins["indent_blankline"] == 1 then
+if treesitter_enabled then
   require("indent_blankline").setup {
       -- for example, context is off by default, use this to turn it on
       show_current_context = treesitter_enabled,
@@ -77,14 +77,14 @@ keymap.set(
 	"n",
 	"<leader>cn",
   function()
-    vim.cmd("call NextCS()")
+    vim.cmd("NextCS")
   end
 )
 keymap.set(
 	"n",
 	"<leader>cp",
   function()
-    vim.cmd("call PreviousCS()")
+    vim.cmd("PreviousCS")
   end
 )
 
