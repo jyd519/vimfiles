@@ -10,9 +10,14 @@ if mod then
                   -- inline fence not get syntax highlight with treesitter highlight
                   return true
                 end
-                local max_filesize = 100 * 1024 -- 100 KB
-                local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-                if ok and stats and stats.size > max_filesize then
+
+                ---@diagnostic disable-next-line: undefined-field
+                if vim.b.large_buf then
+                  return true
+                end
+
+                local LINE_NR_THRESH = 1000
+                if vim.api.nvim_buf_line_count(buf) > LINE_NR_THRESH then
                     return true
                 end
             end,

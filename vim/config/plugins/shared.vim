@@ -52,7 +52,7 @@ let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash"
 
 " ALE {{{
 "--------------------------------------------------------------------------------
-let g:ale_enabled = 1
+let g:ale_enabled = 0
 let g:ale_maximum_file_size=256000 " 256KB
 let g:ale_disable_lsp = 1 " use lsp with coc-nvim instead
 let g:ale_linters = {

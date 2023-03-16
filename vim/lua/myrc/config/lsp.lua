@@ -88,9 +88,7 @@ local function setup_client(client, bufnr)
 
   -- Selects a code action available at the current cursor position
   bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-  bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
   bufmap('n', 'gx', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-  bufmap('x', 'gx', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
 
   -- Show diagnostics in a floating window
   bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
@@ -186,78 +184,102 @@ for _, lsp in ipairs(servers) do
   }
 end
 
+-- null-ls
 local null_ls = require("null-ls")
--- local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+
+local gotest = require("go.null_ls").gotest()
+local gotest_codeaction = require("go.null_ls").gotest_action()
+local golangci_lint = require("go.null_ls").golangci_lint()
+
+local lsp_formatting = function(bufnr)
+  vim.lsp.buf.format({
+    filter = function(client)
+      -- apply whatever logic you want (in this example, we'll only use null-ls)
+      return client.name == "null-ls"
+    end,
+    bufnr = bufnr,
+  })
+end
+
+local eslinrc_patterns = { ".eslintrc", ".eslintrc.json", ".eslintrc.yml", ".eslintrc.yaml" }
+local prettierrc_patterns = { ".prettierrc", ".prettierrc.json", ".prettierrc.yml", ".prettierrc.yaml" }
 null_ls.setup({
-  debug = true,
+  debug = false,
+  debounce = 1000, default_timeout = 5000,
+  should_attach = function(bufnr)
+    return not vim.api.nvim_buf_get_name(bufnr):match("node_modules")
+  end,
   sources = {
-    null_ls.builtins.code_actions.refactoring,
-    null_ls.builtins.code_actions.eslint,
-    null_ls.builtins.code_actions.gitsigns,
-    null_ls.builtins.diagnostics.eslint,
-    null_ls.builtins.formatting.prettier
+    require("typescript.extensions.null-ls.code-actions"),
+    gotest,
+    gotest_codeaction,
+    golangci_lint,
+    null_ls.builtins.code_actions.eslint.with({
+      condition = function(utils)
+        return utils.root_has_file(eslinrc_patterns)
+      end
+    }),
+    -- null_ls.builtins.code_actions.gitsigns,  -- blame current line
+    -- null_ls.builtins.code_actions.refactoring,
+    null_ls.builtins.diagnostics.eslint.with({
+      condition = function(utils)
+        return utils.root_has_file(eslinrc_patterns) and not vim.b.large_buf
+      end
+    }),
+    null_ls.builtins.formatting.prettier.with({
+      condition = function(utils)
+        return utils.root_has_file(prettierrc_patterns)
+      end
+    }),
+    null_ls.builtins.formatting.golines.with({
+      extra_args = {
+        "--max-len=180",
+        "--base-formatter=gofumpt",
+      },
+    })
   },
   on_attach = function(client, bufnr)
     lspconfig.util.default_config.on_attach(client, bufnr)
-    -- slow
-    -- if client.server_capabilities.documentFormattingProvider then
-    --   vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-    --   vim.api.nvim_create_autocmd("BufWritePre", {
-    --     group = augroup,
-    --     buffer = bufnr,
-    --     callback = function()
-    --       vim.lsp.buf.format()
-    --     end,
-    --   })
-    -- end
+    if client.supports_method("textDocument/formatting") then
+      vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+      vim.api.nvim_create_autocmd("BufWritePre", {
+        group = augroup,
+        buffer = bufnr,
+        callback = function()
+          lsp_formatting(bufnr)
+        end,
+      })
+    end
   end
 })
 
 -- tsserver
--- lspconfig.tsserver.setup({
---   on_attach = function(client, bufnr)
---     client.server_capabilities.document_formatting = false
---     client.server_capabilities.document_range_formatting = false
---     client.server_capabilities.documentFormattingProvider = false
---     client.server_capabilities.documentRangeFormattingProvider = false
---     local ts_utils = require("nvim-lsp-ts-utils")
---     ts_utils.setup({})
---     ts_utils.setup_client(client)
---     -- buf_map(bufnr, "n", "gs", ":TSLspOrganize<CR>")
---     -- buf_map(bufnr, "n", "gi", ":TSLspRenameFile<CR>")
---     -- buf_map(bufnr, "n", "go", ":TSLspImportAll<CR>")
---     --
---     --
---     vim.api.nvim_buf_create_user_command(bufnr, "Organize", ":TSLspOrganize", {
---       nargs = 0,
---       desc = "TSLspOrganize",
---     })
---     vim.api.nvim_buf_create_user_command(bufnr, "RenameFile", ":TSLspRenameFile", {
---       nargs = 0,
---       desc = "TSLspRenameFile",
---     })
---     vim.api.nvim_buf_create_user_command(bufnr, "Ips", ":TSLspImportAll", {
---       nargs = 0,
---       desc = "TSLspImportAll",
---     })
---     lspconfig.util.default_config.on_attach(client, bufnr)
---   end,
--- })
 require("typescript").setup({
-    disable_commands = false, -- prevent the plugin from creating Vim commands
-    debug = false, -- enable debug logging for commands
-    go_to_source_definition = {
-        fallback = true, -- fall back to standard LSP definition on failure
-    },
-    server = { -- pass options to lspconfig's setup method
-      on_attach = function(client, bufnr)
-        client.server_capabilities.document_formatting = false
-        client.server_capabilities.document_range_formatting = false
-        client.server_capabilities.documentFormattingProvider = false
-        client.server_capabilities.documentRangeFormattingProvider = false
-        lspconfig.util.default_config.on_attach(client, bufnr)
-      end,
-    },
+  disable_commands = false, -- prevent the plugin from creating Vim commands
+  debug = false, -- enable debug logging for commands
+  go_to_source_definition = {
+    fallback = true, -- fall back to standard LSP definition on failure
+  },
+  server = { -- pass options to lspconfig's setup method
+    on_new_config = function(new_config, new_root_dir)
+      if new_root_dir:match("node_modules") or vim.b.large_buf then
+        print("tsserver disabled for this buffer")
+        new_config.enabled = false
+      end
+      return new_config
+    end,
+    on_attach = function(client, bufnr)
+      -- if vim.api.nvim_buf_get_name(bufnr):match("node_modules") then
+      -- vim.lsp.stop_client(client.id, false)
+      -- end
+      client.server_capabilities.document_formatting = false
+      client.server_capabilities.document_range_formatting = false
+      client.server_capabilities.documentFormattingProvider = false
+      client.server_capabilities.documentRangeFormattingProvider = false
+      lspconfig.util.default_config.on_attach(client, bufnr)
+    end,
+  },
 })
 
 -- jsonls
@@ -271,36 +293,40 @@ lspconfig.jsonls.setup {
 }
 
 -- angularls
-local nodeRoot = "/Users/jiyongdong/.nvm/versions/node/v12.22.12/"
-local languageServerPath = nodeRoot .. "lib"
-local cmd = { nodeRoot .. "bin/node", languageServerPath .. "/node_modules/@angular/language-server/index.js", "--stdio",
-  "--tsProbeLocations", languageServerPath, "--ngProbeLocations", languageServerPath }
-require 'lspconfig'.angularls.setup {
-  cmd = cmd,
-  on_new_config = function(new_config --[[ , new_root_dir ]])
-    new_config.cmd = cmd
-  end,
-}
+require 'lspconfig'.angularls.setup{}
 
 -- GoLang
-lspconfig.gopls.setup {
-  on_attach = function(client, bufnr)
-    lspconfig.util.default_config.on_attach(client, bufnr)
-  end,
-  settings = {
-    gopls = {
-      experimentalPostfixCompletions = true,
-      analyses = {
-        unusedparams = true,
-        shadow = true,
-      },
-      staticcheck = true,
-    },
+require('go').setup{
+  lsp_cfg = false,
+  lsp_codelens = false,
+  lsp_inlay_hints = {
+    -- parameter_hints_prefix = " ",
+    parameter_hints_prefix = "f ",
   },
-  init_options = {
-    usePlaceholders = true,
-  }
 }
+local golspcfg = require'go.lsp'.config() -- config() return the go.nvim gopls setup
+golspcfg.on_attach = function(client, bufnr)
+  lspconfig.util.default_config.on_attach(client, bufnr)
+end
+lspconfig.gopls.setup(golspcfg)
+-- lspconfig.gopls.setup {
+--   on_attach = function(client, bufnr)
+--     lspconfig.util.default_config.on_attach(client, bufnr)
+--   end,
+--   settings = {
+--     gopls = {
+--       experimentalPostfixCompletions = true,
+--       analyses = {
+--         unusedparams = true,
+--         shadow = true,
+--       },
+--       staticcheck = true,
+--     },
+--   },
+--   init_options = {
+--     usePlaceholders = true,
+--   }
+-- }
 
 -- lua lsp
 local function get_lua_library()
@@ -339,7 +365,7 @@ lspconfig['lua_ls'].setup {
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
   root_dir = function(fname)
-    return lspconfig.util.root_pattern('.git')(fname) or fn.getcwd()
+    return lspconfig.util.root_pattern('.git', '.project', 'package.json', 'pyproject.toml')(fname) or fn.getcwd()
   end,
   settings = {
     Lua = {
@@ -387,7 +413,7 @@ local function get_typescript_server_path(root_dir)
   -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
   local found_ts = ''
   local function check_dir(path)
-    found_ts =  lspconfig.util.path.join(path, 'node_modules', 'typescript', 'lib')
+    found_ts = lspconfig.util.path.join(path, 'node_modules', 'typescript', 'lib')
     if lspconfig.util.path.exists(found_ts) then
       return path
     end
@@ -399,8 +425,8 @@ local function get_typescript_server_path(root_dir)
   end
 end
 
-lspconfig.volar.setup{
-  filetypes = {'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue', 'json'},
+lspconfig.volar.setup {
+  filetypes = { 'vue' },
   on_attach = function(client, bufnr)
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
