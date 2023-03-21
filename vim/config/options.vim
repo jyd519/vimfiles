@@ -105,15 +105,3 @@ endif
 " look ctags in directory the current file in, and working directory,
 " and looking up and up until /
 set tags=./tags,tags,./.tags,.tags
-
-" Set GUI VIM Font
-" if has("gui_running") && !has("gui_vimr")
-"   if has("mac")
-"     set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
-"     set guifontwide=PingFangSC-Light:h16
-"   else
-"     set guifont=Hack_Nerd_Font_Mono:h14
-"     set guifontwide=NSimSun:h14
-"   endif
-" endif
-"

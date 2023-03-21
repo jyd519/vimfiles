@@ -1,6 +1,7 @@
 if vim.fn.has('termguicolors')==1 then
   vim.cmd("set termguicolors")
 end
+
 require("notify").setup({
   -- Animation style (see below for details)
   stages = "fade_in_slide_out",

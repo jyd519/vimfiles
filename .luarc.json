@@ -12,5 +12,7 @@
         "prequire",
         "put",
         "USE_VOLAR"
-    ]
+    ],
+    "workspace.checkThirdParty": false,
+    "workspace.maxPreload": 4000
 }

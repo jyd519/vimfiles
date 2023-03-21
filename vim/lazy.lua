@@ -1,5 +1,5 @@
 -- My Neovim configuration
--- Jyd  Last-Modified: 2023-01-08
+-- Jyd  Last-Modified: 2023-03-20
 --
 -- let g:loaded_python3_provider = 0
 -- let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
@@ -10,50 +10,28 @@
 -- let g:enabled_plugins = {}
 --
 -- source path/to/init.lua
---
--- set background="light"
--- let g:colorscheme='vscode'
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
 
-vim.cmd('set rtp^=' .. VIMFILES)
-vim.cmd('set rtp+=' .. VIMFILES .. '/after')
-vim.cmd('set packpath+=' .. VIMFILES)
+vim.opt.rtp:prepend(VIMFILES)
+vim.opt.rtp:append(VIMFILES .. '/after')
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
-g.myinitrc=VIMFILES .. '/init.lua'
+g.myinitrc=VIMFILES .. '/lazy.lua'
 
 -- load global variables
 vim.cmd('runtime config/globals.vim')
 
 -- load plugins
-require('myrc.packer')
-if PACKER_BOOTSTRAP then
-  print("plugins installed, you need restart vim to take effect.")
-  vim.cmd('sleep 2')
-  return
-end
-prequire('myrc.packer_compiled')
-
-local plugins = g.enabled_plugins
-for name in pairs(packer_plugins) do
-  plugins[string.lower(name)] = 1
-end
-g.enabled_plugins = plugins
+require('myrc.lazy')
 
 -- load options, mappings and configurations
 local scripts = {'config/options.vim',
                  'config/mappings.vim',
-                 'config/plugins/shared.vim',
+                 'config/plugins/shared.vim', -- plugins dependent 
                  'lua/myrc/config/common.lua',
                }
 for _, s in pairs(scripts) do
   vim.cmd('runtime ' .. s)
 end
-
--- colorscheme
-if g.colorscheme == nil then
-  g.colorscheme = 'vscode'
-end
-vim.cmd('colorscheme ' .. g.colorscheme)

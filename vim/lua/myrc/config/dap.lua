@@ -101,7 +101,7 @@ local function DebugTest()
         end
     elseif ft == "typescript" or ft == "javascript" then
         if string.match(file, ".*test%.[jt]s") then
-            require("myrc.dap-jest").debug()
+            require("myrc.config.dap-jest").debug()
             return
         end
     elseif ft == "python" then

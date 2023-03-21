@@ -13,7 +13,7 @@ end }
 
 Plug { "nvim-lua/plenary.nvim" } -- some useful lua functions
 Plug { "anuvyklack/keymap-amend.nvim" }
-Plug { "tweekmonster/startuptime.vim" }
+Plug { "dstein64/vim-startuptime", cmd = "StartupTime" }
 
 Plug { "mattn/emmet-vim", ft = { "html", "jsx", "vue" } }
 Plug { "jiangmiao/auto-pairs" }
@@ -66,7 +66,7 @@ if g.enabled_plugins.python then
 end
 Plug { "honza/vim-snippets" }
 Plug { "mhartington/vim-angular2-snippets", ft = "typescript" }
-Plug { "L3MON4D3/LuaSnip" }
+Plug { "L3MON4D3/LuaSnip", config = [[require "myrc.config.luasnip"]]  }
 Plug { "rafamadriz/friendly-snippets" }
 
 -- Completion Engine
@@ -81,6 +81,12 @@ Plug { "hrsh7th/cmp-nvim-lsp-document-symbol", after = "nvim-cmp" }
 Plug { "quangnguyen30192/cmp-nvim-tags", ft = { "c", "cpp" } }
 Plug { "saadparwaiz1/cmp_luasnip" }
 Plug { "b0o/schemastore.nvim" }
+
+-- Plug { "jcdickinson/codeium.nvim",
+--   config = function()
+--     require("codeium").setup({ })
+--   end
+-- }
 
 -- LSP
 Plug { "williamboman/mason.nvim" }

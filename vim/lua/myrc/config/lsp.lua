@@ -1,15 +1,16 @@
 -- Setup lspconfig.
---
--- Reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
---
+-- >> Reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+-- Globals {{{2
 local api = vim.api
 local fn = vim.fn
+
+local lspconfig = require('lspconfig')
 
 require("mason").setup()
 require("mason-lspconfig").setup()
 
 vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
-vim.lsp.set_log_level("info")
+vim.lsp.set_log_level("warn")
 
 local bufmap = function(mode, lhs, rhs, opts)
   local options = { buffer = true }
@@ -19,47 +20,20 @@ local bufmap = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
-local function show_documentation()
-  if dap.session() then
-    require "dapui".eval()
-  else
-    local filetype = vim.bo.filetype
-    if vim.tbl_contains({ 'markdown' }, filetype) then
-      local clients = { "Vim", "Man" }
-      vim.ui.select(clients, {
-        prompt = 'Select a action:',
-        format_item = function(client)
-          return string.lower(client)
-        end,
-      }, function(item)
-        if item == "Vim" then
-          vim.cmd('h ' .. fn.expand('<cword>'))
-        elseif item == "Man" then
-          vim.cmd('Man ' .. fn.expand('<cword>'))
-        end
-      end)
-      return
-    end
-
-    if vim.tbl_contains({ 'vim', 'help' }, filetype) then
-      ---@diagnostic disable-next-line: missing-parameter
-      vim.cmd('h ' .. fn.expand('<cword>'))
-    elseif vim.tbl_contains({ 'man' }, filetype) then
-      ---@diagnostic disable-next-line: missing-parameter
-      vim.cmd('Man ' .. fn.expand('<cword>'))
-      ---@diagnostic disable-next-line: missing-parameter
-    elseif fn.expand('%:t') == 'Cargo.toml' then
-      require('crates').show_popup()
-    elseif filetype == 'rust' then
-      vim.cmd('RustHoverActions')
-    else
-      vim.lsp.buf.hover()
+local has_file = function(root, ...)
+  local patterns = vim.tbl_flatten({ ... })
+  local join = lspconfig.util.path.join
+  for _, name in ipairs(patterns) do
+    if vim.loop.fs_stat(join(root, name)) ~= nil then
+      return true
     end
   end
+  return false
 end
+-- }}}
 
-vim.keymap.set('n', 'K', show_documentation, { noremap = true, silent = true, desc = "show document for underline word" })
-
+-- set keymap on on_attach {{{2
+---@diagnostic disable-next-line: unused-local
 local function setup_client(client, bufnr)
   -- Jump to the definition
   bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
@@ -99,14 +73,14 @@ local function setup_client(client, bufnr)
   -- Move to the next diagnostic
   bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
 end
+-- }}}
 
+-- default lspconfig {{{2
 local lsp_defaults = {
   flags = { debounce_text_changes = 150, },
   capabilities = require('cmp_nvim_lsp').default_capabilities(
     vim.lsp.protocol.make_client_capabilities()
   ),
-  -- Callback function that will be executed when a language server is attached to a buffer
-  ---@diagnostic disable-next-line: unused-local
   on_attach = function(client, bufnr)
     -- nvim 0.7 nvim_exec_autocmds's functionality's is limited
     -- api.nvim_exec_autocmds('User', {pattern = 'LspAttached', data=client.id})
@@ -114,79 +88,17 @@ local lsp_defaults = {
   end
 }
 
-api.nvim_create_autocmd('User', {
-  pattern = 'LspAttached',
-  desc = 'LSP actions',
-  callback = function(args)
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client.server_capabilities.hoverProvider then
-      -- Displays hover information about the symbol under the cursor
-      bufmap('n', 'K', show_documentation, { desc = 'dap eval or lsp.buf.hover' })
-    end
-
-    -- Jump to the definition
-    bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
-
-    -- Jump to declaration
-    bufmap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
-
-    -- Lists all the implementations for the symbol under the cursor
-    bufmap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>')
-
-    -- Jumps to the definition of the type symbol
-    bufmap('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
-
-    -- Lists all the references
-    bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
-
-    -- Displays a function's signature information
-    bufmap('n', '<leader>gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
-
-    -- Renames all references to the symbol under the cursor
-    bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
-    bufmap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<cr>')
-
-    -- Selects a code action available at the current cursor position
-    bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-    bufmap('x', '<F4>', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
-    bufmap('n', 'gx', '<cmd>lua vim.lsp.buf.code_action()<cr>')
-    bufmap('x', 'gx', '<cmd>lua vim.lsp.buf.range_code_action()<cr>')
-
-    -- Show diagnostics in a floating window
-    bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
-
-    -- Move to the previous diagnostic
-    bufmap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
-
-    -- Move to the next diagnostic
-    bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
-  end
-})
-
--- Setup lspconfig.
-local lspconfig = require('lspconfig')
 lspconfig.util.default_config = vim.tbl_deep_extend(
   'force',
   lspconfig.util.default_config,
   lsp_defaults
 )
 _G.lspconfig = lspconfig
+-- }}}
 
--- Setup LSP Server
---
-
-local servers = { 'cmake', 'bashls', 'pyright', 'cssls', 'ansiblels' }
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = function(client, bufnr)
-      lspconfig.util.default_config.on_attach(client, bufnr)
-    end,
-  }
-end
-
--- null-ls
+-- null-ls{{{2
 local null_ls = require("null-ls")
-local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+local augroup = api.nvim_create_augroup("LspFormatting", {})
 
 local gotest = require("go.null_ls").gotest()
 local gotest_codeaction = require("go.null_ls").gotest_action()
@@ -205,10 +117,12 @@ end
 local eslinrc_patterns = { ".eslintrc", ".eslintrc.json", ".eslintrc.yml", ".eslintrc.yaml" }
 local prettierrc_patterns = { ".prettierrc", ".prettierrc.json", ".prettierrc.yml", ".prettierrc.yaml" }
 null_ls.setup({
-  debug = false,
-  debounce = 1000, default_timeout = 5000,
+  log_level = "warn",
+  debounce = 500,
+  default_timeout = 5000,
+  diagnostics_format = "[#{c}] #{m} (#{s})",
   should_attach = function(bufnr)
-    return not vim.api.nvim_buf_get_name(bufnr):match("node_modules")
+    return not api.nvim_buf_get_name(bufnr):match("node_modules")
   end,
   sources = {
     require("typescript.extensions.null-ls.code-actions"),
@@ -216,21 +130,38 @@ null_ls.setup({
     gotest_codeaction,
     golangci_lint,
     null_ls.builtins.code_actions.eslint.with({
-      condition = function(utils)
-        return utils.root_has_file(eslinrc_patterns)
+      runtime_condition = function(params)
+        return string.match(params.bufname, "node_modules") == nil
       end
     }),
     -- null_ls.builtins.code_actions.gitsigns,  -- blame current line
-    -- null_ls.builtins.code_actions.refactoring,
+    null_ls.builtins.code_actions.refactoring,
     null_ls.builtins.diagnostics.eslint.with({
-      condition = function(utils)
-        return utils.root_has_file(eslinrc_patterns) and not vim.b.large_buf
-      end
+      runtime_condition = function(params)
+        if vim.b.large_buf then
+          return false
+        end
+        local root = vim.fn.getcwd()
+        if not has_file(root, eslinrc_patterns) then
+          return false
+        end
+        return string.match(params.bufname, "node_modules") == nil
+      end,
+      -- condition = function(utils)
+      --   return utils.root_has_file(eslinrc_patterns) and not vim.b.large_buf
+      -- end
     }),
     null_ls.builtins.formatting.prettier.with({
-      condition = function(utils)
-        return utils.root_has_file(prettierrc_patterns)
-      end
+      runtime_condition = function(params)
+        local root = vim.fn.getcwd()
+        if not has_file(root, prettierrc_patterns) then
+          return false
+        end
+        return string.match(params.bufname, "node_modules") == nil
+      end,
+      -- condition = function(utils)
+      --   return utils.root_has_file(prettierrc_patterns) and not vim.b.large_buf
+      -- end
     }),
     null_ls.builtins.formatting.golines.with({
       extra_args = {
@@ -242,26 +173,28 @@ null_ls.setup({
   on_attach = function(client, bufnr)
     lspconfig.util.default_config.on_attach(client, bufnr)
     if client.supports_method("textDocument/formatting") then
-      vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-      vim.api.nvim_create_autocmd("BufWritePre", {
+      api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+      api.nvim_create_autocmd("BufWritePre", {
         group = augroup,
         buffer = bufnr,
         callback = function()
-          lsp_formatting(bufnr)
+          -- lsp_formatting(bufnr)
         end,
       })
     end
   end
 })
+-- }}}
 
--- tsserver
+-- tsserver {{{2
 require("typescript").setup({
   disable_commands = false, -- prevent the plugin from creating Vim commands
-  debug = false, -- enable debug logging for commands
+  debug = false,            -- enable debug logging for commands
   go_to_source_definition = {
-    fallback = true, -- fall back to standard LSP definition on failure
+    fallback = true,        -- fall back to standard LSP definition on failure
   },
-  server = { -- pass options to lspconfig's setup method
+  server = {
+    autostart = false,      -- use volar first
     on_new_config = function(new_config, new_root_dir)
       if new_root_dir:match("node_modules") or vim.b.large_buf then
         print("tsserver disabled for this buffer")
@@ -281,8 +214,9 @@ require("typescript").setup({
     end,
   },
 })
+-- }}}
 
--- jsonls
+-- jsonls{{{2
 lspconfig.jsonls.setup {
   settings = {
     json = {
@@ -291,20 +225,19 @@ lspconfig.jsonls.setup {
     },
   },
 }
+-- }}}
 
--- angularls
-require 'lspconfig'.angularls.setup{}
-
--- GoLang
-require('go').setup{
+-- GoLang  {{{2
+require('go').setup {
   lsp_cfg = false,
   lsp_codelens = false,
+  luasnip = true,
   lsp_inlay_hints = {
     -- parameter_hints_prefix = " ",
     parameter_hints_prefix = "f ",
   },
 }
-local golspcfg = require'go.lsp'.config() -- config() return the go.nvim gopls setup
+local golspcfg = require 'go.lsp'.config() -- config() return the go.nvim gopls setup
 golspcfg.on_attach = function(client, bufnr)
   lspconfig.util.default_config.on_attach(client, bufnr)
 end
@@ -327,8 +260,9 @@ lspconfig.gopls.setup(golspcfg)
 --     usePlaceholders = true,
 --   }
 -- }
+-- }}}
 
--- lua lsp
+-- lua lsp {{{2
 local function get_lua_library()
   local library = {}
 
@@ -341,7 +275,9 @@ local function get_lua_library()
   local function add(lib)
     for _, p in pairs(vim.fn.expand(lib, false, true)) do
       p = vim.loop.fs_realpath(p)
-      library[p] = true
+      if p then
+        library[p] = true
+      end
     end
   end
 
@@ -352,16 +288,18 @@ local function get_lua_library()
   add("$VIMFILES/lua")
 
   -- add plugins
-  add("$VIMFILES/pack/packer/start/plenary.nvim/lua")
-  add("$VIMFILES/pack/packer/start/nvim-cmp/lua")
-  add("$VIMFILES/pack/packer/start/nvim-lspconfig/lua")
-  add("$VIMFILES/pack/packer/opt/neodev.nvim/types")
+  add("$VIMFILES/lazy/plenary.nvim/lua")
+  add("$VIMFILES/lazy/nvim-cmp/lua")
+  add("$VIMFILES/lazy/nvim-lspconfig/lua")
+  add("$VIMFILES/lazy/neodev.nvim/types")
   return library
 end
 
 lspconfig['lua_ls'].setup {
   single_file_support = true,
   on_attach = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = false -- we use null-ls to format code
+    client.server_capabilities.documentRangeFormattingProvider = false
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
   root_dir = function(fname)
@@ -379,9 +317,9 @@ lspconfig['lua_ls'].setup {
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
-        library = get_lua_library(),
+        -- library = get_lua_library(),
         maxPreload = 1000,
-        preloadFileSize = 150,
+        preloadFileSize = 500,
       },
       -- Do not send telemetry data containing a randomized but unique identifier
       telemetry = {
@@ -390,11 +328,13 @@ lspconfig['lua_ls'].setup {
     },
   },
 }
+-- }}}
 
+-- rust {{{2
 require('rust-tools').setup {
   server = {
     on_attach = function(client, bufnr)
-      local set_option = vim.api.nvim_buf_set_option
+      local set_option = api.nvim_buf_set_option
       set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
       set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
       set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
@@ -405,12 +345,11 @@ require('rust-tools').setup {
     }
   }
 }
+-- }}}
 
--- vue
+-- vue/volar {{{2
 local function get_typescript_server_path(root_dir)
   local global_ts = '~/.npm/lib/node_modules/typescript/lib'
-  -- Alternative location if installed as root:
-  -- local global_ts = '/usr/local/lib/node_modules/typescript/lib'
   local found_ts = ''
   local function check_dir(path)
     found_ts = lspconfig.util.path.join(path, 'node_modules', 'typescript', 'lib')
@@ -426,18 +365,78 @@ local function get_typescript_server_path(root_dir)
 end
 
 lspconfig.volar.setup {
-  filetypes = { 'vue' },
+  filetypes = { 'vue', "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact",
+    "typescript.tsx" },
+
   on_attach = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = false -- we use null-ls to format code
+    client.server_capabilities.documentRangeFormattingProvider = false
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
+
   on_new_config = function(new_config, new_root_dir)
+    if new_root_dir:match("node_modules") or vim.b.large_buf then
+      print("Volar disabled")
+      new_config.enabled = false
+      return new_config
+    end
     new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
+    return new_config
   end,
 }
+-- }}}
 
--- lsp formatting
-vim.api.nvim_create_user_command("Format", function()
-  vim.lsp.buf.format({ async = true })
-end, {
-  desc = "Format the current buffer",
-})
+-- other languages {{{2
+local servers = { 'cmake', 'bashls', 'pyright', 'angularls', 'cssls', 'ansiblels' }
+for _, lsp in ipairs(servers) do
+  lspconfig[lsp].setup {
+    on_attach = function(client, bufnr)
+      lspconfig.util.default_config.on_attach(client, bufnr)
+    end,
+  }
+end
+-- }}}
+
+-- supper K mapping {{{2
+local function show_documentation()
+  if dap.session() then
+    require("dapui").eval()
+  else
+    local filetype = vim.bo.filetype
+    if vim.tbl_contains({ 'markdown' }, filetype) then
+      local clients = { "Vim", "Man" }
+      vim.ui.select(clients, {
+        prompt = 'Select a action:',
+        format_item = function(client)
+          return string.lower(client)
+        end,
+      }, function(item)
+        if item == "Vim" then
+          vim.cmd('h ' .. fn.expand('<cword>'))
+        elseif item == "Man" then
+          vim.cmd('Man ' .. fn.expand('<cword>'))
+        end
+      end)
+      return
+    end
+
+    if vim.tbl_contains({ 'vim', 'help' }, filetype) then
+      ---@diagnostic disable-next-line: missing-parameter
+      vim.cmd('h ' .. fn.expand('<cword>'))
+    elseif vim.tbl_contains({ 'man' }, filetype) then
+      ---@diagnostic disable-next-line: missing-parameter
+      vim.cmd('Man ' .. fn.expand('<cword>'))
+      ---@diagnostic disable-next-line: missing-parameter
+    elseif fn.expand('%:t') == 'Cargo.toml' then
+      require('crates').show_popup()
+    elseif filetype == 'rust' then
+      vim.cmd("RustHoverActions")
+    else
+      vim.lsp.buf.hover()
+    end
+  end
+end
+
+vim.keymap.set('n', 'K', show_documentation, { noremap = true, silent = true, desc = "show document for underline word" })
+-- }}}
+-- vim: set fdm=marker fen fdl=1:
