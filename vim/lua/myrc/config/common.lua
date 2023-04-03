@@ -102,6 +102,7 @@ vim.api.nvim_create_autocmd(
                 vim.b.large_buf = true
                 vim.cmd("syntax off")
                 vim.cmd("IndentBlanklineDisable") -- disable indent-blankline.nvim
+                vim.b.copilot_enabled = false
                 vim.opt.foldmethod = "manual"
                 vim.opt.spell = false
             else

@@ -123,6 +123,21 @@ require("lazy").setup(
                 require("myrc.config.gitsigns")
             end
         },
+        {
+            "jcdickinson/codeium.nvim",
+            enabled = false,
+            config = function()
+                require("codeium").setup({})
+            end
+        },
+        {
+            "github/copilot.vim",
+            config = function()
+              vim.g.copilot_no_tab_map = true
+              vim.g.copilot_assume_mapped = true
+              vim.g.copilot_tab_fallback = ""
+            end
+        },
         -- }}}
         -- DAP Debugging {{{2
         {
@@ -199,6 +214,7 @@ require("lazy").setup(
                 {"saadparwaiz1/cmp_luasnip"},
                 {
                     "tzachar/cmp-tabnine",
+                    enabled = false,
                     build = "./install.sh",
                     config = function()
                         require("myrc.config.tabnine")
@@ -286,7 +302,7 @@ require("lazy").setup(
         root = g.VIMFILES .. "/lazy",
         performance = {
             rtp = {
-                reset = false -- reset the runtime path to $VIMRUNTIME and your config directory
+                reset = false -- no reset the runtime path to $VIMRUNTIME and your config directory
             }
         },
         ui = {

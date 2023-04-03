@@ -34,6 +34,12 @@ local kind_icons = {
 }
 -- }}}
 
+local has_words_before = function()
+  unpack = unpack or table.unpack
+  local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+  return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+end
+
 cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
@@ -55,11 +61,17 @@ cmp.setup({
         cmp.complete()
       end, {'i', 's', 'c'}),
     ['<C-e>'] = cmp.mapping.abort(),
-    ['<CR>'] = cmp.mapping.confirm{
-      behavior = cmp.ConfirmBehavior.Replace,
-      -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-      select = false,
-    },
+    ['<CR>'] = cmp.mapping({
+       i = function(fallback)
+         if cmp.visible() and cmp.get_active_entry() then
+           cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
+         else
+           fallback()
+         end
+       end,
+       s = cmp.mapping.confirm({ select = true }),
+       c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+    }),
 
     -- jump backward
     ['<C-h>'] = cmp.mapping(function(fallback)
@@ -74,19 +86,26 @@ cmp.setup({
 
     -- expand or jump forward
     ['<C-k>'] = cmp.mapping(function(fallback)
+      local copilot_keys = vim.fn['copilot#Accept']()
       if luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
+      elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
+        vim.api.nvim_feedkeys(copilot_keys, 'i', true)
       elseif vim.call("UltiSnips#CanJumpForwards") == 1 then
         vim.call("UltiSnips#JumpForwards")
       else
-        -- fallback()
+        fallback()
       end
     end, {'i', 's'}),
 
-    -- choose alternatives
-    ['<C-l>'] = cmp.mapping(function(fallback)
-      if luasnip.choice_active() then
-        luasnip.change_choice(1)
+    -- select previous item
+    ['<C-p>'] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.choice_active() then
+        luasnip.change_choice(-1)
+      elseif vim.b._copilot then
+        vim.call("copilot#Previous")
       else
         fallback()
       end
@@ -98,6 +117,17 @@ cmp.setup({
         cmp.select_next_item()
       elseif luasnip.choice_active() then
         luasnip.change_choice(-1)
+      elseif vim.b._copilot then
+        vim.call("copilot#Next")
+      else
+        fallback()
+      end
+    end, {'i', 's'}),
+
+    -- choose alternatives
+    ['<C-l>'] = cmp.mapping(function(fallback)
+      if luasnip.choice_active() then
+        luasnip.change_choice(1)
       else
         fallback()
       end
@@ -113,14 +143,20 @@ cmp.setup({
     end, {'i', 's'}),
 
     ['<Tab>'] = cmp.mapping(function(fallback)
+      local copilot_keys = vim.fn['copilot#Accept']()
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_jumpable() then
         luasnip.expand_or_jump()
+      elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
+        vim.api.nvim_feedkeys(copilot_keys, 'i', true)
+      elseif has_words_before() then
+        cmp.complete()
       else
         fallback()
       end
     end, { 'i', 's' }),
+
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
@@ -137,7 +173,7 @@ cmp.setup({
 			-- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
 			vim_item.menu = ({
 				copilot = "[Copilot]",
-				luasnip = "[LuaSnip]",
+				luasnip = "[Snippet]",
 				cmp_tabnine = "[TN]",
 				codeium = "[Codeium]",
 				nvim_lua = "[NVim Lua]",
@@ -157,8 +193,8 @@ cmp.setup({
     -- { name = 'snippy' }, -- For snippy users.
     { name = "path" },
     -- { name = "codeium" },
-    -- { name = "copilot" },
-    { name = 'cmp_tabnine' },
+    { name = "copilot" },
+    -- { name = 'cmp_tabnine' },
     { name = "crates" },
   }, {
     { name = 'buffer', max_item_count = 6 },

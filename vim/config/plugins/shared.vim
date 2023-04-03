@@ -47,22 +47,20 @@ let g:mdip_imgdir='images'
 " vim supports fenced code syntax
 "  -> https://vimtricks.com/p/highlight-syntax-inside-markdown/
 let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html",
+      \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml",
       \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
 " }}}
 
 " ALE {{{
 "--------------------------------------------------------------------------------
-let g:ale_enabled = 0
-let g:ale_maximum_file_size=256000 " 256KB
+let g:ale_enabled = 1
 let g:ale_disable_lsp = 1 " use lsp with coc-nvim instead
-let g:ale_linters = {
-      \ 'javascript': [],
-      \ 'typescript': [],
-      \ 'python': ['pylint', 'mypy', 'pyright'],
-      \ 'cpp': [],
-      \ 'c': [],
-      \}
-
+let g:ale_use_neovim_diagnostics_api = g:is_nvim
+let g:ale_lint_on_enter = 0 " We prefer run ALELint manually
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_lint_on_insert_leave = 0
+let g:ale_lint_on_save=0
+let g:ale_maximum_file_size=256000 " 256KB
 let g:ale_echo_msg_format = "[%linter%] %s [%severity%]"
 let g:ale_echo_msg_error_str="E"
 let g:ale_echo_msg_warning_str = "W"
@@ -71,10 +69,19 @@ let g:ale_objcpp_clang_options = '-std=c++17 -Wall'
 let g:ale_cpp_cc_options = '-std=c++17 -Wall'
 let g:ale_c_cc_options = '-std=c11 -Wall'
 let g:ale_pattern_options_enabled = 1
+let g:ale_linters = {
+      \ 'javascript': [],
+      \ 'typescript': [],
+      \ 'python': ['pylint', 'mypy', 'pyright'],
+      \ 'cpp': [],
+      \ 'c': [],
+      \}
+
 let g:ale_pattern_options = {
       \ '\.min\.js$': {'ale_enabled': 0},
       \ '\.min\.css$': {'ale_enabled': 0},
       \}
+
 let g:ale_fixers = {
       \ '*': ['remove_trailing_lines', 'trim_whitespace'],
       \ 'javascript': [],
