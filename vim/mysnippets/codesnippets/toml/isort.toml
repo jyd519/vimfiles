@@ -1,0 +1,7 @@
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+combine_as_imports = true
+force_grid_wrap = 2
+use_parentheses=true

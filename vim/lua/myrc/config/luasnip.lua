@@ -5,13 +5,15 @@ require("luasnip.loaders.from_vscode").lazy_load()
 
 -- snipmate format
 --    https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#from_snipmate
--- require("luasnip.loaders.from_snipmate").lazy_load()
+require("luasnip.loaders.from_snipmate").lazy_load()
 require("luasnip.loaders.from_snipmate").lazy_load({paths = vim.fn.expand("$VIMFILES/mysnippets/snippets")})
 
 -- luasnip format
 ---@diagnostic disable-next-line: missing-parameter
 require("luasnip.loaders.from_lua").load()
 require("luasnip.loaders.from_lua").load({paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets")})
+
+luasnip.filetype_extend("all", { "_" })
 
 -- Commands {{{2
 vim.api.nvim_create_user_command("ReloadSnippet", function(args)
@@ -53,11 +55,11 @@ luasnip.config.set_config({
 				virt_text = { { "⛏️ ", "GruvboxOrange" } },
 			},
 		},
-		-- [types.insertNode] = {
-		-- 	active = {
-		-- 		virt_text = { { "✍️ ", "GruvboxBlue" } },
-		-- 	},
-		-- },
+		[types.insertNode] = {
+			active = {
+				virt_text = { { "✍️ ", "GruvboxBlue" } },
+			},
+		},
 	},
 }) --}}}
 

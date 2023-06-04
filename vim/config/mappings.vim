@@ -150,4 +150,28 @@ endfunction
 command! ZoomToggle call s:ZoomToggle()
 nnoremap <silent> <leader>z :ZoomToggle<CR>
 
+" quickfix {{{
+function! ToggleQuickFix()
+    if empty(filter(getwininfo(), 'v:val.quickfix')) && !empty(getqflist())
+        copen
+    else
+        cclose
+    endif
+endfunction
+
+nnoremap <silent> <F2> :call ToggleQuickFix()<cr>
+nnoremap <silent> <leader>cc :call ToggleQuickFix()<cr>
+"}}}
+"
+" location list {{{
+function! ToggleLocationList()
+    if empty(filter(getwininfo(), 'v:val.loclist'))
+        silent! lopen
+    else
+        silent! lclose
+    endif
+endfunction
+nnoremap <silent> <leader>ll :call ToggleLocationList()<cr>
+"}}}
+
 " vim: set fdm=marker fen:

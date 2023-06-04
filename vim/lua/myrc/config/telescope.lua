@@ -23,24 +23,32 @@ telescope.setup {
 }
 
 telescope.load_extension("ui-select")
+telescope.load_extension('bookmarks')
 
 nvim_set_keymap(
     "n",
-    "<leader>da",
+    "<leader>xa",
     ':lua require"telescope.builtin".diagnostics{}<CR>',
-    {noremap = true, silent = true, desc = "Show LSP diagnostics"}
+    {noremap = true, silent = true, desc = "Show all diagnostics"}
 )
 nvim_set_keymap(
     "n",
-    "<leader>dd",
+    "<leader>xb",
     ':lua require"telescope.builtin".diagnostics{bufnr=0}<CR>',
-    {noremap = true, silent = true}
+    {noremap = true, silent = true, desc = "Show buffer diagnostics"}
 )
 nvim_set_keymap(
     "n",
     "<leader>qf",
     ':lua require"telescope.builtin".quickfix{bufnr=0}<CR>',
-    {noremap = true, silent = true}
+    {noremap = true, silent = true, desc = "Quickfix"}
+)
+
+nvim_set_keymap(
+    "n",
+    "<leader>sb",
+    ':lua require("telescope").extensions.bookmarks.list{bufnr=0}<CR>',
+    {noremap = true, silent = true, desc = "List bookmarks"}
 )
 
 vim.keymap.set(
@@ -112,7 +120,7 @@ vim.api.nvim_create_user_command(
         desc = "Select a template to use"
     }
 )
-vim.cmd[[nnoremap <leader>ft :Ft<CR>]]
+vim.cmd[[nnoremap <leader>st :Ft<CR>]]
 
 -- browse my notes 
 if g.notes_dir then

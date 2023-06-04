@@ -40,14 +40,55 @@ require("lazy").setup(
         },
         {"christoomey/vim-tmux-navigator", enabled = fn.has("win32") == 0 and fn.executable("tmux") == 1},
         -- }}}
-        -- colorscheme {{{2
-        {"Mofiqul/vscode.nvim", lazy = true},
+        -- Colorschemes {{{2
+        {"Mofiqul/vscode.nvim"},
         {"NLKNguyen/papercolor-theme", lazy = true},
+        {"rebelot/kanagawa.nvim"},
+        {"navarasu/onedark.nvim"},
+        {
+            "catppuccin/nvim",
+            name = "catppuccin",
+            config = function()
+                require("catppuccin").setup(
+                    {
+                        flavour = "latte", -- latte, frappe, macchiato, mocha
+                        background = {
+                            light = "latte",
+                            dark = "mocha"
+                        },
+                        transparent_background = true
+                    }
+                )
+            end
+        },
+        {
+            "marko-cerovac/material.nvim",
+            config = function()
+                vim.g.material_style = "lighter"
+            end
+        },
         -- }}}
         -- Basic plugins {{{2
         "mhinz/vim-startify",
         "anuvyklack/keymap-amend.nvim",
-        "justinmk/vim-sneak",
+        -- "justinmk/vim-sneak",
+        {
+            "phaazon/hop.nvim",
+            event = "VeryLazy",
+            config = function()
+                require("myrc.config.hop")
+            end
+        },
+        {
+            "anuvyklack/hydra.nvim",
+            event = "VeryLazy",
+            dependencies = {
+                {"jbyuki/venn.nvim"}
+            },
+            config = function()
+                require("myrc.config.hydra")
+            end
+        },
         {"mattn/emmet-vim", ft = {"html", "jsx", "vue"}},
         {
             "echasnovski/mini.nvim",
@@ -72,7 +113,29 @@ require("lazy").setup(
         },
         {"numToStr/Comment.nvim", config = true},
         {"gpanders/editorconfig.nvim"},
-        {"kyazdani42/nvim-web-devicons", lazy = true},
+        {
+            "kylechui/nvim-surround",
+            version = "*", -- Use for stability; omit to use `main` branch for the latest features
+            event = "VeryLazy",
+            config = function()
+                require("myrc.config.surround")
+            end
+        },
+        {
+            "kyazdani42/nvim-web-devicons",
+            lazy = true,
+            config = function()
+                require "nvim-web-devicons".setup(
+                    {
+                        -- Used by telescope
+                        -- https://github.com/nvim-tree/nvim-web-devicons
+                        -- https://www.nerdfonts.com/font-downloads
+                        color_icons = true,
+                        default = true
+                    }
+                )
+            end
+        },
         {
             "rcarriga/nvim-notify",
             config = function()
@@ -84,7 +147,7 @@ require("lazy").setup(
         {
             dir = g.VIMFILES .. "/locals/nvim-projectconfig",
             opts = {silent = false},
-            priority = 20
+            priority = 100
         },
         -- }}}
         -- Coding {{{2
@@ -113,7 +176,7 @@ require("lazy").setup(
                 filetype_exclude = {"markdown", "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy"},
                 -- depends on treesitter
                 show_current_context = true,
-                show_current_context_start = true
+                show_current_context_start = false
             }
         },
         {
@@ -124,18 +187,31 @@ require("lazy").setup(
             end
         },
         {
-            "jcdickinson/codeium.nvim",
-            enabled = false,
+            -- "jcdickinson/codeium.nvim",
+            "Exafunction/codeium.vim",
+            enabled = true,
             config = function()
-                require("codeium").setup({})
+                vim.g.codeium_no_map_tab = 1
+                vim.keymap.set(
+                    "i",
+                    "<C-g>",
+                    function()
+                        return vim.fn["codeium#Accept"]()
+                    end,
+                    {expr = true}
+                )
+                -- vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
+                -- vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
+                -- require("codeium").setup({})
             end
         },
         {
             "github/copilot.vim",
+            enabled = false,
             config = function()
-              vim.g.copilot_no_tab_map = true
-              vim.g.copilot_assume_mapped = true
-              vim.g.copilot_tab_fallback = ""
+                vim.g.copilot_no_tab_map = true
+                vim.g.copilot_assume_mapped = true
+                vim.g.copilot_tab_fallback = ""
             end
         },
         -- }}}
@@ -279,6 +355,27 @@ require("lazy").setup(
             },
             config = function()
                 require("myrc.config.telescope")
+            end
+        },
+        {
+            -- https://github.com/tomasky/bookmarks.nvim
+            "tomasky/bookmarks.nvim",
+            event = "VimEnter",
+            config = function()
+                require("bookmarks").setup(
+                    {
+                        on_attach = function(bufnr)
+                            local bm = require "bookmarks"
+                            local map = vim.keymap.set
+                            map("n", "mm", bm.bookmark_toggle) -- add or remove bookmark at current line
+                            map("n", "mi", bm.bookmark_ann) -- add or edit mark annotation at current line
+                            map("n", "mc", bm.bookmark_clean) -- clean all marks in local buffer
+                            map("n", "mn", bm.bookmark_next) -- jump to next mark in local buffer
+                            map("n", "mp", bm.bookmark_prev) -- jump to previous mark in local buffer
+                            map("n", "ml", bm.bookmark_list) -- show marked file list in quickfix window
+                        end
+                    }
+                )
             end
         },
         -- }}}

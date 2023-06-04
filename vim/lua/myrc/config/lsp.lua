@@ -9,7 +9,6 @@ local lspconfig = require('lspconfig')
 require("mason").setup()
 require("mason-lspconfig").setup()
 
-vim.opt.completeopt = { 'menu', 'menuone', 'noselect' }
 vim.lsp.set_log_level("warn")
 
 local bufmap = function(mode, lhs, rhs, opts)
@@ -30,6 +29,7 @@ local has_file = function(root, ...)
   end
   return false
 end
+
 -- }}}
 
 -- set keymap on on_attach {{{2
@@ -97,10 +97,10 @@ _G.lspconfig = lspconfig
 -- }}}
 
 -- null-ls{{{2
+-- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTIN_CONFIG.md
 local null_ls = require("null-ls")
 local augroup = api.nvim_create_augroup("LspFormatting", {})
-
-local gotest = require("go.null_ls").gotest()
+-- local gotest = require("go.null_ls").gotest()
 local gotest_codeaction = require("go.null_ls").gotest_action()
 local golangci_lint = require("go.null_ls").golangci_lint()
 
@@ -116,19 +116,56 @@ end
 
 local eslinrc_patterns = { ".eslintrc", ".eslintrc.json", ".eslintrc.yml", ".eslintrc.yaml" }
 local prettierrc_patterns = { ".prettierrc", ".prettierrc.json", ".prettierrc.yml", ".prettierrc.yaml" }
+
+local find_in_virtualenv = function(name)
+    local utils = require("null-ls.utils")
+    local venv_path = os.getenv("VIRTUAL_ENV")
+    if venv_path then
+      local fullpath = utils.path.join(venv_path, "bin",  name)
+      if utils.path.exists(fullpath) then
+        return fullpath
+      end
+    end
+    return name
+end
+
 null_ls.setup({
   log_level = "warn",
   debounce = 500,
-  default_timeout = 5000,
+  default_timeout = 10000,
   diagnostics_format = "[#{c}] #{m} (#{s})",
   should_attach = function(bufnr)
     return not api.nvim_buf_get_name(bufnr):match("node_modules")
   end,
   sources = {
-    require("typescript.extensions.null-ls.code-actions"),
-    gotest,
+    -- golang
+    -- gotest,
     gotest_codeaction,
     golangci_lint,
+    null_ls.builtins.formatting.golines.with({
+      extra_args = {
+        "--max-len=180",
+        "--base-formatter=gofumpt",
+      },
+    }),
+    -- python
+    null_ls.builtins.diagnostics.pylint.with({
+      command = find_in_virtualenv("pylint"),
+    }),
+    -- null_ls.builtins.formatting.pyflyby,
+    null_ls.builtins.formatting.black,
+    null_ls.builtins.diagnostics.mypy.with{
+      command = find_in_virtualenv("mypy"),
+      runtime_condition = function(params)
+        local utils = require("null-ls.utils")
+        return utils.path.exists(params.bufname)
+      end,
+      extra_args = {
+        "--ignore-missing-imports",
+      },
+    },
+    -- typescript
+    require("typescript.extensions.null-ls.code-actions"),
     null_ls.builtins.code_actions.eslint.with({
       runtime_condition = function(params)
         return string.match(params.bufname, "node_modules") == nil
@@ -163,12 +200,6 @@ null_ls.setup({
       --   return utils.root_has_file(prettierrc_patterns) and not vim.b.large_buf
       -- end
     }),
-    null_ls.builtins.formatting.golines.with({
-      extra_args = {
-        "--max-len=180",
-        "--base-formatter=gofumpt",
-      },
-    })
   },
   on_attach = function(client, bufnr)
     lspconfig.util.default_config.on_attach(client, bufnr)
@@ -183,6 +214,26 @@ null_ls.setup({
       })
     end
   end
+})
+
+vim.api.nvim_create_user_command("NullLsEnable", function(args)
+  require("null-ls.sources").enable(args.fargs[1])
+end, {
+    nargs = 1,
+    complete = function(ArgLead, CmdLine, CursorPos)
+      return require("null-ls.sources").get_supported(vim.bo.filetype).diagnostics
+    end,
+    desc = "Null-ls: Enable Sources",
+})
+
+vim.api.nvim_create_user_command("NullLsDisable", function(args)
+  require("null-ls.sources").disable(args.fargs[1])
+end, {
+    nargs = 1,
+    complete = function(ArgLead, CmdLine, CursorPos)
+      return require("null-ls.sources").get_supported(vim.bo.filetype).diagnostics
+    end,
+    desc = "Null-ls: Disable Sources",
 })
 -- }}}
 
@@ -291,7 +342,7 @@ local function get_lua_library()
   add("$VIMFILES/lazy/plenary.nvim/lua")
   add("$VIMFILES/lazy/nvim-cmp/lua")
   add("$VIMFILES/lazy/nvim-lspconfig/lua")
-  add("$VIMFILES/lazy/neodev.nvim/types")
+  add("$VIMFILES/lazy/null-ls.nvim/lua")
   return library
 end
 
@@ -317,9 +368,10 @@ lspconfig['lua_ls'].setup {
       },
       workspace = {
         -- Make the server aware of Neovim runtime files
-        -- library = get_lua_library(),
+        library = get_lua_library(),
         maxPreload = 1000,
         preloadFileSize = 500,
+        checkThirdParty = false,
       },
       -- Do not send telemetry data containing a randomized but unique identifier
       telemetry = {
@@ -344,6 +396,27 @@ require('rust-tools').setup {
       adapter = require('dap').adapters.codelldb
     }
   }
+}
+-- }}}
+
+-- pyright {{{2
+-- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+lspconfig.pyright.setup {
+  on_attach = function(client, bufnr)
+    lspconfig.util.default_config.on_attach(client, bufnr)
+  end,
+  before_init = function(_, config)
+      local join = lspconfig.util.path.join
+      local p
+      if vim.env.VIRTUAL_ENV then
+          p = join(vim.env.VIRTUAL_ENV, "bin", "python3")
+      else
+          p = "python3"
+      end
+      print("Python (pyright): ", p)
+      config.settings.python.pythonPath = p
+      config.setttings.diagnostics.pylint.enabled = false
+  end,
 }
 -- }}}
 
@@ -387,7 +460,7 @@ lspconfig.volar.setup {
 -- }}}
 
 -- other languages {{{2
-local servers = { 'cmake', 'bashls', 'pyright', 'angularls', 'cssls', 'ansiblels' }
+local servers = { 'cmake', 'bashls', 'angularls', 'cssls', 'ansiblels' }
 for _, lsp in ipairs(servers) do
   lspconfig[lsp].setup {
     on_attach = function(client, bufnr)
@@ -439,4 +512,17 @@ end
 
 vim.keymap.set('n', 'K', show_documentation, { noremap = true, silent = true, desc = "show document for underline word" })
 -- }}}
+--
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
+  vim.lsp.diagnostic.on_publish_diagnostics, {
+    signs = {
+      severity= vim.diagnostic.severity.HINT,
+      -- severity_limit = "Hint",
+    },
+    virtual_text = {
+      severity = vim.diagnostic.severity.WARN
+      -- severity_limit = "Warning",
+    },
+  }
+)
 -- vim: set fdm=marker fen fdl=1:

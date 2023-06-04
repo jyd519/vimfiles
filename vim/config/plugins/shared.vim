@@ -32,7 +32,7 @@ let g:cmake_ycm_symlinks=1
 " vim-surroud {{{
 "--------------------------------------------------------------------------------
 let g:surround_indent = 0 " Disable indenting for surrounded text
-let g:surround_{char2nr("r")} = "💥 \r 💥"
+let g:surround_{char2nr("f")} = "💥 \r 💥"
 " }}}
 
 " markdown {{{
@@ -56,10 +56,13 @@ let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash"
 let g:ale_enabled = 1
 let g:ale_disable_lsp = 1 " use lsp with coc-nvim instead
 let g:ale_use_neovim_diagnostics_api = g:is_nvim
+let g:ale_set_quickfix = 0
+let g:ale_set_loclist = 1
 let g:ale_lint_on_enter = 0 " We prefer run ALELint manually
 let g:ale_lint_on_text_changed = 'never'
 let g:ale_lint_on_insert_leave = 0
 let g:ale_lint_on_save=0
+let g:ale_open_list=1
 let g:ale_maximum_file_size=256000 " 256KB
 let g:ale_echo_msg_format = "[%linter%] %s [%severity%]"
 let g:ale_echo_msg_error_str="E"
@@ -68,11 +71,13 @@ let g:ale_c_parse_compile_commands = 0
 let g:ale_objcpp_clang_options = '-std=c++17 -Wall'
 let g:ale_cpp_cc_options = '-std=c++17 -Wall'
 let g:ale_c_cc_options = '-std=c11 -Wall'
+let g:ale_python_mypy_options='--follow-imports=silent'
 let g:ale_pattern_options_enabled = 1
 let g:ale_linters = {
       \ 'javascript': [],
       \ 'typescript': [],
-      \ 'python': ['pylint', 'mypy', 'pyright'],
+      \ 'python': ['pylint', 'mypy', 'black'],
+      \ 'go': ['gofmt', 'golint', 'gopls', 'govet', 'golangci-lint'],
       \ 'cpp': [],
       \ 'c': [],
       \}
@@ -84,10 +89,13 @@ let g:ale_pattern_options = {
 
 let g:ale_fixers = {
       \ '*': ['remove_trailing_lines', 'trim_whitespace'],
-      \ 'javascript': [],
-      \ 'typescript': [],
-      \ 'python': ['autopep8', 'yapf'],
+      \ 'javascript': ['eslint'],
+      \ 'typescript': ['eslint'],
+      \ 'python': ['black', 'yapf', 'isort'],
       \}
+
+nnoremap <leader>L <Plug>(ale_lint)
+nnoremap <leader>fx <Plug>(ale_fix)
 " }}}
 
 " vim-session settings {{{
@@ -103,7 +111,6 @@ if get(g:enabled_plugins, "telescope.nvim", 0)
   " Find files using Telescope command-line sugar.
   nnoremap <leader>ff <cmd>Telescope find_files<cr>
   nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-  nnoremap <leader>fb <cmd>Telescope buffers<cr>
   nnoremap <leader>fh <cmd>Telescope oldfiles<cr>
   nnoremap <leader>fo <cmd>Telescope oldfiles<cr>
   nnoremap <C-P> <cmd>Telescope find_files<cr>
@@ -134,11 +141,11 @@ elseif get(g:enabled_plugins, "fzf.vim", 0)
   nnoremap <leader>fb :Buffers<CR>
 
   function! s:find_notes(sub)
-    let opts = {'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . a:sub, 
-              \ 'sink': 'e', 
-              \ 'down': '50%', 
-              \ 'dir': g:notes_dir,
-              \ 'options': ['--info=inline', '--reverse']} 
+    let opts = {'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . a:sub,
+          \ 'sink': 'e',
+          \ 'down': '50%',
+          \ 'dir': g:notes_dir,
+          \ 'options': ['--info=inline', '--reverse']}
     call fzf#run(opts)
   endfunction
 
@@ -151,7 +158,7 @@ elseif get(g:enabled_plugins, "fzf.vim", 0)
     " Allow to press esc key to close fzf window
     autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
   endif
-endif 
+endif
 " }}}
 
 " t.vim {{{
@@ -162,7 +169,7 @@ let $mysnippets = g:mysnippets_dir
 if get(g:enabled_plugins, "telescope.nvim", 0)
   " integrate with telescope
 elseif get(g:enabled_plugins, "fzf.vim", 0)
-" integrate with fzf
+  " integrate with fzf
   function! s:search_template(arg, bang)
     let all = len(&ft) == 0 || a:arg =~ 'a'
     call fzf#vim#files((all? g:mysnippets_dir : g:mysnippets_dir . '/' . &ft),
@@ -254,7 +261,6 @@ endif
 
 " Neoformat {{{
 "--------------------------------------------------------------------------------
-" prequirements: npm i -g prettier js-beautify ...
 let g:neoformat_try_node_exe = 1
 " Enable alignment globally
 let g:neoformat_basic_format_align = 1
@@ -262,32 +268,36 @@ let g:neoformat_basic_format_align = 1
 let g:neoformat_basic_format_retab = 1
 " Enable trimmming of trailing whitespace globally
 let g:neoformat_basic_format_trim = 1
-let g:neoformat_enabled_yaml= ['prettier']
-let g:neoformat_enabled_python = ['yapf', 'autopep8']
+let g:neoformat_enabled_javascript = ['prettierd', 'prettier', 'jsbeautify']
+let g:neoformat_enabled_typescript = ['prettierd', 'prettier', 'tsfmt']
+let g:neoformat_enabled_css = ['prettierd', 'prettier', 'tsfmt']
+let g:neoformat_enabled_html = ['prettierd', 'prettier','htmlbeautify']
+let g:neoformat_enabled_python = ['black', 'isort', 'docformatter', 'pyment', 'pydevf']
+nmap <leader>F :Neoformat<CR>
 " }}}
 
 " vim-test {{{
 "--------------------------------------------------------------------------------
 if get(g:enabled_plugins, "test", 0)
-  let g:test#javascript#runner = 'jest'
-
   if g:is_nvim
     let g:test#strategy = "neovim"
     let g:test#neovim#start_normal = 0 " 1: enter normal mode
     tnoremap <C-o> <C-\><C-n>
   endif
 
+  let test#javascript#runner = 'jest'
+  let test#python#djangotest#options = '--keepdb'
   let test#rust#cargotest#options = '-- --nocapture'
   let test#go#test#options = '-v'
-  autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>rt :TestNearest<cr>
-  autocmd vimrc Filetype javascript,typescript,go,rust noremap <buffer> <leader>tt :TestNearest<cr>
-  autocmd vimrc Filetype javascript,typescript,go noremap <buffer> <leader>tf :TestFile<cr>
+  autocmd vimrc Filetype javascript,typescript,go,rust,python noremap <buffer> <leader>rt :TestNearest<cr>
+  autocmd vimrc Filetype javascript,typescript,go,rust,python noremap <buffer> <leader>tt :TestNearest<cr>
+  autocmd vimrc Filetype javascript,typescript,go,python noremap <buffer> <leader>tf :TestFile<cr>
 endif
 " }}}
 
 " quickrun {{{
 "--------------------------------------------------------------------------------
-if get(g:enabled_plugins, "vim-quickrun", 0) 
+if get(g:enabled_plugins, "vim-quickrun", 0)
   let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
   autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
 endif
@@ -325,30 +335,33 @@ let g:BufKillCreateMappings = 0  " bufkill.vim
 " vim plugins
 "--------------------------------------------------------------------------------
 if !g:is_nvim
-" Pascal configuration
-"--------------------------------------------------------------------------------
-autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
+  " Pascal configuration
+  "--------------------------------------------------------------------------------
+  autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
-" vim-json
-"--------------------------------------------------------------------------------
-let g:vim_json_syntax_conceal = 0
+  " vim-json
+  "--------------------------------------------------------------------------------
+  let g:vim_json_syntax_conceal = 0
 
-" tcomment
-"--------------------------------------------------------------------------------
-let g:tcomment#options_comments = {'whitespace': 'left'}
-let g:tcomment#options_commentstring = {'whitespace': 'left'}
+  " tcomment
+  "--------------------------------------------------------------------------------
+  let g:tcomment#options_comments = {'whitespace': 'left'}
+  let g:tcomment#options_commentstring = {'whitespace': 'left'}
 
-" vim-session settings
-"--------------------------------------------------------------------------------
-let g:session_autosave='prompt'
-let g:session_autoload='no'
-let g:session_autosave_periodic=0
+  " vim-session settings
+  "--------------------------------------------------------------------------------
+  let g:session_autosave='prompt'
+  let g:session_autoload='no'
+  let g:session_autosave_periodic=0
 
-" Graphviz
-"--------------------------------------------------------------------------------
-let g:WMGraphviz_output = "svg"
-let g:previm_open_cmd = 'open -a "google chrome"'
+  " Graphviz
+  "--------------------------------------------------------------------------------
+  let g:WMGraphviz_output = "svg"
+  let g:previm_open_cmd = 'open -a "google chrome"'
 endif
+
+" put the quickfix window on bottom always
+autocmd vimrc FileType qf wincmd J
 
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}

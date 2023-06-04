@@ -3,7 +3,7 @@
 " Version:      2.2
 " GetLatestVimScripts: 1697 1 :AutoInstall: surround.vim
 
-if exists("g:loaded_surround") || &cp || v:version < 700
+if has('nvim') || exists("g:loaded_surround") || &cp || v:version < 700
   finish
 endif
 let g:loaded_surround = 1

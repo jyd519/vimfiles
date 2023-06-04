@@ -40,6 +40,13 @@ local has_words_before = function()
   return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
 end
 
+local is_insert_keys = function(keys)
+  if type(keys) == 'string' and not (keys == '' or keys == "\\<C-N>" or keys=="\t") then
+    return true
+  end
+  return false
+end
+
 cmp.setup({
   snippet = {
     -- REQUIRED - you must specify a snippet engine
@@ -60,19 +67,22 @@ cmp.setup({
     ['<C-x><C-o>'] = cmp.mapping(function()
         cmp.complete()
       end, {'i', 's', 'c'}),
-    ['<C-e>'] = cmp.mapping.abort(),
+    ['<C-e>'] = cmp.mapping(function()
+        cmp.abort()
+        luasnip.unlink_current()
+      end, {'i'}),
     ['<CR>'] = cmp.mapping({
-       i = function(fallback)
-         if cmp.visible() and cmp.get_active_entry() then
-           cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
-         else
-           fallback()
-         end
-       end,
-       s = cmp.mapping.confirm({ select = true }),
-       c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
+       i = cmp.mapping.confirm({ select = true }),
+       -- i = function(fallback)
+       --   if cmp.visible() and cmp.get_active_entry() then
+       --     cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
+       --   else
+       --     fallback()
+       --   end
+       -- end,
+       -- s = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true}),
+       -- c = cmp.mapping.confirm({ select = true }),
     }),
-
     -- jump backward
     ['<C-h>'] = cmp.mapping(function(fallback)
       if luasnip.jumpable(-1) then
@@ -86,15 +96,18 @@ cmp.setup({
 
     -- expand or jump forward
     ['<C-k>'] = cmp.mapping(function(fallback)
-      local copilot_keys = vim.fn['copilot#Accept']()
-      if luasnip.expand_or_jumpable() then
+      local codeium_keys = vim.fn['codeium#Accept']()
+      -- vim.fn['copilot#Accept']()
+      if luasnip.jumpable() then
         luasnip.expand_or_jump()
-      elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
-        vim.api.nvim_feedkeys(copilot_keys, 'i', true)
+      elseif is_insert_keys(codeium_keys) then
+        vim.api.nvim_feedkeys(codeium_keys, 'i', true)
+      elseif luasnip.expandable() then
+        luasnip.expand_or_jump()
       elseif vim.call("UltiSnips#CanJumpForwards") == 1 then
         vim.call("UltiSnips#JumpForwards")
       else
-        fallback()
+        -- fallback()
       end
     end, {'i', 's'}),
 
@@ -104,6 +117,8 @@ cmp.setup({
         cmp.select_prev_item()
       elseif luasnip.choice_active() then
         luasnip.change_choice(-1)
+      elseif vim.b._codeium_status > 0 then
+        vim.fn['codeium#CycleCompletions'](1)
       elseif vim.b._copilot then
         vim.call("copilot#Previous")
       else
@@ -116,7 +131,9 @@ cmp.setup({
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.choice_active() then
-        luasnip.change_choice(-1)
+        luasnip.change_choice(1)
+      elseif vim.b._codeium_status > 0 then
+        vim.fn['codeium#CycleCompletions'](-1)
       elseif vim.b._copilot then
         vim.call("copilot#Next")
       else
@@ -127,7 +144,7 @@ cmp.setup({
     -- choose alternatives
     ['<C-l>'] = cmp.mapping(function(fallback)
       if luasnip.choice_active() then
-        luasnip.change_choice(1)
+        luasnip.change_choice(-1)
       else
         fallback()
       end
@@ -143,13 +160,13 @@ cmp.setup({
     end, {'i', 's'}),
 
     ['<Tab>'] = cmp.mapping(function(fallback)
-      local copilot_keys = vim.fn['copilot#Accept']()
+      -- local copilot_keys = vim.fn['copilot#Accept']()
       if cmp.visible() then
         cmp.select_next_item()
-      elseif luasnip.expand_or_jumpable() then
+      elseif luasnip.expand_or_locally_jumpable() then
         luasnip.expand_or_jump()
-      elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
-        vim.api.nvim_feedkeys(copilot_keys, 'i', true)
+      -- elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
+      --   vim.api.nvim_feedkeys(copilot_keys, 'i', true)
       elseif has_words_before() then
         cmp.complete()
       else
@@ -160,6 +177,8 @@ cmp.setup({
     ['<S-Tab>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
       else
         fallback()
       end
@@ -192,8 +211,8 @@ cmp.setup({
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
     { name = "path" },
-    -- { name = "codeium" },
-    { name = "copilot" },
+    { name = "codeium" },
+    -- { name = "copilot" },
     -- { name = 'cmp_tabnine' },
     { name = "crates" },
   }, {
@@ -223,7 +242,7 @@ cmp.setup.cmdline(':', {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'path', option = { trailing_slash = false, label_trailing_slash = false } }
+    { name = 'path' }
   }, {
     -- Do not show completion for words starting with 'Man'
     -- https://github.com/hrsh7th/cmp-cmdline/issues/47

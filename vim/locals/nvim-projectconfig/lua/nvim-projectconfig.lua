@@ -3,7 +3,7 @@ local M = {}
 
 local config = {
     silent = true,
-    autocmd = true,
+    autocmd = false,
     project_dir = '~/.config/nvim/projects/',
     project_config = {},
 }

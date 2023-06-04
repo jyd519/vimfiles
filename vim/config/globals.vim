@@ -41,6 +41,9 @@ let g:vimsyn_embed = 'lP'
 let g:mapleader = ","
 let g:maplocalleader = ","
 
+" surround_no_insert_mappings
+let g:surround_no_insert_mappings=1
+
 if !exists("$HOME")
   $HOME = expand("~")
 endif
@@ -61,3 +64,8 @@ end
 _G.dump = _G.put
 END
 endif
+
+" startify
+let g:startify_change_to_dir = 0
+let g:startify_change_to_vcs_root = 1
+

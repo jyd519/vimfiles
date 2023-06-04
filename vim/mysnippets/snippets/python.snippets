@@ -227,8 +227,16 @@ snippet loggingInApp "logging in application" b
 		# logger.debug('often makes a very good meal of %s', 'visiting tourists')
 
 
+snippet rprint "rich.print"
+	__import__("rich").print($0)
+
 snippet py3req  "python interpreter version check"
 		PY_MAJOR, PY_MINOR = sys.version_info[0:2]
 		if not ((PY_MAJOR == 3 and PY_MINOR >= 8) or PY_MAJOR > 3):
 				sys.exit('This scripts requires Python >= 3.8; '
 								 'your version of Python is ' + sys.version)
+
+
+snippet  urlparse "parse url"
+		from urllib.parse import urlparse
+		result = urlparse("$0:https:/www.google.com")

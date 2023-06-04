@@ -42,7 +42,7 @@ set wildmode=list:longest,full
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip     " MacOSX/Linux
 set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
 set wildignore+=*DS_Store,*.pyc
-set completeopt=menuone,longest,preview,noselect
+set completeopt=menu,menuone,noselect,preview
 "set t_ti= t_te= Keep screen after vim exited
 
 set clipboard+=unnamed

@@ -61,3 +61,14 @@ snippet dev-server "http static server supporting proxy api requests"
 		app.listen(PORT, () => {
 			console.log("listening on port ", PORT);
 		});
+
+
+
+snippet watermark "svg based watermark"
+		const markTemplate = (name) => {
+			return `<svg xmlns='http://www.w3.org/2000/svg' version='1.1' height='160px' width='200px'><text transform='translate(20, 150) rotate(-45)' fill='rgba(5,5,5,0.18)' font-size='16'>${name}</text></svg>`;
+		};
+
+		const base64Mark = btoa(markTemplate("6465be0a17a5722e8cf7a2e1"));
+
+		document.body.style.backgroundImage = `url("data:image/svg+xml;base64,${base64Mark}")`;

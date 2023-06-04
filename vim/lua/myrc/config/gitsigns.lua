@@ -1,7 +1,7 @@
 -- gitsigns -- {{{1
 -- https://github.com/lewis6991/gitsigns.nvim
 require('gitsigns').setup {
-  current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+  current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
 
   on_attach = function(bufnr)
     local gs = package.loaded.gitsigns

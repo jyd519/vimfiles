@@ -1,0 +1,41 @@
+[tool.isort]
+profile = "black"
+known_first_party = ["ops", "dashboard"]
+known_third_party = ["rest_framework", "django", "pytest"]
+
+[tool.mypy]
+python_version = "3.9"
+exclude = ["example"]
+ignore_missing_imports = true
+
+# [[tool.mypy.overrides]]
+# module = [
+#     "pulp",
+# ]
+# ignore_missing_imports = true
+
+[tool.pyright]
+typeCheckingMode = "off"
+
+[tool.pytest.ini_options]
+testpaths = [
+  "tests"
+]
+
+[tool.pylint]
+max-line-length = 120
+
+[tool.pylint.MASTER]
+init-hook='import sys; sys.path.append(".")'
+
+[tool.pylint.messages_control]
+disable = [
+  "missing-docstring",
+]
+
+good-names = [
+  "pb",
+  "x", "y",
+  "i", "j", "k"
+]
+

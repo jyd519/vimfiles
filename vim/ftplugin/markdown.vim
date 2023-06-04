@@ -50,13 +50,67 @@ function! PreviewMindmap()
   let b:job = jobstart("markmap -w " . expand("%:p"), { "detach": 1})
 endfunction
 
+
+function! TableFormat()
+    let l:pos = getpos('.')
+    normal! {
+    " Search instead of `normal! j` because of the table at beginning of file edge case.
+    call search('|')
+    normal! j
+    " Remove everything that is not a pipe, colon or hyphen next to a colon othewise
+    " well formated tables would grow because of addition of 2 spaces on the separator
+    " line by Tabularize /|.
+    let l:flags = (&gdefault ? '' : 'g')
+    execute 's/\(:\@<!-:\@!\|[^|:-]\)//e' . l:flags
+    execute 's/--/-/e' . l:flags
+    Tabularize /\(\\\)\@<!|
+    " Move colons for alignment to left or right side of the cell.
+    execute 's/:\( \+\)|/\1:|/e' . l:flags
+    execute 's/|\( \+\):/|:\1/e' . l:flags
+    execute 's/|:\?\zs[ -]\+\ze:\?|/\=repeat("-", len(submatch(0)))/' . l:flags
+    call setpos('.', l:pos)
+endfunction
+
 " Customizing surround 
 let g:surround_{char2nr("*")} = "**\r**"
 let g:surround_{char2nr("I")} = "_\r_"
 let g:surround_{char2nr('c')}="```\r```"
-let g:surround_{char2nr('C')}="```\1lang:\1\r```"
+let g:surround_{char2nr('l')}="```\1lang:\1\r```"
+if g:is_nvim
+  lua  <<END
+require("nvim-surround").buffer_setup(
+    {
+        surrounds = {
+            ["*"] = {
+                add = function()
+                    return {{'**'}, {'**'}}
+                end
+            },
+            ["I"] = {
+                add = function()
+                    return {{'_'}, {'_'}}
+                end
+            },
+            ["c"] = {
+                add = function()
+                    return {{'`'}, {'`'}}
+                end
+            },
+            ["l"] = {
+                add = function()
+                  local config = require("nvim-surround.config")
+                  local result = config.get_input("Enter the language name: ")
+                  if result then
+                      return { { "```" .. result }, { "```" } }
+                  end
+                end
+            }
+        }
+    }
+)
+END
+endif
 
-" nmap <buffer> <LocalLeader>r :update<cr>:call PreviewMarkdown()<cr>
 nmap <buffer> <LocalLeader>m :update<cr>:call PreviewMindmap()<cr>
 
 "Key Mapings
@@ -67,7 +121,7 @@ endif
 nmap <buffer> <space><space> ysiw`
 
 nmap <buffer> <LocalLeader>p :call mdip#MarkdownClipboardImage()<CR>
-nmap <buffer> <LocalLeader>tf :TableFormat<cr>
+nmap <buffer> <LocalLeader>tf :call TableFormat()<cr>
 
 nmap <buffer> <LocalLeader>1 :call setline('.', substitute(getline('.'), '^#* *', '# ', ''))<cr>
 nmap <buffer> <LocalLeader>2 :call setline('.', substitute(getline('.'), '^#* *', '## ', ''))<cr>
@@ -96,7 +150,9 @@ function! ToUnorderList() range
   let m = visualmode()
   if m ==# 'V'
     for line in range(a:firstline, a:lastline)
-      call setline(line, '+ ' . getline(line))
+      if getline(line) !~ '^ *$'
+        call setline(line, '+ ' . getline(line))
+      endif
     endfor
   endif
 endfunction
