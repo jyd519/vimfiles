@@ -13,7 +13,7 @@ function! s:adjustSyntax()
   syn match  mkdLineBreak    /  \+$/
   syn region mkdBlockquote   start=/^\s*>/                   end=/$/ contains=mkdLineBreak
   syn match  mkdListItem     /^\s*\%([-*+]\|\d\+\.\)\ze\s\+/
-  syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$" contains=markdownCode
+  syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$" contains=markdownCode,markdownLinkText
   " syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$"
   hi link mkdLineBreak Underlined
   hi link mkdBlockquote Comment 

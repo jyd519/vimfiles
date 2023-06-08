@@ -1,4 +1,4 @@
-local M={}
+local M = {}
 
 local dap = require("dap")
 
@@ -36,7 +36,7 @@ local dap = require("dap")
 ---@param language string
 ---@param setting table
 M.add = function(language, setting)
-  for i=#dap.configurations[language],1,-1 do
+  for i = #dap.configurations[language], 1, -1 do
     if dap.configurations.python[i].name == setting.name then
       table.remove(dap.configurations[language], i)
     end
@@ -45,4 +45,3 @@ M.add = function(language, setting)
 end
 
 return M
-

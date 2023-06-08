@@ -1,32 +1,34 @@
 local configs = {
   lazy = {},
-  start = {}
+  start = {},
 }
 
 local Plug = {
-  begin = vim.fn['plug#begin'],
+  begin = vim.fn["plug#begin"],
 
   -- "end" is a keyword, need something else
   ends = function()
-    vim.fn['plug#end']()
+    vim.fn["plug#end"]()
 
     for _, config in pairs(configs.start) do
-      if type(config) == 'function' then
+      if type(config) == "function" then
         config()
       else
         local f = loadstring(config)
         f()
       end
     end
-  end
+  end,
 }
 
--- Not a fan of global functions, but it'll work better 
+-- Not a fan of global functions, but it'll work better
 -- for the people that will copy/paste this
 _G.VimPlugApplyConfig = function(plugin_name)
   local fn = configs.lazy[plugin_name]
-  if type(fn) == 'function' then fn() end
-  if type(fn) == 'string' then
+  if type(fn) == "function" then
+    fn()
+  end
+  if type(fn) == "string" then
     local f = loadstring(fn)
     f()
   end
@@ -54,18 +56,18 @@ local meta = {
     end
 
     -- we declare some aliases for `do` and `for`
-    opts['do'] = opts.run
+    opts["do"] = opts.run
     opts.run = nil
 
-    opts['for'] = opts.ft
+    opts["for"] = opts.ft
     opts.ft = nil
 
-    vim.call('plug#', repo, opts)
+    vim.call("plug#", repo, opts)
 
     if opts.config then
       local plugin = opts.as or plug_name(repo)
 
-      if opts['for'] == nil and opts.on == nil then
+      if opts["for"] == nil and opts.on == nil then
         configs.start[plugin] = opts.config
       else
         configs.lazy[plugin] = opts.config
@@ -73,9 +75,8 @@ local meta = {
         local user_cmd = [[ autocmd! User %s ++once lua VimPlugApplyConfig('%s') ]]
         vim.cmd(user_cmd:format(plugin, plugin))
       end
-
     end
-  end
+  end,
 }
 
 -- https://github.com/junegunn/vim-plug/wiki/tips

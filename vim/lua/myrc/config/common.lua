@@ -9,67 +9,50 @@ end
 -- }}
 
 -- Cancel search highlighting {{{2
-keymap.amend(
-    "n",
-    "<Esc>",
-    function(original)
-        if vim.v.hlsearch and vim.v.hlsearch == 1 then
-            vim.cmd("nohlsearch")
-        end
-        original()
-    end,
-    {desc = "disable search highlight"}
-)
+keymap.amend("n", "<Esc>", function(original)
+  if vim.v.hlsearch and vim.v.hlsearch == 1 then
+    vim.cmd("nohlsearch")
+  end
+  original()
+end, { desc = "disable search highlight" })
 -- }}}
 
-
 -- Lookup ansible-doc {{{2
-vim.api.nvim_create_user_command(
-    "Adoc",
-    function(args)
-        vim.cmd(
-            "new | setlocal buftype=nofile bufhidden=hide noswapfile ft=man sw=4 |" ..
-                "r !ansible-doc " .. args.args .. ""
-        )
-        vim.defer_fn(
-            function()
-                vim.cmd('exec "norm ggM"')
-            end,
-            100
-        )
-    end,
-    {
-        nargs = "+",
-        desc = "Lookup ansible document"
-    }
-)
+vim.api.nvim_create_user_command("Adoc", function(args)
+  vim.cmd(
+    "new | setlocal buftype=nofile bufhidden=hide noswapfile ft=man sw=4 |" .. "r !ansible-doc " .. args.args .. ""
+  )
+  vim.defer_fn(function()
+    vim.cmd('exec "norm ggM"')
+  end, 100)
+end, {
+  nargs = "+",
+  desc = "Lookup ansible document",
+})
 -- }}}
 
 -- Handling large file{{{2
 -- https://www.reddit.com/r/neovim/comments/z85s1l/disable_lsp_for_very_large_files/
-vim.api.nvim_create_autocmd(
-    {"BufReadPre"},
-    {
-        callback = function()
-            local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()))
-            if ok and stats and (stats.size > 1000000) then
-                vim.b.large_buf = true
-                vim.cmd("syntax off")
-                vim.cmd("IndentBlanklineDisable") -- disable indent-blankline.nvim
-                vim.b.copilot_enabled = false
-                vim.opt.foldmethod = "manual"
-                vim.opt.spell = false
-            else
-                vim.b.large_buf = false
-            end
-        end,
-        group = augroup("large_buf"),
-        pattern = "*"
-    }
-)
+vim.api.nvim_create_autocmd({ "BufReadPre" }, {
+  callback = function()
+    local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf()))
+    if ok and stats and (stats.size > 1000000) then
+      vim.b.large_buf = true
+      vim.cmd("syntax off")
+      vim.g.indent_blankline_enabled = false
+      vim.b.copilot_enabled = false
+      vim.opt.foldmethod = "manual"
+      vim.opt.spell = false
+    else
+      vim.b.large_buf = false
+    end
+  end,
+  group = augroup("large_buf"),
+  pattern = "*",
+})
 -- }}}
 
-api.nvim_set_keymap("n", "<leader>sl", "<cmd>lua require('myrc.split').splitJsString()<CR>", {noremap = true})
+api.nvim_set_keymap("n", "<leader>sl", "<cmd>lua require('myrc.split').splitJsString()<CR>", { noremap = true })
 
 -- lsp formatting {{{2
 api.nvim_create_user_command("Format", function()

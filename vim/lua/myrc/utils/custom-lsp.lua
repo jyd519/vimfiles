@@ -14,7 +14,6 @@ local M = {}
 --   return settings
 -- end)
 
-
 ---@param server_name string
 ---@param settings_patcher fun(settings: table): table
 function M.patch_lsp_settings(server_name, settings_patcher)
@@ -44,4 +43,3 @@ function M.patch_lsp_settings(server_name, settings_patcher)
 end
 
 return M
-

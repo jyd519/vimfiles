@@ -1,4 +1,4 @@
-if vim.fn.has('termguicolors')==1 then
+if vim.fn.has("termguicolors") == 1 then
   vim.cmd("set termguicolors")
 end
 

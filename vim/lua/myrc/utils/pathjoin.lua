@@ -19,24 +19,22 @@ end
 if isWindows then
   -- Windows aware path utilities
   function getPrefix(path)
-    return path:match("^%a:\\") or
-           path:match("^/") or
-           path:match("^\\+")
+    return path:match("^%a:\\") or path:match("^/") or path:match("^\\+")
   end
   function splitPath(path)
     local parts = {}
-    for part in string.gmatch(path, '([^/\\]+)') do
+    for part in string.gmatch(path, "([^/\\]+)") do
       table.insert(parts, part)
     end
     return parts
   end
   function joinParts(prefix, parts, i, j)
     if not prefix then
-      return table.concat(parts, '/', i, j)
-    elseif prefix ~= '/' then
-      return prefix .. table.concat(parts, '\\', i, j)
+      return table.concat(parts, "/", i, j)
+    elseif prefix ~= "/" then
+      return prefix .. table.concat(parts, "\\", i, j)
     else
-      return prefix .. table.concat(parts, '/', i, j)
+      return prefix .. table.concat(parts, "/", i, j)
     end
   end
 else
@@ -46,21 +44,21 @@ else
   end
   function splitPath(path)
     local parts = {}
-    for part in string.gmatch(path, '([^/]+)') do
+    for part in string.gmatch(path, "([^/]+)") do
       table.insert(parts, part)
     end
     return parts
   end
   function joinParts(prefix, parts, i, j)
     if prefix then
-      return prefix .. table.concat(parts, '/', i, j)
+      return prefix .. table.concat(parts, "/", i, j)
     end
-    return table.concat(parts, '/', i, j)
+    return table.concat(parts, "/", i, j)
   end
 end
 
 local function pathJoin(...)
-  local inputs = {...}
+  local inputs = { ... }
   local l = #inputs
 
   -- Find the last segment that is an absolute path
@@ -69,7 +67,9 @@ local function pathJoin(...)
   local prefix
   while true do
     prefix = getPrefix(inputs[i])
-    if prefix or i <= 1 then break end
+    if prefix or i <= 1 then
+      break
+    end
     i = i - 1
   end
 
@@ -93,8 +93,8 @@ local function pathJoin(...)
   local reversed = {}
   for idx = #parts, 1, -1 do
     local part = parts[idx]
-    if part ~= '.' then
-      if part == '..' then
+    if part ~= "." then
+      if part == ".." then
         skip = skip + 1
       elseif skip > 0 then
         skip = skip - 1

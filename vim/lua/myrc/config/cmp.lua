@@ -1,36 +1,36 @@
 -- Setup auto completion
-local cmp = require('cmp')
-local luasnip = require('luasnip')
+local cmp = require("cmp")
+local luasnip = require("luasnip")
 
 -- Setup nvim-cmp {{{
 
 -- Source Kind Icons {{{2
 local kind_icons = {
-	Text = "",
-	Method = "m",
-	Function = "",
-	Constructor = "",
-	Field = "",
-	Variable = "",
-	Class = "",
-	Interface = "",
-	Module = "",
-	Property = "",
-	Unit = "",
-	Value = "",
-	Enum = "",
-	Keyword = "",
-	Snippet = "",
-	Color = "",
-	File = "",
-	Reference = "",
-	Folder = "",
-	EnumMember = "",
-	Constant = "",
-	Struct = "",
-	Event = "",
-	Operator = "",
-	TypeParameter = "",
+  Text = "",
+  Method = "m",
+  Function = "",
+  Constructor = "",
+  Field = "",
+  Variable = "",
+  Class = "",
+  Interface = "",
+  Module = "",
+  Property = "",
+  Unit = "",
+  Value = "",
+  Enum = "",
+  Keyword = "",
+  Snippet = "",
+  Color = "",
+  File = "",
+  Reference = "",
+  Folder = "",
+  EnumMember = "",
+  Constant = "",
+  Struct = "",
+  Event = "",
+  Operator = "",
+  TypeParameter = "",
 }
 -- }}}
 
@@ -41,7 +41,7 @@ local has_words_before = function()
 end
 
 local is_insert_keys = function(keys)
-  if type(keys) == 'string' and not (keys == '' or keys == "\\<C-N>" or keys=="\t") then
+  if type(keys) == "string" and not (keys == "" or keys == "\\<C-N>" or keys == "\t") then
     return true
   end
   return false
@@ -62,29 +62,29 @@ cmp.setup({
     documentation = cmp.config.window.bordered(),
   },
   mapping = cmp.mapping.preset.insert({
-    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-x><C-o>'] = cmp.mapping(function()
-        cmp.complete()
-      end, {'i', 's', 'c'}),
-    ['<C-e>'] = cmp.mapping(function()
-        cmp.abort()
-        luasnip.unlink_current()
-      end, {'i'}),
-    ['<CR>'] = cmp.mapping({
-       i = cmp.mapping.confirm({ select = true }),
-       -- i = function(fallback)
-       --   if cmp.visible() and cmp.get_active_entry() then
-       --     cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
-       --   else
-       --     fallback()
-       --   end
-       -- end,
-       -- s = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true}),
-       -- c = cmp.mapping.confirm({ select = true }),
+    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    ["<C-x><C-o>"] = cmp.mapping(function()
+      cmp.complete()
+    end, { "i", "s", "c" }),
+    ["<C-e>"] = cmp.mapping(function()
+      cmp.abort()
+      luasnip.unlink_current()
+    end, { "i" }),
+    ["<CR>"] = cmp.mapping({
+      i = cmp.mapping.confirm({ select = true }),
+      -- i = function(fallback)
+      --   if cmp.visible() and cmp.get_active_entry() then
+      --     cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
+      --   else
+      --     fallback()
+      --   end
+      -- end,
+      -- s = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true}),
+      -- c = cmp.mapping.confirm({ select = true }),
     }),
     -- jump backward
-    ['<C-h>'] = cmp.mapping(function(fallback)
+    ["<C-h>"] = cmp.mapping(function(fallback)
       if luasnip.jumpable(-1) then
         luasnip.jump(-1)
       elseif vim.call("UltiSnips#CanJumpBackwards") == 1 then
@@ -92,16 +92,16 @@ cmp.setup({
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { "i", "s" }),
 
     -- expand or jump forward
-    ['<C-k>'] = cmp.mapping(function(fallback)
-      local codeium_keys = vim.fn['codeium#Accept']()
+    ["<C-k>"] = cmp.mapping(function(fallback)
+      local codeium_keys = vim.fn["codeium#Accept"]()
       -- vim.fn['copilot#Accept']()
       if luasnip.jumpable() then
         luasnip.expand_or_jump()
       elseif is_insert_keys(codeium_keys) then
-        vim.api.nvim_feedkeys(codeium_keys, 'i', true)
+        vim.api.nvim_feedkeys(codeium_keys, "i", true)
       elseif luasnip.expandable() then
         luasnip.expand_or_jump()
       elseif vim.call("UltiSnips#CanJumpForwards") == 1 then
@@ -109,57 +109,57 @@ cmp.setup({
       else
         -- fallback()
       end
-    end, {'i', 's'}),
+    end, { "i", "s" }),
 
     -- select previous item
-    ['<C-p>'] = cmp.mapping(function(fallback)
+    ["<C-p>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.choice_active() then
         luasnip.change_choice(-1)
       elseif vim.b._codeium_status > 0 then
-        vim.fn['codeium#CycleCompletions'](1)
+        vim.fn["codeium#CycleCompletions"](1)
       elseif vim.b._copilot then
         vim.call("copilot#Previous")
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { "i", "s" }),
 
     -- select next item
-    ['<C-n>'] = cmp.mapping(function(fallback)
+    ["<C-n>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.choice_active() then
         luasnip.change_choice(1)
       elseif vim.b._codeium_status > 0 then
-        vim.fn['codeium#CycleCompletions'](-1)
+        vim.fn["codeium#CycleCompletions"](-1)
       elseif vim.b._copilot then
         vim.call("copilot#Next")
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { "i", "s" }),
 
     -- choose alternatives
-    ['<C-l>'] = cmp.mapping(function(fallback)
+    ["<C-l>"] = cmp.mapping(function(fallback)
       if luasnip.choice_active() then
         luasnip.change_choice(-1)
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { "i", "s" }),
 
     -- choose with vim.ui.select
-    ['<C-u>'] = cmp.mapping(function(fallback)
+    ["<C-u>"] = cmp.mapping(function(fallback)
       if luasnip.choice_active() then
         require("luasnip.extras.select_choice")()
       else
         fallback()
       end
-    end, {'i', 's'}),
+    end, { "i", "s" }),
 
-    ['<Tab>'] = cmp.mapping(function(fallback)
+    ["<Tab>"] = cmp.mapping(function(fallback)
       -- local copilot_keys = vim.fn['copilot#Accept']()
       if cmp.visible() then
         cmp.select_next_item()
@@ -172,9 +172,9 @@ cmp.setup({
       else
         fallback()
       end
-    end, { 'i', 's' }),
+    end, { "i", "s" }),
 
-    ['<S-Tab>'] = cmp.mapping(function(fallback)
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.jumpable(-1) then
@@ -182,31 +182,31 @@ cmp.setup({
       else
         fallback()
       end
-    end, { 'i', 's' }),
+    end, { "i", "s" }),
   }),
-	formatting = {
-		fields = { "kind", "abbr", "menu" },
-		format = function(entry, vim_item)
-			-- Kind icons
-			vim_item.kind = string.format("%s", kind_icons[vim_item.kind])
-			-- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
-			vim_item.menu = ({
-				copilot = "[Copilot]",
-				luasnip = "[Snippet]",
-				cmp_tabnine = "[TN]",
-				codeium = "[Codeium]",
-				nvim_lua = "[NVim Lua]",
-				nvim_lsp = "[LSP]",
-				buffer = "[Buffer]",
-				path = "[Path]",
-			})[entry.source.name]
-			return vim_item
-		end,
-	},
+  formatting = {
+    fields = { "kind", "abbr", "menu" },
+    format = function(entry, vim_item)
+      -- Kind icons
+      vim_item.kind = string.format("%s", kind_icons[vim_item.kind])
+      -- vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind) -- This concatonates the icons with the name of the item kind
+      vim_item.menu = ({
+        copilot = "[Copilot]",
+        luasnip = "[Snippet]",
+        cmp_tabnine = "[TN]",
+        codeium = "[Codeium]",
+        nvim_lua = "[NVim Lua]",
+        nvim_lsp = "[LSP]",
+        buffer = "[Buffer]",
+        path = "[Path]",
+      })[entry.source.name]
+      return vim_item
+    end,
+  },
   sources = cmp.config.sources({
-    { name = 'nvim_lua' },
-    { name = 'nvim_lsp', max_item_count = 6 },
-    { name = 'luasnip' }, -- For luasnip users.
+    { name = "nvim_lua" },
+    { name = "nvim_lsp", max_item_count = 6 },
+    { name = "luasnip" }, -- For luasnip users.
     -- { name = 'vsnip' }, -- For vsnip users.
     -- { name = 'ultisnips' }, -- For ultisnips users.
     -- { name = 'snippy' }, -- For snippy users.
@@ -216,39 +216,39 @@ cmp.setup({
     -- { name = 'cmp_tabnine' },
     { name = "crates" },
   }, {
-    { name = 'buffer', max_item_count = 6 },
-  })
+    { name = "buffer", max_item_count = 6 },
+  }),
 })
 
 -- Set configuration for specific filetype {{{1
-cmp.setup.filetype('gitcommit', {
+cmp.setup.filetype("gitcommit", {
   sources = cmp.config.sources({
-    { name = 'cmp_git' }, -- You can specify the `cmp_git` source if you were installed it.
+    { name = "cmp_git" }, -- You can specify the `cmp_git` source if you were installed it.
   }, {
-    { name = 'buffer' },
-  })
+    { name = "buffer" },
+  }),
 })
 
 -- Use buffer source for `/` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline('/', {
+cmp.setup.cmdline("/", {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
-    { name = 'buffer' }
-  }
+    { name = "buffer" },
+  },
 })
 
 -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline(':', {
+cmp.setup.cmdline(":", {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = 'path' }
+    { name = "path" },
   }, {
     -- Do not show completion for words starting with 'Man'
     -- https://github.com/hrsh7th/cmp-cmdline/issues/47
     -- { name = 'cmdline', keyword_pattern = [[^\@<!Man\s]] }
-    { name = 'cmdline' }
-  })
+    { name = "cmdline" },
+  }),
 })
 
 -- }}}
