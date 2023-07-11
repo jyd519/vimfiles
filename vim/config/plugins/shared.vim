@@ -46,7 +46,7 @@ let g:mdip_imgdir='images'
 
 " vim supports fenced code syntax
 "  -> https://vimtricks.com/p/highlight-syntax-inside-markdown/
-let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html",
+let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html", "swift",
       \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml",
       \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
 " }}}

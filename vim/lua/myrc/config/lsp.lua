@@ -30,6 +30,56 @@ local has_file = function(root, ...)
   return false
 end
 
+local function get_typescript_server_path(root_dir)
+  local found_ts = ""
+  local function check_dir(path)
+    found_ts = lspconfig.util.path.join(path, "node_modules", "typescript", "lib")
+    if lspconfig.util.path.exists(found_ts) then
+      return path
+    end
+  end
+  if lspconfig.util.search_ancestors(root_dir, check_dir) then
+    return found_ts
+  else
+    return vim.fn.expand("~/.nvm/versions/node/v16.19.1/lib/node_modules/typescript/lib")
+  end
+end
+
+--- Make an on_new_config function that sets the settings
+---@param on_new_config function
+---@return function
+local make_on_new_config = function(on_new_config)
+  return lspconfig.util.add_hook_before(on_new_config, function(new_config, root_dir)
+    local server_name = new_config.name
+    if vim.b.large_buf then
+      print(server_name .. " disabled for the file is too large")
+      new_config.enabled = false
+      return new_config
+    end
+
+    if server_name == "volar" then
+      if root_dir:match("node_modules") then
+        print("Volar disabled")
+        new_config.enabled = false
+        return new_config
+      end
+      new_config.init_options.typescript.tsdk = get_typescript_server_path(root_dir)
+    end
+
+    local nlspsettings = require("nlspsettings")
+    local config = nlspsettings.get_settings(root_dir, server_name)
+
+    local settings = vim.empty_dict()
+    settings = vim.tbl_deep_extend("keep", settings, new_config.settings)
+    settings = vim.tbl_deep_extend("force", settings, config)
+    if server_name == "jsonls" then
+      vim.list_extend(settings.json.schemas, new_config.settings.json.schemas)
+    end
+    new_config.settings = settings
+    return new_config
+  end)
+end
+
 -- }}}
 
 -- set keymap on on_attach {{{2
@@ -76,9 +126,13 @@ end
 -- }}}
 
 -- default lspconfig {{{2
+local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+capabilities.textDocument.completion.completionItem.snippetSupport = true
 local lsp_defaults = {
-  flags = { debounce_text_changes = 150 },
-  capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities()),
+   -- This is the default in Nvim 0.7+
+  -- flags = { debounce_text_changes = 150 },
+  capabilities = capabilities,
+  on_new_config = make_on_new_config(lspconfig.util.default_config.on_new_config),
   on_attach = function(client, bufnr)
     -- nvim 0.7 nvim_exec_autocmds's functionality's is limited
     -- api.nvim_exec_autocmds('User', {pattern = 'LspAttached', data=client.id})
@@ -258,17 +312,6 @@ require("typescript").setup({
 })
 -- }}}
 
--- jsonls{{{2
-lspconfig.jsonls.setup({
-  settings = {
-    json = {
-      schemas = require("schemastore").json.schemas(),
-      validate = { enable = true },
-    },
-  },
-})
--- }}}
-
 -- GoLang  {{{2
 require("go").setup({
   lsp_cfg = false,
@@ -398,11 +441,9 @@ lspconfig.pyright.setup({
   end,
   before_init = function(_, config)
     local join = lspconfig.util.path.join
-    local p
+    local p = "python3"
     if vim.env.VIRTUAL_ENV then
       p = join(vim.env.VIRTUAL_ENV, "bin", "python3")
-    else
-      p = "python3"
     end
     print("Python (pyright): ", p)
     config.settings.python.pythonPath = p
@@ -412,22 +453,6 @@ lspconfig.pyright.setup({
 -- }}}
 
 -- vue/volar {{{2
-local function get_typescript_server_path(root_dir)
-  local global_ts = "/Users/jiyongdong/.nvm/versions/node/v16.19.1/lib/node_modules/typescript/lib"
-  local found_ts = ""
-  local function check_dir(path)
-    found_ts = lspconfig.util.path.join(path, "node_modules", "typescript", "lib")
-    if lspconfig.util.path.exists(found_ts) then
-      return path
-    end
-  end
-  if lspconfig.util.search_ancestors(root_dir, check_dir) then
-    return found_ts
-  else
-    return global_ts
-  end
-end
-
 lspconfig.volar.setup({
   filetypes = {
     "vue",
@@ -438,33 +463,47 @@ lspconfig.volar.setup({
     "typescriptreact",
     "typescript.tsx",
   },
-
+  on_new_config = lspconfig.util.default_config.on_new_config,
   on_attach = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = false -- we use null-ls to format code
     client.server_capabilities.documentRangeFormattingProvider = false
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
-
-  on_new_config = function(new_config, new_root_dir)
-    if new_root_dir:match("node_modules") or vim.b.large_buf then
-      print("Volar disabled")
-      new_config.enabled = false
-      return new_config
-    end
-    new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
-    return new_config
-  end,
 })
 -- }}}
 
 -- other languages {{{2
-local servers = { "cmake", "bashls", "angularls", "cssls", "ansiblels" }
+local lsp_settings = {
+  cssls = {
+    settings = {
+      css = {
+        lint = {
+          unknownAtRules = "ignore",
+        },
+      },
+    },
+  },
+  jsonls = {
+    settings = {
+      json = {
+        schemas = require("schemastore").json.schemas(),
+        validate = { enable = true },
+      },
+    },
+  },
+}
+
+local servers = { "cmake", "bashls", "angularls", "cssls", "ansiblels", "tailwindcss", "jsonls" }
 for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup({
+  local opts = {
     on_attach = function(client, bufnr)
       lspconfig.util.default_config.on_attach(client, bufnr)
     end,
-  })
+  }
+  if lsp_settings[lsp] ~= nil then
+    opts = vim.tbl_deep_extend("force", lsp_settings[lsp], opts)
+  end
+  lspconfig[lsp].setup(opts)
 end
 -- }}}
 
@@ -515,7 +554,8 @@ vim.keymap.set(
   { noremap = true, silent = true, desc = "show document for underline word" }
 )
 -- }}}
---
+
+-- diagnostic signs {{{2
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
   signs = {
     severity = vim.diagnostic.severity.HINT,
@@ -526,4 +566,6 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagn
     -- severity_limit = "Warning",
   },
 })
+-- }}}
+
 -- vim: set fdm=marker fen fdl=1:

@@ -285,7 +285,7 @@ require("lazy").setup(
         { "hrsh7th/cmp-nvim-lsp" },
         { "hrsh7th/cmp-buffer" },
         { "hrsh7th/cmp-path" },
-        { "jyd519/cmp-cmdline" },
+        { "hrsh7th/cmp-cmdline" },
         { "hrsh7th/cmp-nvim-lua" },
         { "hrsh7th/cmp-nvim-lsp-document-symbol" },
         { "quangnguyen30192/cmp-nvim-tags", ft = { "c", "cpp" } },
@@ -307,6 +307,19 @@ require("lazy").setup(
     -- LSP {{{2
     { "williamboman/mason.nvim", config = true },
     { "williamboman/mason-lspconfig.nvim" },
+    {
+      "tamago324/nlsp-settings.nvim",
+      event = { "BufReadPre", "BufNewFile" },
+      config = function()
+        require("nlspsettings").setup({
+          config_home = vim.fn.stdpath("config") .. "/nlsp-settings",
+          local_settings_dir = ".vim",
+          local_settings_root_markers_fallback = { ".git", ".vim" },
+          append_default_schemas = true,
+          loader = "json",
+        })
+      end,
+    },
     {
       "neovim/nvim-lspconfig",
       event = { "BufReadPre", "BufNewFile" },

@@ -75,3 +75,17 @@ snippet myerrorn "Custom Error Func(inherits)" b
 				Error.captureStackTrace && Error.captureStackTrace(this, this.constructor);
 		};
 		util.inherits($1, Error);
+
+
+snippet defineStore "pinia defineStore"
+	// import { defineStore } from 'pinia';
+	export const useCounterStore = defineStore('$1:storeName', () => {
+		const count = ref(0)
+		const doubleCount = computed(() => count.value * 2)
+		function increment() {
+			count.value++
+		}
+
+		return { count, doubleCount, increment }
+	})
+
