@@ -19,6 +19,6 @@ require("marks").setup({
   -- default 10.
   sign_priority = { lower = 10, upper = 15, builtin = 8, bookmark = 20 },
   -- disables mark tracking for specific filetypes. default {}
-  excluded_filetypes = {},
+  excluded_filetypes = {"nerdtree"},
   mappings = {},
 })

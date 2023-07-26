@@ -10,6 +10,8 @@ if !g:is_nvim
   let g:UltiSnipsExpandTrigger="<C-k>"
   let g:UltiSnipsJumpForwardTrigger="<C-k>"
   let g:UltiSnipsJumpBackwardTrigger="<C-p>"
+else
+  let g:UltiSnipsExpandTrigger = ""
 endif
 let g:UltiSnipsListSnippets="<C-l>"
 let g:UltiSnipsEditSplit='horizontal'
@@ -113,7 +115,6 @@ if get(g:enabled_plugins, "telescope.nvim", 0)
   nnoremap <leader>fg <cmd>Telescope live_grep<cr>
   nnoremap <leader>fh <cmd>Telescope oldfiles<cr>
   nnoremap <leader>fo <cmd>Telescope oldfiles<cr>
-  nnoremap <C-P> <cmd>Telescope find_files<cr>
 elseif get(g:enabled_plugins, "fzf.vim", 0)
   "--------------------------------------------------------------------------------
   " An action can be a reference to a function that processes selected lines
@@ -158,6 +159,10 @@ elseif get(g:enabled_plugins, "fzf.vim", 0)
     " Allow to press esc key to close fzf window
     autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
   endif
+endif
+
+if get(g:enabled_plugins, "fzf.vim", 0)
+  nnoremap <C-P> :Files<CR>
 endif
 " }}}
 

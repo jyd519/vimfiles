@@ -37,6 +37,15 @@ require("lazy").setup(
       end,
     },
     { "christoomey/vim-tmux-navigator", enabled = fn.has("win32") == 0 and fn.executable("tmux") == 1 },
+    {
+      "ojroques/nvim-osc52",
+      event = "VimEnter",
+      enabled = vim.env.SSH_CLIENT ~= nil,
+      config = function()
+        require("osc52").setup()
+        vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
+      end,
+    },
     -- }}}
     -- Colorschemes {{{2
     { "Mofiqul/vscode.nvim" },
@@ -262,7 +271,7 @@ require("lazy").setup(
     -- Snippets {{{2
     {
       "SirVer/ultisnips",
-      enabled = g.enabled_plugins.python,
+      enabled = g.enabled_plugins.python==1 and vim.fn.has('python3')==1,
       event = { "BufReadPre", "BufNewFile" },
     },
     {
@@ -381,7 +390,13 @@ require("lazy").setup(
           on_attach = function(bufnr)
             local bm = require("bookmarks")
             local map = vim.keymap.set
-            map("n", "mm", bm.bookmark_toggle) -- add or remove bookmark at current line
+            local toggle = function()
+              if vim.bo.filetype == "nerdtree" then
+                return
+              end
+              bm.bookmark_toggle()
+            end
+            map("n", "mt", toggle) -- add or remove bookmark at current line
             map("n", "mi", bm.bookmark_ann) -- add or edit mark annotation at current line
             map("n", "mc", bm.bookmark_clean) -- clean all marks in local buffer
             map("n", "mn", bm.bookmark_next) -- jump to next mark in local buffer
