@@ -99,11 +99,22 @@ require("lazy").setup(
       "echasnovski/mini.nvim",
       version = "*",
       event = "VeryLazy",
+      enabled = false,
       config = function(_, opts)
         -- https://github.com/echasnovski/mini.nvim
         require("mini.pairs").setup(opts)
       end,
     },
+    {
+      "windwp/nvim-autopairs",
+      event = "InsertEnter",
+      config = function()
+        require("nvim-autopairs").setup({
+          map_cr = false,
+        })
+      end,
+    },
+
     { "AndrewRadev/splitjoin.vim" },
     "tmhedberg/matchit",
     "junegunn/vim-easy-align",
@@ -266,12 +277,22 @@ require("lazy").setup(
     { "pearofducks/ansible-vim" },
     { "dense-analysis/ale", lazy = true, event = "VimEnter" }, -- linter
     -- Markdown, reStructuredText, textile
+    {
+        'yaocccc/nvim-hl-mdcodeblock.lua',
+        enabled = false,
+        after = 'nvim-treesitter',
+        config = function ()
+            require('hl-mdcodeblock').setup({
+                -- option
+            })
+        end
+    },
     { "jyd519/md-img-paste.vim", ft = "markdown" },
     -- }}}
     -- Snippets {{{2
     {
       "SirVer/ultisnips",
-      enabled = g.enabled_plugins.python==1 and vim.fn.has('python3')==1,
+      enabled = g.enabled_plugins.python == 1 and vim.fn.has("python3") == 1,
       event = { "BufReadPre", "BufNewFile" },
     },
     {
@@ -336,10 +357,6 @@ require("lazy").setup(
         require("myrc.config.lsp")
       end,
     },
-    {
-      "jose-elias-alvarez/null-ls.nvim",
-      event = { "BufReadPre", "BufNewFile" },
-    },
     { "folke/neodev.nvim", lazy = true },
     {
       "simrat39/symbols-outline.nvim",
@@ -373,7 +390,7 @@ require("lazy").setup(
     },
     {
       "nvim-telescope/telescope.nvim",
-      tag = "0.1.1",
+      tag = "0.1.2",
       dependencies = {
         { "nvim-telescope/telescope-ui-select.nvim" },
       },

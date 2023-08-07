@@ -1,15 +1,5 @@
 -- My Neovim configuration
--- Jyd  Last-Modified: 2023-03-20
---
--- let g:loaded_python3_provider = 0
--- let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
--- let g:node_host_prog = '/usr/local/bin/neovim-node-host'
--- let g:copilot_node_command=expand('~/.nvm/versions/node/v16.10.0/bin/node')
--- let g:notes_dir = '/Volumes/dev/notes'
---
--- let g:enabled_plugins = {}
---
--- source path/to/init.lua
+-- Jyd  Last-Modified: 2023-08-07 
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')

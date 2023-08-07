@@ -9,7 +9,6 @@
 SCRIPT_PATH="$( cd "$(dirname $0)" ; pwd -P )"
 
 VIMCONFIG=$(cat <<-END
-let g:use_heavy_plugin = 0
 let g:test#javascript#runner = 'jest'
 set background="light"
 let g:colorscheme='PaperColor'
@@ -18,7 +17,7 @@ END
 )
 
 NVIMCONFIG=$(cat <<-END
-let g:loaded_python_provider = 0
+let g:loaded_python_provider = 1
 let g:python_host_prog = '~/.pyenv/versions/2.7.18/bin/python2'
 let g:python3_host_prog = '~/.pyenv/versions/3.10.2/bin/python3.10'
 let g:node_host_prog = '/usr/local/bin/neovim-node-host'

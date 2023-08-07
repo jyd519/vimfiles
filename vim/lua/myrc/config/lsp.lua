@@ -129,7 +129,7 @@ end
 local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 local lsp_defaults = {
-   -- This is the default in Nvim 0.7+
+  -- This is the default in Nvim 0.7+
   -- flags = { debounce_text_changes = 150 },
   capabilities = capabilities,
   on_new_config = make_on_new_config(lspconfig.util.default_config.on_new_config),
@@ -142,144 +142,6 @@ local lsp_defaults = {
 
 lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.default_config, lsp_defaults)
 _G.lspconfig = lspconfig
--- }}}
-
--- null-ls{{{2
--- https://github.com/jose-elias-alvarez/null-ls.nvim/blob/main/doc/BUILTIN_CONFIG.md
-local null_ls = require("null-ls")
-local augroup = api.nvim_create_augroup("LspFormatting", {})
--- local gotest = require("go.null_ls").gotest()
-local gotest_codeaction = require("go.null_ls").gotest_action()
-local golangci_lint = require("go.null_ls").golangci_lint()
-
-local lsp_formatting = function(bufnr)
-  vim.lsp.buf.format({
-    filter = function(client)
-      -- apply whatever logic you want (in this example, we'll only use null-ls)
-      return client.name == "null-ls"
-    end,
-    bufnr = bufnr,
-  })
-end
-
-local eslinrc_patterns = { ".eslintrc", ".eslintrc.json", ".eslintrc.yml", ".eslintrc.yaml" }
-local prettierrc_patterns = { ".prettierrc", ".prettierrc.json", ".prettierrc.yml", ".prettierrc.yaml" }
-
-local find_in_virtualenv = function(name)
-  local utils = require("null-ls.utils")
-  local venv_path = os.getenv("VIRTUAL_ENV")
-  if venv_path then
-    local fullpath = utils.path.join(venv_path, "bin", name)
-    if utils.path.exists(fullpath) then
-      return fullpath
-    end
-  end
-  return name
-end
-
-null_ls.setup({
-  log_level = "warn",
-  debounce = 500,
-  default_timeout = 10000,
-  diagnostics_format = "[#{c}] #{m} (#{s})",
-  should_attach = function(bufnr)
-    return not api.nvim_buf_get_name(bufnr):match("node_modules")
-  end,
-  sources = {
-    -- golang
-    -- gotest,
-    gotest_codeaction,
-    golangci_lint,
-    null_ls.builtins.formatting.golines.with({
-      extra_args = {
-        "--max-len=180",
-        "--base-formatter=gofumpt",
-      },
-    }),
-    -- python
-    null_ls.builtins.diagnostics.pylint.with({
-      command = find_in_virtualenv("pylint"),
-      runtime_condition = function(params)
-        return os.getenv("VIRTUAL_ENV") ~= nil
-      end,
-    }),
-    -- null_ls.builtins.formatting.pyflyby,
-    null_ls.builtins.formatting.black,
-    null_ls.builtins.diagnostics.mypy.with({
-      command = find_in_virtualenv("mypy"),
-      runtime_condition = function(params)
-        local utils = require("null-ls.utils")
-        return utils.path.exists(params.bufname) and os.getenv("VIRTUAL_ENV") ~= nil
-      end,
-      extra_args = {
-        "--ignore-missing-imports",
-      },
-    }),
-    -- typescript
-    require("typescript.extensions.null-ls.code-actions"),
-    null_ls.builtins.code_actions.eslint.with({
-      runtime_condition = function(params)
-        return string.match(params.bufname, "node_modules") == nil
-      end,
-    }),
-    -- null_ls.builtins.code_actions.gitsigns,  -- blame current line
-    null_ls.builtins.code_actions.refactoring,
-    null_ls.builtins.diagnostics.eslint.with({
-      runtime_condition = function(params)
-        if vim.b.large_buf then
-          return false
-        end
-        local root = vim.fn.getcwd()
-        if not has_file(root, eslinrc_patterns) then
-          return false
-        end
-        return string.match(params.bufname, "node_modules") == nil
-      end,
-    }),
-    null_ls.builtins.formatting.prettierd.with({
-      runtime_condition = function(params)
-        local root = vim.fn.getcwd()
-        if not has_file(root, prettierrc_patterns) then
-          return false
-        end
-        return string.match(params.bufname, "node_modules") == nil
-      end,
-    }),
-  },
-  on_attach = function(client, bufnr)
-    lspconfig.util.default_config.on_attach(client, bufnr)
-    if client.supports_method("textDocument/formatting") then
-      api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
-      api.nvim_create_autocmd("BufWritePre", {
-        group = augroup,
-        buffer = bufnr,
-        callback = function()
-          -- lsp_formatting(bufnr)
-        end,
-      })
-    end
-  end,
-})
-
-vim.api.nvim_create_user_command("NullLsEnable", function(args)
-  require("null-ls.sources").enable(args.fargs[1])
-end, {
-  nargs = 1,
-  complete = function(ArgLead, CmdLine, CursorPos)
-    return require("null-ls.sources").get_supported(vim.bo.filetype).diagnostics
-  end,
-  desc = "Null-ls: Enable Sources",
-})
-
-vim.api.nvim_create_user_command("NullLsDisable", function(args)
-  require("null-ls.sources").disable(args.fargs[1])
-end, {
-  nargs = 1,
-  complete = function(ArgLead, CmdLine, CursorPos)
-    return require("null-ls.sources").get_supported(vim.bo.filetype).diagnostics
-  end,
-  desc = "Null-ls: Disable Sources",
-})
 -- }}}
 
 -- tsserver {{{2
@@ -376,14 +238,13 @@ local function get_lua_library()
   add("$VIMFILES/lazy/plenary.nvim/lua")
   add("$VIMFILES/lazy/nvim-cmp/lua")
   add("$VIMFILES/lazy/nvim-lspconfig/lua")
-  add("$VIMFILES/lazy/null-ls.nvim/lua")
   return library
 end
 
 lspconfig["lua_ls"].setup({
   single_file_support = true,
   on_attach = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = false -- we use null-ls to format code
+    client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
@@ -465,8 +326,6 @@ lspconfig.volar.setup({
   },
   on_new_config = lspconfig.util.default_config.on_new_config,
   on_attach = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = false -- we use null-ls to format code
-    client.server_capabilities.documentRangeFormattingProvider = false
     lspconfig.util.default_config.on_attach(client, bufnr)
   end,
 })

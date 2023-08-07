@@ -1,7 +1,7 @@
 "--------------------------------------------------------------------------------
 " Configurations for Vim
 " Use vim-plug to install plugins
-" Jyd  Last-Modified: 2021-12-13
+" Jyd  Last-Modified: 2023-8-7
 "--------------------------------------------------------------------------------
 set nocompatible
 

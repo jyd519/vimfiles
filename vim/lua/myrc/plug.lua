@@ -95,8 +95,6 @@ Plug({ "b0o/schemastore.nvim" })
 Plug({ "williamboman/mason.nvim" })
 Plug({ "williamboman/mason-lspconfig.nvim" })
 Plug({ "neovim/nvim-lspconfig" })
-Plug({ "jose-elias-alvarez/null-ls.nvim" })
--- Plug {"jose-elias-alvarez/nvim-lsp-ts-utils"}
 Plug({ "jose-elias-alvarez/typescript.nvim" })
 Plug({ "arkav/lualine-lsp-progress" })
 Plug({ "folke/neodev.nvim", opt = true, ft = { "lua" } })

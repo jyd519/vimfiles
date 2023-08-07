@@ -15,21 +15,18 @@
 ```vim
 let g:loaded_perl_provider = 0
 let g:loaded_ruby_provider = 0
-" let g:loaded_python3_provider = 1
-" let g:loaded_node_provider = 1
 let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
+let g:loaded_python3_provider = 1
 let g:node_host_prog = '/usr/local/bin/neovim-node-host'
+let g:loaded_node_provider = 1
+
 let g:copilot_node_command=expand('~/.nvm/versions/node/v16.10.0/bin/node')
 " let g:notes_dir = '<path>'
 
 " enable plugins
 " let g:enabled_plugins = { "fzf": 1, "node": 1, "go": 1, "rust": 1, "python": 1}
 
-" use vim-plug
-source ~/vimgit/vim/plug.lua
-
-" use packer.nvim
-" source ~/vimgit/vim/init.lua
+source ~/vimgit/vim/lazy.lua
 
 set background=light
 colorscheme vscode

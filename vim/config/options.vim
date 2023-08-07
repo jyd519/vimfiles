@@ -44,6 +44,7 @@ set wildignore+=*\\tmp\\*,*.swp,*.zip,*.exe  " Windows
 set wildignore+=*DS_Store,*.pyc
 set completeopt=menu,menuone,noselect,preview
 "set t_ti= t_te= Keep screen after vim exited
+set formatoptions+=mM " Better CJK supports
 
 set clipboard+=unnamed
 
