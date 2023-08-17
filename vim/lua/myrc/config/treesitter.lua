@@ -6,10 +6,9 @@ if mod then
     highlight = {
       enable = true, -- false will disable the whole extension
       disable = function(lang, buf)
-        -- if lang == "markdown" then
-        --   -- inline fence not get syntax highlight with treesitter highlight
-        --   return true
-        -- end
+        if lang == "markdown" then
+          return true
+        end
 
         ---@diagnostic disable-next-line: undefined-field
         if vim.b.large_buf then

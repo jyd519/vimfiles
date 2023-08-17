@@ -17,20 +17,20 @@ END
 )
 
 NVIMCONFIG=$(cat <<-END
-let g:loaded_python_provider = 1
-let g:python_host_prog = '~/.pyenv/versions/2.7.18/bin/python2'
-let g:python3_host_prog = '~/.pyenv/versions/3.10.2/bin/python3.10'
-let g:node_host_prog = '/usr/local/bin/neovim-node-host'
+let g:loaded_perl_provider = 0
+let g:loaded_ruby_provider = 0
 
-let g:use_heavy_plugin = 1
-let g:use_treesitter = 1
+let g:loaded_python3_provider = 1
+let g:python3_host_prog = '~/.pyenv/versions/3.10.2/bin/python3.10'
+let g:loaded_node_provider = 1
+let g:node_host_prog = '/usr/local/bin/neovim-node-host'
 
 let g:test#javascript#runner = 'jest'
 
 set background="light"
 let g:colorscheme='vscode'
 
-source $SCRIPT_PATH/vim/init.lua
+source $SCRIPT_PATH/vim/lazy.lua
 END
 )
 

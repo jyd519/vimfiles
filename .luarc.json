@@ -6,11 +6,7 @@
     "Lua.diagnostics.globals": [
         "vim",
         "hs",
-        "parse",
-        "s",
-        "t",
         "prequire",
-        "put",
-        "USE_VOLAR"
+        "put"
     ]
 }

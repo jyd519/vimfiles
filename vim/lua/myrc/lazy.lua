@@ -44,6 +44,9 @@ require("lazy").setup(
       config = function()
         require("osc52").setup()
         vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
+        vim.cmd[[
+          autocmd vimrc TextYankPost * lua require("osc52").copy_visual()
+        ]]
       end,
     },
     -- }}}
@@ -183,11 +186,11 @@ require("lazy").setup(
     { "sbdchd/neoformat", cmd = { "Neoformat" } },
     {
       "lukas-reineke/indent-blankline.nvim",
-      event = { "BufReadPost", "BufNewFile" },
+      event = { "VeryLazy" },
       config = true,
       opts = {
         char = "│",
-        filetype_exclude = { "markdown", "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+        filetype_exclude = {"qf", "markdown", "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
         -- depends on treesitter
         show_current_context = true,
         show_current_context_start = false,
@@ -205,12 +208,19 @@ require("lazy").setup(
       enabled = true,
       config = function()
         vim.g.codeium_no_map_tab = 1
+
         vim.keymap.set("i", "<C-g>", function()
           return vim.fn["codeium#Accept"]()
-        end, { expr = true })
-        -- vim.keymap.set('i', '<c-;>', function() return vim.fn['codeium#CycleCompletions'](1) end, { expr = true })
-        -- vim.keymap.set('i', '<c-,>', function() return vim.fn['codeium#CycleCompletions'](-1) end, { expr = true })
-        -- require("codeium").setup({})
+        end, { expr = true, desc = "Accept Codeium" })
+
+        local mapkey = require("keymap-amend")
+        mapkey("i", "<C-j>", function(fallback)
+          if vim.b._codeium_completions ~= nil then
+            return vim.fn["codeium#Clear"]()
+          else
+            fallback()
+          end
+        end, { silent = true, desc = "Clear Codeium Completions" })
       end,
     },
     {
@@ -377,16 +387,20 @@ require("lazy").setup(
       },
     },
     {
+      "ibhagwan/fzf-lua",
+      event = "VimEnter",
+      enabled = fn.get(g.enabled_plugins, "fzf") == 1,
+      config = function()
+        -- calling `setup` is optional for customization
+        require("fzf-lua").setup({
+          fzf_opts = {['--layout'] = 'reverse-list'},
+        })
+      end
+    },
+    {
       "junegunn/fzf.vim",
       event = "VimEnter",
-      dependencies = {
-        {
-          "junegunn/fzf",
-          build = "fzf#install()",
-          enabled = fn.get(g.enabled_plugins, "fzf") == 1,
-        },
-      },
-      enabled = fn.get(g.enabled_plugins, "fzf") == 1,
+      enabled = false , -- fn.get(g.enabled_plugins, "fzf") == 1,
     },
     {
       "nvim-telescope/telescope.nvim",

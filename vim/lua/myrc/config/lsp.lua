@@ -104,7 +104,6 @@ local function setup_client(client, bufnr)
   bufmap("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
 
   -- Renames all references to the symbol under the cursor
-  bufmap("n", "<F2>", "<cmd>lua vim.lsp.buf.rename()<cr>")
   bufmap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<cr>")
 
   -- formatting code
@@ -235,9 +234,13 @@ local function get_lua_library()
   add("$VIMFILES/lua")
 
   -- add plugins
-  add("$VIMFILES/lazy/plenary.nvim/lua")
-  add("$VIMFILES/lazy/nvim-cmp/lua")
-  add("$VIMFILES/lazy/nvim-lspconfig/lua")
+  -- add("$VIMFILES/lazy/plenary.nvim/lua")
+  -- add("$VIMFILES/lazy/nvim-cmp/lua")
+  -- add("$VIMFILES/lazy/nvim-lspconfig/lua")
+  local paths = vim.api.nvim_get_runtime_file("", true)
+  for _, p in pairs(paths) do
+    library[p] = true
+  end
   return library
 end
 

@@ -174,4 +174,10 @@ endfunction
 nnoremap <silent> <leader>ll :call ToggleLocationList()<cr>
 "}}}
 
+
+" enable osc52 copying for remote ssh connection
+if $SSH_CONNECTION != ""
+  autocmd vimrc TextYankPost * lua require("osc52").copy_visual()
+endif
+
 " vim: set fdm=marker fen:

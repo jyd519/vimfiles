@@ -10,22 +10,32 @@
 
 + For Neovim User
 
-~/.config/nvim/init.vim
+```sh
+mkdir -p ~/.config/nvim
+```
+
+Edit `~/.config/nvim/init.vim`
 
 ```vim
 let g:loaded_perl_provider = 0
 let g:loaded_ruby_provider = 0
+" path to python3
 let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
 let g:loaded_python3_provider = 1
+" npm i -g neovim
 let g:node_host_prog = '/usr/local/bin/neovim-node-host'
 let g:loaded_node_provider = 1
 
-let g:copilot_node_command=expand('~/.nvm/versions/node/v16.10.0/bin/node')
+let g:node_path = $NODE_PATH != "" ? $NODE_PATH :  'node'
+
+" let g:copilot_node_command=expand('~/.nvm/versions/node/v16.10.0/bin/node')
 " let g:notes_dir = '<path>'
 
 " enable plugins
 " let g:enabled_plugins = { "fzf": 1, "node": 1, "go": 1, "rust": 1, "python": 1}
 
+
+set termguicolors
 source ~/vimgit/vim/lazy.lua
 
 set background=light

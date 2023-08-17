@@ -105,13 +105,34 @@ let g:session_autosave_periodic=0
 " }}}
 
 " fzf/telescopoe {{{1
-if get(g:enabled_plugins, "telescope.nvim", 0)
-  "--------------------------------------------------------------------------------
-  " Find files using Telescope command-line sugar.
-  nnoremap <leader>ff <cmd>Telescope find_files<cr>
-  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-  nnoremap <leader>fh <cmd>Telescope oldfiles<cr>
-  nnoremap <leader>fo <cmd>Telescope oldfiles<cr>
+if get(g:enabled_plugins, "fzf-lua", 0)
+  " https://github.com/ibhagwan/fzf-lua
+  nnoremap <C-P> <cmd>lua require('fzf-lua').files({cwd_prompt = false, prompt="Files> "})<CR>
+  nnoremap <leader>ff <cmd>lua require('fzf-lua').files({ cwd_prompt = false, prompt="Files> ", fzf_opts = {['--layout'] = 'reverse-list'} })<CR>
+  nnoremap <leader>ft <cmd>lua require('fzf-lua').files({ cwd_prompt = false, prompt="Notes> ", fzf_opts = {['--layout'] = 'reverse-list'}, cwd=vim.g.mysnippets_dir })<CR>
+  nnoremap <leader>fm <cmd>lua require('fzf-lua').marks()<CR>
+  nnoremap <leader>fo <cmd>lua require('fzf-lua').oldfiles()<CR>
+  nnoremap <leader>fb <cmd>lua require('fzf-lua').buffers()<CR>
+  nnoremap <leader>fq <cmd>lua require('fzf-lua').quickfix()<CR>
+  nnoremap <leader>fl <cmd>lua require('fzf-lua').loclist()<CR>
+  nnoremap <leader>fg <cmd>lua require('fzf-lua').git_files()<CR>
+  nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
+  if exists('g:notes_dir') && executable("rg")
+    nnoremap <leader>fn <cmd>lua require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md"', cwd = vim.g.notes_dir })<CR>
+    lua << EOF
+    vim.api.nvim_buf_create_user_command(0, 'Notes',
+      function(opts)
+        require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' .. opts.fargs[1], cwd = vim.g.notes_dir })
+      end,
+      { nargs = 1,
+        complete = function(ArgLead, CmdLine, CursorPos)
+          return vim.fn.readdir(vim.g.notes_dir, function (filename) 
+            return  vim.fn.isdirectory(vim.g.notes_dir .. '/' .. filename) == 1 and string.sub(filename, 1, 1) ~= "." 
+          end)
+      end,
+      })
+EOF
+  endif
 elseif get(g:enabled_plugins, "fzf.vim", 0)
   "--------------------------------------------------------------------------------
   " An action can be a reference to a function that processes selected lines
@@ -156,10 +177,13 @@ elseif get(g:enabled_plugins, "fzf.vim", 0)
     " Allow to press esc key to close fzf window
     autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
   endif
-endif
-
-if get(g:enabled_plugins, "fzf.vim", 0)
-  nnoremap <C-P> :Files<CR>
+elseif get(g:enabled_plugins, "telescope", 0)
+  "--------------------------------------------------------------------------------
+  " Find files using Telescope command-line sugar.
+  nnoremap <leader>ff <cmd>Telescope find_files<cr>
+  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
+  nnoremap <leader>fh <cmd>Telescope oldfiles<cr>
+  nnoremap <leader>fo <cmd>Telescope oldfiles<cr>
 endif
 " }}}
 

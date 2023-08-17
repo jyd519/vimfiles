@@ -62,7 +62,7 @@ if has('termguicolors')
   endif
 endif
 
-set path=.,./include/**/*,/usr/local/include,/usr/include,$VIMFILES
+set path=,,.,./include,/usr/local/include,/usr/include,$VIMFILES
 
 " Default sh is Bash
 let g:bash_is_sh=1

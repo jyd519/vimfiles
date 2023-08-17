@@ -71,6 +71,10 @@ cmp.setup({
       cmp.abort()
       luasnip.unlink_current()
     end, { "i" }),
+    ['<Esc>'] = cmp.mapping(function(fallback)
+        luasnip.unlink_current()
+        fallback()
+    end, { "i" }),
     ["<CR>"] = cmp.mapping({
       i = cmp.mapping.confirm({ select = true }),
       -- i = function(fallback)
