@@ -18,7 +18,7 @@ endif
 set rtp^=$VIMFILES rtp+=$VIMFILES/after
 
 " enable plugins
-" let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "coc": 0 }
+let g:enabled_plugins = { "fzf": 1, "node": 1, "go": 1, "rust": 0, "coc": 0 }
 
 runtime config/globals.vim
 

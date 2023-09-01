@@ -25,7 +25,6 @@ call plug#begin('$VIMFILES/plugged')
 
 Plug 'mhinz/vim-startify'
 Plug 'NLKNguyen/papercolor-theme'
-Plug 'Mofiqul/vscode.nvim'
 
 " Efficient editing
 Plug 'jyd519/ListToggle'          " toggle quickfix/location window
@@ -35,8 +34,8 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'tmhedberg/matchit'
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'junegunn/vim-easy-align'
-" Plug 'tpope/vim-surround'
-" Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
 Plug 'chiedojohn/vim-case-convert'
 Plug 'tomtom/tcomment_vim'
 Plug $VIMFILES . '/locals/vim-a'
@@ -77,10 +76,8 @@ if get(g:enabled_plugins, "python", 0)
 endif
 
 " async
-if get(g:enabled_plugins, "rare", 0)
-  Plug 'skywind3000/asyncrun.vim'
-  Plug 'tpope/vim-dispatch'
-endif
+Plug 'skywind3000/asyncrun.vim'
+Plug 'tpope/vim-dispatch'
 
 " Auto Completion
 if get(g:enabled_plugins, "ycm", 0)
@@ -169,6 +166,7 @@ Plug 'ilyachur/cmake4vim'
 
 " vimdoc - Chinese version
 Plug 'yianwillis/vimcdoc'
+
 " reading rfc
 Plug 'mhinz/vim-rfc'
 

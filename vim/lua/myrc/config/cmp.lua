@@ -41,9 +41,7 @@ local has_words_before = function()
 end
 
 local is_insert_keys = function(keys)
-  if type(keys) == "string" and not (keys == "" or keys == "\\<C-N>" or keys == "\t") then
-    return true
-  end
+  if type(keys) == "string" and not (keys == "" or keys == "\\<C-N>" or keys == "\t") then return true end
   return false
 end
 
@@ -64,16 +62,14 @@ cmp.setup({
   mapping = cmp.mapping.preset.insert({
     ["<C-d>"] = cmp.mapping.scroll_docs(-4),
     ["<C-f>"] = cmp.mapping.scroll_docs(4),
-    ["<C-x><C-o>"] = cmp.mapping(function()
-      cmp.complete()
-    end, { "i", "s", "c" }),
+    ["<C-x><C-o>"] = cmp.mapping(function() cmp.complete() end, { "i", "s", "c" }),
     ["<C-e>"] = cmp.mapping(function()
       cmp.abort()
       luasnip.unlink_current()
     end, { "i" }),
-    ['<Esc>'] = cmp.mapping(function(fallback)
-        luasnip.unlink_current()
-        fallback()
+    ["<Esc>"] = cmp.mapping(function(fallback)
+      luasnip.unlink_current()
+      fallback()
     end, { "i" }),
     ["<CR>"] = cmp.mapping({
       i = cmp.mapping.confirm({ select = true }),
@@ -237,7 +233,23 @@ cmp.setup.filetype("gitcommit", {
 cmp.setup.cmdline("/", {
   mapping = cmp.mapping.preset.cmdline(),
   sources = {
-    { name = "buffer" },
+    {
+      name = "buffer",
+      options = {
+        -- https://github.com/hrsh7th/cmp-buffer#indexing-and-how-to-optimize-it
+        get_bufnrs = function()
+          if vim.b.large_buf then
+            return {}
+          end
+          local buf = vim.api.nvim_get_current_buf()
+          local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+          if byte_size > 5 * 1024 * 1024 then -- 1 Megabyte max
+            return {}
+          end
+          return { buf }
+        end,
+      },
+    },
   },
 })
 

@@ -31,9 +31,7 @@ Hydra({
     hint = {
       border = "rounded",
     },
-    on_enter = function()
-      vim.o.virtualedit = "all"
-    end,
+    on_enter = function() vim.o.virtualedit = "all" end,
   },
   mode = "n",
   body = "<leader>v",
@@ -105,9 +103,7 @@ Hydra({
       border = "rounded",
       position = "bottom-right",
     },
-    on_exit = function()
-      vim.cmd("DapStop")
-    end,
+    on_exit = function() vim.cmd("silent! DapStop") end,
   },
   mode = { "n" },
   body = "<leader>D",
@@ -131,9 +127,7 @@ Hydra({
     { "<F9>", dap.toggle_breakpoint, { desc = false } },
     {
       "C",
-      function()
-        dap.set_breakpoint(vim.fn.input("[Condition] > "))
-      end,
+      function() dap.set_breakpoint(vim.fn.input("[Condition] > ")) end,
       desc = "Conditional Breakpoint",
     },
     { "T", dap.clear_breakpoints, { desc = "clear breakpoints" } },
@@ -143,17 +137,13 @@ Hydra({
 
     {
       "U",
-      function()
-        dapui.toggle()
-      end,
+      function() dapui.toggle() end,
       desc = "Toggle UI",
     },
     -- {"e", function () require"dapui".eval() end, {desc = "evaluate variable"}},
     {
       "E",
-      function()
-        dapui.eval(vim.fn.input("[Expression] > "))
-      end,
+      function() dapui.eval(vim.fn.input("[Expression] > ")) end,
       desc = "Evaluate Input",
     },
     { "r", dap.repl.open, { exit = true, desc = "open repl" } },
@@ -174,30 +164,25 @@ end
 local hydra_cs = Hydra({
   name = "Switch colorscheme",
   mode = { "n" },
-  -- body = "<leader>cc",
+  body = "<leader>c",
   config = {
     color = "pink",
+    hint = { type = "window"},
     invoke_on_body = true,
-    on_enter = function()
-      print(vim.g.colors_name, vim.go.background)
-    end,
-    on_key = function()
-      print(vim.g.colors_name or "", vim.go.background)
-    end,
+    on_enter = function() print(vim.g.colors_name, vim.go.background) end,
+    on_key = function() print(vim.g.colors_name or "", vim.go.background) end,
   },
   heads = {
     { "<left>", "<cmd>NextCS<cr>", { desc = "←" } },
     { "<right>", "<cmd>PreviousCS<cr>", { desc = "→" } },
     { "<space>", toggle_background, { desc = "dark/light" } },
-    { "<up>", toggle_background, { desc = false } },
+    { "s", "<Cmd>Telescope colorscheme<cr>", { exit = true, desc = "select colorscheme" } },
     { "q", nil, { exit = true } },
     { "<Esc>", nil, { exit = true } },
   },
 })
 
-vim.api.nvim_create_user_command("SwitchCS", function()
-  hydra_cs:activate()
-end, {})
+vim.api.nvim_create_user_command("SwitchCS", function() hydra_cs:activate() end, {})
 
 -- diagnostics{{{2
 --
@@ -220,53 +205,43 @@ local diagnostic_hint = [[
 ]]
 
 Hydra({
-  hint = diagnostic_hint,
   name = "Diagnostics",
+  mode = { "n" },
+  body = "<leader>xn",
+  hint = diagnostic_hint,
   config = {
     invoke_on_body = true,
     color = "pink",
     hint = {
-      position = "bottom",
+      -- position = "bottom",
       border = "rounded",
     },
   },
-  mode = { "n" },
-  body = "<leader>dd",
   heads = {
     {
       "n",
-      function()
-        vim.diagnostic.goto_next()
-      end,
+      function() vim.diagnostic.goto_next() end,
       { desc = "next diagnostic" },
     },
     {
       "N",
-      function()
-        vim.diagnostic.goto_prev()
-      end,
+      function() vim.diagnostic.goto_prev() end,
       { desc = "previous diagnostic" },
     },
     {
       "a",
-      function()
-        require("telescope.builtin").diagnostics({})
-      end,
+      function() require("telescope.builtin").diagnostics({}) end,
       { desc = "diagnostics", exit = true, nowait = true },
     },
     { "t", toggle_diagnostics, { desc = "toggle diagnostics" } },
     {
       "l",
-      function()
-        require("telescope.builtin").diagnostics({ bufnr = 0 })
-      end,
+      function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end,
       { desc = "buffer diagnostics", exit = true, nowait = true },
     },
     {
       "b",
-      function()
-        require("telescope.builtin").diagnostics({ bufnr = 0 })
-      end,
+      function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end,
       { desc = "buffer diagnostics", exit = true, nowait = true },
     },
     {

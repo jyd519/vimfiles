@@ -2,13 +2,21 @@
 -- Jyd  Last-Modified: 2023-08-07 
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
-local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
+
+-- local VIMFILES=fn.fnamemodify(fn.resolve(fn.expand('<sfile>:p')), ':h')
+local VIMFILES=fn.expand('<sfile>:p:h')
 
 vim.opt.rtp:prepend(VIMFILES)
 vim.opt.rtp:append(VIMFILES .. '/after')
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
 g.myinitrc=VIMFILES .. '/lazy.lua'
+
+if env.DARK ~= nil then
+  vim.o.background = env.DARK == "1" and "dark" or "light"
+end
+
+vim.loader.enable()
 
 -- load global variables
 vim.cmd('runtime config/globals.vim')

@@ -36,8 +36,8 @@ augroup end
 
 " folding
 " setlocal foldlevel=1
-set foldmethod=expr
-set foldexpr=nvim_treesitter#foldexpr()
+" set foldmethod=expr
+" set foldexpr=nvim_treesitter#foldexpr()
 
 set textwidth=120
 

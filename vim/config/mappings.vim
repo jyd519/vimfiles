@@ -83,100 +83,29 @@ tnoremap <C-l> <C-\><C-N><C-w>l
 
 " Auto switching IME {{{1
 "--------------------------------------------------------------------------------
-function! s:Ime_en()
-  let ts = localtime()
-  let input_status = system('im-select')
-  if input_status =~ "com.apple.keylayout.ABC"
-    let b:inputtoggle = 0
-  else
-    let b:inputtoggle = 1
-    call system('im-select com.apple.keylayout.ABC') "use en ime
-  endif
-endfunction
-
-function! s:Ime_zh()
-  try
-    if b:inputtoggle == 1
-      " Restore previous IME
-      call system('im-select com.apple.inputmethod.SCIM.ITABC')
-    endif
-  catch /inputtoggle/
-    let b:inputtoggle = 0
-  endtry
-endfunction
-
 if has("mac") && executable("im-select")
-  autocmd! vimrc InsertLeave * call <SID>Ime_en()
-  autocmd! vimrc InsertEnter * call <SID>Ime_zh()
+  autocmd! vimrc InsertLeave * call misc#Ime_en()
+  autocmd! vimrc InsertEnter * call misc#Ime_zh()
 endif
 "}}}
 
 " Search for visually selected text {{{1
-function! s:getSelectedText()
-  let l:old_reg = getreg('"')
-  let l:old_regtype = getregtype('"')
-  norm gvy
-  let l:ret = getreg('"')
-  call setreg('"', l:old_reg, l:old_regtype)
-  exe "norm \<Esc>"
-  return l:ret
-endfunction
-
-vnoremap <silent> * :call setreg("/",
-      \ substitute(<SID>getSelectedText(),
-      \ '\_s\+',
-      \ '\\_s\\+', 'g')
-      \ )<Cr>n
-
-vnoremap <silent> # :call setreg("?",
-      \ substitute(<SID>getSelectedText(),
-      \ '\_s\+',
-      \ '\\_s\\+', 'g')
-      \ )<Cr>n
-
+vnoremap <silent> * :call misc#SearchVisualTextDown()<CR>
+vnoremap <silent> # :call misc#SearchVisualTextUp()<CR>
 
 " Zoom / Restore window {{{1
-function! s:ZoomToggle() abort
-  if exists('t:zoomed') && t:zoomed
-    execute t:zoom_winrestcmd
-    let t:zoomed = 0
-  else
-    let t:zoom_winrestcmd = winrestcmd()
-    resize
-    vertical resize
-    let t:zoomed = 1
-  endif
-endfunction
-command! ZoomToggle call s:ZoomToggle()
-nnoremap <silent> <leader>z :ZoomToggle<CR>
+command! ZoomToggle call misc#ZoomToggle()
+nnoremap <silent> <leader>z :call misc#ZoomToggle()<CR>
 
 " quickfix {{{
-function! ToggleQuickFix()
-    if empty(filter(getwininfo(), 'v:val.quickfix')) && !empty(getqflist())
-        copen
-    else
-        cclose
-    endif
-endfunction
-
-nnoremap <silent> <F2> :call ToggleQuickFix()<cr>
-nnoremap <silent> <leader>cc :call ToggleQuickFix()<cr>
+nnoremap <silent> <F2> :call qf#ToggleQuickFix()<cr>
+nnoremap <silent> <S-F2> :call qf#ToggleLocationList()<cr>
+nnoremap <silent> <leader>xg :call qf#ToggleQuickFix()<cr>
+nnoremap <silent> <leader>xl :call qf#ToggleLocationList()<cr>
 "}}}
-"
-" location list {{{
-function! ToggleLocationList()
-    if empty(filter(getwininfo(), 'v:val.loclist'))
-        silent! lopen
-    else
-        silent! lclose
-    endif
-endfunction
-nnoremap <silent> <leader>ll :call ToggleLocationList()<cr>
-"}}}
-
 
 " enable osc52 copying for remote ssh connection
-if $SSH_CONNECTION != ""
+if $SSH_CONNECTION != "" && g:is_nvim
   autocmd vimrc TextYankPost * lua require("osc52").copy_visual()
 endif
 

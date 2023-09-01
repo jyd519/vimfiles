@@ -94,7 +94,7 @@ let g:ale_fixers = {
       \}
 
 nnoremap <leader>L <Plug>(ale_lint)
-nnoremap <leader>fx <Plug>(ale_fix)
+nnoremap <leader>xF <Plug>(ale_fix)
 " }}}
 
 " vim-session settings {{{
@@ -113,7 +113,7 @@ if get(g:enabled_plugins, "fzf-lua", 0)
   nnoremap <leader>fm <cmd>lua require('fzf-lua').marks()<CR>
   nnoremap <leader>fo <cmd>lua require('fzf-lua').oldfiles()<CR>
   nnoremap <leader>fb <cmd>lua require('fzf-lua').buffers()<CR>
-  nnoremap <leader>fq <cmd>lua require('fzf-lua').quickfix()<CR>
+  nnoremap <leader>fx <cmd>lua require('fzf-lua').quickfix()<CR>
   nnoremap <leader>fl <cmd>lua require('fzf-lua').loclist()<CR>
   nnoremap <leader>fg <cmd>lua require('fzf-lua').git_files()<CR>
   nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
@@ -133,7 +133,9 @@ if get(g:enabled_plugins, "fzf-lua", 0)
       })
 EOF
   endif
-elseif get(g:enabled_plugins, "fzf.vim", 0)
+endif
+
+if get(g:enabled_plugins, "fzf.vim", 0)
   "--------------------------------------------------------------------------------
   " An action can be a reference to a function that processes selected lines
   function! s:build_quickfix_list(lines)
@@ -154,36 +156,30 @@ elseif get(g:enabled_plugins, "fzf.vim", 0)
 
   " key binding
   nnoremap <C-P> :Files<CR>
-  nnoremap <leader>ff :Files<CR>
-  nnoremap <leader>fm :Marks<CR>
-  nnoremap <leader>fh :History<CR>
-  nnoremap <leader>fb :Buffers<CR>
 
-  function! s:find_notes(sub)
-    let opts = {'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . a:sub,
-          \ 'sink': 'e',
-          \ 'down': '50%',
-          \ 'dir': g:notes_dir,
-          \ 'options': ['--info=inline', '--reverse']}
-    call fzf#run(opts)
-  endfunction
+  if get(g:enabled_plugins, 'telescope.nvim', 0) == 0
+    nnoremap <leader>ff :Files<CR>
+    nnoremap <leader>fm :Marks<CR>
+    nnoremap <leader>fo :History<CR>
 
-  if exists('g:notes_dir') && executable("rg")
-    command! -nargs=? Notes call s:find_notes(<q-args>)
-    nnoremap <leader>fn :Notes<CR>
+    function! s:find_notes(sub)
+      let opts = {'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . a:sub,
+            \ 'sink': 'e',
+            \ 'down': '50%',
+            \ 'dir': g:notes_dir,
+            \ 'options': ['--info=inline', '--reverse']}
+      call fzf#run(opts)
+    endfunction
+    
+    if exists('g:notes_dir') && executable("rg")
+      command! -nargs=? Notes call s:find_notes(<q-args>)
+      nnoremap <leader>fn :Notes<CR>
+    endif
   endif
-
   if has("nvim")
     " Allow to press esc key to close fzf window
     autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
   endif
-elseif get(g:enabled_plugins, "telescope", 0)
-  "--------------------------------------------------------------------------------
-  " Find files using Telescope command-line sugar.
-  nnoremap <leader>ff <cmd>Telescope find_files<cr>
-  nnoremap <leader>fg <cmd>Telescope live_grep<cr>
-  nnoremap <leader>fh <cmd>Telescope oldfiles<cr>
-  nnoremap <leader>fo <cmd>Telescope oldfiles<cr>
 endif
 " }}}
 
@@ -192,9 +188,7 @@ endif
 let g:mysnippets_dir = expand("$VIMFILES/mysnippets/codesnippets")
 let $mysnippets = g:mysnippets_dir
 
-if get(g:enabled_plugins, "telescope.nvim", 0)
-  " integrate with telescope
-elseif get(g:enabled_plugins, "fzf.vim", 0)
+if get(g:enabled_plugins, "fzf.vim", 0)
   " integrate with fzf
   function! s:search_template(arg, bang)
     let all = len(&ft) == 0 || a:arg =~ 'a'
@@ -243,9 +237,9 @@ runtime ftplugin/man.vim
 "--------------------------------------------------------------------------------
 if get(g:enabled_plugins, "vim-easy-align", 0)
   " Start interactive EasyAlign in visual mode (e.g. vipga)
-  xmap <leader>a <Plug>(EasyAlign)
+  vmap ga <Plug>(EasyAlign)
   " Start interactive EasyAlign for a motion/text object (e.g. gaip)
-  nmap <leader>a <Plug>(EasyAlign)
+  xmap ga <Plug>(EasyAlign)
 endif
 "}}}
 

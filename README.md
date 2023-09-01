@@ -14,7 +14,7 @@
 mkdir -p ~/.config/nvim
 ```
 
-Edit `~/.config/nvim/init.vim`
+Below is the example for `~/.config/nvim/init.vim`
 
 ```vim
 let g:loaded_perl_provider = 0
@@ -34,11 +34,18 @@ let g:node_path = $NODE_PATH != "" ? $NODE_PATH :  'node'
 " enable plugins
 " let g:enabled_plugins = { "fzf": 1, "node": 1, "go": 1, "rust": 1, "python": 1}
 
+" HACK: work around bad detection of background in Tmux (no OSC11 support)
+" https://github.com/neovim/neovim/issues/17070
+if $TERM_PROGRAM == "tmux"
+  lua vim.loop.fs_write(2, "\27Ptmux;\27\27]11;?\7\27\\", -1, nil)
+endif
 
-set termguicolors
+if exists('+termguicolors')
+  set termguicolors
+endif
+
 source ~/vimgit/vim/lazy.lua
 
-set background=light
 colorscheme vscode
 ```
 
@@ -47,22 +54,21 @@ colorscheme vscode
 ```vim
 let g:enabled_plugins={"fzf":1, "coc": 0} 
 
-source ~/.vimgit/vim/init.vim
+source ~/.vimgit/vim/basic.vim
 
 set guifont=Consolas:h14
 colors papercolor
 
 " Set GUI VIM Font
-if has("gui_running") && !has("gui_vimr")
-  if has("mac")
-    set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
-    set guifontwide=PingFangSC-Light:h16
-  else
-    set guifont=Hack_Nerd_Font_Mono:h14
-    set guifontwide=NSimSun:h14
-  endif
-endif
-
+" if has("gui_running") && !has("gui_vimr")
+"   if has("mac")
+"     set guifont=JetBrains_Mono_Regular_Nerd_Font_Complete_Mono:h16
+"     set guifontwide=PingFangSC-Light:h16
+"   else
+"     set guifont=Hack_Nerd_Font_Mono:h14
+"     set guifontwide=NSimSun:h14
+"   endif
+" endif
 ```
 
 ## Dependencies

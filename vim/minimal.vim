@@ -12,7 +12,11 @@ if !exists("$MYVIMRC")
   let $MYVIMRC=g:myinitrc
 endif
 
-let g:enabled_plugins = {"netrw": 1} 
+if exists('g:enabled_plugins') 
+  let g:enabled_plugins["netrw"] =  1
+else
+  let g:enabled_plugins = {"netrw": 1} 
+endif
 
 runtime config/globals.vim
 runtime config/options.vim

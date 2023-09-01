@@ -85,3 +85,64 @@ function! misc#DeleteTrailingWS() abort
   %s/\v\s+$//ge
   normal `z
 endfunc
+
+
+" Zoom / Restore window
+function! misc#ZoomToggle() abort
+  if exists('t:zoomed') && t:zoomed
+    execute t:zoom_winrestcmd
+    let t:zoomed = 0
+  else
+    let t:zoom_winrestcmd = winrestcmd()
+    resize
+    vertical resize
+    let t:zoomed = 1
+  endif
+endfunction
+
+
+" Auto switching IME
+"--------------------------------------------------------------------------------
+function! misc#Ime_en()
+  let ts = localtime()
+  let input_status = system('im-select')
+  if input_status =~ "com.apple.keylayout.ABC"
+    let b:inputtoggle = 0
+  else
+    let b:inputtoggle = 1
+    call system('im-select com.apple.keylayout.ABC') "use en ime
+  endif
+endfunction
+
+function! misc#Ime_zh()
+  try
+    if b:inputtoggle == 1
+      " Restore previous IME
+      call system('im-select com.apple.inputmethod.SCIM.ITABC')
+    endif
+  catch /inputtoggle/
+    let b:inputtoggle = 0
+  endtry
+endfunction
+
+
+" Search for visually selected text
+function! s:getSelectedText()
+  let l:old_reg = getreg('"')
+  let l:old_regtype = getregtype('"')
+  norm gvy
+  let l:ret = getreg('"')
+  call setreg('"', l:old_reg, l:old_regtype)
+  exe "norm \<Esc>"
+  return l:ret
+endfunction
+
+function! misc#SearchVisualTextDown()
+  call setreg("/", substitute(<SID>getSelectedText(), '\_s\+', '\\_s\\+', 'g'))
+  norm n
+endfunction
+
+function! misc#SearchVisualTextUp()
+  call setreg("/", substitute(<SID>getSelectedText(), '\_s\+', '\\_s\\+', 'g'))
+  norm N
+endfunction

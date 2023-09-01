@@ -86,41 +86,40 @@ end
 ---@diagnostic disable-next-line: unused-local
 local function setup_client(client, bufnr)
   -- Jump to the definition
-  bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>")
+  bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", { desc = "Go to definition" })
 
   -- Jump to declaration
-  bufmap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>")
+  bufmap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", { desc = "Go to declaration" })
 
   -- Lists all the implementations for the symbol under the cursor
-  bufmap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>")
+  bufmap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", { desc = "Go to implementation" })
 
   -- Jumps to the definition of the type symbol
-  bufmap("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>")
+  bufmap("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", { desc = "Go to type definition" })
 
   -- Lists all the references
-  bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>")
+  bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", { desc = "List references" })
 
   -- Displays a function's signature information
-  bufmap("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>")
+  bufmap("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", { desc = "Show signature" })
 
   -- Renames all references to the symbol under the cursor
-  bufmap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<cr>")
+  bufmap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<cr>", { desc = "Rename symbol" })
 
   -- formatting code
-  bufmap("n", "<leader>cf", "<cmd>lua vim.lsp.buf.format({async = true})<cr>")
+  bufmap("n", "<leader>cf", "<cmd>lua vim.lsp.buf.format({async = true})<cr>", { desc = "Format code" })
 
   -- Selects a code action available at the current cursor position
-  bufmap("n", "<F4>", "<cmd>lua vim.lsp.buf.code_action()<cr>")
-  bufmap("n", "gx", "<cmd>lua vim.lsp.buf.code_action()<cr>")
+  bufmap("n", "gx", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code action" })
 
   -- Show diagnostics in a floating window
-  bufmap("n", "gl", "<cmd>lua vim.diagnostic.open_float()<cr>")
+  bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
 
   -- Move to the previous diagnostic
-  bufmap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>")
+  bufmap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", { desc = "Previous diagnostic" })
 
   -- Move to the next diagnostic
-  bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>")
+  bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", { desc = "Next diagnostic" })
 end
 -- }}}
 
@@ -153,6 +152,7 @@ require("typescript").setup({
   server = {
     autostart = false, -- use volar first
     on_new_config = function(new_config, new_root_dir)
+      ---@diagnostic disable-next-line: undefined-field
       if new_root_dir:match("node_modules") or vim.b.large_buf then
         print("tsserver disabled for this buffer")
         new_config.enabled = false
@@ -175,19 +175,19 @@ require("typescript").setup({
 
 -- GoLang  {{{2
 require("go").setup({
-  lsp_cfg = false,
-  lsp_codelens = false,
+  lsp_cfg = true,
+  lsp_codelens = true,
   luasnip = true,
   lsp_inlay_hints = {
-    -- parameter_hints_prefix = " ",
-    parameter_hints_prefix = "f ",
+    parameter_hints_prefix = " ",
+    -- parameter_hints_prefix = "f ",
   },
+  lsp_on_attach = function(client, bufnr)
+    setup_client(client, bufnr)
+  end,
 })
-local golspcfg = require("go.lsp").config() -- config() return the go.nvim gopls setup
-golspcfg.on_attach = function(client, bufnr)
-  lspconfig.util.default_config.on_attach(client, bufnr)
-end
-lspconfig.gopls.setup(golspcfg)
+-- local golspcfg = require("go.lsp").config() -- config() return the go.nvim gopls setup
+-- lspconfig.gopls.setup(golspcfg)
 -- lspconfig.gopls.setup {
 --   on_attach = function(client, bufnr)
 --     lspconfig.util.default_config.on_attach(client, bufnr)
@@ -220,9 +220,9 @@ local function get_lua_library()
 
   local function add(lib)
     for _, p in pairs(vim.fn.expand(lib, false, true)) do
-      p = vim.loop.fs_realpath(p)
-      if p then
-        library[p] = true
+      local rp = vim.loop.fs_realpath(p)
+      if rp then
+        library[rp] = true
       end
     end
   end

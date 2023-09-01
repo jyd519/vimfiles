@@ -1,58 +1,65 @@
-local mod = prequire("nvim-treesitter.configs")
-if mod then
-  mod.setup({
-    -- one of "all", "maintained" (parsers with maintainers), or a list of languages
-    -- ensure_installed = {"c", "cpp", "css", "rust", "python", "json", "go", "cmake", "html", "javascript", "typescript"},
-    highlight = {
-      enable = true, -- false will disable the whole extension
-      disable = function(lang, buf)
-        if lang == "markdown" then
-          return true
-        end
+local treesitter = require("nvim-treesitter.configs")
 
-        ---@diagnostic disable-next-line: undefined-field
-        if vim.b.large_buf then
-          return true
-        end
+---@diagnostic disable-next-line: missing-fields
+treesitter.setup({
+  -- one of "all", "maintained" (parsers with maintainers), or a list of languages
+  -- ensure_installed = {"c", "cpp", "css", "rust", "python", "json", "go", "cmake", "html", "javascript", "typescript"},
 
-        local LINE_NR_THRESH = 1000
-        if vim.api.nvim_buf_line_count(buf) > LINE_NR_THRESH then
-          return true
-        end
-      end,
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- Automatically install missing parsers when entering buffer
+  auto_install = false,
+
+  highlight = {
+    enable = true, -- false will disable the whole extension
+    disable = function(lang, buf)
+      if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
+
+      ---@diagnostic disable-next-line: undefined-field
+      if vim.b.large_buf then return true end
+    end,
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
     },
-    incremental_selection = {
+  },
+  refactor = {
+    highlight_definitions = { enable = true },
+    highlight_current_scope = { enable = true },
+    smart_rename = {
       enable = true,
       keymaps = {
-        init_selection = "gnn",
-        node_incremental = "grn",
-        scope_incremental = "grc",
-        node_decremental = "grm",
+        smart_rename = "grr",
       },
     },
-    refactor = {
-      highlight_definitions = { enable = true },
-      highlight_current_scope = { enable = true },
-      smart_rename = {
-        enable = true,
-        keymaps = {
-          smart_rename = "grr",
-        },
-      },
-    },
-  })
+  },
+})
 
-  local has_parser = require("nvim-treesitter.parsers").has_parser
-  local treesitter_fold = vim.api.nvim_create_augroup("treesitter_fold", { clear = true })
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "cpp", "c", "vim", "typescript", "lua", "rust" },
-    group = treesitter_fold,
-    desc = "enable treesitter folding",
-    callback = function()
-      if has_parser(vim.bo.filetype) then
-        vim.o.foldmethod = "expr"
-        vim.o.foldexpr = "nvim_treesitter#foldexpr()"
-      end
-    end,
-  })
-end
+local has_parser = require("nvim-treesitter.parsers").has_parser
+local tfgroup = vim.api.nvim_create_augroup("treesitter_fold", { clear = true })
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "cpp", "c", "typescript", "lua", "rust" },
+  group = tfgroup,
+  desc = "enable treesitter folding",
+  callback = function()
+    if has_parser(vim.bo.filetype) then
+      vim.o.foldmethod = "expr"
+      vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+    end
+  end,
+})
+
+vim.keymap.set('n', '<leader>ts', function()
+  ---@diagnostic disable: undefined-field
+  if vim.b.ts_highlight then
+    vim.treesitter.stop()
+  else
+    vim.treesitter.start()
+  end
+end)

@@ -1,6 +1,9 @@
 -- Install lazy.nvim {{{2
 local fn = vim.fn
 local g = vim.g
+if g.cfg_install_missing_plugins ==  nil then
+  g.cfg_install_missing_plugins = 1
+end
 
 local lazypath = g.VIMFILES .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -25,16 +28,12 @@ require("lazy").setup(
       "nvim-treesitter/nvim-treesitter",
       version = false,
       event = { "BufReadPost", "BufNewFile" },
-      config = function()
-        require("myrc.config.treesitter")
-      end,
+      config = function() require("myrc.config.treesitter") end,
     },
     {
       "dstein64/vim-startuptime",
       cmd = "StartupTime",
-      init = function()
-        vim.g.startuptime_tries = 10
-      end,
+      init = function() vim.g.startuptime_tries = 10 end,
     },
     { "christoomey/vim-tmux-navigator", enabled = fn.has("win32") == 0 and fn.executable("tmux") == 1 },
     {
@@ -44,9 +43,9 @@ require("lazy").setup(
       config = function()
         require("osc52").setup()
         vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
-        vim.cmd[[
+        vim.cmd([[
           autocmd vimrc TextYankPost * lua require("osc52").copy_visual()
-        ]]
+        ]])
       end,
     },
     -- }}}
@@ -71,21 +70,17 @@ require("lazy").setup(
     },
     {
       "marko-cerovac/material.nvim",
-      config = function()
-        vim.g.material_style = "lighter"
-      end,
+      config = function() vim.g.material_style = "lighter" end,
     },
     -- }}}
     -- Basic plugins {{{2
-    "mhinz/vim-startify",
+    { "mhinz/vim-startify" },
     "anuvyklack/keymap-amend.nvim",
-    -- "justinmk/vim-sneak",
     {
-      "phaazon/hop.nvim",
+      "smoka7/hop.nvim",
+      version = "*",
       event = "VeryLazy",
-      config = function()
-        require("myrc.config.hop")
-      end,
+      config = function() require("myrc.config.hop") end,
     },
     {
       "anuvyklack/hydra.nvim",
@@ -93,21 +88,9 @@ require("lazy").setup(
       dependencies = {
         { "jbyuki/venn.nvim" },
       },
-      config = function()
-        require("myrc.config.hydra")
-      end,
+      config = function() require("myrc.config.hydra") end,
     },
     { "mattn/emmet-vim", ft = { "html", "jsx", "vue" } },
-    {
-      "echasnovski/mini.nvim",
-      version = "*",
-      event = "VeryLazy",
-      enabled = false,
-      config = function(_, opts)
-        -- https://github.com/echasnovski/mini.nvim
-        require("mini.pairs").setup(opts)
-      end,
-    },
     {
       "windwp/nvim-autopairs",
       event = "InsertEnter",
@@ -119,26 +102,21 @@ require("lazy").setup(
     },
 
     { "AndrewRadev/splitjoin.vim" },
-    "tmhedberg/matchit",
-    "junegunn/vim-easy-align",
+    { "tmhedberg/matchit" },
+    { "junegunn/vim-easy-align" },
     { "godlygeek/tabular", cmd = "Tabularize" },
     { "tpope/vim-repeat" },
     { "chiedojohn/vim-case-convert" },
     {
       "chentoast/marks.nvim",
-      config = function()
-        require("myrc.config.marks")
-      end,
+      config = function() require("myrc.config.marks") end,
     },
     { "numToStr/Comment.nvim", config = true },
-    { "gpanders/editorconfig.nvim", enabled = not vim.fn.has("nvim-0.9") },
+    { "gpanders/editorconfig.nvim", enabled = vim.fn.has("nvim-0.9") == 0 },
     {
       "kylechui/nvim-surround",
-      version = "*", -- Use for stability; omit to use `main` branch for the latest features
       event = "VeryLazy",
-      config = function()
-        require("myrc.config.surround")
-      end,
+      config = function() require("myrc.config.surround") end,
     },
     {
       "kyazdani42/nvim-web-devicons",
@@ -155,9 +133,7 @@ require("lazy").setup(
     },
     {
       "rcarriga/nvim-notify",
-      config = function()
-        require("myrc.config.notify")
-      end,
+      config = function() require("myrc.config.notify") end,
     },
     { dir = g.VIMFILES .. "/locals/t.nvim", cmd = { "T", "TS" } },
     { dir = g.VIMFILES .. "/locals/vim-a", cmd = { "A", "AH" } },
@@ -171,18 +147,7 @@ require("lazy").setup(
     { "thinca/vim-quickrun", cmd = { "QuickRun" } },
     { "vim-test/vim-test", event = "VimEnter" }, -- Unit-Testing
     -- https://github.com/ThePrimeagen/refactoring.nvim#installation
-    {
-      "ThePrimeagen/refactoring.nvim",
-      config = function()
-        require("telescope").load_extension("refactoring")
-        vim.api.nvim_set_keymap(
-          "v",
-          "<leader>rf",
-          "<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
-          { noremap = true }
-        )
-      end,
-    },
+    { "ThePrimeagen/refactoring.nvim", config = true },
     { "sbdchd/neoformat", cmd = { "Neoformat" } },
     {
       "lukas-reineke/indent-blankline.nvim",
@@ -190,7 +155,8 @@ require("lazy").setup(
       config = true,
       opts = {
         char = "│",
-        filetype_exclude = {"qf", "markdown", "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
+        filetype = { "python", "cpp", "c", "lua" },
+        filetype_exclude = { "qf", "startify", "markdown", "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
         -- depends on treesitter
         show_current_context = true,
         show_current_context_start = false,
@@ -199,9 +165,7 @@ require("lazy").setup(
     {
       "lewis6991/gitsigns.nvim",
       event = { "BufReadPre", "BufNewFile" },
-      config = function()
-        require("myrc.config.gitsigns")
-      end,
+      config = function() require("myrc.config.gitsigns") end,
     },
     {
       "Exafunction/codeium.vim",
@@ -209,9 +173,12 @@ require("lazy").setup(
       config = function()
         vim.g.codeium_no_map_tab = 1
 
-        vim.keymap.set("i", "<C-g>", function()
-          return vim.fn["codeium#Accept"]()
-        end, { expr = true, desc = "Accept Codeium" })
+        vim.keymap.set(
+          "i",
+          "<C-g>",
+          function() return vim.fn["codeium#Accept"]() end,
+          { expr = true, desc = "Accept Codeium" }
+        )
 
         local mapkey = require("keymap-amend")
         mapkey("i", "<C-j>", function(fallback)
@@ -252,9 +219,7 @@ require("lazy").setup(
       "mfussenegger/nvim-dap",
       lazy = true,
       event = "BufReadPre",
-      config = function()
-        require("myrc.config.dap")
-      end,
+      config = function() require("myrc.config.dap") end,
     },
     "theHamsta/nvim-dap-virtual-text",
     "rcarriga/nvim-dap-ui",
@@ -268,40 +233,37 @@ require("lazy").setup(
     { "jose-elias-alvarez/typescript.nvim" },
     { "ray-x/guihua.lua", ft = "go" }, -- float term, codeaction and codelens gui support
     { "ray-x/go.nvim", ft = "go" },
-    { "fatih/vim-go", ft = "go" }, -- run = ":GoUpdateBinaries"
+    { "fatih/vim-go", enabled = false, ft = "go" }, -- run = ":GoUpdateBinaries"
     {
       "rust-lang/rust.vim",
-      init = function()
-        vim.g.rustfmt_autosave = 1
-      end,
+      init = function() vim.g.rustfmt_autosave = 1 end,
     },
     { "simrat39/rust-tools.nvim" },
     { "saecki/crates.nvim", config = true },
     {
       "p00f/clangd_extensions.nvim",
       ft = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
-      config = function()
-        require("myrc.config.clangd")
-      end,
+      config = function() require("myrc.config.clangd") end,
     },
     { "pearofducks/ansible-vim" },
     { "dense-analysis/ale", lazy = true, event = "VimEnter" }, -- linter
     -- Markdown, reStructuredText, textile
     {
-        'yaocccc/nvim-hl-mdcodeblock.lua',
-        enabled = false,
-        after = 'nvim-treesitter',
-        config = function ()
-            require('hl-mdcodeblock').setup({
-                -- option
-            })
-        end
+      "yaocccc/nvim-hl-mdcodeblock.lua",
+      enabled = false,
+      after = "nvim-treesitter",
+      config = function()
+        require("hl-mdcodeblock").setup({
+          -- option
+        })
+      end,
     },
     { "jyd519/md-img-paste.vim", ft = "markdown" },
     -- }}}
     -- Snippets {{{2
     {
       "SirVer/ultisnips",
+      lazy = true,
       enabled = g.enabled_plugins.python == 1 and vim.fn.has("python3") == 1,
       event = { "BufReadPre", "BufNewFile" },
     },
@@ -312,9 +274,7 @@ require("lazy").setup(
         { "rafamadriz/friendly-snippets" },
         { "honza/vim-snippets" },
       },
-      config = function()
-        require("myrc.config.luasnip")
-      end,
+      config = function() require("myrc.config.luasnip") end,
     },
     -- }}}
     -- Completion Engine {{{2
@@ -334,14 +294,10 @@ require("lazy").setup(
           "tzachar/cmp-tabnine",
           enabled = false,
           build = "./install.sh",
-          config = function()
-            require("myrc.config.tabnine")
-          end,
+          config = function() require("myrc.config.tabnine") end,
         },
       },
-      config = function()
-        require("myrc.config.cmp")
-      end,
+      config = function() require("myrc.config.cmp") end,
     },
     -- }}}
     -- LSP {{{2
@@ -363,16 +319,12 @@ require("lazy").setup(
     {
       "neovim/nvim-lspconfig",
       event = { "BufReadPre", "BufNewFile" },
-      config = function()
-        require("myrc.config.lsp")
-      end,
+      config = function() require("myrc.config.lsp") end,
     },
     { "folke/neodev.nvim", lazy = true },
     {
       "simrat39/symbols-outline.nvim",
-      config = function()
-        require("myrc.config.symbols-outline")
-      end,
+      config = function() require("myrc.config.symbols-outline") end,
     },
     { "b0o/schemastore.nvim" },
     -- }}}
@@ -389,18 +341,20 @@ require("lazy").setup(
     {
       "ibhagwan/fzf-lua",
       event = "VimEnter",
-      enabled = fn.get(g.enabled_plugins, "fzf") == 1,
+      enabled = fn.get(g.enabled_plugins, "fzf-lua") == 1,
       config = function()
-        -- calling `setup` is optional for customization
         require("fzf-lua").setup({
-          fzf_opts = {['--layout'] = 'reverse-list'},
+          fzf_opts = { ["--layout"] = "reverse-list" },
         })
-      end
+      end,
     },
     {
       "junegunn/fzf.vim",
       event = "VimEnter",
-      enabled = false , -- fn.get(g.enabled_plugins, "fzf") == 1,
+      enabled = fn.get(g.enabled_plugins, "fzf.vim") == 1,
+      dependencies = {
+        "junegunn/fzf",
+      }
     },
     {
       "nvim-telescope/telescope.nvim",
@@ -408,9 +362,7 @@ require("lazy").setup(
       dependencies = {
         { "nvim-telescope/telescope-ui-select.nvim" },
       },
-      config = function()
-        require("myrc.config.telescope")
-      end,
+      config = function() require("myrc.config.telescope") end,
     },
     {
       -- https://github.com/tomasky/bookmarks.nvim
@@ -422,9 +374,7 @@ require("lazy").setup(
             local bm = require("bookmarks")
             local map = vim.keymap.set
             local toggle = function()
-              if vim.bo.filetype == "nerdtree" then
-                return
-              end
+              if vim.bo.filetype == "nerdtree" then return end
               bm.bookmark_toggle()
             end
             map("n", "mt", toggle) -- add or remove bookmark at current line
@@ -446,9 +396,7 @@ require("lazy").setup(
         -- The icon font for Visual Studio Code
         { "ChristianChiarulli/neovim-codicons", lazy = true },
       },
-      config = function()
-        require("myrc.config.lualine")
-      end,
+      config = function() require("myrc.config.lualine") end,
     },
     { "arkav/lualine-lsp-progress" },
     -- 2}}}
@@ -460,6 +408,10 @@ require("lazy").setup(
       rtp = {
         reset = false, -- no reset the runtime path to $VIMRUNTIME and your config directory
       },
+    },
+    install = {
+      -- skip installing missing dependencies when internet access is not allowed 
+      missing = g.cfg_install_missing_plugins == 1,
     },
     ui = {
       icons = {
@@ -485,9 +437,7 @@ require("lazy").setup(
 local plugins = g.enabled_plugins
 local lazyPlugins = require("lazy").plugins()
 for _, plugin in pairs(lazyPlugins) do
-  if type(plugin) == "table" then
-    plugins[plugin.name:lower()] = 1
-  end
+  if type(plugin) == "table" then plugins[plugin.name:lower()] = 1 end
 end
 g.enabled_plugins = plugins
 -- }}}
