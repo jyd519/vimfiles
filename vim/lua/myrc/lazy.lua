@@ -152,15 +152,8 @@ require("lazy").setup(
     {
       "lukas-reineke/indent-blankline.nvim",
       event = { "VeryLazy" },
-      config = true,
-      opts = {
-        char = "│",
-        filetype = { "python", "cpp", "c", "lua" },
-        filetype_exclude = { "qf", "startify", "markdown", "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
-        -- depends on treesitter
-        show_current_context = true,
-        show_current_context_start = false,
-      },
+      main = "ibl",
+      config = function() require("myrc.config.indent-blankline") end,
     },
     {
       "lewis6991/gitsigns.nvim",
