@@ -1,6 +1,6 @@
 local outline = require("symbols-outline")
 outline.setup({
-  autofold_depth = 2,
+  autofold_depth = 1,
   keymaps = {
     -- These keymaps can be a string or a table for multiple keys
     close = { "q" },

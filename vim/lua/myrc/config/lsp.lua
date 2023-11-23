@@ -3,6 +3,7 @@
 -- Globals {{{2
 local api = vim.api
 local fn = vim.fn
+local lsp = vim.lsp
 
 local lspconfig = require("lspconfig")
 
@@ -13,9 +14,7 @@ vim.lsp.set_log_level("warn")
 
 local bufmap = function(mode, lhs, rhs, opts)
   local options = { buffer = true }
-  if opts then
-    options = vim.tbl_extend("force", options, opts)
-  end
+  if opts then options = vim.tbl_extend("force", options, opts) end
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
@@ -23,9 +22,7 @@ local has_file = function(root, ...)
   local patterns = vim.tbl_flatten({ ... })
   local join = lspconfig.util.path.join
   for _, name in ipairs(patterns) do
-    if vim.loop.fs_stat(join(root, name)) ~= nil then
-      return true
-    end
+    if vim.loop.fs_stat(join(root, name)) ~= nil then return true end
   end
   return false
 end
@@ -34,9 +31,7 @@ local function get_typescript_server_path(root_dir)
   local found_ts = ""
   local function check_dir(path)
     found_ts = lspconfig.util.path.join(path, "node_modules", "typescript", "lib")
-    if lspconfig.util.path.exists(found_ts) then
-      return path
-    end
+    if lspconfig.util.path.exists(found_ts) then return path end
   end
   if lspconfig.util.search_ancestors(root_dir, check_dir) then
     return found_ts
@@ -72,9 +67,7 @@ local make_on_new_config = function(on_new_config)
     local settings = vim.empty_dict()
     settings = vim.tbl_deep_extend("keep", settings, new_config.settings)
     settings = vim.tbl_deep_extend("force", settings, config)
-    if server_name == "jsonls" then
-      vim.list_extend(settings.json.schemas, new_config.settings.json.schemas)
-    end
+    if server_name == "jsonls" then vim.list_extend(settings.json.schemas, new_config.settings.json.schemas) end
     new_config.settings = settings
     return new_config
   end)
@@ -120,6 +113,28 @@ local function setup_client(client, bufnr)
 
   -- Move to the next diagnostic
   bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", { desc = "Next diagnostic" })
+
+  -- The blow command will highlight the current variable and its usages in the buffer.
+  if client.server_capabilities.documentHighlightProvider then
+    vim.cmd([[
+      hi! link LspReferenceRead Visual
+      hi! link LspReferenceText Visual
+      hi! link LspReferenceWrite Visual
+    ]])
+
+    local gid = api.nvim_create_augroup("lsp_document_highlight", { clear = true })
+    api.nvim_create_autocmd("CursorHold", {
+      group = gid,
+      buffer = bufnr,
+      callback = function() lsp.buf.document_highlight() end,
+    })
+
+    api.nvim_create_autocmd("CursorMoved", {
+      group = gid,
+      buffer = bufnr,
+      callback = function() lsp.buf.clear_references() end,
+    })
+  end
 end
 -- }}}
 
@@ -182,9 +197,7 @@ require("go").setup({
     parameter_hints_prefix = " ",
     -- parameter_hints_prefix = "f ",
   },
-  lsp_on_attach = function(client, bufnr)
-    setup_client(client, bufnr)
-  end,
+  lsp_on_attach = function(client, bufnr) setup_client(client, bufnr) end,
 })
 -- local golspcfg = require("go.lsp").config() -- config() return the go.nvim gopls setup
 -- lspconfig.gopls.setup(golspcfg)
@@ -221,9 +234,7 @@ local function get_lua_library()
   local function add(lib)
     for _, p in pairs(vim.fn.expand(lib, false, true)) do
       local rp = vim.loop.fs_realpath(p)
-      if rp then
-        library[rp] = true
-      end
+      if rp then library[rp] = true end
     end
   end
 
@@ -300,15 +311,11 @@ require("rust-tools").setup({
 -- pyright {{{2
 -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 lspconfig.pyright.setup({
-  on_attach = function(client, bufnr)
-    lspconfig.util.default_config.on_attach(client, bufnr)
-  end,
+  on_attach = function(client, bufnr) lspconfig.util.default_config.on_attach(client, bufnr) end,
   before_init = function(_, config)
     local join = lspconfig.util.path.join
     local p = "python3"
-    if vim.env.VIRTUAL_ENV then
-      p = join(vim.env.VIRTUAL_ENV, "bin", "python3")
-    end
+    if vim.env.VIRTUAL_ENV then p = join(vim.env.VIRTUAL_ENV, "bin", "python3") end
     print("Python (pyright): ", p)
     config.settings.python.pythonPath = p
     config.setttings.diagnostics.pylint.enabled = false
@@ -328,9 +335,7 @@ lspconfig.volar.setup({
     "typescript.tsx",
   },
   on_new_config = lspconfig.util.default_config.on_new_config,
-  on_attach = function(client, bufnr)
-    lspconfig.util.default_config.on_attach(client, bufnr)
-  end,
+  on_attach = function(client, bufnr) lspconfig.util.default_config.on_attach(client, bufnr) end,
 })
 -- }}}
 
@@ -358,13 +363,9 @@ local lsp_settings = {
 local servers = { "cmake", "bashls", "angularls", "cssls", "ansiblels", "tailwindcss", "jsonls" }
 for _, lsp in ipairs(servers) do
   local opts = {
-    on_attach = function(client, bufnr)
-      lspconfig.util.default_config.on_attach(client, bufnr)
-    end,
+    on_attach = function(client, bufnr) lspconfig.util.default_config.on_attach(client, bufnr) end,
   }
-  if lsp_settings[lsp] ~= nil then
-    opts = vim.tbl_deep_extend("force", lsp_settings[lsp], opts)
-  end
+  if lsp_settings[lsp] ~= nil then opts = vim.tbl_deep_extend("force", lsp_settings[lsp], opts) end
   lspconfig[lsp].setup(opts)
 end
 -- }}}
@@ -379,9 +380,7 @@ local function show_documentation()
       local clients = { "Vim", "Man" }
       vim.ui.select(clients, {
         prompt = "Select a action:",
-        format_item = function(client)
-          return string.lower(client)
-        end,
+        format_item = function(client) return string.lower(client) end,
       }, function(item)
         if item == "Vim" then
           vim.cmd("h " .. fn.expand("<cword>"))

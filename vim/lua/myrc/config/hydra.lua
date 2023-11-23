@@ -79,6 +79,7 @@ Hydra({
 })
 
 -- Dap{{{2
+--
 local dap_hint = [[
      ^ ^Step^ ^ ^      ^ ^     Action
  ----^-^-^-^--^-^----  ^-^-------------------------------------------------
@@ -92,10 +93,11 @@ local dap_hint = [[
      ^ ^  _q_: exit
 ]]
 local dap = require("dap")
+
 local dapui = require("dapui")
 Hydra({
   name = "Dap Debug",
-  hint = dap_hint,
+  -- hint = dap_hint,
   config = {
     color = "pink",
     invoke_on_body = true,
@@ -111,15 +113,8 @@ Hydra({
     { "S", DebugTest, { desc = "Start Debugging" } },
     { "<F5>", DebugTest, { desc = "Start Debugging" } },
 
-    { "O", dap.step_out, { desc = "step out" } },
     { "<F12>", dap.step_out, { desc = "step out" } },
-
-    { "n", dap.step_over, { desc = "step over" } },
     { "<F10>", dap.step_over, { desc = "step over" } },
-
-    { "B", dap.step_back, { desc = "step back" } },
-
-    { "s", dap.step_into, { desc = "step into" } },
     { "<F11>", dap.step_into, { desc = "step into" } },
 
     { "R", dap.run_to_cursor, { desc = "run to cursor" } },

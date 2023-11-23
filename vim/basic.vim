@@ -31,3 +31,4 @@ let s:configs = [
 for s in s:configs
   execute printf('source %s/%s', $VIMFILES, s)
 endfor
+

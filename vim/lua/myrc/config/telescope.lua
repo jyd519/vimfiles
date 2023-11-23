@@ -23,6 +23,11 @@ telescope.setup({
   },
   extensions = {
     ["ui-select"] = { require("telescope.themes").get_dropdown({}) },
+
+    -- https://github.com/piersolenski/telescope-import.nvim
+    import = {
+      insert_at_top = true,
+    },
   },
   mappings = {
     i = {
@@ -41,6 +46,7 @@ telescope.setup({
 telescope.load_extension("refactoring")
 telescope.load_extension("ui-select")
 telescope.load_extension("bookmarks")
+telescope.load_extension("import")
 -- telescope.load_extension("fzf")
 
 vim.keymap.set(

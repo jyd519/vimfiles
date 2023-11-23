@@ -104,25 +104,18 @@ endfunction
 " Auto switching IME
 "--------------------------------------------------------------------------------
 function! misc#Ime_en()
-  let ts = localtime()
-  let input_status = system('im-select')
-  if input_status =~ "com.apple.keylayout.ABC"
-    let b:inputtoggle = 0
-  else
-    let b:inputtoggle = 1
-    call system('im-select com.apple.keylayout.ABC') "use en ime
-  endif
+  call system('im-select com.apple.keylayout.ABC') "use en ime
 endfunction
 
 function! misc#Ime_zh()
-  try
-    if b:inputtoggle == 1
-      " Restore previous IME
-      call system('im-select com.apple.inputmethod.SCIM.ITABC')
-    endif
-  catch /inputtoggle/
-    let b:inputtoggle = 0
-  endtry
+  " try
+  "   if b:inputtoggle == 1
+  "     " Restore previous IME
+  "     call system('im-select com.apple.inputmethod.SCIM.ITABC')
+  "   endif
+  " catch /inputtoggle/
+  "   let b:inputtoggle = 0
+  " endtry
 endfunction
 
 

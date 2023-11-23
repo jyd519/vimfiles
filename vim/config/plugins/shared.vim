@@ -392,5 +392,11 @@ endif
 " put the quickfix window on bottom always
 autocmd vimrc FileType qf wincmd J
 
+
+" log file
+if !g:is_nvim
+  autocmd vimrc BufReadPost *.log set ft=log
+endif
+
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}

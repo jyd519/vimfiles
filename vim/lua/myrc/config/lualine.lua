@@ -16,7 +16,7 @@ local ale_spinner = 0
 
 require("lualine").setup({
   options = {
-    theme = "auto",
+    theme = "powerline",
   },
   sections = {
     lualine_a = { "mode" },
