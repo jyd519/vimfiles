@@ -5,6 +5,7 @@ local filetype_exclude = {
     "checkhealth",
     "help",
     "man",
+    "mason",
     "qf",
     "startify",
     "markdown",

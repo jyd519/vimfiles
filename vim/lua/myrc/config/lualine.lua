@@ -10,7 +10,7 @@ local function diff_source()
   end
 end
 
-local hydra_status = require("hydra.statusline")
+-- local hydra_status = require("hydra.statusline")
 local spinner_symbols = { '🌑 ', '🌒 ', '🌓 ', '🌔 ', '🌕 ', '🌖 ', '🌗 ', '🌘 ' }
 local ale_spinner = 0
 
@@ -29,9 +29,9 @@ require("lualine").setup({
       },
       {
         function()
-          if hydra_status.is_active() then
-            return hydra_status.get_name()
-          end
+          -- if hydra_status.is_active() then
+          --   return hydra_status.get_name()
+          -- end
           local ok, data = pcall(vim.fn["ale#engine#IsCheckingBuffer"], vim.api.nvim_get_current_buf())
           if ok and data == 1 then
             ale_spinner = (ale_spinner + 1) % #spinner_symbols

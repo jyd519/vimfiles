@@ -104,7 +104,7 @@ let g:session_autoload='no'
 let g:session_autosave_periodic=0
 " }}}
 
-" fzf/telescopoe {{{1
+" fzf/telescope {{{1
 if get(g:enabled_plugins, "fzf-lua", 0)
   " https://github.com/ibhagwan/fzf-lua
   nnoremap <C-P> <cmd>lua require('fzf-lua').files({cwd_prompt = false, prompt="Files> "})<CR>
@@ -157,7 +157,7 @@ if get(g:enabled_plugins, "fzf.vim", 0)
   " key binding
   nnoremap <C-P> :Files<CR>
 
-  if get(g:enabled_plugins, 'telescope.nvim', 0) == 0
+  if get(g:enabled_plugins, 'telescope', 0) == 0
     nnoremap <leader>ff :Files<CR>
     nnoremap <leader>fm :Marks<CR>
     nnoremap <leader>fo :History<CR>
@@ -302,6 +302,13 @@ let g:neoformat_enabled_typescript = ['prettierd', 'prettier', 'tsfmt']
 let g:neoformat_enabled_css = ['prettierd', 'prettier', 'tsfmt']
 let g:neoformat_enabled_html = ['prettierd', 'prettier','htmlbeautify']
 let g:neoformat_enabled_python = ['black', 'isort', 'docformatter', 'pyment', 'pydevf']
+" bugfix: https://github.com/sbdchd/neoformat/issues/486
+let g:neoformat_c_clangformat = {
+            \ 'exe': 'clang-format',
+            \ 'args': ['-assume-filename=', '"%:p"'],
+            \ 'stdin': 1,
+            \ }
+let g:neoformat_cpp_clangformat = g:neoformat_c_clangformat
 nmap <leader>F :Neoformat<CR>
 " }}}
 

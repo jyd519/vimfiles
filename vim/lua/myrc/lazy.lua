@@ -56,12 +56,13 @@ require("lazy").setup(
         },
         -- }}}
         -- Colorschemes {{{2
-        {"Mofiqul/vscode.nvim"},
-        {"NLKNguyen/papercolor-theme"},
-        {"rakr/vim-one"},
-        {"navarasu/onedark.nvim"},
+        {"Mofiqul/vscode.nvim", lazy=true},
+        {"NLKNguyen/papercolor-theme", lazy=true},
+        {"rakr/vim-one", lazy=true},
+        {"navarasu/onedark.nvim", lazy=true},
         {
             "catppuccin/nvim",
+            lazy=true,
             name = "catppuccin",
             config = function()
                 require("catppuccin").setup(
@@ -78,13 +79,19 @@ require("lazy").setup(
         },
         {
             "marko-cerovac/material.nvim",
+            lazy = true,
             config = function()
                 vim.g.material_style = "lighter"
             end
         },
         -- }}}
         -- Basic plugins {{{2
-        {"mhinz/vim-startify"},
+        {"mhinz/vim-startify",
+            enabled = false,
+            config = function()
+               g.startify_files_number = 5
+            end,
+        },
         "anuvyklack/keymap-amend.nvim",
         {
             "smoka7/hop.nvim",
@@ -116,23 +123,26 @@ require("lazy").setup(
                 )
             end
         },
-        {"AndrewRadev/splitjoin.vim"},
-        {"tmhedberg/matchit"},
-        {"junegunn/vim-easy-align"},
+        {"AndrewRadev/splitjoin.vim", event="VeryLazy"},
+        {"tmhedberg/matchit", event="VeryLazy"},
+        {"junegunn/vim-easy-align", event = { "BufReadPost", "BufNewFile" }},
         {"godlygeek/tabular", cmd = "Tabularize"},
-        {"tpope/vim-repeat"},
-        {"chiedojohn/vim-case-convert"},
+        {"tpope/vim-repeat", event="VeryLazy"},
+        {"chiedojohn/vim-case-convert", event="VeryLazy"},
         {
             "chentoast/marks.nvim",
+            event = { "BufReadPost", "BufNewFile" },
             config = function()
                 require("myrc.config.marks")
             end
         },
-        {"numToStr/Comment.nvim", config = true},
-        {"gpanders/editorconfig.nvim", enabled = vim.fn.has("nvim-0.9") == 0},
+        {"numToStr/Comment.nvim", event="VeryLazy", config = true},
+        {"gpanders/editorconfig.nvim",
+          enabled = vim.fn.has("nvim-0.9") == 0,
+        },
         {
             "kylechui/nvim-surround",
-            event = "VeryLazy",
+            event = { "BufReadPost", "BufNewFile" },
             config = function()
                 require("myrc.config.surround")
             end
@@ -154,6 +164,7 @@ require("lazy").setup(
         },
         {
             "rcarriga/nvim-notify",
+            event = "VeryLazy",
             config = function()
                 require("myrc.config.notify")
             end
@@ -162,26 +173,30 @@ require("lazy").setup(
         {dir = g.VIMFILES .. "/locals/vim-a", cmd = {"A", "AH"}},
         {
             dir = g.VIMFILES .. "/locals/nvim-projectconfig",
+            event = "VeryLazy",
             opts = {silent = false},
             priority = 100
         },
         -- }}}
         -- Coding {{{2
         {"thinca/vim-quickrun", cmd = {"QuickRun"}},
-        {"vim-test/vim-test", event = "VimEnter"}, -- Unit-Testing
+        {"vim-test/vim-test", event = {"BufReadPost", "BufNewFile"}}, -- Unit-Testing
         -- https://github.com/ThePrimeagen/refactoring.nvim#installation
-        {"ThePrimeagen/refactoring.nvim", config = true},
+        {"ThePrimeagen/refactoring.nvim",
+          config = true,
+          ft = {"typescript", "javascript", "go", "rust", "python", "lua", "c", "cpp"},
+        },
         {"sbdchd/neoformat", cmd = {"Neoformat"}},
         {
             "lukas-reineke/indent-blankline.nvim",
-            event = {"VeryLazy"},
+            event = { "BufReadPost", "BufNewFile" },
             config = function()
                 require("myrc.config.indent-blankline")
             end
         },
         {
             "lewis6991/gitsigns.nvim",
-            event = {"BufReadPre", "BufNewFile"},
+            event = {"BufReadPost", "BufNewFile"},
             config = function()
                 require("myrc.config.gitsigns")
             end
@@ -189,6 +204,7 @@ require("lazy").setup(
         {
             "Exafunction/codeium.vim",
             enabled = true,
+            event = {"BufReadPost", "BufNewFile"},
             config = function()
                 vim.g.codeium_no_map_tab = 1
 
@@ -227,6 +243,7 @@ require("lazy").setup(
         },
         {
             "norcalli/nvim-colorizer.lua",
+            ft = {"css", "sass", "scss", "vue", "html", "javascript", "typescript"},
             config = function()
                 require("colorizer").setup(
                     {
@@ -247,32 +264,36 @@ require("lazy").setup(
         {
             "mfussenegger/nvim-dap",
             lazy = true,
-            event = "BufReadPre",
+            event = {"BufReadPost", "BufNewFile"},
+            ft = {"go", "python", "lua", "rust", "typescript", "javascript"},
             config = function()
                 require("myrc.config.dap")
-            end
+            end,
+            dependencies = {
+              {"theHamsta/nvim-dap-virtual-text"},
+              {"rcarriga/nvim-dap-ui"},
+              {"mfussenegger/nvim-dap-python"},
+              {"nvim-telescope/telescope-dap.nvim"},
+              {"leoluz/nvim-dap-go"},
+              {"jbyuki/one-small-step-for-vimkind", module = "osv"},
+              {"mxsdev/nvim-dap-vscode-js"},
+            },
         },
-        "theHamsta/nvim-dap-virtual-text",
-        "rcarriga/nvim-dap-ui",
-        "mfussenegger/nvim-dap-python",
-        "nvim-telescope/telescope-dap.nvim",
-        {"leoluz/nvim-dap-go"},
-        {"jbyuki/one-small-step-for-vimkind", module = "osv"},
-        {"mxsdev/nvim-dap-vscode-js"},
         -- }}}
         -- Languages Go/dart/rust/cpp/typescript {{{2
-        {"jose-elias-alvarez/typescript.nvim"},
+        {"jose-elias-alvarez/typescript.nvim", ft = {"typescript", "typescriptreact", "typescript.tsx", "javascript"}},
         {"ray-x/guihua.lua", ft = "go"}, -- float term, codeaction and codelens gui support
         {"ray-x/go.nvim", ft = "go"},
         {"fatih/vim-go", enabled = false, ft = "go"}, -- run = ":GoUpdateBinaries"
         {
             "rust-lang/rust.vim",
+            ft = {"rust", "rs"},
             init = function()
                 vim.g.rustfmt_autosave = 1
             end
         },
-        {"simrat39/rust-tools.nvim"},
-        {"saecki/crates.nvim", config = true},
+        {"simrat39/rust-tools.nvim", ft={"rust"}},
+        {"saecki/crates.nvim", config = true, ft={"toml"}},
         {
             "p00f/clangd_extensions.nvim",
             ft = {"c", "cpp", "objc", "objcpp", "cuda", "proto"},
@@ -280,8 +301,17 @@ require("lazy").setup(
                 require("myrc.config.clangd")
             end
         },
-        {"pearofducks/ansible-vim"},
-        {"dense-analysis/ale", lazy = true, event = "VimEnter"}, -- linter
+        {"pearofducks/ansible-vim", ft = {"yaml", "ansible", "ansible_hosts"}},
+        {"dense-analysis/ale", lazy = true,
+            cmd = {
+                "ALEToggle",
+                "ALEInfo",
+                "ALEDetail",
+                "ALELint",
+                "ALEFix",
+            },
+            keys = {"<Plug>(ale_lint)", "<Plug>(ale_fix)"},
+        }, -- linter
         -- Markdown, reStructuredText, textile
         {
             "yaocccc/nvim-hl-mdcodeblock.lua",
@@ -298,14 +328,14 @@ require("lazy").setup(
             "SirVer/ultisnips",
             lazy = true,
             enabled = g.enabled_plugins.python == 1 and vim.fn.has("python3") == 1,
-            event = {"BufReadPre", "BufNewFile"}
+            event = {"BufReadPost", "BufNewFile"}
         },
         {
             "L3MON4D3/LuaSnip",
-            event = {"BufReadPre", "BufNewFile"},
+            event = { "InsertEnter" },
             dependencies = {
                 {"rafamadriz/friendly-snippets"},
-                {"honza/vim-snippets"}
+                {"honza/vim-snippets"},
             },
             config = function()
                 require("myrc.config.luasnip")
@@ -315,7 +345,7 @@ require("lazy").setup(
         -- Completion Engine {{{2
         {
             "hrsh7th/nvim-cmp",
-            event = "VimEnter",
+            event = {"InsertEnter", "CmdLineEnter"},
             dependencies = {
                 {"hrsh7th/cmp-nvim-lsp"},
                 {"hrsh7th/cmp-buffer"},
@@ -340,11 +370,11 @@ require("lazy").setup(
         },
         -- }}}
         -- LSP {{{2
-        {"williamboman/mason.nvim", config = true},
-        {"williamboman/mason-lspconfig.nvim"},
+        {"williamboman/mason.nvim", cmd = "Mason", config = true},
+        {"williamboman/mason-lspconfig.nvim", event = {"BufReadPost", "BufNewFile"}},
         {
             "neovim/nvim-lspconfig",
-            event = {"BufReadPre", "BufNewFile"},
+            event = {"BufReadPost", "BufNewFile"},
             config = function()
                 require("myrc.config.lsp")
             end
@@ -352,11 +382,13 @@ require("lazy").setup(
         {"folke/neodev.nvim", lazy = true},
         {
             "simrat39/symbols-outline.nvim",
+            cmd = {"SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose"},
+            keys = {"<leader>to"},
             config = function()
                 require("myrc.config.symbols-outline")
             end
         },
-        {"b0o/schemastore.nvim"},
+        {"b0o/schemastore.nvim", lazy=true},
         -- }}}
         -- File explorer/Fuzzy Finder {{{2
         {
@@ -370,7 +402,7 @@ require("lazy").setup(
         },
         {
             "ibhagwan/fzf-lua",
-            event = "VimEnter",
+            event = { "BufReadPost", "BufNewFile" },
             enabled = fn.get(g.enabled_plugins, "fzf-lua") == 1,
             config = function()
                 require("fzf-lua").setup(
@@ -382,7 +414,7 @@ require("lazy").setup(
         },
         {
             "junegunn/fzf.vim",
-            event = "VimEnter",
+            event = { "BufReadPost", "BufNewFile" },
             enabled = fn.get(g.enabled_plugins, "fzf.vim") == 1,
             dependencies = {
                 "junegunn/fzf"
@@ -390,7 +422,11 @@ require("lazy").setup(
         },
         {
             "nvim-telescope/telescope.nvim",
-            tag = "0.1.2",
+            enabled = fn.get(g.enabled_plugins, "telescope") == 1,
+            cmd = { "Telescope" },
+            keys = {"<leader>ff", "<leader>xd", "<leader>xa", "<leader>b",
+                    "<leader>fo", "<C-p>", "<leader>fn", "<leader>fv"},
+            tag = "0.1.5",
             dependencies = {
                 {
                     "nvim-telescope/telescope-ui-select.nvim",
@@ -404,7 +440,7 @@ require("lazy").setup(
         {
             -- https://github.com/tomasky/bookmarks.nvim
             "tomasky/bookmarks.nvim",
-            event = "VimEnter",
+            keys = {"mm", "mt", "ml", "mc"},
             config = function()
                 require("myrc.config.bookmarks")
             end
@@ -416,13 +452,13 @@ require("lazy").setup(
             event = "VeryLazy",
             dependencies = {
                 -- The icon font for Visual Studio Code
-                {"ChristianChiarulli/neovim-codicons", lazy = true}
+                {"ChristianChiarulli/neovim-codicons", lazy = true},
+                {"arkav/lualine-lsp-progress"},
             },
             config = function()
                 require("myrc.config.lualine")
             end
         },
-        {"arkav/lualine-lsp-progress"}
         -- 2}}}
     },
     -- Lazy configurations {{{2
