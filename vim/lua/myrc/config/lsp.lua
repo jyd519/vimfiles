@@ -36,7 +36,8 @@ local function get_typescript_server_path(root_dir)
   if lspconfig.util.search_ancestors(root_dir, check_dir) then
     return found_ts
   else
-    return vim.fn.expand("~/.nvm/versions/node/v16.19.1/lib/node_modules/typescript/lib")
+    put(">> typescript/lib not found")
+    return found_ts
   end
 end
 
@@ -75,7 +76,13 @@ end
 
 -- }}}
 
--- set keymap on on_attach {{{2
+-- set keymap {{{2
+--
+vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, { desc = "Show diagnostics" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, { desc = "Set location list" })
+--
 ---@diagnostic disable-next-line: unused-local
 local function setup_client(client, bufnr)
   -- Jump to the definition
@@ -105,14 +112,14 @@ local function setup_client(client, bufnr)
   -- Selects a code action available at the current cursor position
   bufmap("n", "gx", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code action" })
 
-  -- Show diagnostics in a floating window
+  -- -- Show diagnostics in a floating window
   bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
-
-  -- Move to the previous diagnostic
-  bufmap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", { desc = "Previous diagnostic" })
-
-  -- Move to the next diagnostic
-  bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", { desc = "Next diagnostic" })
+  --
+  -- -- Move to the previous diagnostic
+  -- bufmap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", { desc = "Previous diagnostic" })
+  --
+  -- -- Move to the next diagnostic
+  -- bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", { desc = "Next diagnostic" })
 
   -- The blow command will highlight the current variable and its usages in the buffer.
   if client.server_capabilities.documentHighlightProvider then
@@ -136,25 +143,30 @@ local function setup_client(client, bufnr)
     })
   end
 end
+
+-- Use LspAttach autocommand to only map the following keys
+-- after the language server attaches to the current buffer
+vim.api.nvim_create_autocmd("LspAttach", {
+  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+  callback = function(ev) setup_client(vim.lsp.get_client_by_id(ev.data.client_id), ev.buf) end,
+})
 -- }}}
 
 -- default lspconfig {{{2
-local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 local lsp_defaults = {
-  -- This is the default in Nvim 0.7+
-  -- flags = { debounce_text_changes = 150 },
   capabilities = capabilities,
   on_new_config = make_on_new_config(lspconfig.util.default_config.on_new_config),
-  on_attach = function(client, bufnr)
-    -- nvim 0.7 nvim_exec_autocmds's functionality's is limited
-    -- api.nvim_exec_autocmds('User', {pattern = 'LspAttached', data=client.id})
-    setup_client(client, bufnr)
-  end,
+  -- on_attach = function(client, bufnr)
+  --   -- nvim 0.7 nvim_exec_autocmds's functionality's is limited
+  --   setup_client(client, bufnr)
+  -- end,
 }
 
 lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.default_config, lsp_defaults)
 _G.lspconfig = lspconfig
+
 -- }}}
 
 -- tsserver {{{2
@@ -189,37 +201,16 @@ require("typescript").setup({
 -- }}}
 
 -- GoLang  {{{2
-require("go").setup({
-  lsp_cfg = true,
-  lsp_codelens = true,
-  luasnip = true,
-  lsp_inlay_hints = {
-    parameter_hints_prefix = " ",
-    -- parameter_hints_prefix = "f ",
-  },
-  lsp_on_attach = function(client, bufnr) setup_client(client, bufnr) end,
-})
--- local golspcfg = require("go.lsp").config() -- config() return the go.nvim gopls setup
--- lspconfig.gopls.setup(golspcfg)
--- lspconfig.gopls.setup {
---   on_attach = function(client, bufnr)
---     lspconfig.util.default_config.on_attach(client, bufnr)
---   end,
---   settings = {
---     gopls = {
---       experimentalPostfixCompletions = true,
---       analyses = {
---         unusedparams = true,
---         shadow = true,
---       },
---       staticcheck = true,
---     },
+-- require("go").setup({
+--   lsp_cfg = true,
+--   lsp_codelens = true,
+--   luasnip = true,
+--   lsp_inlay_hints = {
+--     parameter_hints_prefix = " ",
+--     -- parameter_hints_prefix = "f ",
 --   },
---   init_options = {
---     usePlaceholders = true,
---   }
--- }
--- }}}
+--   lsp_on_attach = function(client, bufnr) setup_client(client, bufnr) end,
+-- })
 
 -- lua lsp {{{2
 local function get_lua_library()
@@ -245,17 +236,18 @@ local function get_lua_library()
   add("$VIMFILES/lua")
 
   -- add plugins
-  -- add("$VIMFILES/lazy/plenary.nvim/lua")
-  -- add("$VIMFILES/lazy/nvim-cmp/lua")
-  -- add("$VIMFILES/lazy/nvim-lspconfig/lua")
-  local paths = vim.api.nvim_get_runtime_file("", true)
-  for _, p in pairs(paths) do
-    library[p] = true
-  end
+  add("$VIMFILES/lazy/plenary.nvim/lua")
+  add("$VIMFILES/lazy/nvim-cmp/lua")
+  add("$VIMFILES/lazy/nvim-lspconfig/lua")
+  -- local paths = vim.api.nvim_get_runtime_file("", true)
+  -- for _, p in pairs(paths) do
+  --   library[p] = true
+  -- end
   return library
 end
 
 lspconfig["lua_ls"].setup({
+  autostart = false,
   single_file_support = true,
   on_attach = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = false
@@ -360,13 +352,13 @@ local lsp_settings = {
   },
 }
 
-local servers = { "cmake", "bashls", "angularls", "cssls", "ansiblels", "tailwindcss", "jsonls" }
-for _, lsp in ipairs(servers) do
+local servers = { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls" }
+for _, name in ipairs(servers) do
   local opts = {
-    on_attach = function(client, bufnr) lspconfig.util.default_config.on_attach(client, bufnr) end,
+    capabilities = capabilities,
   }
-  if lsp_settings[lsp] ~= nil then opts = vim.tbl_deep_extend("force", lsp_settings[lsp], opts) end
-  lspconfig[lsp].setup(opts)
+  -- if lsp_settings[name] ~= nil then opts = vim.tbl_deep_extend("force", lsp_settings[name], opts) end
+  lspconfig[name].setup(opts)
 end
 -- }}}
 
@@ -428,5 +420,17 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagn
   },
 })
 -- }}}
+
+local toggle_lsp_client = function()
+  local buf = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_active_clients({ bufnr = buf })
+  if not vim.tbl_isempty(clients) then
+    vim.cmd("LspStop")
+  else
+    vim.cmd("LspStart")
+  end
+end
+
+vim.keymap.set("n", "<leader>tl", toggle_lsp_client, { noremap = true, silent = true, desc = "Toggle LSP server" })
 
 -- vim: set fdm=marker fen fdl=1:

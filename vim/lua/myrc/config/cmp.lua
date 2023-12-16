@@ -71,24 +71,12 @@ cmp.setup({
       luasnip.unlink_current()
       fallback()
     end, { "i" }),
-    ["<CR>"] = cmp.mapping({
-      i = cmp.mapping.confirm({ select = true }),
-      -- i = function(fallback)
-      --   if cmp.visible() and cmp.get_active_entry() then
-      --     cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
-      --   else
-      --     fallback()
-      --   end
-      -- end,
-      -- s = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true}),
-      -- c = cmp.mapping.confirm({ select = true }),
-    }),
+    ["<C-y>"] = cmp.mapping.confirm({ select = true }),
+    ["<CR>"] = cmp.mapping.confirm({ select = false }),
     -- jump backward
     ["<C-h>"] = cmp.mapping(function(fallback)
       if luasnip.jumpable(-1) then
         luasnip.jump(-1)
-      elseif vim.call("UltiSnips#CanJumpBackwards") == 1 then
-        vim.call("UltiSnips#JumpBackwards")
       else
         fallback()
       end
@@ -102,10 +90,10 @@ cmp.setup({
         luasnip.expand_or_jump()
       elseif is_insert_keys(codeium_keys) then
         vim.api.nvim_feedkeys(codeium_keys, "i", true)
+      elseif cmp.confirm({ select = true }) then
+        --
       elseif luasnip.expandable() then
         luasnip.expand_or_jump()
-      elseif vim.call("UltiSnips#CanJumpForwards") == 1 then
-        vim.call("UltiSnips#JumpForwards")
       else
         -- fallback()
       end
@@ -238,9 +226,7 @@ cmp.setup.cmdline("/", {
       options = {
         -- https://github.com/hrsh7th/cmp-buffer#indexing-and-how-to-optimize-it
         get_bufnrs = function()
-          if vim.b.large_buf then
-            return {}
-          end
+          if vim.b.large_buf then return {} end
           local buf = vim.api.nvim_get_current_buf()
           local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
           if byte_size > 5 * 1024 * 1024 then -- 1 Megabyte max

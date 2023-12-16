@@ -399,6 +399,9 @@ endif
 " put the quickfix window on bottom always
 autocmd vimrc FileType qf wincmd J
 
+if get(g:enabled_plugins, "coc", 0)
+  runtime config/plugins/coc.vim
+endif
 
 " log file
 if !g:is_nvim

@@ -18,7 +18,9 @@ endif
 set rtp^=$VIMFILES rtp+=$VIMFILES/after
 
 " enable plugins
-let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "coc": 0 }
+if !exists("g:enabled_plugins")
+  let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "coc": 0 }
+endif
 
 runtime config/globals.vim
 

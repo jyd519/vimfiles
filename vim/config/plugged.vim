@@ -38,7 +38,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'chiedojohn/vim-case-convert'
 Plug 'tomtom/tcomment_vim'
-Plug $VIMFILES . '/locals/vim-a'
+Plug $VIMFILES . '/locals/vim-a', { 'on': ['A', 'AH'] }
 
 if s:any("test")
   Plug 'vim-test/vim-test'    " Unit-Testing, requires python
@@ -46,7 +46,7 @@ if s:any("test")
 endif
 
 Plug 'thinca/vim-quickrun'
-Plug 'tweekmonster/startuptime.vim'
+Plug 'dstein64/vim-startuptime', { 'on': ['StartupTime'] }
 
 Plug 'preservim/nerdtree', { 'on': ['NERDTreeToggle', 'NERDTreeFind'] }
 
@@ -91,7 +91,7 @@ endif
 Plug 'vim-airline/vim-airline'
 
 " Code formatter
-Plug 'sbdchd/neoformat'
+Plug 'sbdchd/neoformat', {'on': ['Neoformat']}
 
 " Git
 Plug 'tpope/vim-fugitive'
@@ -162,7 +162,7 @@ Plug 'cespare/vim-toml', {'for': 'toml'}
 Plug 'rhysd/vim-grammarous', { 'on': ['GrammarousCheck'] }
 
 " C/C++ build
-Plug 'ilyachur/cmake4vim'
+Plug 'ilyachur/cmake4vim', { 'for': ['cpp', 'c', 'objc', 'objcc', 'cmake'] }
 
 " vimdoc - Chinese version
 Plug 'yianwillis/vimcdoc'

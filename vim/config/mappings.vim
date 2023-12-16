@@ -1,4 +1,4 @@
-" Requirements: 
+" Requirements:
 "    im-select (macOS)
 "
 " Empty `vimrc` augroup {{{
@@ -65,7 +65,7 @@ endif
 
 " Open with browser {{{1
 if has("win32")
-  nmap <leader>o :update<cr>:silent !"chrome.exe" "file://%:p"<cr>
+  nmap <leader>o :update<cr>:silent !start chrome.exe file://%:p<cr>
 endif
 if has("mac")
   nmap <leader>o :update<cr>:silent !open -a "Google Chrome" "%:p"<cr>:redraw!<cr>
@@ -74,7 +74,7 @@ endif
 
 " Terminal {{{1
 " to exit terminal-mode
-tnoremap <Esc> <C-\><C-n>  
+tnoremap <Esc> <C-\><C-n>
 tnoremap <C-h> <C-\><C-N><C-w>h
 tnoremap <C-j> <C-\><C-N><C-w>j
 tnoremap <C-k> <C-\><C-N><C-w>k
