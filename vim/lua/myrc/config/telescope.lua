@@ -47,7 +47,7 @@ telescope.load_extension("refactoring")
 telescope.load_extension("ui-select")
 telescope.load_extension("bookmarks")
 telescope.load_extension("import")
--- telescope.load_extension("fzf")
+telescope.load_extension("fzf")
 
 vim.keymap.set(
   "n",

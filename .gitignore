@@ -2,6 +2,7 @@
 tags
 .DS_Store
 .netrwhist
+plug.vim.old
 vim/sessions
 vim/plugged
 vim/undodir

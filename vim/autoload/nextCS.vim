@@ -4,6 +4,7 @@
 " Maintainer:  Javier Lopez <m@javier.io>
 " License:     WTFPL -- look it up.
 " ============================================================================
+let g:current = 0
 
 function! nextCS#AvoidECN()
     if exists('g:colors_name')
@@ -23,7 +24,7 @@ endfunction
 function! nextCS#GetCS() "getColorSheme
     "this search in the color directories for *.vim files and add them to colorSchemesDetected
     "let g:colorSchemesDetected = map(split(globpath(&runtimepath, "colors/*.vim", "\n")), 'fnamemodify(v:val, ":t:r")')
-    let g:colorSchemesDetected = map(split(globpath(&runtimepath, g:nextcs_dir . "*.vim")), 'fnamemodify(v:val, ":t:r")')
+    let g:colorSchemesDetected = map(split(globpath(&runtimepath, g:nextcs_dir . "*.{vim,lua}")), 'fnamemodify(v:val, ":t:r")')
 
     if empty(g:colorSchemesDetected)
         echo 'nextCS: you do not have any color file at $runtimepath/' . g:nextcs_dir

@@ -1,0 +1,26 @@
+CompileFlags:
+    Add: [-xc++]
+
+---
+If:
+  PathMatch: .*\.cpp
+
+CompileFlags:
+  Add: [-std=c++20]
+
+---
+# objcpp
+If:
+  PathMatch: .*mm$
+
+CompileFlags:
+  Remove: -xc++
+
+---
+If:
+  PathMatch: .*\.c
+
+CompileFlags:
+  Add: [-std=c17]
+
+# vim: ft=yaml:

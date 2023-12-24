@@ -118,11 +118,16 @@ if get(g:enabled_plugins, "fzf-lua", 0)
   nnoremap <leader>fg <cmd>lua require('fzf-lua').git_files()<CR>
   nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
   if exists('g:notes_dir') && executable("rg")
-    nnoremap <leader>fn <cmd>lua require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md"', cwd = vim.g.notes_dir })<CR>
+"~/.ripgreprc
+" --smart-case
+" --hidden
+" --glob
+" !.git
+    nnoremap <leader>fn <cmd>lua require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files ---glob "*.md"', cwd = vim.g.notes_dir })<CR>
     lua << EOF
     vim.api.nvim_buf_create_user_command(0, 'Notes',
       function(opts)
-        require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' .. opts.fargs[1], cwd = vim.g.notes_dir })
+        require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --glob "*.md" ' .. opts.fargs[1], cwd = vim.g.notes_dir })
       end,
       { nargs = 1,
         complete = function(ArgLead, CmdLine, CursorPos)
@@ -162,8 +167,10 @@ if get(g:enabled_plugins, "fzf.vim", 0)
     nnoremap <leader>fm :Marks<CR>
     nnoremap <leader>fo :History<CR>
 
+    command! -nargs=0 Colors :Telescope colorscheme
+
     function! s:find_notes(sub)
-      let opts = {'source': 'rg --files --hidden --smart-case --glob "!.git/*" --glob "*.md" ' . a:sub,
+      let opts = {'source': 'rg --files --glob "*.md" ' . a:sub,
             \ 'sink': 'e',
             \ 'down': '50%',
             \ 'dir': g:notes_dir,
@@ -207,7 +214,7 @@ endif
 "--------------------------------------------------------------------------------
 if executable('rg')
   " Use rg over grep
-  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ $*
+  set grepprg=rg\ --vimgrep\ --no-heading
   set grepformat=%f:%l:%c%m
 
   " Ag command
@@ -290,7 +297,7 @@ endif
 
 " Neoformat {{{
 "--------------------------------------------------------------------------------
-let g:neoformat_try_node_exe = 1
+let g:neoformat_try_node_exe = 1 " prefer command in local node_modules
 " Enable alignment globally
 let g:neoformat_basic_format_align = 1
 " Enable tab to spaces conversion globally
@@ -395,6 +402,15 @@ if !g:is_nvim
   let g:WMGraphviz_output = "svg"
   let g:previm_open_cmd = 'open -a "google chrome"'
 endif
+
+" floaterm
+if has("win32")
+  let g:floaterm_shell="pwsh.exe"
+endif
+nnoremap   <silent>   <F1>    :FloatermNew<CR>
+tnoremap   <silent>   <F1>    <C-\><C-n>:FloatermNew<CR>
+nnoremap   <silent>   <F12>   :FloatermToggle<CR>
+tnoremap   <silent>   <F12>   <C-\><C-n>:FloatermToggle<CR>
 
 " put the quickfix window on bottom always
 autocmd vimrc FileType qf wincmd J

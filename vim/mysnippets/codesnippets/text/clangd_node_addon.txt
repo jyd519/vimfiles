@@ -1,0 +1,8 @@
+-xc++
+-DUNICODE
+-D_UNICODE
+-DNODE_WANT_INTERNALS
+-DNODE_PLATFORM="windows"
+-DNODE_ARCH="x64"
+-Isrc
+-I./deps/spdlog/include/

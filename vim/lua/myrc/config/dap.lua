@@ -126,6 +126,7 @@ local function DebugTest()
 end
 _G.DebugTest = DebugTest
 
+-- Use hydra instead
 local function setup_keymap()
   local mapkey = require("keymap-amend")
 

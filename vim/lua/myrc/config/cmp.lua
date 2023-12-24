@@ -193,7 +193,7 @@ cmp.setup({
   },
   sources = cmp.config.sources({
     { name = "nvim_lua" },
-    { name = "nvim_lsp", max_item_count = 6 },
+    { name = "nvim_lsp", max_item_count = 20 },
     { name = "luasnip" }, -- For luasnip users.
     -- { name = 'vsnip' }, -- For vsnip users.
     -- { name = 'ultisnips' }, -- For ultisnips users.
@@ -244,7 +244,7 @@ cmp.setup.cmdline(":", {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = "path" },
+    { name = "path", options = { label_trailing_slash  = false } },
   }, {
     -- Do not show completion for words starting with 'Man'
     -- https://github.com/hrsh7th/cmp-cmdline/issues/47

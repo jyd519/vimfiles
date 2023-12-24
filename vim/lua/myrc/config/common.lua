@@ -60,7 +60,6 @@ vim.api.nvim_create_autocmd({ "BufReadPre" }, {
     if vim.fn.fnamemodify(bufname, ":e") == "log" then
       if vim.api.nvim_buf_line_count(vim.api.nvim_get_current_buf()) > 200000 then
         vim.b.large_buf = true
-        vim.g.indent_blankline_enabled = false
         vim.b.copilot_enabled = false
         vim.b.codeium_enabled = false
         vim.opt.foldmethod = "manual"

@@ -202,14 +202,9 @@ require("typescript").setup({
 
 -- GoLang  {{{2
 -- require("go").setup({
---   lsp_cfg = true,
---   lsp_codelens = true,
+--   lsp_cfg = false,
+--   verbose = false,
 --   luasnip = true,
---   lsp_inlay_hints = {
---     parameter_hints_prefix = " ",
---     -- parameter_hints_prefix = "f ",
---   },
---   lsp_on_attach = function(client, bufnr) setup_client(client, bufnr) end,
 -- })
 
 -- lua lsp {{{2
@@ -352,7 +347,7 @@ local lsp_settings = {
   },
 }
 
-local servers = { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls" }
+local servers = { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls", "gopls" }
 for _, name in ipairs(servers) do
   local opts = {
     capabilities = capabilities,

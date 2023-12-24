@@ -1,0 +1,37 @@
+If:
+  PathMatch: .*\.h
+
+CompileFlags:
+  Add: [-xc++]
+
+---
+If:
+  PathMatch: .*\.cpp
+
+CompileFlags:
+  Add: [
+    "-xc++",
+    "-DNODE_WANT_INTERNALS",
+    '-DNODE_PLATFORM="windows"',
+    '-DNODE_ARCH="x64"',
+    "-DUNICODE",
+    "-D_UNICODE",
+    "-std=c++20",
+  ]
+
+---
+If:
+  PathMatch: .*\.c
+
+CompileFlags:
+  Add: [-std=c17]
+
+---
+# objcpp
+If:
+  PathMatch: .*mm$
+
+CompileFlags:
+  Remove: -xc++
+
+# vim: ft=yaml:

@@ -81,23 +81,19 @@ Hydra({
 -- Dap{{{2
 --
 local dap_hint = [[
-     ^ ^Step^ ^ ^      ^ ^     Action
- ----^-^-^-^--^-^----  ^-^-------------------------------------------------
-     ^ ^back^ ^ ^     ^_t_: toggle breakpoint     ^_<F5>_/_S_: Start/Continue
-     ^ ^ _B_^ ^        _T_: clear breakpoints     ^_<F10>_   : step over
- out _O_ ^ ^ _s_ into  _c_: continue              ^_<F11>_   : step into
-     ^ ^ _n_  ^ ^      _x_: stop                  ^_<F12>_   : step out
-     ^ ^over  ^ ^    ^^_r_: open repl             ^  _R_     : run to cursor
-     ^ ^      ^ ^    ^^_E_: evaluate input        ^  _U_     : toggle UI
-     ^ ^      ^ ^    ^^_C_: conditional breakpoint
-     ^ ^  _q_: exit
+ ^_,b_^: ^toggle breakpoint     ^_,S_/_<F5>_^: ^start/continue
+ ^_,c_^: ^continue              ^_,r_     ^^^: ^run to cursor        
+ ^_,x_: stop  ^^                ^_,p_^: ^open repl ^         _,u_: ^toggle UI             
+ ^_,n_/_<F10>_: step over       _,i_/_<F11>_^: ^step into    ^_,o_/_<F12>_^: ^step out  
+ ^_,T_: ^clear breakpoints ^    ^^_,B_: ^conditional breakpoint
+ ^_,e_/_,E_: evaluate input     ^_q_^: ^exit
 ]]
 local dap = require("dap")
 
 local dapui = require("dapui")
 Hydra({
   name = "Dap Debug",
-  -- hint = dap_hint,
+  hint = dap_hint,
   config = {
     color = "pink",
     invoke_on_body = true,
@@ -105,43 +101,44 @@ Hydra({
       border = "rounded",
       position = "bottom-right",
     },
-    on_exit = function() vim.cmd("silent! DapStop") end,
+    on_exit = function() vim.cmd("silent! DapTerminate") end,
   },
   mode = { "n" },
   body = "<leader>D",
   heads = {
-    { "S", DebugTest, { desc = "Start Debugging" } },
+    { ",S", DebugTest, { desc = "Start Debugging" } },
     { "<F5>", DebugTest, { desc = "Start Debugging" } },
 
     { "<F12>", dap.step_out, { desc = "step out" } },
+    { ",o", dap.step_out, { desc = "step out" } },
     { "<F10>", dap.step_over, { desc = "step over" } },
+    { ",n", dap.step_over, { desc = "step over" } },
+    { ",i", dap.step_into, { desc = "step into" } },
     { "<F11>", dap.step_into, { desc = "step into" } },
 
-    { "R", dap.run_to_cursor, { desc = "run to cursor" } },
-    { "t", dap.toggle_breakpoint, { desc = "toggle breakpoint" } },
+    { ",r", dap.run_to_cursor, { desc = "run to cursor" } },
+    { ",c", dap.continue, { desc = "continue" } },
+    { ",b", dap.toggle_breakpoint, { desc = "toggle breakpoint" } },
     { "<F9>", dap.toggle_breakpoint, { desc = false } },
     {
-      "C",
+      ",B",
       function() dap.set_breakpoint(vim.fn.input("[Condition] > ")) end,
       desc = "Conditional Breakpoint",
     },
-    { "T", dap.clear_breakpoints, { desc = "clear breakpoints" } },
-
-    { "c", dap.continue, { desc = "continue" } },
-    { "x", dap.close, { desc = "stop" } },
-
+    { ",T", dap.clear_breakpoints, { desc = "clear breakpoints" } },
+    { ",x", dap.close, { desc = "stop" } },
     {
-      "U",
+      ",u",
       function() dapui.toggle() end,
       desc = "Toggle UI",
     },
-    -- {"e", function () require"dapui".eval() end, {desc = "evaluate variable"}},
+    {",e", function () require"dapui".eval() end, {desc = "evaluate variable"}},
     {
-      "E",
+      ",E",
       function() dapui.eval(vim.fn.input("[Expression] > ")) end,
       desc = "Evaluate Input",
     },
-    { "r", dap.repl.open, { exit = true, desc = "open repl" } },
+    { ",p", dap.repl.open, { desc = "open repl" } },
     { "q", nil, { exit = true, nowait = true, desc = "exit" } },
   },
 })
@@ -159,7 +156,7 @@ end
 local hydra_cs = Hydra({
   name = "Switch colorscheme",
   mode = { "n" },
-  body = "<leader>c",
+  body = "<leader>cs",
   config = {
     color = "pink",
     hint = { type = "window"},
@@ -202,7 +199,7 @@ local diagnostic_hint = [[
 Hydra({
   name = "Diagnostics",
   mode = { "n" },
-  body = "<leader>xn",
+  body = "<leader>X",
   hint = diagnostic_hint,
   config = {
     invoke_on_body = true,

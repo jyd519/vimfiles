@@ -46,6 +46,7 @@ require("lazy").setup(
         ]])
       end,
     },
+    { "tpope/vim-unimpaired", event = "VeryLazy" },
     -- }}}
     -- Colorschemes {{{2
     { "Mofiqul/vscode.nvim", lazy = true },
@@ -158,7 +159,7 @@ require("lazy").setup(
       config = true,
       ft = { "typescript", "javascript", "go", "rust", "python", "lua", "c", "cpp" },
     },
-    { "sbdchd/neoformat", cmd = { "Neoformat" } },
+    { "jyd519/neoformat", cmd = { "Neoformat" } },
     {
       "lukas-reineke/indent-blankline.nvim",
       event = { "BufReadPost", "BufNewFile" },
@@ -169,7 +170,8 @@ require("lazy").setup(
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.gitsigns") end,
     },
-    {"tpope/vim-fugitive"},
+    { "tpope/vim-fugitive", event = "VeryLazy" },
+    { "voldikss/vim-floaterm", event = "VeryLazy" },
     {
       "Exafunction/codeium.vim",
       enabled = true,
@@ -244,7 +246,6 @@ require("lazy").setup(
       "ray-x/go.nvim",
       ft = { "go", "gomod" },
       config = function() require("go").setup() end,
-      event = { "CmdlineEnter" },
     },
     { "fatih/vim-go", enabled = false, ft = "go" }, -- run = ":GoUpdateBinaries"
     {
@@ -389,6 +390,10 @@ require("lazy").setup(
         {
           "nvim-telescope/telescope-ui-select.nvim",
           "piersolenski/telescope-import.nvim",
+          {
+            "nvim-telescope/telescope-fzf-native.nvim",
+            build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+          },
         },
       },
       config = function() require("myrc.config.telescope") end,
