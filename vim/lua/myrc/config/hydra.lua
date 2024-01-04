@@ -1,5 +1,6 @@
 -- https://github.com/anuvyklack/hydra.nvim
 local Hydra = require("hydra")
+local cmd = require("hydra.keymap-util").cmd
 
 -- Side scroll{{{2
 Hydra({
@@ -88,9 +89,7 @@ local dap_hint = [[
  ^_,T_: ^clear breakpoints ^    ^^_,B_: ^conditional breakpoint
  ^_,e_/_,E_: evaluate input     ^_q_^: ^exit
 ]]
-local dap = require("dap")
 
-local dapui = require("dapui")
 Hydra({
   name = "Dap Debug",
   hint = dap_hint,
@@ -106,39 +105,39 @@ Hydra({
   mode = { "n" },
   body = "<leader>D",
   heads = {
-    { ",S", DebugTest, { desc = "Start Debugging" } },
-    { "<F5>", DebugTest, { desc = "Start Debugging" } },
+    { ",S", function() require("myrc.utils.dap").debug_test() end, { desc = "Start Debugging" } },
+    { "<F5>", function() require("myrc.utils.dap").debug_test() end, { desc = "Start Debugging" } },
 
-    { "<F12>", dap.step_out, { desc = "step out" } },
-    { ",o", dap.step_out, { desc = "step out" } },
-    { "<F10>", dap.step_over, { desc = "step over" } },
-    { ",n", dap.step_over, { desc = "step over" } },
-    { ",i", dap.step_into, { desc = "step into" } },
-    { "<F11>", dap.step_into, { desc = "step into" } },
+    { "<F12>", function() require("dap").step_out() end, { desc = "step out" } },
+    { ",o", function() require("dap").step_out() end, { desc = "step out" } },
+    { "<F10>", function() require("dap").step_over() end, { desc = "step over" } },
+    { ",n", function() require("dap").step_over() end, { desc = "step over" } },
+    { ",i", function() require("dap").step_into() end, { desc = "step into" } },
+    { "<F11>", function() require("dap").step_into() end, { desc = "step into" } },
 
-    { ",r", dap.run_to_cursor, { desc = "run to cursor" } },
-    { ",c", dap.continue, { desc = "continue" } },
-    { ",b", dap.toggle_breakpoint, { desc = "toggle breakpoint" } },
-    { "<F9>", dap.toggle_breakpoint, { desc = false } },
+    { ",r", function() require("dap").run_to_cursor() end, { desc = "run to cursor" } },
+    { ",c", function() require("dap").continue() end, { desc = "continue" } },
+    { ",b", function() require("dap").toggle_breakpoint() end, { desc = "toggle breakpoint" } },
+    { "<F9>", function() require("dap").toggle_breakpoint() end, { desc = false } },
     {
       ",B",
-      function() dap.set_breakpoint(vim.fn.input("[Condition] > ")) end,
+      function() require("dap").set_breakpoint(vim.fn.input("[Condition] > ")) end,
       desc = "Conditional Breakpoint",
     },
-    { ",T", dap.clear_breakpoints, { desc = "clear breakpoints" } },
-    { ",x", dap.close, { desc = "stop" } },
+    { ",T", function() require("dap").clear_breakpoints() end, { desc = "clear breakpoints" } },
+    { ",x", function() require("dap").close() end, { desc = "stop" } },
     {
       ",u",
-      function() dapui.toggle() end,
+      function() require("dapui").toggle() end,
       desc = "Toggle UI",
     },
-    {",e", function () require"dapui".eval() end, {desc = "evaluate variable"}},
+    { ",e", function() require("dapui").eval() end, { desc = "evaluate variable" } },
     {
       ",E",
-      function() dapui.eval(vim.fn.input("[Expression] > ")) end,
+      function() require("dapui").eval(vim.fn.input("[Expression] > ")) end,
       desc = "Evaluate Input",
     },
-    { ",p", dap.repl.open, { desc = "open repl" } },
+    { ",p", function() require("dap").repl.open() end, { desc = "open repl" } },
     { "q", nil, { exit = true, nowait = true, desc = "exit" } },
   },
 })
@@ -159,7 +158,7 @@ local hydra_cs = Hydra({
   body = "<leader>cs",
   config = {
     color = "pink",
-    hint = { type = "window"},
+    hint = { type = "window" },
     invoke_on_body = true,
     on_enter = function() print(vim.g.colors_name, vim.go.background) end,
     on_key = function() print(vim.g.colors_name or "", vim.go.background) end,
@@ -248,6 +247,53 @@ Hydra({
       nil,
       { exit = true, nowait = true },
     },
+  },
+})
+
+local telescope_hint = [[
+                 _f_: files       _m_: marks
+   🭇🬭🬭🬭🬭🬭🬭🬭🬭🬼    _o_: old files   _g_: live grep
+  🭉🭁🭠🭘    🭣🭕🭌🬾   _p_: projects    _/_: search in file
+  🭅█ ▁     █🭐
+  ██🬿      🭊██   _r_: resume      _u_: undotree
+ 🭋█🬝🮄🮄🮄🮄🮄🮄🮄🮄🬆█🭀  _h_: vim help    _c_: execute command
+ 🭤🭒🬺🬹🬱🬭🬭🬭🬭🬵🬹🬹🭝🭙  _k_: keymaps     _;_: commands history 
+                 _O_: options     _?_: search history
+ ^
+                 _<Enter>_: Telescope           _<Esc>_
+]]
+
+Hydra({
+  name = "Telescope",
+  hint = telescope_hint,
+  config = {
+    color = "teal",
+    invoke_on_body = true,
+    hint = {
+      position = "middle",
+      border = "rounded",
+    },
+    on_enter = function() vim.cmd([[Lazy load telescope.nvim]]) end,
+  },
+  mode = "n",
+  body = "-f",
+  heads = {
+    { "f", cmd("Telescope find_files") },
+    { "g", cmd("Telescope live_grep") },
+    { "o", cmd("Telescope oldfiles"), { desc = "recently opened files" } },
+    { "h", cmd("Telescope help_tags"), { desc = "vim help" } },
+    { "m", cmd("MarksListBuf"), { desc = "marks" } },
+    { "k", cmd("Telescope keymaps") },
+    { "O", cmd("Telescope vim_options") },
+    { "r", cmd("Telescope resume") },
+    { "p", cmd("Telescope projects"), { desc = "projects" } },
+    { "/", cmd("Telescope current_buffer_fuzzy_find"), { desc = "search in file" } },
+    { "?", cmd("Telescope search_history"), { desc = "search history" } },
+    { ";", cmd("Telescope command_history"), { desc = "command-line history" } },
+    { "c", cmd("Telescope commands"), { desc = "execute command" } },
+    { "u", cmd("silent! %foldopen! | UndotreeToggle"), { desc = "undotree" } },
+    { "<Enter>", cmd("Telescope"), { exit = true, desc = "list all pickers" } },
+    { "<Esc>", nil, { exit = true, nowait = true } },
   },
 })
 

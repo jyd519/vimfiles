@@ -44,7 +44,7 @@ let g:maplocalleader = ","
 " surround_no_insert_mappings
 let g:surround_no_insert_mappings=1
 
-if !exists("$HOME")
+if $HOME == ""
   $HOME = expand("~")
 endif
 
@@ -56,7 +56,6 @@ local function prequire(m)
   return err
 end
 _G.prequire = prequire
-
 function _G.put(...)
   local objects = vim.tbl_map(vim.inspect, {...})
   print(unpack(objects))

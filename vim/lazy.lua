@@ -21,8 +21,8 @@ vim.loader.enable()
 -- load global variables
 vim.cmd('runtime config/globals.vim')
 
--- load plugins
-require('myrc.lazy')
+require('myrc.lazy') -- load plugins
+require('myrc.mapping')
 
 -- load options, mappings and configurations
 local scripts = {'config/options.vim',

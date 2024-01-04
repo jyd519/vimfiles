@@ -76,13 +76,7 @@ end
 
 -- }}}
 
--- set keymap {{{2
---
-vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, { desc = "Show diagnostics" })
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
-vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, { desc = "Set location list" })
---
+-- set lsp keymap {{{2
 ---@diagnostic disable-next-line: unused-local
 local function setup_client(client, bufnr)
   -- Jump to the definition
@@ -158,15 +152,8 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 local lsp_defaults = {
   capabilities = capabilities,
   on_new_config = make_on_new_config(lspconfig.util.default_config.on_new_config),
-  -- on_attach = function(client, bufnr)
-  --   -- nvim 0.7 nvim_exec_autocmds's functionality's is limited
-  --   setup_client(client, bufnr)
-  -- end,
 }
-
 lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.default_config, lsp_defaults)
-_G.lspconfig = lspconfig
-
 -- }}}
 
 -- tsserver {{{2
@@ -177,7 +164,7 @@ require("typescript").setup({
     fallback = true, -- fall back to standard LSP definition on failure
   },
   server = {
-    autostart = false, -- use volar first
+    autostart = vim.g.prefer_volar ~= 1, -- use volar first
     on_new_config = function(new_config, new_root_dir)
       ---@diagnostic disable-next-line: undefined-field
       if new_root_dir:match("node_modules") or vim.b.large_buf then
@@ -187,14 +174,10 @@ require("typescript").setup({
       return new_config
     end,
     on_attach = function(client, bufnr)
-      -- if vim.api.nvim_buf_get_name(bufnr):match("node_modules") then
-      -- vim.lsp.stop_client(client.id, false)
-      -- end
       client.server_capabilities.document_formatting = false
       client.server_capabilities.document_range_formatting = false
       client.server_capabilities.documentFormattingProvider = false
       client.server_capabilities.documentRangeFormattingProvider = false
-      lspconfig.util.default_config.on_attach(client, bufnr)
     end,
   },
 })
@@ -206,6 +189,7 @@ require("typescript").setup({
 --   verbose = false,
 --   luasnip = true,
 -- })
+-- }}}
 
 -- lua lsp {{{2
 local function get_lua_library()
@@ -234,6 +218,7 @@ local function get_lua_library()
   add("$VIMFILES/lazy/plenary.nvim/lua")
   add("$VIMFILES/lazy/nvim-cmp/lua")
   add("$VIMFILES/lazy/nvim-lspconfig/lua")
+  -- TOO SLOW
   -- local paths = vim.api.nvim_get_runtime_file("", true)
   -- for _, p in pairs(paths) do
   --   library[p] = true
@@ -247,7 +232,6 @@ lspconfig["lua_ls"].setup({
   on_attach = function(client, bufnr)
     client.server_capabilities.documentFormattingProvider = false
     client.server_capabilities.documentRangeFormattingProvider = false
-    lspconfig.util.default_config.on_attach(client, bufnr)
   end,
   root_dir = function(fname)
     return lspconfig.util.root_pattern(".git", ".project", "package.json", "pyproject.toml")(fname) or fn.getcwd()
@@ -286,7 +270,6 @@ require("rust-tools").setup({
       set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
       set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
       set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
-      lspconfig.util.default_config.on_attach(client, bufnr)
     end,
     dap = {
       adapter = require("dap").adapters.codelldb,
@@ -298,7 +281,6 @@ require("rust-tools").setup({
 -- pyright {{{2
 -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 lspconfig.pyright.setup({
-  on_attach = function(client, bufnr) lspconfig.util.default_config.on_attach(client, bufnr) end,
   before_init = function(_, config)
     local join = lspconfig.util.path.join
     local p = "python3"
@@ -312,6 +294,7 @@ lspconfig.pyright.setup({
 
 -- vue/volar {{{2
 lspconfig.volar.setup({
+  autostart = vim.g.prefer_volar == 1,
   filetypes = {
     "vue",
     "javascript",
@@ -321,22 +304,11 @@ lspconfig.volar.setup({
     "typescriptreact",
     "typescript.tsx",
   },
-  on_new_config = lspconfig.util.default_config.on_new_config,
-  on_attach = function(client, bufnr) lspconfig.util.default_config.on_attach(client, bufnr) end,
 })
 -- }}}
 
 -- other languages {{{2
 local lsp_settings = {
-  cssls = {
-    settings = {
-      css = {
-        lint = {
-          unknownAtRules = "ignore",
-        },
-      },
-    },
-  },
   jsonls = {
     settings = {
       json = {
@@ -352,80 +324,22 @@ for _, name in ipairs(servers) do
   local opts = {
     capabilities = capabilities,
   }
-  -- if lsp_settings[name] ~= nil then opts = vim.tbl_deep_extend("force", lsp_settings[name], opts) end
+  if lsp_settings[name] then
+    opts = vim.tbl_deep_extend("force", opts, lsp_settings[name])
+  end
   lspconfig[name].setup(opts)
 end
--- }}}
-
--- supper K mapping {{{2
-local function show_documentation()
-  if dap.session() then
-    require("dapui").eval()
-  else
-    local filetype = vim.bo.filetype
-    if vim.tbl_contains({ "markdown" }, filetype) then
-      local clients = { "Vim", "Man" }
-      vim.ui.select(clients, {
-        prompt = "Select a action:",
-        format_item = function(client) return string.lower(client) end,
-      }, function(item)
-        if item == "Vim" then
-          vim.cmd("h " .. fn.expand("<cword>"))
-        elseif item == "Man" then
-          vim.cmd("Man " .. fn.expand("<cword>"))
-        end
-      end)
-      return
-    end
-
-    if vim.tbl_contains({ "vim", "help" }, filetype) then
-      ---@diagnostic disable-next-line: missing-parameter
-      vim.cmd("h " .. fn.expand("<cword>"))
-    elseif vim.tbl_contains({ "man" }, filetype) then
-      ---@diagnostic disable-next-line: missing-parameter
-      vim.cmd("Man " .. fn.expand("<cword>"))
-    ---@diagnostic disable-next-line: missing-parameter
-    elseif fn.expand("%:t") == "Cargo.toml" then
-      require("crates").show_popup()
-    elseif filetype == "rust" then
-      vim.cmd("RustHoverActions")
-    else
-      vim.lsp.buf.hover()
-    end
-  end
-end
-
-vim.keymap.set(
-  "n",
-  "K",
-  show_documentation,
-  { noremap = true, silent = true, desc = "show document for underline word" }
-)
 -- }}}
 
 -- diagnostic signs {{{2
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
   signs = {
     severity = vim.diagnostic.severity.HINT,
-    -- severity_limit = "Hint",
   },
   virtual_text = {
     severity = vim.diagnostic.severity.WARN,
-    -- severity_limit = "Warning",
   },
 })
 -- }}}
-
-local toggle_lsp_client = function()
-  local buf = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_active_clients({ bufnr = buf })
-  if not vim.tbl_isempty(clients) then
-    vim.cmd("LspStop")
-  else
-    vim.cmd("LspStart")
-  end
-end
-
-vim.keymap.set("n", "<leader>tl", toggle_lsp_client, { noremap = true, silent = true, desc = "Toggle LSP server" })
 
 -- vim: set fdm=marker fen fdl=1:

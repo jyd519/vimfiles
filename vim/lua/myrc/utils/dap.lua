@@ -1,7 +1,4 @@
 local M = {}
-
-local dap = require("dap")
-
 -- python3 -m debugpy  --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8088 --nothreading --noreload
 --
 -- local dap = require("dap")
@@ -33,15 +30,50 @@ local dap = require("dap")
 --     justMyCode = false,
 -- })
 
+
 ---@param language string
 ---@param setting table
 M.add = function(language, setting)
+  local dap = require("dap")
   for i = #dap.configurations[language], 1, -1 do
     if dap.configurations.python[i].name == setting.name then
       table.remove(dap.configurations[language], i)
     end
   end
   table.insert(dap.configurations[language], setting)
+end
+
+M.debug_test = functin()
+  local dap = require("dap")
+  if dap.session() then
+    dap.continue()
+    return
+  end
+
+  local ft = vim.bo.filetype
+  local file = vim.fn.expand("%:t")
+  if ft == "go" then
+    if string.match(file, ".*_test.go") then
+      require("dap-go").debug_test()
+      return
+    end
+  elseif ft == "typescript" or ft == "javascript" then
+    if string.match(file, ".*test%.[jt]s") then
+      require("myrc.config.dap-jest").debug()
+      return
+    end
+  elseif ft == "python" then
+    if string.match(file, ".*_test%.py") or string.match(file, "test_.+%.py") then
+      require("dap-python").test_method()
+      return
+    end
+  end
+  if ft == "lua" then
+    require("osv").run_this()
+    return
+  end
+
+  dap.continue()
 end
 
 return M

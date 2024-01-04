@@ -22,8 +22,8 @@ let g:UltiSnipsSnippetStorageDirectoryForUltiSnipsEdit = g:UltiSnipsSnippetsDir
 
 " cmake {{{
 "--------------------------------------------------------------------------------
-autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
-autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
+" autocmd vimrc BufRead,BufNewFile *.cmake,CMakeLists.txt,*.cmake.in setf cmake
+" autocmd vimrc BufRead,BufNewFile *.ctest,*.ctest.in setf cmake
 let g:cmake_default_config='Debug'
 let g:cmake_build_type='Debug'
 let g:cmake_export_compile_commands=1
@@ -77,7 +77,7 @@ let g:ale_pattern_options_enabled = 1
 let g:ale_linters = {
       \ 'javascript': ["eslint"],
       \ 'typescript': ["eslint"],
-      \ 'python': ['pylint', 'mypy', 'black'],
+      \ 'python': ['ruff', 'pylint', 'mypy', 'black'],
       \ 'go': ['gofmt', 'golint', 'gopls', 'govet', 'golangci-lint'],
       \}
 
@@ -90,7 +90,7 @@ let g:ale_fixers = {
       \ '*': ['remove_trailing_lines', 'trim_whitespace'],
       \ 'javascript': ['eslint', 'prettier'],
       \ 'typescript': ['eslint', 'prettier'],
-      \ 'python': ['black', 'yapf', 'isort'],
+      \ 'python': ['ruff', 'black', 'yapf', 'isort'],
       \}
 
 nnoremap <leader>L <Plug>(ale_lint)
@@ -118,16 +118,12 @@ if get(g:enabled_plugins, "fzf-lua", 0)
   nnoremap <leader>fg <cmd>lua require('fzf-lua').git_files()<CR>
   nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
   if exists('g:notes_dir') && executable("rg")
-"~/.ripgreprc
-" --smart-case
-" --hidden
-" --glob
-" !.git
-    nnoremap <leader>fn <cmd>lua require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files ---glob "*.md"', cwd = vim.g.notes_dir })<CR>
+    "RIPGREP_CONFIG_PATH=~/.ripgreprc
+    nnoremap <leader>fn <cmd>lua require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case ---glob "*.md"', cwd = vim.g.notes_dir })<CR>
     lua << EOF
     vim.api.nvim_buf_create_user_command(0, 'Notes',
       function(opts)
-        require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --glob "*.md" ' .. opts.fargs[1], cwd = vim.g.notes_dir })
+        require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case --glob "*.md" ' .. opts.fargs[1], cwd = vim.g.notes_dir })
       end,
       { nargs = 1,
         complete = function(ArgLead, CmdLine, CursorPos)
@@ -170,7 +166,7 @@ if get(g:enabled_plugins, "fzf.vim", 0)
     command! -nargs=0 Colors :Telescope colorscheme
 
     function! s:find_notes(sub)
-      let opts = {'source': 'rg --files --glob "*.md" ' . a:sub,
+      let opts = {'source': 'rg --files --hidden --smart-case --glob "*.md" ' . a:sub,
             \ 'sink': 'e',
             \ 'down': '50%',
             \ 'dir': g:notes_dir,
@@ -214,7 +210,7 @@ endif
 "--------------------------------------------------------------------------------
 if executable('rg')
   " Use rg over grep
-  set grepprg=rg\ --vimgrep\ --no-heading
+  set grepprg=rg\ --vimgrep\ --no-heading\ --smart-case\ --hidden
   set grepformat=%f:%l:%c%m
 
   " Ag command
@@ -308,7 +304,7 @@ let g:neoformat_enabled_javascript = ['prettierd', 'prettier', 'jsbeautify']
 let g:neoformat_enabled_typescript = ['prettierd', 'prettier', 'tsfmt']
 let g:neoformat_enabled_css = ['prettierd', 'prettier', 'tsfmt']
 let g:neoformat_enabled_html = ['prettierd', 'prettier','htmlbeautify']
-let g:neoformat_enabled_python = ['black', 'isort', 'docformatter', 'pyment', 'pydevf']
+let g:neoformat_enabled_python = ['ruff', 'black', 'isort']
 " bugfix: https://github.com/sbdchd/neoformat/issues/486
 let g:neoformat_c_clangformat = {
             \ 'exe': 'clang-format',
@@ -342,7 +338,9 @@ endif
 "--------------------------------------------------------------------------------
 if get(g:enabled_plugins, "vim-quickrun", 0)
   let g:quickrun_no_default_key_mappings = 1 " Disable the default keymap to ,r
-  autocmd vimrc Filetype lua noremap <buffer> <leader>r :QuickRun<cr>
+  let g:quickrun_config = {}
+  let g:quickrun_config.cmake = { 'command': 'cmake', 'runner': 'system', 'exec': ['%c -P %s %a'] }
+  autocmd vimrc Filetype lua,cmake noremap <buffer> <leader>r :QuickRun<cr>
 endif
 " }}}
 
@@ -352,7 +350,7 @@ let g:victionary#map_defaults = 0
 
 " tmux_navigator: Disable tmux navigator when zooming the Vim pane
 "--------------------------------------------------------------------------------
-if get(g:enabled_plugins, "vim-tmux-navigator", 0)
+if get(g:enabled_plugins, "tmux", 0)
   let g:tmux_navigator_disable_when_zoomed = 1
   let g:tmux_navigator_no_mappings = 1
   nnoremap <silent> <c-h> :TmuxNavigateLeft<cr>
@@ -411,6 +409,17 @@ nnoremap   <silent>   <F1>    :FloatermNew<CR>
 tnoremap   <silent>   <F1>    <C-\><C-n>:FloatermNew<CR>
 nnoremap   <silent>   <F12>   :FloatermToggle<CR>
 tnoremap   <silent>   <F12>   <C-\><C-n>:FloatermToggle<CR>
+
+" Use PowerShell
+if has("win32") && get(g:enabled_plugins, "powershell") == 1
+  " Use powershell
+  let &shell = executable('pwsh') ? 'pwsh' : 'powershell'
+  let &shellcmdflag = '-NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues[''Out-File:Encoding'']=''utf8'';'
+  let &shellredir = '2>&1 | %%{ "$_" } | Out-File %s; exit $LastExitCode'
+  let &shellpipe  = '2>&1 | %%{ "$_" } | Tee-Object %s; exit $LastExitCode'
+  set shellquote= shellxquote=
+endif
+
 
 " put the quickfix window on bottom always
 autocmd vimrc FileType qf wincmd J

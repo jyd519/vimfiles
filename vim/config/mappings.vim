@@ -50,6 +50,12 @@ inoremap <C-e> <Esc>A
 inoremap <C-a> <Esc>I
 cnoremap <C-a> <C-b>
 
+if !has("mac")
+  " Ctrl-V Paste from clipboard
+  cnoremap <C-V> <c-r>+
+  inoremap <C-V> <c-r>+
+endif
+
 " Editing a protected file as 'sudo'
 command! W w !sudo tee % > /dev/null
 "}}}

@@ -204,7 +204,7 @@ cmp.setup({
     -- { name = 'cmp_tabnine' },
     { name = "crates" },
   }, {
-    { name = "buffer", max_item_count = 6 },
+    { name = "buffer" },
   }),
 })
 
@@ -213,7 +213,21 @@ cmp.setup.filetype("gitcommit", {
   sources = cmp.config.sources({
     { name = "cmp_git" }, -- You can specify the `cmp_git` source if you were installed it.
   }, {
-    { name = "buffer" },
+    {
+      name = "buffer",
+      options = {
+        -- https://github.com/hrsh7th/cmp-buffer#indexing-and-how-to-optimize-it
+        get_bufnrs = function()
+          if vim.b.large_buf then return {} end
+          local buf = vim.api.nvim_get_current_buf()
+          local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
+          if byte_size > 2 * 1024 * 1024 then -- 2 Megabyte max
+            return {}
+          end
+          return { buf }
+        end,
+      },
+    },
   }),
 })
 
@@ -229,7 +243,7 @@ cmp.setup.cmdline("/", {
           if vim.b.large_buf then return {} end
           local buf = vim.api.nvim_get_current_buf()
           local byte_size = vim.api.nvim_buf_get_offset(buf, vim.api.nvim_buf_line_count(buf))
-          if byte_size > 5 * 1024 * 1024 then -- 1 Megabyte max
+          if byte_size > 2 * 1024 * 1024 then -- 2 Megabyte max
             return {}
           end
           return { buf }
@@ -244,7 +258,7 @@ cmp.setup.cmdline(":", {
   -- completion = { autocomplete = false },
   mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
-    { name = "path", options = { label_trailing_slash  = false } },
+    { name = "path", options = { label_trailing_slash = false } },
   }, {
     -- Do not show completion for words starting with 'Man'
     -- https://github.com/hrsh7th/cmp-cmdline/issues/47

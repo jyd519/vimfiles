@@ -54,12 +54,3 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
-
-vim.keymap.set('n', '<leader>ts', function()
-  ---@diagnostic disable: undefined-field
-  if vim.b.ts_highlight then
-    vim.treesitter.stop()
-  else
-    vim.treesitter.start()
-  end
-end)

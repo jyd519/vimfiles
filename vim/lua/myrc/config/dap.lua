@@ -3,9 +3,7 @@
 local dap = require("dap")
 _G.dap = dap
 
-local is_windows = function()
-  return vim.loop.os_uname().sysname:find("Windows", 1, true) and true
-end
+local is_windows = vim.fn.has('win32') == 1
 
 local dap_breakpoint = {
   error = {
@@ -92,207 +90,6 @@ dap.listeners.before.event_exited["dapui_config"] = function()
 end
 -- }}}
 
--- Keymaps {{{1
-local function DebugTest()
-  if dap.session() then
-    dap.continue()
-    return
-  end
-
-  local ft = vim.bo.filetype
-  local file = vim.fn.expand("%:t")
-  if ft == "go" then
-    if string.match(file, ".*_test.go") then
-      require("dap-go").debug_test()
-      return
-    end
-  elseif ft == "typescript" or ft == "javascript" then
-    if string.match(file, ".*test%.[jt]s") then
-      require("myrc.config.dap-jest").debug()
-      return
-    end
-  elseif ft == "python" then
-    if string.match(file, ".*_test%.py") or string.match(file, "test_.+%.py") then
-      require("dap-python").test_method()
-      return
-    end
-  end
-  if ft == "lua" then
-    require("osv").run_this()
-    return
-  end
-
-  dap.continue()
-end
-_G.DebugTest = DebugTest
-
--- Use hydra instead
-local function setup_keymap()
-  local mapkey = require("keymap-amend")
-
-  mapkey("n", "<F5>", function()
-    DebugTest()
-  end, { silent = true, desc = "Start Debugging" })
-
-  mapkey("n", "<F9>", function(fallback)
-    if dap.session then
-      require("dap").toggle_breakpoint()
-    else
-      fallback()
-    end
-  end, { silent = true, desc = "Toggle Breakpoints/Run" })
-
-  mapkey("n", "<F10>", function(fallback)
-    if dap.session then
-      require("dap").step_over()
-    else
-      fallback()
-    end
-  end, { silent = true, desc = "Step Over" })
-
-  mapkey("n", "<F11>", function(fallback)
-    if dap.session() then
-      dap.step_into()
-    else
-      fallback()
-    end
-  end, { silent = true, desc = "Step Into" })
-
-  mapkey("n", "<F12>", function(fallback)
-    if dap.session() then
-      dap.step_out()
-    else
-      fallback()
-    end
-  end, { silent = true, desc = "Step out" })
-
-  local keymap = {
-    R = {
-      function()
-        require("dap").run_to_cursor()
-      end,
-      "Run to Cursor",
-    },
-    E = {
-      function()
-        require("dapui").eval(vim.fn.input("[Expression] > "))
-      end,
-      "Evaluate Input",
-    },
-    ["cb"] = {
-      function()
-        require("dap").set_breakpoint(vim.fn.input("[Condition] > "))
-      end,
-      "Conditional Breakpoint",
-    },
-    U = {
-      function()
-        require("dapui").toggle()
-      end,
-      "Toggle UI",
-    },
-    c = {
-      function()
-        require("dap").continue()
-      end,
-      "Continue",
-    },
-    e = {
-      function()
-        require("dapui").eval()
-      end,
-      "Evaluate",
-    },
-    ["vs"] = {
-      function()
-        require("dapui").float_element("scopes", { enter = true })
-      end,
-      "Open scopes window",
-    },
-    g = {
-      function()
-        require("dap").session()
-      end,
-      "Get Session",
-    },
-    h = {
-      function()
-        require("dap.ui.widgets").hover()
-      end,
-      "Hover Variables",
-    },
-    S = {
-      function()
-        require("dap.ui.widgets").scopes()
-      end,
-      "Scopes",
-    },
-    i = {
-      function()
-        require("dap").step_into()
-      end,
-      "Step Into",
-    },
-    o = {
-      function()
-        require("dap").step_over()
-      end,
-      "Step Over",
-    },
-    p = {
-      function()
-        require("dap").pause.toggle()
-      end,
-      "Pause",
-    },
-    q = {
-      function()
-        dap.close()
-      end,
-      "Quit",
-    },
-    ["rp"] = {
-      function()
-        require("dap").repl.toggle()
-      end,
-      "Toggle Repl",
-    },
-    s = {
-      function()
-        require("dap").continue()
-      end,
-      "Start",
-    },
-    b = {
-      function()
-        require("dap").toggle_breakpoint()
-      end,
-      "Toggle Breakpoint",
-    },
-    x = {
-      function()
-        require("dap").terminate()
-      end,
-      "Terminate",
-    },
-  }
-
-  for sk, sv in pairs(keymap) do
-    mapkey("n", "<leader>d" .. sk, sv[1], { desc = sv[2] })
-  end
-
-  mapkey("v", "<leader>e", function(original)
-    if dap.session() then
-      require("dapui").eval()
-    else
-      original()
-    end
-  end, { silent = true, desc = "Evaluate variable" })
-end
-
--- Use hydra instead
--- setup_keymap()
-
 -- Configure Debuggers {{{1
 --
 -- https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation
@@ -328,7 +125,7 @@ end
 local getPythonPath = function()
   local venv_path = os.getenv("VIRTUAL_ENV")
   if venv_path then
-    if is_windows() then
+    if is_windows then
       return venv_path .. "\\Scripts\\python.exe"
     end
     return venv_path .. "/bin/python"
@@ -441,23 +238,37 @@ require("dap-go").setup({})
 
 -- c/c++/rust {{{1
 -- codelldb ref: https://github.com/vadimcn/vscode-lldb/blob/master/MANUAL.md#launching-a-new-process
+local getLLDBPath = function()
+  local llvm_root = os.getenv("LLVM_ROOT")
+  if llvm_root ~= nil then
+    return is_windows and  llvm_root .. "/bin/lldb-vscode" or llvm_root .. "/bin/lldb-vscode.exe"
+  end
+  if vim.fn.executable("/usr/local/bin/lldb-vscode") == 1 then
+    return "/usr/local/bin/lldb-vscode"
+  end
+  if vim.fn.executable("/usr/local/opt/llvm/bin/lldb-vscode") == 1 then
+    return "/usr/local/opt/llvm/bin/lldb-vscode"
+  end
+  return "lldb-vscode"
+end
+
 dap.adapters.lldb = {
   type = "executable",
-  command = "/usr/local/opt/llvm/bin/lldb-vscode", -- adjust as needed, must be absolute path
+  command = getLLDBPath(),
 }
 
 ---@diagnostic disable-next-line: missing-parameter
-local vscode_lldb_path = vim.fn.globpath(os.getenv("HOME") .. "/.vscode/extensions", "*vscode-lldb*")
+local vscode_codelldb_path = vim.fn.globpath(vim.loop.os_homedir() .. "/.vscode/extensions", "*vscode-lldb*")
 dap.adapters.codelldb = {
   type = "server",
   port = "${port}",
   executable = {
-    command = vscode_lldb_path .. "/adapter/codelldb",
+    command = vscode_codelldb_path .. "/adapter/codelldb",
     args = { "--port", "${port}" },
     detach = not vim.fn.has("win32"),
   },
 }
-
+ 
 dap.configurations.cpp = {
   {
     name = "Launch - codelldb",
@@ -506,11 +317,12 @@ dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp
 
 -- javascript {{{1
+local vscode_js_debug_path = vim.fn.globpath(vim.loop.os_homedir() .. "/.vscode/extensions", "*vscode.js-debug*")
 require("dap-vscode-js").setup({
   node_path = vim.g.node_path or "node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
   adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" }, -- which adapters to register in nvim-dap
   -- Path to vscode-js-debug installation.
-  debugger_path = os.getenv("HOME") .. "/dev/tools/vscode-js-debug",
+  debugger_path = vscode_js_debug_path,
 })
 
 for _, language in ipairs({ "typescript", "javascript" }) do

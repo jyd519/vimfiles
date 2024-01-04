@@ -1,5 +1,4 @@
-local outline = require("symbols-outline")
-outline.setup({
+require("symbols-outline").setup({
   autofold_depth = 1,
   keymaps = {
     -- These keymaps can be a string or a table for multiple keys
@@ -17,7 +16,3 @@ outline.setup({
     fold_reset = "R",
   },
 })
-
-vim.keymap.set("n", "<leader>to", function()
-  outline.toggle_outline()
-end)

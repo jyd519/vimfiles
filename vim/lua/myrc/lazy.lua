@@ -4,7 +4,7 @@ local g = vim.g
 if g.cfg_install_missing_plugins == nil then g.cfg_install_missing_plugins = 1 end
 
 local lazypath = g.VIMFILES .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
+if not vim.loop.fs_stat(lazypath .. "/lua") then
   vim.fn.system({
     "git",
     "clone",
@@ -47,6 +47,7 @@ require("lazy").setup(
       end,
     },
     { "tpope/vim-unimpaired", event = "VeryLazy" },
+    { "tpope/vim-scriptease", lazy = true, cmd = "Breakadd" },
     -- }}}
     -- Colorschemes {{{2
     { "Mofiqul/vscode.nvim", lazy = true },
@@ -114,6 +115,7 @@ require("lazy").setup(
     {
       "chentoast/marks.nvim",
       event = { "BufReadPost", "BufNewFile" },
+      cmd = { "MarksListBuf" },
       config = function() require("myrc.config.marks") end,
     },
     { "numToStr/Comment.nvim", event = "VeryLazy", config = true },
@@ -145,9 +147,7 @@ require("lazy").setup(
     { dir = g.VIMFILES .. "/locals/vim-a", cmd = { "A", "AH" } },
     {
       dir = g.VIMFILES .. "/locals/nvim-projectconfig",
-      event = "VeryLazy",
       opts = { silent = false },
-      priority = 100,
     },
     -- }}}
     -- Coding {{{2
@@ -178,7 +178,7 @@ require("lazy").setup(
       event = { "BufReadPost", "BufNewFile" },
       config = function()
         vim.g.codeium_no_map_tab = 1
-
+        vim.g.codeium_filetypes = { markdown = false }
         vim.keymap.set(
           "i",
           "<C-g>",
@@ -224,8 +224,8 @@ require("lazy").setup(
     -- DAP Debugging {{{2
     {
       "mfussenegger/nvim-dap",
-      lazy = true,
-      event = { "BufReadPost", "BufNewFile" },
+      -- event = { "BufReadPost", "BufNewFile" },
+      keys = { "<leader>D" },
       ft = { "go", "python", "lua", "rust", "typescript", "javascript" },
       config = function() require("myrc.config.dap") end,
       dependencies = {
@@ -306,7 +306,7 @@ require("lazy").setup(
       -- event = { "InsertEnter", "CmdLineEnter" },
       dependencies = {
         { "hrsh7th/cmp-buffer" },
-        { "hrsh7th/cmp-path" },
+        { "yehuohan/cmp-path" },
         { "hrsh7th/cmp-cmdline" },
         { "hrsh7th/cmp-nvim-lua" },
         -- { "hrsh7th/cmp-nvim-lsp-document-symbol" },
@@ -326,8 +326,8 @@ require("lazy").setup(
     -- LSP {{{2
     {
       "neovim/nvim-lspconfig",
-      event = "VeryLazy",
-      -- event = { "BufReadPost", "BufNewFile" },
+      -- event = "VeryLazy",
+      event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.lsp") end,
       dependencies = {
         { "folke/neodev.nvim", lazy = true },
@@ -366,7 +366,7 @@ require("lazy").setup(
     {
       "junegunn/fzf.vim",
       event = { "BufReadPost", "BufNewFile" },
-      enabled = fn.get(g.enabled_plugins, "fzf.vim") == 1,
+      enabled = fn.get(g.enabled_plugins, "fzf") == 1,
       dependencies = {
         "junegunn/fzf",
       },
@@ -374,17 +374,7 @@ require("lazy").setup(
     {
       "nvim-telescope/telescope.nvim",
       enabled = fn.get(g.enabled_plugins, "telescope") == 1,
-      cmd = { "Telescope", "Maps" },
-      keys = {
-        "<leader>ff",
-        "<leader>xd",
-        "<leader>xa",
-        "<leader>b",
-        "<leader>fo",
-        "<C-p>",
-        "<leader>fn",
-        "<leader>fv",
-      },
+      cmd = { "Telescope" },
       tag = "0.1.5",
       dependencies = {
         {
