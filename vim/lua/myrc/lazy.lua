@@ -37,7 +37,7 @@ require("lazy").setup(
     {
       "ojroques/nvim-osc52",
       event = "VimEnter",
-      enabled = vim.env.SSH_CLIENT ~= nil,
+      enabled = vim.env.SSH_CLIENT ~= nil or vim.env.WSLENV ~= nil,
       config = function()
         require("osc52").setup()
         vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
