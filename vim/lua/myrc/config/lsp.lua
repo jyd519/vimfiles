@@ -109,12 +109,6 @@ local function setup_client(client, bufnr)
   -- -- Show diagnostics in a floating window
   bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
   --
-  -- -- Move to the previous diagnostic
-  -- bufmap("n", "[d", "<cmd>lua vim.diagnostic.goto_prev()<cr>", { desc = "Previous diagnostic" })
-  --
-  -- -- Move to the next diagnostic
-  -- bufmap("n", "]d", "<cmd>lua vim.diagnostic.goto_next()<cr>", { desc = "Next diagnostic" })
-
   -- The blow command will highlight the current variable and its usages in the buffer.
   if client.server_capabilities.documentHighlightProvider then
     vim.cmd([[
@@ -138,11 +132,44 @@ local function setup_client(client, bufnr)
   end
 end
 
+local format_is_enabled = true
+vim.api.nvim_create_user_command('FormatToggle', function()
+  format_is_enabled = not format_is_enabled
+  print('Setting autoformatting to: ' .. tostring(format_is_enabled))
+end, {})
+
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
 vim.api.nvim_create_autocmd("LspAttach", {
-  group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-  callback = function(ev) setup_client(vim.lsp.get_client_by_id(ev.data.client_id), ev.buf) end,
+  group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
+  callback = function(args)
+    local client_id = args.data.client_id
+    local client = vim.lsp.get_client_by_id(client_id)
+    local bufnr = args.buf
+
+    setup_client(client, bufnr)
+
+    --
+    -- format on save
+    --
+    if not client.server_capabilities.documentFormattingProvider then return end
+
+    -- Tsserver usually works poorly. Sorry you work with bad languages
+    -- You can remove this line if you know what you're doing :)
+    if client.name == "tsserver" then return end
+
+    vim.api.nvim_create_autocmd("BufWritePre", {
+      group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, { clear = true }),
+      buffer = bufnr,
+      callback = function()
+        if not format_is_enabled then return end
+        vim.lsp.buf.format({
+          async = false,
+          filter = function(c) return c.id == client.id end,
+        })
+      end,
+    })
+  end,
 })
 -- }}}
 
@@ -324,9 +351,7 @@ for _, name in ipairs(servers) do
   local opts = {
     capabilities = capabilities,
   }
-  if lsp_settings[name] then
-    opts = vim.tbl_deep_extend("force", opts, lsp_settings[name])
-  end
+  if lsp_settings[name] then opts = vim.tbl_deep_extend("force", opts, lsp_settings[name]) end
   lspconfig[name].setup(opts)
 end
 -- }}}

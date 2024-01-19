@@ -161,6 +161,12 @@ vim.keymap.set("n", "<leader>fs", "<cmd>Telescope lsp_document_symbols<cr>", { d
 vim.keymap.set("n", "<leader>fi", "<cmd>Telescope lsp_implementations<cr>", { desc = "Find lsp implementations" })
 vim.keymap.set("n", "<leader>fc", "<cmd>Telescope colorscheme<cr>", { desc = "Select colorscheme" })
 vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers<cr>", { desc = "List buffers" })
+vim.keymap.set("n", "<leader>fp", function()
+  require("lazy").load({ plugins = { "project.nvim" } })
+  vim.schedule(function()
+    vim.cmd("Telescope projects")
+  end)
+end, { desc = "Find Project" })
 
 vim.keymap.set(
   "n",
@@ -320,6 +326,14 @@ vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, { desc = "Show diagno
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
 vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, { desc = "Set location list" })
+--}}}
+
+-- Make {{{2
+vim.api.nvim_create_user_command(
+  "Make",
+  function(opts) require("myrc.utils.term_run").gulp(opts.fargs) end,
+  { nargs = "*", desc = "Run Build Tools" }
+)
 --}}}
 
 -- vim: set fdm=marker fdl=1: }}}

@@ -40,6 +40,10 @@ Plug 'chiedojohn/vim-case-convert'
 Plug 'tomtom/tcomment_vim'
 Plug $VIMFILES . '/locals/vim-a', { 'on': ['A', 'AH'] }
 
+if $SSH_CONNECTION != ""
+  Plug 'ojroques/vim-oscyank', {'branch': 'main', 'on': ['OSCYank', 'OSCYankReg', '<Plug>OSCYankVisual']}
+endif
+
 if s:any("test")
   Plug 'vim-test/vim-test'    " Unit-Testing, requires python
   Plug 'brookhong/cscope.vim'
@@ -78,6 +82,7 @@ endif
 " async
 Plug 'skywind3000/asyncrun.vim'
 Plug 'tpope/vim-dispatch'
+Plug 'voldikss/vim-floaterm'
 
 " Auto Completion
 if get(g:enabled_plugins, "ycm", 0)

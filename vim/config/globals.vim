@@ -1,5 +1,5 @@
 let g:is_nvim = has('nvim')
-let g:is_vim8 = v:version >= 800 ? 1 : 0
+let g:is_vim = !g:is_nvim
 
 if !exists("g:enabled_plugins")
   let g:enabled_plugins = {}

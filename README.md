@@ -32,7 +32,10 @@ let g:node_path = $NODE_PATH != "" ? $NODE_PATH :  'node'
 " let g:notes_dir = '<path>'
 
 " enable plugins
-" let g:enabled_plugins = { "fzf": 1, "node": 1, "go": 1, "rust": 1, "python": 1}
+" let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "python": 0 \
+"   "fzf-lua": 0, "markdown": 0, \ 
+"   "netrw": 0, "telescope": 1, "test": 0 , "tmux": 0, "nvim-treesitter": 0 \
+"}
 
 " HACK: work around bad detection of background in Tmux (no OSC11 support)
 " https://github.com/neovim/neovim/issues/17070

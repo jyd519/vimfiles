@@ -11,9 +11,13 @@ end
 vim.fn.jobstart('ls', { on_stdout = print_stdout })
 
 
-vim.fn.jobstart({'ls'}, {
+vim.fn.jobstart({'cmd.exe', '/c', 'dir'}, {
     on_stdout = function(chan_id, data, name)
-        print(vim.inspect(data)) -- ?? ""
+      if name == "stdout" then
+        print(data[1])
+      else
+        print(name)
+      end
     end
 })
 

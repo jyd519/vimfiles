@@ -71,7 +71,7 @@ endif
 
 " Open with browser {{{1
 if has("win32")
-  nmap <leader>o :update<cr>:silent !start chrome.exe file://%:p<cr>
+  nmap <leader>o :update<cr>:silent !start chrome.exe "file://%:p"<cr>
 endif
 if has("mac")
   nmap <leader>o :update<cr>:silent !open -a "Google Chrome" "%:p"<cr>:redraw!<cr>
@@ -111,8 +111,8 @@ nnoremap <silent> <leader>xl :call qf#ToggleLocationList()<cr>
 "}}}
 
 " enable osc52 copying for remote ssh connection
-if $SSH_CONNECTION != "" && g:is_nvim
-  autocmd vimrc TextYankPost * lua require("osc52").copy_visual()
+if $SSH_CONNECTION != "" && g:is_vim
+  nmap <leader>y <Plug>OSCYankVisual
 endif
 
 " vim: set fdm=marker fen:

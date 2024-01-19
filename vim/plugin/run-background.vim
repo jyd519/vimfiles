@@ -1,4 +1,9 @@
+if g:is_nvim
+  finish
+endif
+
 " Run command in background
+"
 " This callback will be executed when the entire command is completed
 function! BackgroundCommandClose(channel)
   " Read the output from the command into the quickfix window

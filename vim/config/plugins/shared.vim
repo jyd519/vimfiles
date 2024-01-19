@@ -405,10 +405,9 @@ endif
 if has("win32")
   let g:floaterm_shell="pwsh.exe"
 endif
-nnoremap   <silent>   <F1>    :FloatermNew<CR>
-tnoremap   <silent>   <F1>    <C-\><C-n>:FloatermNew<CR>
-nnoremap   <silent>   <F12>   :FloatermToggle<CR>
-tnoremap   <silent>   <F12>   <C-\><C-n>:FloatermToggle<CR>
+
+nnoremap   <silent>   <F12>   :ToggleTerm<CR>
+tnoremap   <silent>   <F12>   <C-\><C-n>:ToggleTerm<CR>
 
 " Use PowerShell
 if has("win32") && get(g:enabled_plugins, "powershell") == 1

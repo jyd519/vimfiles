@@ -3,7 +3,6 @@ local cmp = require("cmp")
 local luasnip = require("luasnip")
 
 -- Setup nvim-cmp {{{
-
 -- Source Kind Icons {{{2
 local kind_icons = {
   Text = "",
@@ -33,7 +32,6 @@ local kind_icons = {
   TypeParameter = "󰰥",
 }
 -- }}}
---
 local has_words_before = function()
   unpack = unpack or table.unpack
   local line, col = unpack(vim.api.nvim_win_get_cursor(0))
@@ -261,9 +259,9 @@ cmp.setup.cmdline(":", {
     { name = "path", options = { label_trailing_slash = false } },
   }, {
     -- Do not show completion for words starting with 'Man'
-    -- https://github.com/hrsh7th/cmp-cmdline/issues/47
-    -- { name = 'cmdline', keyword_pattern = [[^\@<!Man\s]] }
-    { name = "cmdline" },
+    { name = "cmdline", option = {
+      ignore_cmds = { "Man", "!" },
+    } },
   }),
 })
 

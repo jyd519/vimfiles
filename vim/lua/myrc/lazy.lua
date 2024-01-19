@@ -152,7 +152,7 @@ require("lazy").setup(
     -- }}}
     -- Coding {{{2
     { "thinca/vim-quickrun", cmd = { "QuickRun" } },
-    { "vim-test/vim-test", event = { "BufReadPost", "BufNewFile" } }, -- Unit-Testing
+    { "jyd519/vim-test", event = { "BufReadPost", "BufNewFile" } }, -- Unit-Testing
     -- https://github.com/ThePrimeagen/refactoring.nvim#installation
     {
       "ThePrimeagen/refactoring.nvim",
@@ -171,7 +171,12 @@ require("lazy").setup(
       config = function() require("myrc.config.gitsigns") end,
     },
     { "tpope/vim-fugitive", event = "VeryLazy" },
-    { "voldikss/vim-floaterm", event = "VeryLazy" },
+    {
+      "akinsho/toggleterm.nvim",
+      version = "*",
+      event = "VeryLazy",
+      config = function() require("myrc.config.toggleterm") end,
+    },
     {
       "Exafunction/codeium.vim",
       enabled = true,
@@ -280,7 +285,7 @@ require("lazy").setup(
       after = "nvim-treesitter",
       config = function() require("hl-mdcodeblock").setup({}) end,
     },
-    { "jyd519/md-img-paste.vim", ft = "markdown" },
+    { "img-paste-devs/img-paste.vim", ft = "markdown" },
     -- }}}
     -- Snippets {{{2
     {
@@ -382,11 +387,18 @@ require("lazy").setup(
           "piersolenski/telescope-import.nvim",
           {
             "nvim-telescope/telescope-fzf-native.nvim",
+            enabled = vim.fn.executable("cmake") == 1,
             build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
           },
         },
       },
       config = function() require("myrc.config.telescope") end,
+    },
+    {
+      "https://github.com/ahmedkhalf/project.nvim",
+      config = function()
+        require("project_nvim").setup({})
+      end,
     },
     {
       -- https://github.com/tomasky/bookmarks.nvim
@@ -417,8 +429,8 @@ require("lazy").setup(
       },
     },
     install = {
-      -- skip installing missing dependencies when internet access is not allowed
-      missing = g.cfg_install_missing_plugins == 1,
+      -- skip installing missing dependencies when running in a ssh session 
+      missing = vim.env.SSH_CONNECTION == nil,
     },
     ui = {
       icons = {
