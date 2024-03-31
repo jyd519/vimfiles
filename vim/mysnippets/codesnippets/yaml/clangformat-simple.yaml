@@ -1,0 +1,5 @@
+IncludeBlocks: Preserve
+SortIncludes: Never
+ColumnLimit: 120
+MacroBlockBegin: "^wxBEGIN_EVENT_TABLE"
+MacroBlockEnd: "^wxEND_EVENT_TABLE"

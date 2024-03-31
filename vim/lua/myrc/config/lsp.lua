@@ -132,10 +132,10 @@ local function setup_client(client, bufnr)
   end
 end
 
-local format_is_enabled = true
+local format_is_enabled = false
 vim.api.nvim_create_user_command('FormatToggle', function()
   format_is_enabled = not format_is_enabled
-  print('Setting autoformatting to: ' .. tostring(format_is_enabled))
+  vim.notify('Autoformatting ' .. (format_is_enabled and 'enabled' or 'disabled'))
 end, {})
 
 -- Use LspAttach autocommand to only map the following keys
@@ -157,6 +157,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- Tsserver usually works poorly. Sorry you work with bad languages
     -- You can remove this line if you know what you're doing :)
     if client.name == "tsserver" then return end
+
+    -- Enable inlay hints
+    if client.name == "clangd" then
+      -- require("clangd_extensions.inlay_hints").setup_autocmd()
+      -- require("clangd_extensions.inlay_hints").set_inlay_hints()
+    end
 
     vim.api.nvim_create_autocmd("BufWritePre", {
       group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, { clear = true }),
@@ -186,18 +192,19 @@ lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.defa
 -- tsserver {{{2
 require("typescript").setup({
   disable_commands = false, -- prevent the plugin from creating Vim commands
-  debug = false, -- enable debug logging for commands
+  debug = true, -- enable debug logging for commands
   go_to_source_definition = {
     fallback = true, -- fall back to standard LSP definition on failure
   },
+  -- root_dir = lspconfig.util.root_pattern("tsconfig.json", "package.json", "jsconfig.json", ".git"),
   server = {
     autostart = vim.g.prefer_volar ~= 1, -- use volar first
     on_new_config = function(new_config, new_root_dir)
       ---@diagnostic disable-next-line: undefined-field
-      if new_root_dir:match("node_modules") or vim.b.large_buf then
-        print("tsserver disabled for this buffer")
-        new_config.enabled = false
-      end
+      -- if new_root_dir:match("node_modules") or vim.b.large_buf then
+      --   print("tsserver disabled for this buffer")
+      --   new_config.enabled = false
+      -- end
       return new_config
     end,
     on_attach = function(client, bufnr)
@@ -314,7 +321,6 @@ lspconfig.pyright.setup({
     if vim.env.VIRTUAL_ENV then p = join(vim.env.VIRTUAL_ENV, "bin", "python3") end
     print("Python (pyright): ", p)
     config.settings.python.pythonPath = p
-    config.setttings.diagnostics.pylint.enabled = false
   end,
 })
 -- }}}
@@ -333,6 +339,7 @@ lspconfig.volar.setup({
   },
 })
 -- }}}
+
 
 -- other languages {{{2
 local lsp_settings = {

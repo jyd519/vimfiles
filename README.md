@@ -24,7 +24,8 @@ let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
 let g:loaded_python3_provider = 1
 " npm i -g neovim
 let g:node_host_prog = '/usr/local/bin/neovim-node-host'
-let g:loaded_node_provider = 1
+" On Windows
+" let g:node_host_prog="<path>/node_modules/neovim/bin/cli.js"
 
 let g:node_path = $NODE_PATH != "" ? $NODE_PATH :  'node'
 

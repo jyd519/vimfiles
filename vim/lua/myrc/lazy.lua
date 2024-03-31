@@ -89,7 +89,7 @@ require("lazy").setup(
       config = function() require("myrc.config.hop") end,
     },
     {
-      "anuvyklack/hydra.nvim",
+      "nvimtools/hydra.nvim",
       event = "VeryLazy",
       dependencies = {
         { "jbyuki/venn.nvim" },
@@ -235,7 +235,7 @@ require("lazy").setup(
       config = function() require("myrc.config.dap") end,
       dependencies = {
         { "theHamsta/nvim-dap-virtual-text" },
-        { "rcarriga/nvim-dap-ui" },
+        { "rcarriga/nvim-dap-ui", dependencies = {"nvim-neotest/nvim-nio"} },
         { "mfussenegger/nvim-dap-python" },
         { "nvim-telescope/telescope-dap.nvim" },
         { "leoluz/nvim-dap-go" },
@@ -351,12 +351,19 @@ require("lazy").setup(
     -- File explorer/Fuzzy Finder {{{2
     {
       "preservim/nerdtree",
+      enabled = false,
       cmd = {
         "NERDTree",
         "NERDTreeToggle",
         "NERDTreeFind",
         "NERDTreeFromBookmark",
       },
+    },
+    {
+      "nvim-tree/nvim-tree.lua",
+      config = function() 
+        require("myrc.config.nvim-tree")
+      end,
     },
     {
       "ibhagwan/fzf-lua",

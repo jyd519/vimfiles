@@ -49,7 +49,7 @@ let g:mdip_imgdir='images'
 " vim supports fenced code syntax
 "  -> https://vimtricks.com/p/highlight-syntax-inside-markdown/
 let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html", "swift",
-      \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml", "cmake",
+      \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml", "cmake", "make",
       \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
 " }}}
 
@@ -248,11 +248,15 @@ endif
 
 " NERDTree {{{
 "--------------------------------------------------------------------------------
-if get(g:enabled_plugins, "nerdtree", 0)
+if g:is_nvim
+  noremap <F3> :NvimTreeOpen<cr>
+  noremap <leader>nf :NvimTreeFindFile<cr>
+else
   let g:NERDTreeWinSize=40
   noremap <F3> :NERDTreeToggle<cr>
   noremap <leader>nf :NERDTreeFind<cr>
 endif
+
 " }}}
 
 " Graphviz {{{
@@ -431,6 +435,12 @@ endif
 if !g:is_nvim
   autocmd vimrc BufReadPost *.log set ft=log
 endif
+
+" Trailing whitespace and tabs are forbidden, so highlight them.
+highlight ForbiddenWhitespace ctermbg=red guibg=red
+match ForbiddenWhitespace /\s\+$\|\t/
+" Do not highlight spaces at the end of line while typing on that line.
+autocmd InsertEnter * match ForbiddenWhitespace /\t\|\s\+\%#\@<!$/
 
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}

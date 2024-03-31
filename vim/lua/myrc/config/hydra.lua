@@ -30,7 +30,14 @@ Hydra({
     color = "pink",
     invoke_on_body = true,
     hint = {
-      border = "rounded",
+      float_opts = {
+          -- row, col, height, width, relative, and anchor should not be
+          -- overridden
+          style = "minimal",
+          focusable = false,
+          noautocmd = true,
+          border = "rounded",
+      },
     },
     on_enter = function() vim.o.virtualedit = "all" end,
   },
@@ -53,7 +60,13 @@ Hydra({
     color = "pink",
     invoke_on_body = true,
     hint = {
-      border = "rounded",
+      float_opts = {
+          -- row, col, height, width, relative, and anchor should not be
+          -- overridden
+          style = "minimal",
+          focusable = false,
+          noautocmd = true,
+      },
     },
   },
   mode = "n",
@@ -97,7 +110,13 @@ Hydra({
     color = "pink",
     invoke_on_body = true,
     hint = {
-      border = "rounded",
+      float_opts = {
+          -- row, col, height, width, relative, and anchor should not be
+          -- overridden
+          style = "minimal",
+          focusable = false,
+          noautocmd = true,
+      },
       position = "bottom-right",
     },
     on_exit = function() vim.cmd("silent! DapTerminate") end,
@@ -192,7 +211,7 @@ end
 local diagnostic_hint = [[
  _n_: next diagnostic   _N_: previous diagnostic  _F_: code action
  _a_: all diagnostics   _l_: buffer diagnostics   _t_: toggle diagnostics
- ^                      _q_: exit
+ ^^                     _q_: exit
 ]]
 
 Hydra({
@@ -204,8 +223,14 @@ Hydra({
     invoke_on_body = true,
     color = "pink",
     hint = {
-      -- position = "bottom",
-      border = "rounded",
+      float_opts = {
+          -- row, col, height, width, relative, and anchor should not be
+          -- overridden
+          style = "minimal",
+          focusable = false,
+          noautocmd = true,
+          border = "double",
+      },
     },
   },
   heads = {
@@ -271,12 +296,19 @@ Hydra({
     invoke_on_body = true,
     hint = {
       position = "middle",
-      border = "rounded",
+      float_opts = {
+          -- row, col, height, width, relative, and anchor should not be
+          -- overridden
+          style = "minimal",
+          focusable = false,
+          noautocmd = true,
+          border = "double",
+      },
     },
     on_enter = function() vim.cmd([[Lazy load telescope.nvim]]) end,
   },
   mode = "n",
-  body = "-f",
+  body = "<space>f",
   heads = {
     { "f", cmd("Telescope find_files") },
     { "g", cmd("Telescope live_grep") },

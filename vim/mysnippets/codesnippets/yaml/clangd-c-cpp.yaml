@@ -1,0 +1,29 @@
+---
+CompileFlags:
+  Add:
+    - -I"D:/work/avutil" 
+    - -I"D:/work/avutil/src"
+    - -I'D:/dev/cpp/vcpkg/packages/ffmpeg_x86-windows/include'
+---
+If:
+  PathMatch: .*\.cpp
+
+CompileFlags:
+  Add: [-xc++, -std=c++17]
+
+---
+# objcpp
+If:
+  PathMatch: .*\.mm
+
+CompileFlags:
+  Remove: -xc++
+
+---
+If:
+  PathMatch: .*\.c
+
+CompileFlags:
+  Add: [-std=c99]
+
+# vim: ft=yaml:

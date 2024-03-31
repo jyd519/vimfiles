@@ -163,10 +163,9 @@ vim.keymap.set("n", "<leader>fc", "<cmd>Telescope colorscheme<cr>", { desc = "Se
 vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers<cr>", { desc = "List buffers" })
 vim.keymap.set("n", "<leader>fp", function()
   require("lazy").load({ plugins = { "project.nvim" } })
-  vim.schedule(function()
-    vim.cmd("Telescope projects")
-  end)
+  vim.schedule(function() vim.cmd("Telescope projects") end)
 end, { desc = "Find Project" })
+
 
 vim.keymap.set(
   "n",
@@ -273,10 +272,24 @@ local toggle_lsp_client = function()
     vim.cmd("LspStop")
   else
     vim.cmd("LspStart")
+    vim.notify("Starting LSP Server", vim.log.levels.INFO, { title = "LSP" })
   end
 end
 
-vim.keymap.set("n", "<leader>tl", toggle_lsp_client, { desc = "Toggle LSP server" })
+local start_lsp_client = function()
+  local buf = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_active_clients({ bufnr = buf })
+  if not vim.tbl_isempty(clients) then
+    vim.cmd("LspRestart")
+    vim.notify("Restarting LSP Server", vim.log.levels.INFO, { title = "LSP" })
+  else
+    vim.cmd("LspStart")
+    vim.notify("Starting LSP Server", vim.log.levels.INFO, { title = "LSP" })
+  end
+end
+
+vim.keymap.set("n", "<leader>lt", toggle_lsp_client, { desc = "Toggle LSP server" })
+vim.keymap.set("n", "<leader>lr", start_lsp_client, { desc = "Start/Restart LSP Server" })
 --- }}}
 
 -- Supper K {{{2
