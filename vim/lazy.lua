@@ -1,5 +1,5 @@
 -- My Neovim configuration
--- Jyd  Last-Modified: 2023-08-07 
+-- Jyd  Last-Modified: 2023-08-07
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 
@@ -27,7 +27,7 @@ require('myrc.mapping')
 -- load options, mappings and configurations
 local scripts = {'config/options.vim',
                  'config/mappings.vim',
-                 'config/plugins/shared.vim', -- plugins dependent 
+                 'config/plugins/shared.vim', -- plugins dependent
                  'lua/myrc/config/common.lua',
                }
 for _, s in pairs(scripts) do

@@ -1,18 +1,11 @@
-require("symbols-outline").setup({
-  autofold_depth = 1,
-  keymaps = {
-    -- These keymaps can be a string or a table for multiple keys
-    close = { "q" },
-    goto_location = "<Cr>",
-    focus_location = { "e", "o" },
-    hover_symbol = "<C-space>",
-    toggle_preview = "K",
-    rename_symbol = "r",
-    code_actions = "a",
-    fold = { "c", "zc" },
-    unfold = "zo",
-    fold_all = { "W", "zm" },
-    unfold_all = { "E", "zO" },
-    fold_reset = "R",
+require("outline").setup({
+  symbol_folding = {
+    autofold_depth = 2,
+    auto_unfold = {
+      hovered = true,
+    },
+  },
+  outline_items = {
+    show_symbol_lineno = true,
   },
 })

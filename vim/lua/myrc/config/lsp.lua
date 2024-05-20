@@ -53,15 +53,6 @@ local make_on_new_config = function(on_new_config)
       return new_config
     end
 
-    if server_name == "volar" then
-      if root_dir:match("node_modules") then
-        print("Volar disabled")
-        new_config.enabled = false
-        return new_config
-      end
-      new_config.init_options.typescript.tsdk = get_typescript_server_path(root_dir)
-    end
-
     local nlspsettings = require("nlspsettings")
     local config = nlspsettings.get_settings(root_dir, server_name)
 
@@ -133,9 +124,9 @@ local function setup_client(client, bufnr)
 end
 
 local format_is_enabled = false
-vim.api.nvim_create_user_command('FormatToggle', function()
+vim.api.nvim_create_user_command("FormatToggle", function()
   format_is_enabled = not format_is_enabled
-  vim.notify('Autoformatting ' .. (format_is_enabled and 'enabled' or 'disabled'))
+  vim.notify("Autoformatting " .. (format_is_enabled and "enabled" or "disabled"))
 end, {})
 
 -- Use LspAttach autocommand to only map the following keys
@@ -190,15 +181,24 @@ lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.defa
 -- }}}
 
 -- tsserver {{{2
+local mason_registry = require("mason-registry")
+local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server"
 require("typescript").setup({
   disable_commands = false, -- prevent the plugin from creating Vim commands
-  debug = true, -- enable debug logging for commands
   go_to_source_definition = {
     fallback = true, -- fall back to standard LSP definition on failure
   },
   -- root_dir = lspconfig.util.root_pattern("tsconfig.json", "package.json", "jsconfig.json", ".git"),
   server = {
-    autostart = vim.g.prefer_volar ~= 1, -- use volar first
+    init_options = {
+      plugins = {
+        {
+          name = "@vue/typescript-plugin",
+          location = vue_language_server_path,
+          languages = { "vue" },
+        },
+      },
+    },
     on_new_config = function(new_config, new_root_dir)
       ---@diagnostic disable-next-line: undefined-field
       -- if new_root_dir:match("node_modules") or vim.b.large_buf then
@@ -326,20 +326,15 @@ lspconfig.pyright.setup({
 -- }}}
 
 -- vue/volar {{{2
+-- https://github.com/vuejs/language-tools
 lspconfig.volar.setup({
-  autostart = vim.g.prefer_volar == 1,
-  filetypes = {
-    "vue",
-    "javascript",
-    "javascriptreact",
-    "javascript.jsx",
-    "typescript",
-    "typescriptreact",
-    "typescript.tsx",
+  init_options = {
+    vue = {
+      hybridMode = false,
+    },
   },
 })
 -- }}}
-
 
 -- other languages {{{2
 local lsp_settings = {
@@ -353,7 +348,8 @@ local lsp_settings = {
   },
 }
 
-local servers = { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls", "gopls" }
+local servers =
+  { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls", "gopls", "emmet_language_server" }
 for _, name in ipairs(servers) do
   local opts = {
     capabilities = capabilities,

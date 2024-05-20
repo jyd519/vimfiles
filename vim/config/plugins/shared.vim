@@ -46,17 +46,19 @@ let g:tex_conceal = ""
 let g:vim_markdown_math = 1
 let g:mdip_imgdir='images'
 
+if g:is_vim
 " vim supports fenced code syntax
 "  -> https://vimtricks.com/p/highlight-syntax-inside-markdown/
-let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html", "swift",
-      \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml", "cmake", "make",
-      \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
+  let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html", "swift",
+        \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml", "cmake", "make",
+        \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
+endif
 " }}}
 
 " ALE {{{
 "--------------------------------------------------------------------------------
 let g:ale_enabled = 1
-let g:ale_disable_lsp = 1 
+let g:ale_disable_lsp = 1
 let g:ale_use_neovim_diagnostics_api = g:is_nvim
 let g:ale_set_quickfix = 0
 let g:ale_set_loclist = 1
@@ -127,8 +129,8 @@ if get(g:enabled_plugins, "fzf-lua", 0)
       end,
       { nargs = 1,
         complete = function(ArgLead, CmdLine, CursorPos)
-          return vim.fn.readdir(vim.g.notes_dir, function (filename) 
-            return  vim.fn.isdirectory(vim.g.notes_dir .. '/' .. filename) == 1 and string.sub(filename, 1, 1) ~= "." 
+          return vim.fn.readdir(vim.g.notes_dir, function (filename)
+            return  vim.fn.isdirectory(vim.g.notes_dir .. '/' .. filename) == 1 and string.sub(filename, 1, 1) ~= "."
           end)
       end,
       })
@@ -173,7 +175,7 @@ if get(g:enabled_plugins, "fzf.vim", 0)
             \ 'options': ['--info=inline', '--reverse']}
       call fzf#run(opts)
     endfunction
-    
+
     if exists('g:notes_dir') && executable("rg")
       command! -nargs=? Notes call s:find_notes(<q-args>)
       nnoremap <leader>fn :Notes<CR>
@@ -249,8 +251,8 @@ endif
 " NERDTree {{{
 "--------------------------------------------------------------------------------
 if g:is_nvim
-  noremap <F3> :NvimTreeOpen<cr>
-  noremap <leader>nf :NvimTreeFindFile<cr>
+  noremap <F3> :NvimTreeToggle<cr>
+  noremap <leader>nf :NvimTreeFindFile!<cr>
 else
   let g:NERDTreeWinSize=40
   noremap <F3> :NERDTreeToggle<cr>
@@ -348,11 +350,8 @@ if get(g:enabled_plugins, "vim-quickrun", 0)
 endif
 " }}}
 
-" victionary
-"--------------------------------------------------------------------------------
-let g:victionary#map_defaults = 0
-
-" tmux_navigator: Disable tmux navigator when zooming the Vim pane
+" tmux_navigator:  {{{
+" Disable tmux navigator when zooming the Vim pane
 "--------------------------------------------------------------------------------
 if get(g:enabled_plugins, "tmux", 0)
   let g:tmux_navigator_disable_when_zoomed = 1
@@ -362,6 +361,11 @@ if get(g:enabled_plugins, "tmux", 0)
   nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
   nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
 endif
+" }}}
+
+" victionary
+"--------------------------------------------------------------------------------
+let g:victionary#map_defaults = 0
 
 " Sneak
 "--------------------------------------------------------------------------------
@@ -377,7 +381,7 @@ let g:rustfmt_autosave = 1
 let g:ansible_unindent_after_newline = 1  " ansible
 let g:BufKillCreateMappings = 0  " bufkill.vim
 
-" vim plugins
+" vim plugins {{{
 "--------------------------------------------------------------------------------
 if !g:is_nvim
   " Pascal configuration
@@ -404,8 +408,9 @@ if !g:is_nvim
   let g:WMGraphviz_output = "svg"
   let g:previm_open_cmd = 'open -a "google chrome"'
 endif
+" }}}
 
-" floaterm
+" floaterm {{{
 if has("win32")
   let g:floaterm_shell="pwsh.exe"
 endif
@@ -422,7 +427,45 @@ if has("win32") && get(g:enabled_plugins, "powershell") == 1
   let &shellpipe  = '2>&1 | %%{ "$_" } | Tee-Object %s; exit $LastExitCode'
   set shellquote= shellxquote=
 endif
+" }}}
 
+" Trailing whitespace and tabs are forbidden, so highlight them. {{{
+autocmd ColorScheme * highlight ForbiddenWhitespace ctermbg=red guibg=red
+highlight ForbiddenWhitespace ctermbg=red guibg=red
+
+augroup TrailingSpace
+  autocmd!
+  autocmd FileType python,c,sh,javascript,typescript,vim,lua match ForbiddenWhitespace /\s\+$/
+  autocmd FileType python,c,cpp,sh,javascript,typescript autocmd BufWritePre * :call TrimTrailingWhitespaces()
+augroup END
+
+" Do not highlight spaces at the end of line while typing on that line.
+" autocmd InsertEnter * match ForbiddenWhitespace /\s\+\%#\@<!$/
+" match ExtraWhitespace /\s\+$/
+" autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+" autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+" autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+" autocmd BufWinLeave * call clearmatches()
+function ShowSpaces(...)
+  let @/='\v(\s+$)|( +\ze\t)'
+  let oldhlsearch=&hlsearch
+  if !a:0
+    let &hlsearch=!&hlsearch
+  else
+    let &hlsearch=a:1
+  end
+  return oldhlsearch
+endfunction
+
+function TrimTrailingWhitespaces() range
+  let oldhlsearch=ShowSpaces(1)
+  execute a:firstline.",".a:lastline."substitute ///ge"
+  let &hlsearch=oldhlsearch
+endfunction
+
+command -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
+command -bar -nargs=0 -range=% TrimSpaces <line1>,<line2>call TrimTrailingWhitespaces()
+" }}}
 
 " put the quickfix window on bottom always
 autocmd vimrc FileType qf wincmd J
@@ -435,12 +478,5 @@ endif
 if !g:is_nvim
   autocmd vimrc BufReadPost *.log set ft=log
 endif
-
-" Trailing whitespace and tabs are forbidden, so highlight them.
-highlight ForbiddenWhitespace ctermbg=red guibg=red
-match ForbiddenWhitespace /\s\+$\|\t/
-" Do not highlight spaces at the end of line while typing on that line.
-autocmd InsertEnter * match ForbiddenWhitespace /\t\|\s\+\%#\@<!$/
-
 "--------------------------------------------------------------------------------
 " vim: set fdm=marker fen: }}}

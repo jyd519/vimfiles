@@ -259,7 +259,7 @@ end, { desc = "Toggle treesitter" })
 
 -- {{{2 Toggle Symbols Outline
 vim.keymap.set("n", "<leader>to", function()
-  local outline = require("symbols-outline")
+  local outline = require("outline")
   outline.toggle_outline()
 end, { desc = "Toggle Symbols Outline" })
 --- }}}

@@ -24,7 +24,7 @@ require("lazy").setup(
     { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
     {
       "nvim-treesitter/nvim-treesitter",
-      version = false,
+      tag = "v0.9.2",
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.treesitter") end,
     },
@@ -37,7 +37,7 @@ require("lazy").setup(
     {
       "ojroques/nvim-osc52",
       event = "VimEnter",
-      enabled = vim.env.SSH_CLIENT ~= nil or vim.env.WSLENV ~= nil,
+      enabled = vim.env.SSH_CLIENT ~= nil or vim.env.WSL_DISTRO_NAME ~= nil,
       config = function()
         require("osc52").setup()
         vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
@@ -96,13 +96,15 @@ require("lazy").setup(
       },
       config = function() require("myrc.config.hydra") end,
     },
-    { "mattn/emmet-vim", ft = { "html", "jsx", "vue" } },
+    { "mattn/emmet-vim", ft = { "html", "jsx", "vue", "javascriptreact", "javascript", "css", "scss" } },
     {
       "windwp/nvim-autopairs",
       event = "InsertEnter",
       config = function()
         require("nvim-autopairs").setup({
           map_cr = false,
+          disable_in_visualblock = true,
+          fast_wrap = {},
         })
       end,
     },
@@ -179,27 +181,8 @@ require("lazy").setup(
     },
     {
       "Exafunction/codeium.vim",
-      enabled = true,
-      event = { "BufReadPost", "BufNewFile" },
-      config = function()
-        vim.g.codeium_no_map_tab = 1
-        vim.g.codeium_filetypes = { markdown = false }
-        vim.keymap.set(
-          "i",
-          "<C-g>",
-          function() return vim.fn["codeium#Accept"]() end,
-          { expr = true, desc = "Accept Codeium" }
-        )
-
-        local mapkey = require("keymap-amend")
-        mapkey("i", "<C-j>", function(fallback)
-          if vim.b._codeium_completions ~= nil then
-            return vim.fn["codeium#Clear"]()
-          else
-            fallback()
-          end
-        end, { silent = true, desc = "Clear Codeium Completions" })
-      end,
+      event = { "BufEnter" },
+      config = function() require("myrc.config.codeium") end,
     },
     {
       "github/copilot.vim",
@@ -341,9 +324,10 @@ require("lazy").setup(
       },
     },
     {
-      "simrat39/symbols-outline.nvim",
-      cmd = { "SymbolsOutline", "SymbolsOutlineOpen", "SymbolsOutlineClose" },
-      keys = { "<leader>to" },
+      "hedyhli/outline.nvim",
+      lazy = true,
+      cmd = { "Outline", "OutlineOpen" },
+      keys = { "<leader>to", "<cmd>Outline<CR>", desc = "Toggle outline" },
       config = function() require("myrc.config.symbols-outline") end,
     },
     { "b0o/schemastore.nvim", lazy = true },
@@ -361,7 +345,7 @@ require("lazy").setup(
     },
     {
       "nvim-tree/nvim-tree.lua",
-      config = function() 
+      config = function()
         require("myrc.config.nvim-tree")
       end,
     },
@@ -387,7 +371,7 @@ require("lazy").setup(
       "nvim-telescope/telescope.nvim",
       enabled = fn.get(g.enabled_plugins, "telescope") == 1,
       cmd = { "Telescope" },
-      tag = "0.1.5",
+      tag = "0.1.6",
       dependencies = {
         {
           "nvim-telescope/telescope-ui-select.nvim",
@@ -436,7 +420,7 @@ require("lazy").setup(
       },
     },
     install = {
-      -- skip installing missing dependencies when running in a ssh session 
+      -- skip installing missing dependencies when running in a ssh session
       missing = vim.env.SSH_CONNECTION == nil,
     },
     ui = {

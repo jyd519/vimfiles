@@ -1,7 +1,7 @@
 " Jyd
 " https://dev.to/iggredible/learning-vim-regex-26ep
 if exists('b:did_markdown_vim')
-"  finish
+  finish
 endif
 
 let b:did_markdown_vim = 1
@@ -18,9 +18,9 @@ function! s:adjustSyntax()
   syn region mkdBlockquote   start=/^\s*>/                   end=/$/ contains=mkdLineBreak
 
   hi link mkdLineBreak Underlined
-  hi link mkdBlockquote Comment 
+  hi link mkdBlockquote Comment
   " hi! mkdListItem gui=bold guifg=#0451a5
-  " hi! markdownH0 guifg=#0451a5 gui=bold 
+  " hi! markdownH0 guifg=#0451a5 gui=bold
   " hi! markdownH2 guifg=#0451a5 gui=bold
   " hi! markdownH3 guifg=#0451a5 gui=bold
   " hi! markdownH1Delimiter guifg=#0451a5 gui=bold
@@ -29,7 +29,7 @@ function! s:adjustSyntax()
   hi! link markdownUrl htmlLink
 endfunction
 
-augroup mdSyntaxAdjust 
+augroup mdSyntaxAdjust
     autocmd!
     autocmd BufWinEnter <buffer> call s:adjustSyntax()
 augroup end
@@ -73,7 +73,7 @@ function! TableFormat()
     call setpos('.', l:pos)
 endfunction
 
-" Customizing surround 
+" Customizing surround
 let g:surround_{char2nr("*")} = "**\r**"
 let g:surround_{char2nr("I")} = "_\r_"
 let g:surround_{char2nr('c')}="```\r```"
@@ -188,7 +188,7 @@ command! -nargs=0 -range=% Mnobr :<line1>,<line2>call s:clearLineBreak()
 function! s:toImg() range
   for line in range(a:firstline, a:lastline)
     let text = getline(line)
-    if text =~ '([^)]*)' 
+    if text =~ '([^)]*)'
       call setline(line, substitute(text, '\[\([^\]]*\)\](\([^)]*\))', '<img src="\2" style="zoom: 0.5" />', ''))
     endif
   endfor
@@ -200,7 +200,7 @@ nmap <buffer> <LocalLeader>i :Img<cr>
 function! s:toLink() range
   for line in range(a:firstline, a:lastline)
     let text = getline(line)
-    if text =~ 'http*' 
+    if text =~ 'http*'
       " .{-}  <== non greedy match
       " call setline(line, substitute(text, '\v(\+|\-)?\s*(.{-})\s*(http.*)', '\1 [\2](\3)', ''))
       " or

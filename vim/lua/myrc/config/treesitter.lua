@@ -14,11 +14,12 @@ treesitter.setup({
   highlight = {
     enable = true, -- false will disable the whole extension
     disable = function(lang, buf)
-      if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
+      -- if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
 
       ---@diagnostic disable-next-line: undefined-field
       if vim.b.large_buf then return true end
     end,
+    -- additional_vim_regex_highlighting = false,
   },
   incremental_selection = {
     enable = true,
@@ -44,7 +45,7 @@ treesitter.setup({
 local has_parser = require("nvim-treesitter.parsers").has_parser
 local tfgroup = vim.api.nvim_create_augroup("treesitter_fold", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "cpp", "c", "typescript", "lua", "rust" },
+  pattern = { "cpp", "c", "typescript", "lua", "rust", "markdown" },
   group = tfgroup,
   desc = "enable treesitter folding",
   callback = function()
