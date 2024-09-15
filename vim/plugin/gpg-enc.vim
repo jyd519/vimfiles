@@ -5,7 +5,7 @@ let did_gpg_enc_vim = 1
 
 let g:gpg_input_passphrase = 0
 
-if !exists("g:gpg_recipient") 
+if !exists("g:gpg_recipient")
   let g:gpg_recipient = 'jyd119@163.com'
 endif
 
@@ -27,7 +27,7 @@ function! GpgDec(...) range
 
   let cur = line('.')
   let [b, e] = [cur, cur]
-  while b >= 1 
+  while b >= 1
     if getline(b) =~ '^ *-----BEGIN PGP MESSAGE'
       break
     endif
@@ -35,10 +35,10 @@ function! GpgDec(...) range
   endwhile
 
   if getline(b) !~ '^ *-----BEGIN PGP MESSAGE'
-    return 
+    return
   endif
 
-  while e >= 1 
+  while e >= 1
     if getline(e) =~ '^ *-----END PGP MESSAGE'
       break
     endif
@@ -46,24 +46,24 @@ function! GpgDec(...) range
   endwhile
 
   if getline(e) !~ '^ *-----END PGP MESSAGE'
-    return 
+    return
   endif
 
-  silent!  execute(b . ',' . e . '!gpg -da ' . extra . ' 2>/dev/null')
+  silent!  execute(b . ',' . e . '!gpg -daq ' . extra )
 endfunction
- 
-function! GpgDecAll(extra) 
-  let i = 1 
-  let b = i 
-  let e = i 
+
+function! GpgDecAll(extra)
+  let i = 1
+  let b = i
+  let e = i
   let n = 1
-  while i <= line('$') 
+  while i <= line('$')
     if getline(i) =~ '^ *-----BEGIN PGP MESSAGE'
       let b = i
     elseif getline(i) =~ '^ *-----END PGP MESSAGE'
       let e = i
-      if e > b 
-         silent! execute(b . ',' . e . '!gpg -da ' . a:extra . ' 2>/dev/null')
+      if e > b
+         silent! execute(b . ',' . e . '!gpg -daq ' . a:extra)
       endif
     endif
     let i += 1
@@ -76,5 +76,5 @@ function! GpgEnc(...) range
   silent! execute(a:firstline . ',' . a:lastline . '!gpg -ea ' . extra)
 endfunction
 
-command! -nargs=* -range GpgEnc <line1>,<line2>call GpgEnc(<f-args>) 
-command! -nargs=? -range GpgDec <line1>,<line2>call GpgDec(<f-args>) 
+command! -nargs=* -range GpgEnc <line1>,<line2>call GpgEnc(<f-args>)
+command! -nargs=? -range GpgDec <line1>,<line2>call GpgDec(<f-args>)

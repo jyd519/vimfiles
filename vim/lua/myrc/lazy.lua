@@ -228,7 +228,13 @@ require("lazy").setup(
     },
     -- }}}
     -- Languages Go/dart/rust/cpp/typescript {{{2
-    { "jose-elias-alvarez/typescript.nvim", ft = { "typescript", "typescriptreact", "typescript.tsx", "javascript" } },
+    --  deprecated
+    -- { "jose-elias-alvarez/typescript.nvim", ft = { "typescript", "typescriptreact", "typescript.tsx", "javascript" } },
+    {
+      "pmizio/typescript-tools.nvim",
+      dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+      opts = {},
+    },
     { "ray-x/guihua.lua", ft = "go" }, -- float term, codeaction and codelens gui support
     {
       "ray-x/go.nvim",

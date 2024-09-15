@@ -1,6 +1,6 @@
 vim.g.codeium_no_map_tab = 1
 -- vim.g.codeium_manual = true
-vim.g.codeium_enabled = false
+vim.g.codeium_enabled = true
 
 -- vim.g.codeium_filetypes = { markdown = false, json = false, jsonc = false}
 --

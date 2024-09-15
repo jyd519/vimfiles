@@ -183,30 +183,12 @@ lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.defa
 -- tsserver {{{2
 local mason_registry = require("mason-registry")
 local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server"
-require("typescript").setup({
+require("typescript-tools").setup({
   disable_commands = false, -- prevent the plugin from creating Vim commands
   go_to_source_definition = {
     fallback = true, -- fall back to standard LSP definition on failure
   },
-  -- root_dir = lspconfig.util.root_pattern("tsconfig.json", "package.json", "jsconfig.json", ".git"),
   server = {
-    init_options = {
-      plugins = {
-        {
-          name = "@vue/typescript-plugin",
-          location = vue_language_server_path,
-          languages = { "vue" },
-        },
-      },
-    },
-    on_new_config = function(new_config, new_root_dir)
-      ---@diagnostic disable-next-line: undefined-field
-      -- if new_root_dir:match("node_modules") or vim.b.large_buf then
-      --   print("tsserver disabled for this buffer")
-      --   new_config.enabled = false
-      -- end
-      return new_config
-    end,
     on_attach = function(client, bufnr)
       client.server_capabilities.document_formatting = false
       client.server_capabilities.document_range_formatting = false

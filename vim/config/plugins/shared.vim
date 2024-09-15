@@ -252,7 +252,8 @@ endif
 "--------------------------------------------------------------------------------
 if g:is_nvim
   noremap <F3> :NvimTreeToggle<cr>
-  noremap <leader>nf :NvimTreeFindFile!<cr>
+  noremap <leader>nf :NvimTreeFindFile<cr>
+  noremap <leader>nF :NvimTreeFindFile!<cr>
 else
   let g:NERDTreeWinSize=40
   noremap <F3> :NERDTreeToggle<cr>

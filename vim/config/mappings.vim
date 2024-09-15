@@ -115,4 +115,8 @@ if $SSH_CONNECTION != "" && g:is_vim
   nmap <leader>y <Plug>OSCYankVisual
 endif
 
+" Font zoom in/out
+nmap <silent> <C-=> :call zoom#ZoomIn()<Enter>
+nmap <silent> <C--> :call zoom#ZoomOut()<Enter>
+
 " vim: set fdm=marker fen:

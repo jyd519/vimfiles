@@ -1,0 +1,10 @@
+if (DEFINED  opencv_opencv_world_BIN_DIRS_RELEASE)
+  file(GLOB OPENCV_BIN_FILES "${opencv_opencv_world_BIN_DIRS_RELEASE}/*.dll")
+  message(info "${OPENCV_BIN_FILES}")
+  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${OPENCV_BIN_FILES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+      DEPENDS $<TARGET_FILE_DIR:${PROJECT_NAME}>/${PROJECT_NAME}.node
+    )
+else()
+  message(FATAL "opencv_opencv_world_BIN_DIRS_RELEASE not set")
+endif()

@@ -77,6 +77,7 @@ endfunction
 let g:surround_{char2nr("*")} = "**\r**"
 let g:surround_{char2nr("I")} = "_\r_"
 let g:surround_{char2nr('c')}="```\r```"
+let g:surround_{char2nr('L')}="```\r```"
 let g:surround_{char2nr('l')}="```\1lang:\1\r```"
 if g:is_nvim
   lua  <<END
