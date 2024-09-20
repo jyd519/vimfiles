@@ -1,93 +1,79 @@
-" if exists('did_aes_enc_vim') || &cp || version < 700
-"   finish
-" endif
-let did_aes_enc_vim = 1
+if exists('g:did_aes_enc_vim') || &cp || version < 700
+  finish
+endif
+let g:did_aes_enc_vim = 1
 
+" Regular expressions for identifying the start and end of an AES-VIM block
 let g:aes_input_passphrase = 0
 let g:vim_aes_js = expand('<sfile>:p:h:h') . '/tools/aes-vim.js'
 
-let s:mark_begin_re = '^ *```AES-VIM'
-let s:mark_end_re = '^ *``` *$'
+let s:mark_begin_re = '^\s*```AES-VIM'
+let s:mark_end_re = '^\s*``` *$'
 
 function! AesDec(...) range
   let passphrase = a:0 > 0 ? a:1 : ""
   if empty(passphrase) && g:aes_input_passphrase
     let passphrase = inputsecret("Passphrase: ")
   endif
-  let extra = ""
-  if empty(passphrase)
-    let extra .= '-p jyd.vim '
-  else
-    let extra .= "-p " . passphrase
-  endif
+  let extra = empty(passphrase) ? "-p jyd.vim " : "-p " . passphrase
+  let cmd = '!node ' . g:vim_aes_js  . ' -d ' . extra
 
   if a:lastline != a:firstline
-    call AesDecAll(extra)
+    silent! execute a:firstline . ',' . a:lastline . cmd
     return
   endif
 
-  let cur = line('.')
-  let [b, e] = [cur, cur]
-  while b >= 1
-    if getline(b) =~ s:mark_begin_re
-      break
-    endif
-    let b -= 1
+  let [start_line, end_line] = [line('.'), line('.')]
+  while start_line >= 1 && getline(start_line) !~# s:mark_begin_re
+    let start_line -= 1
   endwhile
 
-  if getline(b) !~ s:mark_begin_re
+  if getline(start_line) !~# s:mark_begin_re
     return
   endif
 
-  while e >= 1
-    if getline(e) =~ s:mark_end_re
-      break
-    endif
-    let e += 1
+  while end_line >= 1 && getline(end_line) !~# s:mark_end_re
+    let end_line += 1
   endwhile
 
-  if getline(e) !~ s:mark_end_re
+  if getline(end_line) !~# s:mark_end_re
     return
   endif
 
-  let cmd = '!node ' . g:vim_aes_js  . ' -d ' . extra
-  silent! execute(b . ',' . e . cmd)
+  silent! execute(start_line . ',' . end_line . cmd)
 endfunction
 
 function! AesDecAll(extra)
-  let found = 1
   let n = 0
-  while found > 0
+  while 1
     let found = 0
     let i = 1
-    let b = 1
-    let e = 1
-    while i <= line('$')
+    let start_line = 1
+    let end_line = 1
+    for i in range(1, line('$'))
       if getline(i) =~ s:mark_begin_re
-        let b = i
-      elseif getline(i) =~ s:mark_end_re
-        let e = i
-        if e > b
-          let cmd = '!node ' . g:vim_aes_js  . ' -d ' . a:extra
-          silent! execute(b . ',' . e . cmd)
-          let found = 1
-          let n = n + 1
-          break
-        endif
+        let start_line = i
+      elseif getline(i) =~ s:mark_end_re && start_line > 0
+        let end_line = i
+        let cmd = '!node ' . g:vim_aes_js  . ' -d ' . a:extra
+        silent! execute(start_line . ',' . end_line . cmd)
+        let found = 1
+        let n = n + 1
+        break
       endif
       let i += 1
-    endwhile
+    endfor
+    if !found
+      break
+    endif
   endwhile
   if  n > 0
-    echom "Decrypted " . n
+    echom "Decrypted " . n . " block(s)"
   endif
 endfunction
 
 function! AesEnc(...) range
-  let passphrase = a:0>0? a:1 : ""
-  if empty(passphrase )
-    let passphrase = 'jyd.vim'
-  endif
+  let passphrase = a:0 > 0 ? a:1 : 'jyd.vim'
   let cmd = '!node ' . g:vim_aes_js  . ' -p ' . passphrase
   silent! execute(a:firstline . ',' . a:lastline . cmd)
 endfunction

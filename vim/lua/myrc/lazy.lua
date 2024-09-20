@@ -377,7 +377,7 @@ require("lazy").setup(
       "nvim-telescope/telescope.nvim",
       enabled = fn.get(g.enabled_plugins, "telescope") == 1,
       cmd = { "Telescope" },
-      tag = "0.1.6",
+      tag = "0.1.8",
       dependencies = {
         {
           "nvim-telescope/telescope-ui-select.nvim",
