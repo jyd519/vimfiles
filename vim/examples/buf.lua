@@ -1,6 +1,6 @@
 local api = vim.api
 
-buf = api.nvim_create_buf(false, true) 
+buf = api.nvim_create_buf(false, true)
 
   -- get dimensions
   local width = api.nvim_get_option("columns")

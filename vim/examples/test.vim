@@ -1,21 +1,21 @@
-" range 后缀表示该函数能够处理多行:  [firstline，lastline] 
+" range 后缀表示该函数能够处理多行:  [firstline，lastline]
 " 如果没有range后缀，则 Ta会被调用多次，line('.') 返回对应对行号
 function! Ta(mode) range
   if a:mode ==# "v"
     let c1 = col("'<'")-1
-    let c2 = col("'>'") -1 
+    let c2 = col("'>'") -1
     let lines = getline(a:firstline, a:lastline)
     let lines[-1] = lines[-1][:c2]
     let lines[0] = lines[0][c1:]
-    echo " v:" .  join(lines, ';') 
+    echo " v:" .  join(lines, ';')
   elseif a:mode ==# "V"
     echo " V:" . join(getline(a:firstline, a:lastline), '=')
   elseif a:mode==# ""
     let c1 = col("'<'")-1
-    let c2 = col("'>'") -1 
-    let lines = [] 
+    let c2 = col("'>'") -1
+    let lines = []
     for line in getline(a:firstline, a:lastline)
-      call add(lines, line[c1 : c2]) 
+      call add(lines, line[c1 : c2])
     endfor
     echo " ^V:" . join(lines , '#####')
   else
@@ -61,11 +61,11 @@ map! <F2> <C-R>=strftime('%c')<CR>
 " omap, onoremap, ounmap          Operator pending mode
 
 
-" range 后缀表示该函数能够处理多行:  [a:firstline，a:lastline] 
-function! s:clearLineBreak() range 
+" range 后缀表示该函数能够处理多行:  [a:firstline，a:lastline]
+function! s:clearLineBreak() range
   let m = visualmode()  " 不同的可视模式
   if m ==# 'V'
-    for line in range(a:firstline, a:lastline) 
+    for line in range(a:firstline, a:lastline)
       call setline(line, substitute(getline(line), ' *$', '', ''))
     endfor
   endif
@@ -80,7 +80,7 @@ command! -nargs=0 -range=% Mnobr :<line1>,<line2>call s:clearLineBreak()
 
 vnoremap <silent> <F5> :<C-U>call MyFunc()<CR>
 function! MyFunc()
-   " normal! gv  " 从command模式恢复到visual模式 
+   " normal! gv  " 从command模式恢复到visual模式
     let m = visualmode()
     if m ==# 'v'  "大小写敏感比较
         echo 'character-wise visual'
@@ -121,5 +121,5 @@ endfunction
 call Something("a", "b", "c", "d")
 
 " <bang>0: transform the bang to boolean
-" q-args: 扩展为用户输入的参数（以字符串形式）， 没有参数时扩展为'' 
+" q-args: 扩展为用户输入的参数（以字符串形式）， 没有参数时扩展为''
 command! -range -bang -nargs=* MY echo [<bang>0, <line1>, <line2>, <count>, <q-args>]

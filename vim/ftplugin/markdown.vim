@@ -153,8 +153,8 @@ function! ToUnorderList() range
   let m = visualmode()
   if m ==# 'V'
     for line in range(a:firstline, a:lastline)
-      if getline(line) !~ '^ *$'
-        call setline(line, '+ ' . getline(line))
+      if getline(line) !~# '^\s*$'
+        call setline(line, '+ ' . trim(getline(line), "", 1))
       endif
     endfor
   endif
@@ -167,7 +167,7 @@ function! ToOrderList() range
   if m ==# 'V'
     let i = 1
     for line in range(a:firstline, a:lastline)
-      call setline(line, i . '. ' . getline(line))
+      call setline(line, i . '. ' . trim(getline(line), "", 1))
       let i+=1
     endfor
   endif

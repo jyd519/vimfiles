@@ -1,10 +1,11 @@
 "--------------------------------------------------------------------------------
 "jsbeautify settings
 "--------------------------------------------------------------------------------
-if exists('beautify_plugin_loaded')
+if exists('g:beautify_plugin_loaded')
   finish
-endif 
-let beautify_plugin_loaded = 1
+endif
+
+let g:beautify_plugin_loaded = 1
 
 function! s:JBeautify()
   if &ft ==? 'css'

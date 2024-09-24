@@ -92,24 +92,3 @@ endif
 if maparg("<F9>") == ""
 	map <F9> :make<CR>
 endif
-
-iab psvm public static void main(String[] args) { }<UP><END><BS><BS>
-iab sout System.out.println();<LEFT><LEFT>
-iab serr System.err.println();<LEFT><LEFT>
-iab pr private
-iab pe protected
-iab pu public
-iab ex extends
-iab bo boolean
-iab ab abstract
-iab cl class
-iab st static
-iab fi final
-iab ir import
-iab re return
-iab sw switch
-iab Ob Object
-iab Ex Exception
-iab En Enumeration
-iab Gr Graphics
-

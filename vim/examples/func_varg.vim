@@ -1,9 +1,9 @@
 function! Infect(...)
-  echo a:0   
+  echo a:0
   " => 2
-  echo a:1    
+  echo a:1
   " => jake
-  echo a:2    
+  echo a:2
   " => bella
 
   for s in a:000  " a list
@@ -25,4 +25,4 @@ function! GetVis()
     " return join(lines, "\n")
 endfunction
 
-" call Infect('jake', 'bella')
+call Infect('jake', 'bella')

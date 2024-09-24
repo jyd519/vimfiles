@@ -1,4 +1,4 @@
-"-------------------- 
+"--------------------
 let mylist = [1, 2, ['a', 'b']]
 echo mylist[0]
 " 1
@@ -11,7 +11,7 @@ echo mylist[-2]
 echo get(mylist, 999, "THERE IS NO 1000th ELEMENT")
 " THERE IS NO 1000th ELEMENT
 
-"-------------------- 
+"--------------------
 let mydict = {'blue': "#0000ff", 'foo': {999: "baz"}}
 echo mydict["blue"]
 " #0000ff
@@ -24,19 +24,19 @@ echo mydict.blue
 " BLUE
 
 
-"-------------------- 
+"--------------------
 " There is no Boolean type. Numeric value 0 is treated as falsy, while anything else is truthy.
 " Strings are converted to integers before checking truthiness.
 
 
-"-------------------- 
+"--------------------
 echo 1 . "foo"
 " 1foo
 echo 1 + "1"
 " 2
 
 
-"-------------------- 
+"--------------------
 " <string> == <string>: String equals.
 " <string> != <string>: String does not equal.
 " <string> =~ <pattern>: String matches pattern.
@@ -45,19 +45,19 @@ echo 1 + "1"
 " <operator>?: Additionally don’t match case.
 
 
-"-------------------- 
+"--------------------
 " if <expression>
-" 	...
+"	...
 " elseif <expression>
-" 	...
+"	...
 " else
-" 	...
+"	...
 " endif
 
 
 " for <var> in <list>
-" 	continue
-" 	break
+"	continue
+"	break
 " endfor
 "
 " while <expression>
@@ -69,17 +69,17 @@ for [var1, var2] in [[1, 2], [3, 4]]
 endfor
 
 
-"-------------------- 
+"--------------------
 " try
-" 	...
+"	...
 " catch <pattern (optional)>
-" 	" HIGHLY recommended to catch specific error.
+"	" HIGHLY recommended to catch specific error.
 " finally
-" 	...
+"	...
 " endtry
 
 
-"-------------------- 
+"--------------------
 function! g:Foobar(arg1, arg2, ...)
 	let first_argument = a:arg1
 	let index = 1
@@ -91,16 +91,18 @@ function! RangeSize() range
     echo a:lastline - a:firstline
 endfunction
 
-"-------------------- 
+"--------------------
 let Myfunc = function("strlen")
-echo Myfunc('foobar') 
-" > 6 
+echo Myfunc('foobar')
+" > 6
 
 lua << EOF
 -- your lua code here
-print(vim.loop.os_uname().sysname)
-print(vim.loop.os_gethostname())
+print(vim.uv.os_uname().sysname)
+print(vim.uv.os_gethostname())
 EOF
+
+" for i in range(1,100) | put ='192.168.0.'.i | endfor
 
 " http://www.ibm.com/developerworks/linux/library/l-vim-script-1/index.html
 " https://developer.ibm.com/tutorials/l-vim-script-4/

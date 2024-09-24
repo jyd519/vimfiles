@@ -166,7 +166,6 @@ vim.keymap.set("n", "<leader>fp", function()
   vim.schedule(function() vim.cmd("Telescope projects") end)
 end, { desc = "Find Project" })
 
-
 vim.keymap.set(
   "n",
   "<leader>fv",

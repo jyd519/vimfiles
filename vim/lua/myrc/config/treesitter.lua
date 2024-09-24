@@ -2,7 +2,6 @@ local treesitter = require("nvim-treesitter.configs")
 
 ---@diagnostic disable-next-line: missing-fields
 treesitter.setup({
-  -- one of "all", "maintained" (parsers with maintainers), or a list of languages
   -- ensure_installed = {"c", "cpp", "css", "rust", "python", "json", "go", "cmake", "html", "javascript", "typescript"},
 
   -- Install parsers synchronously (only applied to `ensure_installed`)
@@ -14,6 +13,8 @@ treesitter.setup({
   highlight = {
     enable = true, -- false will disable the whole extension
     disable = function(lang, buf)
+      if vim.list_contains({ "vimdoc", "help" }, lang) then return true end
+
       -- if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
 
       ---@diagnostic disable-next-line: undefined-field

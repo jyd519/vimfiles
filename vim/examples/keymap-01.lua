@@ -33,7 +33,7 @@ map {noremap = false, 'n', '<Leader>e', '%'}
  -- 3) vim.keymap.set supports buffer scoped mapping
  --
 vim.keymap.set({mode}, {lhs}, {rhs}, {options})
-vim.api.nvim_set_keymap({mode}, {lhs}, {rhs}, {options}) 
+vim.api.nvim_set_keymap({mode}, {lhs}, {rhs}, {options})
 ]]
 
 -- vim.keymap.set('n', '<leader>w', ':w<CR>',{noremap = true})
