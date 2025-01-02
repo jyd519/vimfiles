@@ -245,6 +245,11 @@ Hydra({
       { desc = "previous diagnostic" },
     },
     {
+      "L",
+      function() vim.diagnostic.setloclist() end,
+      { desc = "setloclist" },
+    },
+    {
       "a",
       function() require("telescope.builtin").diagnostics({}) end,
       { desc = "diagnostics", exit = true, nowait = true },

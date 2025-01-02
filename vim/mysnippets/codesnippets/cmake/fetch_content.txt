@@ -1,0 +1,32 @@
+if(NOT DEFINED FETCHCONTENT_QUIET)
+  set(FETCHCONTENT_QUIET FALSE)
+endif()
+set(CMAKE_TLS_VERIFY true)
+
+# placeholders
+set(NRF_SDK_NAME nRF5_SDK_17.1.0_ddde560)
+
+include(FetchContent)
+
+# https://www.nordicsemi.com/Products/Development-software/nRF5-SDK/Download
+set(NRF_SDK_DOWNLOAD_URL
+    https://www.nordicsemi.com/-/media/Software-and-other-downloads/SDKs/nRF5/Binaries/${NRF_SDK_NAME}.zip
+)
+# setting hash avoid redownload of big archive on each CMake configure,
+# and provides a way to check if the archive is corrupted
+set(NRF_SDK_DOWNLOAD_SHA256 5bfe38e744c39fd7f30e10077ba12df306ef91f368894795d6a3e7a62dc68061)
+
+FetchContent_Declare(nrf5_sdk
+   URL                  ${NRF_SDK_DOWNLOAD_URL}
+   URL_HASH             SHA256=${NRF_SDK_DOWNLOAD_SHA256}
+   TLS_VERIFY ${CMAKE_TLS_VERIFY}
+   INACTIVITY_TIMEOUT 60
+)
+
+FetchContent_Populate(nrf5_sdk)
+# nrf5_sdk_SOURCE_DIR -> nrf5源码路径
+
+# auto-ignore build dir
+file(GENERATE OUTPUT .gitignore CONTENT "*")
+
+# vim: ft=cmake:

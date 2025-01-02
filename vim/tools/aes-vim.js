@@ -22,11 +22,11 @@ function decrypt(blob, password) {
 
 // wrap long string with width of 80
 function wrapText(text, width) {
-  var lines = ["```AES-VIM"];
+  var lines = ["-----BEGIN VIM ENCRYPTED-----"];
   for (let i = 0; i < text.length; i += width) {
     lines.push(text.substring(i, i + width));
   }
-  lines.push("```");
+  lines.push("-----END VIM ENCRYPTED-----");
   return lines.join("\n");
 }
 

@@ -7,12 +7,17 @@ known_third_party = ["rest_framework", "django", "pytest"]
 python_version = "3.9"
 exclude = ["example"]
 ignore_missing_imports = true
+plugins = ["mypy_django_plugin.main"]
 
 # [[tool.mypy.overrides]]
 # module = [
 #     "pulp",
 # ]
 # ignore_missing_imports = true
+
+
+[tool.django-stubs]
+django_settings_module = "myproject.settings"
 
 [tool.pyright]
 typeCheckingMode = "off"

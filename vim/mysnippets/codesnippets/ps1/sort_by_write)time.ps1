@@ -1,0 +1,1 @@
+$atar = gci '.\dist\*.atar' | sort LastWriteTime | select -last 1

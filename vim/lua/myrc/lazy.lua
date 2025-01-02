@@ -24,7 +24,7 @@ require("lazy").setup(
     { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
     {
       "nvim-treesitter/nvim-treesitter",
-      tag = "v0.9.2",
+      -- tag = "v0.9.3",
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.treesitter") end,
     },
@@ -164,6 +164,7 @@ require("lazy").setup(
     { "jyd519/neoformat", cmd = { "Neoformat" } },
     {
       "lukas-reineke/indent-blankline.nvim",
+      enabled = false,
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.indent-blankline") end,
     },
@@ -178,6 +179,25 @@ require("lazy").setup(
       version = "*",
       event = "VeryLazy",
       config = function() require("myrc.config.toggleterm") end,
+    },
+    {
+      "TimUntersberger/neogit",
+      cmd = "Neogit",
+      config = function()
+        require("neogit").setup({
+          kind = "vsplit", -- opens neogit in a split
+          signs = {
+            section = { "", "" },
+            item = { "", "" },
+            hunk = { "", "" },
+          },
+          integrations = { diffview = true }, -- adds integration with diffview.nvim
+        })
+      end,
+    },
+    {
+      "sindrets/diffview.nvim",
+      cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
     },
     {
       "Exafunction/codeium.vim",
@@ -218,7 +238,7 @@ require("lazy").setup(
       config = function() require("myrc.config.dap") end,
       dependencies = {
         { "theHamsta/nvim-dap-virtual-text" },
-        { "rcarriga/nvim-dap-ui", dependencies = {"nvim-neotest/nvim-nio"} },
+        { "rcarriga/nvim-dap-ui", dependencies = { "nvim-neotest/nvim-nio" } },
         { "mfussenegger/nvim-dap-python" },
         { "nvim-telescope/telescope-dap.nvim" },
         { "leoluz/nvim-dap-go" },
@@ -333,7 +353,7 @@ require("lazy").setup(
       "hedyhli/outline.nvim",
       lazy = true,
       cmd = { "Outline", "OutlineOpen" },
-      keys = { "<leader>to", "<cmd>Outline<CR>", desc = "Toggle outline" },
+      keys = { { "<leader>to", "<cmd>Outline<CR>", desc = "Toggle outline" } },
       config = function() require("myrc.config.symbols-outline") end,
     },
     { "b0o/schemastore.nvim", lazy = true },
@@ -351,9 +371,8 @@ require("lazy").setup(
     },
     {
       "nvim-tree/nvim-tree.lua",
-      config = function()
-        require("myrc.config.nvim-tree")
-      end,
+      tag = "v1.7.1",
+      config = function() require("myrc.config.nvim-tree") end,
     },
     {
       "ibhagwan/fzf-lua",
@@ -392,10 +411,25 @@ require("lazy").setup(
       config = function() require("myrc.config.telescope") end,
     },
     {
-      "https://github.com/ahmedkhalf/project.nvim",
-      config = function()
-        require("project_nvim").setup({ manual_mode = true })
+      "allaman/emoji.nvim",
+      version = "4.0", -- optionally pin to a tag
+      ft = {"markdown", "typescript", "text", "lua"}, -- adjust to your needs
+      opts = {
+        -- default is false
+        enable_cmp_integration = true,
+        -- optional if your plugin installation directory
+        -- is not vim.fn.stdpath("data") .. "/lazy/
+        plugin_path = g.VIMFILES .. "/lazy/",
+      },
+      config = function(_, opts)
+        require("emoji").setup(opts)
+        local ts = require("telescope").load_extension("emoji")
+        vim.keymap.set("n", "<leader>se", ts.emoji, { desc = "[S]earch [E]moji" })
       end,
+    },
+    {
+      "https://github.com/ahmedkhalf/project.nvim",
+      config = function() require("project_nvim").setup({ manual_mode = true }) end,
     },
     {
       -- https://github.com/tomasky/bookmarks.nvim

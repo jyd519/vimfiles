@@ -1,4 +1,11 @@
 [tool.pyright]
-pythonVersion = "3.8"
+pythonVersion = "3.11"
 pythonPlatform = "Linux"
-extraPaths = ["./env/lib/python3.9/site-packages" ]
+extraPaths = ["./venv/lib/python3.11/site-packages" ]
+
+# django-stubs
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "myproject.settings"

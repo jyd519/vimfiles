@@ -14,6 +14,9 @@ end
 
 require("nvim-tree").setup({
   sync_root_with_cwd = true,
+  git = {
+    enable = false
+  },
   on_attach = my_on_attach,
   -- respect_buf_cwd = true,
   -- update_focused_file = {

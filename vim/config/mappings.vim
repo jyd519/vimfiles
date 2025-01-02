@@ -85,6 +85,15 @@ tnoremap <C-h> <C-\><C-N><C-w>h
 tnoremap <C-j> <C-\><C-N><C-w>j
 tnoremap <C-k> <C-\><C-N><C-w>k
 tnoremap <C-l> <C-\><C-N><C-w>l
+
+function! s:setMappingForTerminal()
+  noremap <buffer> q <c-w>c
+endfunction
+if g:is_nvim
+  autocmd vimrc TermOpen * call <SID>setMappingForTerminal()
+else
+  autocmd vimrc TerminalOpen * call <SID>setMappingForTerminal()
+endif
 " }}}
 
 " Auto switching IME {{{1
@@ -118,5 +127,9 @@ endif
 " Font zoom in/out
 nmap <silent> <C-=> :call zoom#ZoomIn()<Enter>
 nmap <silent> <C--> :call zoom#ZoomOut()<Enter>
+
+" aes-vim
+vmap <leader>ec :AesEnc<cr>
+nmap <leader>ed :AesDec<cr>
 
 " vim: set fdm=marker fen:

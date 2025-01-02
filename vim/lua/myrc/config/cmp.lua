@@ -203,6 +203,7 @@ cmp.setup({
     { name = "crates" },
   }, {
     { name = "buffer" },
+    { name = "emoji" },
   }),
 })
 

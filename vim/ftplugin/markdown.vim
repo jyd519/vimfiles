@@ -152,9 +152,17 @@ command! -nargs=0 -range=% Mbr :<line1>,<line2>call AddLineBreak()
 function! ToUnorderList() range
   let m = visualmode()
   if m ==# 'V'
+    let indent = 0
     for line in range(a:firstline, a:lastline)
-      if getline(line) !~# '^\s*$'
-        call setline(line, '+ ' . trim(getline(line), "", 1))
+      if getline(line) !~# '^\s*$' " not empty
+        if getline(line) =~# '\v^\s+'
+          let indent = 2
+        endif
+        if indent > 0 || getline(line) =~# '^ *- *'
+          call setline(line, substitute(getline(line), "\\v[ 0-9+#-]*(.*$)", repeat(" ", indent) . "- \\1", ""))
+        else
+          call setline(line, substitute(getline(line), "\\v[ 0-9+#-]*(.*$)", "+ \\1", ""))
+        endif
       endif
     endfor
   endif
@@ -162,12 +170,16 @@ endfunction
 
 command! -nargs=0 -range=% Ml :<line1>,<line2>call ToUnorderList()
 
+nmap <buffer> gl :<c-u>call ToUnorderList()<cr>
+vmap <buffer> gl :<c-u>'<,'>call ToUnorderList()<cr>
+
 function! ToOrderList() range
   let m = visualmode()
   if m ==# 'V'
     let i = 1
     for line in range(a:firstline, a:lastline)
-      call setline(line, i . '. ' . trim(getline(line), "", 1))
+      call setline(line, substitute(getline(line), "\\v[ 0-9+#-]*(.*$)", i . ". \\1", ""))
+      " call setline(line, i . '. ' . trim(getline(line), "", 1))
       let i+=1
     endfor
   endif

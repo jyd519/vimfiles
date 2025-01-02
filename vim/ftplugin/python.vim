@@ -39,3 +39,17 @@ function! VirtualEnvSitePackagesFolder()
 endfunction
 
 cnoremap %v <C-R>=VirtualEnvSitePackagesFolder()<cr>
+
+" pyflyby
+function! s:PyPostSave()
+  if has("win32")
+    echom "pyflyby is not supported on Windows :("
+    return
+  endif
+  execute "silent !tidy-imports --black --quiet --replace-star-imports --action REPLACE " . bufname("%")
+  execute "silent !isort " . bufname("%")
+  execute "e"
+endfunction
+noremap <buffer> <leader>i :call <SID>PyPostSave()<cr>
+command! PyImport call <SID>PyPostSave()
+

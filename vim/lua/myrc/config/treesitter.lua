@@ -13,7 +13,7 @@ treesitter.setup({
   highlight = {
     enable = true, -- false will disable the whole extension
     disable = function(lang, buf)
-      if vim.list_contains({ "vimdoc", "help" }, lang) then return true end
+      if vim.list_contains({ "vimdoc", "help", }, lang) then return true end
 
       -- if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
 

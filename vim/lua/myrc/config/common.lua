@@ -89,7 +89,7 @@ vim.api.nvim_create_autocmd({ "BufReadPre" }, {
 })
 -- }}}
 
--- lsp formatting {{{2
+-- Lsp formatting {{{2
 api.nvim_create_user_command("Format", function()
   vim.lsp.buf.format({ async = true })
 end, {
