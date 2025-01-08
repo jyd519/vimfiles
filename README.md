@@ -34,9 +34,11 @@ let g:node_path = $NODE_PATH != "" ? $NODE_PATH :  'node'
 
 " enable plugins
 " let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "python": 0 \
-"   "fzf-lua": 0, "markdown": 0, \ 
+"   "fzf-lua": 0, "markdown": 0, \
 "   "netrw": 0, "telescope": 1, "test": 0 , "tmux": 0, "nvim-treesitter": 0 \
 "}
+"
+let test#go#gotest#options = '-v'
 
 " HACK: work around bad detection of background in Tmux (no OSC11 support)
 " https://github.com/neovim/neovim/issues/17070
@@ -56,7 +58,7 @@ colorscheme vscode
 + For Vim User
 
 ```vim
-let g:enabled_plugins={"fzf":1, "coc": 0} 
+let g:enabled_plugins={"fzf":1, "coc": 0}
 
 source ~/.vimgit/vim/basic.vim
 
