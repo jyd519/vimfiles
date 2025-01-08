@@ -177,6 +177,17 @@ vim.keymap.set(
   { desc = "Find vimfiles" }
 )
 
+vim.keymap.set(
+  "n",
+  "<leader>fd",
+  function()
+    require("telescope.builtin").find_files({
+      cwd = table.concat({vim.g.VIMFILES, "doc"}, "/")
+    })
+  end,
+  { desc = "Find vim docs" }
+)
+
 vim.cmd([[com! Maps :Telescope keymaps]])
 
 -- integrate with t.vim

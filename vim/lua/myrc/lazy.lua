@@ -477,6 +477,13 @@ require("lazy").setup(
         lazy = "💤 ",
       },
     },
+    readme = {
+      enabled = true,
+      root = vim.fs.joinpath(vim.g.VIMFILES, "doc"),
+      files = { "README.md", "lua/**/README.md" },
+      -- only generate markdown helptags for plugins that don't have docs
+      skip_if_doc_exists = false,
+    },
   }
   -- }}}
 )

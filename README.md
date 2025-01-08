@@ -2,7 +2,7 @@
 
 ## Install
 
-1. Get Vim Files 
+1. Get Vim Files
 
 `git clone https://github.com/jyd519/vimfiles  ~/.vimgit`
 

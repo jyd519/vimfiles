@@ -10,3 +10,4 @@ vim/pack
 vim/lua/myrc/packer_compiled.lua
 vimfiles.zip
 vim/lazy
+vim/doc/doc
