@@ -4,8 +4,8 @@
 local api = vim.api
 local fn = vim.fn
 local lsp = vim.lsp
-
 local lspconfig = require("lspconfig")
+local util = lspconfig.util
 
 require("mason").setup()
 require("mason-lspconfig").setup()
@@ -19,10 +19,9 @@ local bufmap = function(mode, lhs, rhs, opts)
 end
 
 local has_file = function(root, ...)
-  local patterns = vim.tbl_flatten({ ... })
-  local join = lspconfig.util.path.join
+  local patterns = vim.iter({ ... }):flatten():totable()
   for _, name in ipairs(patterns) do
-    if vim.loop.fs_stat(join(root, name)) ~= nil then return true end
+    if vim.uv.fs_stat(table.concat({ root, name }, "/")) ~= nil then return true end
   end
   return false
 end
@@ -30,10 +29,10 @@ end
 local function get_typescript_server_path(root_dir)
   local found_ts = ""
   local function check_dir(path)
-    found_ts = lspconfig.util.path.join(path, "node_modules", "typescript", "lib")
-    if lspconfig.util.path.exists(found_ts) then return path end
+    found_ts = table.concat({path, "node_modules", "typescript", "lib"}, "/")
+    if vim.loop.fs_stat(found_ts) then return path end
   end
-  if lspconfig.util.search_ancestors(root_dir, check_dir) then
+  if util.search_ancestors(root_dir, check_dir) then
     return found_ts
   else
     put(">> typescript/lib not found")
@@ -45,7 +44,7 @@ end
 ---@param on_new_config function
 ---@return function
 local make_on_new_config = function(on_new_config)
-  return lspconfig.util.add_hook_before(on_new_config, function(new_config, root_dir)
+  return util.add_hook_before(on_new_config, function(new_config, root_dir)
     local server_name = new_config.name
     if vim.b.large_buf then
       print(server_name .. " disabled for the file is too large")
@@ -67,60 +66,29 @@ end
 
 -- }}}
 
--- set lsp keymap {{{2
+-- key mappings {{{2
 ---@diagnostic disable-next-line: unused-local
-local function setup_client(client, bufnr)
-  -- Jump to the definition
+local function setup_keymapping(client, bufnr)
   bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", { desc = "Go to definition" })
-
-  -- Jump to declaration
   bufmap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", { desc = "Go to declaration" })
-
-  -- Lists all the implementations for the symbol under the cursor
   bufmap("n", "gi", "<cmd>lua vim.lsp.buf.implementation()<cr>", { desc = "Go to implementation" })
-
-  -- Jumps to the definition of the type symbol
   bufmap("n", "go", "<cmd>lua vim.lsp.buf.type_definition()<cr>", { desc = "Go to type definition" })
-
-  -- Lists all the references
   bufmap("n", "gr", "<cmd>lua vim.lsp.buf.references()<cr>", { desc = "List references" })
-
-  -- Displays a function's signature information
-  bufmap("n", "<leader>gs", "<cmd>lua vim.lsp.buf.signature_help()<cr>", { desc = "Show signature" })
-
-  -- Renames all references to the symbol under the cursor
+  bufmap("n", "gK", "<cmd>lua vim.lsp.buf.signature_help()<cr>", { desc = "Show signature" })
+  bufmap("i", "<C-s>", "<cmd>lua vim.lsp.buf.signature_help()<cr>", { desc = "Show signature" })
   bufmap("n", "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<cr>", { desc = "Rename symbol" })
-
-  -- formatting code
   bufmap("n", "<leader>cf", "<cmd>lua vim.lsp.buf.format({async = true})<cr>", { desc = "Format code" })
+  bufmap("n", "<space>wa", vim.lsp.buf.add_workspace_folder, { desc = "Add workspace folder" })
+  bufmap("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, { desc = "Remove workspace folder" })
+  bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
 
   -- Selects a code action available at the current cursor position
   bufmap("n", "gx", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code action" })
+  bufmap("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code action" })
 
-  -- -- Show diagnostics in a floating window
-  bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
-  --
-  -- The blow command will highlight the current variable and its usages in the buffer.
-  if client.server_capabilities.documentHighlightProvider then
-    vim.cmd([[
-      hi! link LspReferenceRead Visual
-      hi! link LspReferenceText Visual
-      hi! link LspReferenceWrite Visual
-    ]])
-
-    local gid = api.nvim_create_augroup("lsp_document_highlight", { clear = true })
-    api.nvim_create_autocmd("CursorHold", {
-      group = gid,
-      buffer = bufnr,
-      callback = function() lsp.buf.document_highlight() end,
-    })
-
-    api.nvim_create_autocmd("CursorMoved", {
-      group = gid,
-      buffer = bufnr,
-      callback = function() lsp.buf.clear_references() end,
-    })
-  end
+  -- codelens
+  bufmap("n", "<leader>cc", "<cmd>lua vim.lsp.codelens.run()<cr>", { desc = "Run Codelens" })
+  bufmap("n", "<leader>cC", "<cmd>lua vim.lsp.codelens.refresh()<cr>", { desc = "Refresh & Display Codelens" })
 end
 
 local format_is_enabled = false
@@ -133,56 +101,80 @@ end, {})
 -- after the language server attaches to the current buffer
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
-  callback = function(args)
-    local client_id = args.data.client_id
+  callback = function(event)
+    local client_id = event.data.client_id
     local client = vim.lsp.get_client_by_id(client_id)
-    local bufnr = args.buf
+    local bufnr = event.buf
+    local autocmd = api.nvim_create_autocmd
+    setup_keymapping(client, bufnr)
 
-    setup_client(client, bufnr)
+    if client == nil then return end
 
-    --
-    -- format on save
-    --
-    if not client.server_capabilities.documentFormattingProvider then return end
+    local lsp_group = api.nvim_create_augroup("my_lsp_autocmd", { clear = true })
 
-    -- Tsserver usually works poorly. Sorry you work with bad languages
-    -- You can remove this line if you know what you're doing :)
-    if client.name == "tsserver" then return end
+    -- The blow command will highlight the current variable and its usages in the buffer.
+    if client.server_capabilities.documentHighlightProvider then
+      vim.cmd([[
+        hi! link LspReferenceRead Visual
+        hi! link LspReferenceText Visual
+        hi! link LspReferenceWrite Visual
+      ]])
+
+      autocmd("CursorHold", {
+        group = lsp_group,
+        buffer = bufnr,
+        callback = function() lsp.buf.document_highlight() end,
+      })
+
+      autocmd("CursorMoved", {
+        group = lsp_group,
+        buffer = bufnr,
+        callback = function() lsp.buf.clear_references() end,
+      })
+    end
 
     -- Enable inlay hints
+    if client.supports_method("textDocument/inlayHint") then lsp.inlay_hint.enable(true, { bufnr = event.buf }) end
+
     if client.name == "clangd" then
       -- require("clangd_extensions.inlay_hints").setup_autocmd()
       -- require("clangd_extensions.inlay_hints").set_inlay_hints()
     end
 
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      group = vim.api.nvim_create_augroup("LspFormat." .. bufnr, { clear = true }),
-      buffer = bufnr,
-      callback = function()
-        if not format_is_enabled then return end
-        vim.lsp.buf.format({
-          async = false,
-          filter = function(c) return c.id == client.id end,
-        })
-      end,
-    })
+    -- Tsserver usually works poorly. Sorry you work with bad languages
+    -- You can remove this line if you know what you're doing :)
+    if client.name == "tsserver" then return end
+
+    -- format on save
+    if client.server_capabilities.documentFormattingProvider then
+      autocmd("BufWritePre", {
+        group = lsp_group,
+        buffer = bufnr,
+        callback = function()
+          if not format_is_enabled then return end
+          vim.lsp.buf.format({
+            async = false,
+            filter = function(c) return c.id == client.id end,
+          })
+        end,
+      })
+    end
   end,
 })
 -- }}}
 
 -- default lspconfig {{{2
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-local lsp_defaults = {
+util.default_config = vim.tbl_deep_extend("force", util.default_config, {
   capabilities = capabilities,
-  on_new_config = make_on_new_config(lspconfig.util.default_config.on_new_config),
-}
-lspconfig.util.default_config = vim.tbl_deep_extend("force", lspconfig.util.default_config, lsp_defaults)
+  on_new_config = make_on_new_config(util.default_config.on_new_config),
+})
 -- }}}
 
 -- tsserver {{{2
 local mason_registry = require("mason-registry")
-local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path() .. "/node_modules/@vue/language-server"
+local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path()
+  .. "/node_modules/@vue/language-server"
 require("typescript-tools").setup({
   disable_commands = false, -- prevent the plugin from creating Vim commands
   go_to_source_definition = {
@@ -199,18 +191,9 @@ require("typescript-tools").setup({
 })
 -- }}}
 
--- GoLang  {{{2
--- require("go").setup({
---   lsp_cfg = false,
---   verbose = false,
---   luasnip = true,
--- })
--- }}}
-
 -- lua lsp {{{2
 local function get_lua_library()
   local library = {}
-
   local path = vim.split(package.path, ";")
 
   -- this is the ONLY correct way to setup your path
@@ -220,12 +203,12 @@ local function get_lua_library()
   local function add(lib)
     for _, p in pairs(vim.fn.expand(lib, false, true)) do
       local rp = vim.loop.fs_realpath(p)
-      if rp then library[rp] = true end
+      if rp then table.insert(library, rp) end
     end
   end
 
   -- add runtime
-  add("$VIMRUNTIME/lua")
+  add("$VIMRUNTIME")
 
   -- add your config
   add("$VIMFILES/lua")
@@ -237,43 +220,49 @@ local function get_lua_library()
   -- TOO SLOW
   -- local paths = vim.api.nvim_get_runtime_file("", true)
   -- for _, p in pairs(paths) do
-  --   library[p] = true
+  --   table.insert(library, p)
   -- end
+  table.insert(library, "${3rd}/luv/library")
   return library
 end
 
 lspconfig["lua_ls"].setup({
-  autostart = false,
-  single_file_support = true,
-  on_attach = function(client, bufnr)
-    client.server_capabilities.documentFormattingProvider = false
-    client.server_capabilities.documentRangeFormattingProvider = false
-  end,
   root_dir = function(fname)
-    return lspconfig.util.root_pattern(".git", ".project", "package.json", "pyproject.toml")(fname) or fn.getcwd()
+    local primary =
+      util.root_pattern(".luarc.json", ".luarc.jsonc", ".project", "package.json", "pyproject.toml", ".git")(fname)
+    local fallback = vim.loop.cwd()
+    return primary or fallback
   end,
-  settings = {
-    Lua = {
+  on_init = function(client)
+    -- local path = client.workspace_folders[1].name
+    -- if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
+    --   return
+    -- end
+    client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
       runtime = {
-        -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+        -- Tell the language server which version of Lua you're using
+        -- (most likely LuaJIT in the case of Neovim)
         version = "LuaJIT",
       },
       diagnostics = {
         -- Get the language server to recognize the `vim` global
-        globals = { "vim", "hs" },
+        globals = { "hs" },
       },
+      -- Make the server aware of Neovim runtime files
       workspace = {
+        checkThirdParty = false,
         -- Make the server aware of Neovim runtime files
         library = get_lua_library(),
-        maxPreload = 1000,
-        preloadFileSize = 500,
-        checkThirdParty = false,
+        -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
+        -- library = vim.api.nvim_get_runtime_file("", true)
+        -- maxPreload = 1000,
+        -- preloadFileSize = 500,
+        -- checkThirdParty = false,
       },
-      -- Do not send telemetry data containing a randomized but unique identifier
-      telemetry = {
-        enable = false,
-      },
-    },
+    })
+  end,
+  settings = {
+    Lua = {},
   },
 })
 -- }}}
@@ -282,10 +271,10 @@ lspconfig["lua_ls"].setup({
 require("rust-tools").setup({
   server = {
     on_attach = function(client, bufnr)
-      local set_option = api.nvim_buf_set_option
-      set_option(bufnr, "formatexpr", "v:lua.vim.lsp.formatexpr()")
-      set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
-      set_option(bufnr, "tagfunc", "v:lua.vim.lsp.tagfunc")
+      local set_option = api.nvim_set_option_value
+      set_option("formatexpr", "v:lua.vim.lsp.formatexpr()", { buf = bufnr })
+      set_option("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })
+      set_option("tagfunc", "v:lua.vim.lsp.tagfunc", { buf = bufnr })
     end,
     dap = {
       adapter = require("dap").adapters.codelldb,
@@ -298,9 +287,8 @@ require("rust-tools").setup({
 -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 lspconfig.pyright.setup({
   before_init = function(_, config)
-    local join = lspconfig.util.path.join
     local p = "python3"
-    if vim.env.VIRTUAL_ENV then p = join(vim.env.VIRTUAL_ENV, "bin", "python3") end
+    if vim.env.VIRTUAL_ENV then p = table.concat({ vim.env.VIRTUAL_ENV, "bin", "python3" }, "/") end
     print("Python (pyright): ", p)
     config.settings.python.pythonPath = p
   end,
@@ -341,7 +329,19 @@ for _, name in ipairs(servers) do
 end
 -- }}}
 
--- diagnostic signs {{{2
+-- Rounded border floating windows {{{2
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
+vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
+-- }}}
+
+-- Diagnostics Settings {{{2
+vim.diagnostic.config({
+  float = {
+    source = "if_many",
+    border = "rounded",
+  },
+})
+
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
   signs = {
     severity = vim.diagnostic.severity.HINT,
@@ -350,6 +350,13 @@ vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagn
     severity = vim.diagnostic.severity.WARN,
   },
 })
--- }}}
 
--- vim: set fdm=marker fen fdl=1:
+local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
+for type, icon in pairs(signs) do
+  local hl = "DiagnosticSign" .. type
+  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
+-- }}}
+--
+-- vim: set fdm=marker fdl=1:

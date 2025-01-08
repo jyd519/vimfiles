@@ -20,7 +20,7 @@ nmap <leader>ev :e! $MYVIMRC<CR>
 nmap <leader>ss :source %<cr>
 "}}}
 
-" Smart way to move btw. windows{{{
+" Move to window using the <ctrl> hjkl keys {{{
 nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
 nnoremap <C-h> <C-W>h
@@ -37,7 +37,7 @@ nmap <leader>tm :tabmove
 " ---------------------------------
 
 " Switch to current dir
-nmap <leader>cd :lcd %:p:h<cr>:pwd<cr>
+nmap <leader>CD :lcd %:p:h<cr>:pwd<cr>
 
 " Delete current line without yanking the line breaks
 nnoremap dil ^d$
@@ -49,6 +49,10 @@ vnoremap p "_dP
 inoremap <C-e> <Esc>A
 inoremap <C-a> <Esc>I
 cnoremap <C-a> <C-b>
+
+" Better indenting: keep visual mode after indent
+vnoremap < <gv
+vnoremap > >gv
 
 if !has("mac")
   " Ctrl-V Paste from clipboard
@@ -115,7 +119,7 @@ nnoremap <silent> <leader>z :call misc#ZoomToggle()<CR>
 " quickfix {{{
 nnoremap <silent> <F2> :call qf#ToggleQuickFix()<cr>
 nnoremap <silent> <S-F2> :call qf#ToggleLocationList()<cr>
-nnoremap <silent> <leader>xg :call qf#ToggleQuickFix()<cr>
+nnoremap <silent> <leader>xq :call qf#ToggleQuickFix()<cr>
 nnoremap <silent> <leader>xl :call qf#ToggleLocationList()<cr>
 "}}}
 

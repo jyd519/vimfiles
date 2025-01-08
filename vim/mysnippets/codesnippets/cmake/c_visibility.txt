@@ -1,0 +1,12 @@
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_C_STANDARD 11)
+
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "No build type selected, default to Release")
+    set(CMAKE_BUILD_TYPE "Release")
+endif()
+
+message(STATUS "Building in ${CMAKE_BUILD_TYPE} mode")
+message(STATUS "Building with ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION} on ${CMAKE_SYSTEM}")

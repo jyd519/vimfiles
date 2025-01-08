@@ -44,10 +44,9 @@ local is_insert_keys = function(keys)
 end
 
 cmp.setup({
+  -- REQUIRED - you must specify a snippet engine
   snippet = {
-    -- REQUIRED - you must specify a snippet engine
     expand = function(args)
-      -- vim.fn["vsnip#anonymous"](args.body) -- For `vsnip` users.
       luasnip.lsp_expand(args.body) -- For `luasnip` users.
       -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
       -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
@@ -71,6 +70,7 @@ cmp.setup({
     end, { "i" }),
     ["<C-y>"] = cmp.mapping.confirm({ select = true }),
     ["<CR>"] = cmp.mapping.confirm({ select = false }),
+
     -- jump backward
     ["<C-h>"] = cmp.mapping(function(fallback)
       if luasnip.jumpable(-1) then
@@ -185,6 +185,7 @@ cmp.setup({
         nvim_lsp = "[LSP]",
         buffer = "[Buffer]",
         path = "[Path]",
+        go_pkgs = "[pkgs]",
       })[entry.source.name]
       return vim_item
     end,
@@ -193,9 +194,6 @@ cmp.setup({
     { name = "nvim_lua" },
     { name = "nvim_lsp", max_item_count = 20 },
     { name = "luasnip" }, -- For luasnip users.
-    -- { name = 'vsnip' }, -- For vsnip users.
-    -- { name = 'ultisnips' }, -- For ultisnips users.
-    -- { name = 'snippy' }, -- For snippy users.
     { name = "path" },
     { name = "codeium" },
     -- { name = "copilot" },
@@ -204,7 +202,9 @@ cmp.setup({
   }, {
     { name = "buffer" },
     { name = "emoji" },
+    { name = "go_pkgs" },
   }),
+  matching = { disallow_symbol_nonprefix_matching = false }, -- to use . and / in urls
 })
 
 -- Set configuration for specific filetype {{{1

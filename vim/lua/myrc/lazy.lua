@@ -247,9 +247,6 @@ require("lazy").setup(
       },
     },
     -- }}}
-    -- Languages Go/dart/rust/cpp/typescript {{{2
-    --  deprecated
-    -- { "jose-elias-alvarez/typescript.nvim", ft = { "typescript", "typescriptreact", "typescript.tsx", "javascript" } },
     {
       "pmizio/typescript-tools.nvim",
       dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
@@ -323,6 +320,7 @@ require("lazy").setup(
         { "yehuohan/cmp-path" },
         { "hrsh7th/cmp-cmdline" },
         { "hrsh7th/cmp-nvim-lua" },
+        { "Snikimonkd/cmp-go-pkgs" },
         -- { "hrsh7th/cmp-nvim-lsp-document-symbol" },
         -- { "quangnguyen30192/cmp-nvim-tags", ft = { "c", "cpp" } },
         { "saadparwaiz1/cmp_luasnip" },
