@@ -10,6 +10,44 @@ local function diff_source()
   end
 end
 
+local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
+local ai_processing = false
+local ai_spinner_symbols = {
+  "⠋",
+  "⠙",
+  "⠹",
+  "⠸",
+  "⠼",
+  "⠴",
+  "⠦",
+  "⠧",
+  "⠇",
+  "⠏",
+}
+
+local ai_spinner_index = 1
+local ai_spinner_symbols_len = 10
+vim.api.nvim_create_autocmd({ "User" }, {
+  pattern = "CodeCompanionRequest*",
+  group = group,
+  callback = function(request)
+    if request.match == "CodeCompanionRequestStarted" then
+      ai_processing = true
+    elseif request.match == "CodeCompanionRequestFinished" then
+      ai_processing = false
+    end
+  end,
+})
+
+local function ai_status()
+  if ai_processing then
+    ai_spinner_index = (ai_spinner_index % ai_spinner_symbols_len) + 1
+    return ai_spinner_symbols[ai_spinner_index]
+  else
+    return ""
+  end
+end
+
 -- local hydra_status = require("hydra.statusline")
 local spinner_symbols = { '🌑 ', '🌒 ', '🌓 ', '🌔 ', '🌕 ', '🌖 ', '🌗 ', '🌘 ' }
 local ale_spinner = 0
@@ -39,11 +77,14 @@ require("lualine").setup({
           end
           return ""
         end,
-        -- icon = { "🔍", color={fg="green"} },
         color = { fg = "green" },
       },
     },
     lualine_c = {
+      {
+        ai_status,
+        color = { fg = "white" },
+      },
       {
         "filename",
         file_status = true, -- Displays file status (readonly status, modified status)

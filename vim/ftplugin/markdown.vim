@@ -114,7 +114,7 @@ require("nvim-surround").buffer_setup(
 END
 endif
 
-nmap <buffer> <LocalLeader>m :update<cr>:call PreviewMindmap()<cr>
+nmap <buffer> <LocalLeader>mr :update<cr>:RenderMarkdown toggle<cr>
 
 "Key Mapings
 if has("mac")

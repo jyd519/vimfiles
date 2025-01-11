@@ -182,7 +182,7 @@ vim.keymap.set(
   "<leader>fd",
   function()
     require("telescope.builtin").find_files({
-      cwd = table.concat({vim.g.VIMFILES, "doc"}, "/")
+      cwd = table.concat({ vim.g.VIMFILES, "doc" }, "/"),
     })
   end,
   { desc = "Find vim docs" }
@@ -353,9 +353,7 @@ vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, { desc = "Set locatio
 local diagnostic_goto = function(next, severity)
   local go = next and vim.diagnostic.goto_next or vim.diagnostic.goto_prev
   severity = severity and vim.diagnostic.severity[severity] or nil
-  return function()
-    go({ severity = severity })
-  end
+  return function() go({ severity = severity }) end
 end
 vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
 vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
@@ -388,5 +386,34 @@ vim.api.nvim_create_user_command(
 )
 --}}}
 
-
+-- AI {{{2
+-- https://github.com/olimorris/codecompanion.nvim
+vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI assistant" })
+vim.api.nvim_set_keymap("v", "<leader>ae", "", {
+  desc = "Explain code",
+  callback = function() require("codecompanion").prompt("explain") end,
+  noremap = true,
+  silent = true,
+})
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>al",
+  "<cmd>CodeCompanionActions<cr>",
+  { desc = "AI Actions", noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap(
+  "v",
+  "<leader>al",
+  "<cmd>CodeCompanionActions<cr>",
+  { desc = "AI Actions", noremap = true, silent = true }
+)
+vim.api.nvim_set_keymap(
+  "v",
+  "<leader>am",
+  "<cmd>CodeCompanionChat Add<cr>",
+  { desc = "AI Chat Add", noremap = true, silent = true }
+)
+vim.cmd([[cab cc CodeCompanion]])
+vim.cmd([[cab ccc CodeCompanionChat]])
+--}}}
 -- vim: set fdm=marker fdl=1: }}}

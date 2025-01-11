@@ -214,6 +214,15 @@ require("lazy").setup(
       end,
     },
     {
+      "olimorris/codecompanion.nvim",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        "nvim-treesitter/nvim-treesitter",
+        { "MeanderingProgrammer/render-markdown.nvim", ft = { "markdown", "codecompanion" } },
+      },
+      config = function() require("myrc.config.codecompanion") end,
+    },
+    {
       "norcalli/nvim-colorizer.lua",
       ft = { "css", "sass", "scss", "vue", "html", "javascript", "typescript" },
       config = function()
