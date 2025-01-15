@@ -8,7 +8,7 @@ require("codecompanion").setup({
     },
   },
   opts = {
-    language = "Chinese",
+    language = "English",
     -- log_level = "DEBUG",
   },
   adapters = {
