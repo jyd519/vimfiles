@@ -1,0 +1,5 @@
+snippet nargs Create a modifiable $args copy
+    \$nargs = [System.Collections.ArrayList]@(\$args)
+    #  $nargs.RemoveAt(0), $nargs.Add("XXX")
+
+

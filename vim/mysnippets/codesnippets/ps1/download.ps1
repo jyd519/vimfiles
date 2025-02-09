@@ -1,0 +1,1 @@
+Invoke-WebRequest -Uri https://github.com/kernelwernel/VMAware/releases/latest/download/vmaware.hpp -OutFile deps\vmaware2.hpp

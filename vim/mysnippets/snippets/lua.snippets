@@ -76,3 +76,11 @@ snippet lsppyright "configure pyright"
 				single_file_support = true
 		}
 
+snippet cmd "add new user command"
+    vim.api.nvim_create_user_command("SayHello", function(args)
+        print("Hello " .. args.args)
+        put(args)
+    end, {
+        nargs = "*",
+        desc = "Say hi to someone",
+    })

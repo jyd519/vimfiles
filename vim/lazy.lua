@@ -21,6 +21,13 @@ vim.loader.enable()
 -- load global variables
 vim.cmd('runtime config/globals.vim')
 
+if vim.g.vscode then
+   vim.g.did_load_filetypes = 1
+   require("myrc.vscode.plugins")
+   require("myrc.vscode.setting")
+   return
+end
+
 require('myrc.lazy') -- load plugins
 require('myrc.mapping')
 

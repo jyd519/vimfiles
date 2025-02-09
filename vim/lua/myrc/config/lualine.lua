@@ -10,6 +10,20 @@ local function diff_source()
   end
 end
 
+local function codecompanion_adapter_name()
+  local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
+  if not chat then return nil end
+
+  return chat.adapter.formatted_name
+end
+
+local function codecompanion_current_model_name()
+  local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
+  if not chat then return nil end
+
+  return chat.settings.model
+end
+
 local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
 local ai_processing = false
 local ai_spinner_symbols = {
@@ -49,7 +63,7 @@ local function ai_status()
 end
 
 -- local hydra_status = require("hydra.statusline")
-local spinner_symbols = { '🌑 ', '🌒 ', '🌓 ', '🌔 ', '🌕 ', '🌖 ', '🌗 ', '🌘 ' }
+local spinner_symbols = { "🌑 ", "🌒 ", "🌓 ", "🌔 ", "🌕 ", "🌖 ", "🌗 ", "🌘 " }
 local ale_spinner = 0
 
 require("lualine").setup({
@@ -82,10 +96,6 @@ require("lualine").setup({
     },
     lualine_c = {
       {
-        ai_status,
-        color = { fg = "white" },
-      },
-      {
         "filename",
         file_status = true, -- Displays file status (readonly status, modified status)
         newfile_status = false, -- Display new file status (new file means no write after created)
@@ -94,7 +104,6 @@ require("lualine").setup({
         -- 2: Absolute path
         -- 3: Absolute path, with tilde as the home directory
         -- 4: Filename and parent dir, with tilde as the home directory
-
         shorting_target = 40, -- Shortens path to leave 40 spaces in the window
         -- for other components. (terrible name, any suggestions?)
         symbols = {
@@ -110,6 +119,46 @@ require("lualine").setup({
     lualine_y = { "progress" },
     lualine_z = { "location" },
   },
+  extensions = {
+    {
+      filetypes = { "codecompanion" },
+      sections = {
+        lualine_a = {
+          "mode",
+        },
+        lualine_b = {
+          codecompanion_adapter_name,
+        },
+        lualine_c = {
+          codecompanion_current_model_name,
+        },
+        lualine_x = {
+          { ai_status, color = { fg = "white" } },
+        },
+        lualine_y = {
+          "progress",
+        },
+        lualine_z = {
+          "location",
+        },
+      },
+      inactive_sections = {
+        lualine_a = {},
+        lualine_b = {
+          codecompanion_adapter_name,
+        },
+        lualine_c = {},
+        lualine_x = {
+          { ai_status, color = { fg = "white" } },
+        },
+        lualine_y = {
+          "progress",
+        },
+        lualine_z = {},
+      },
+    },
+  },
+
   -- winbar = {
   -- ...
   -- },

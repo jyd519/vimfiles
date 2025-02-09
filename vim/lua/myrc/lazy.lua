@@ -164,7 +164,7 @@ require("lazy").setup(
     { "jyd519/neoformat", cmd = { "Neoformat" } },
     {
       "lukas-reineke/indent-blankline.nvim",
-      enabled = false,
+      enabled = true,
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.indent-blankline") end,
     },
@@ -218,7 +218,7 @@ require("lazy").setup(
       dependencies = {
         "nvim-lua/plenary.nvim",
         "nvim-treesitter/nvim-treesitter",
-        { "MeanderingProgrammer/render-markdown.nvim", ft = { "codecompanion" } },
+        { "MeanderingProgrammer/render-markdown.nvim", lazy = true, ft = { "codecompanion" } },
       },
       config = function() require("myrc.config.codecompanion") end,
     },
@@ -256,9 +256,46 @@ require("lazy").setup(
       },
     },
     -- }}}
+    -- vim-on-browser {{{2
+    {
+      "glacambre/firenvim",
+      build = ":call firenvim#install(0)",
+      enabled = false,
+      config = function()
+        vim.g.firenvim_config = {
+          localSettings = {
+            [".*"] = { takeover = "never" },
+          },
+        }
+      end,
+    },
+    {
+      "subnut/nvim-ghost.nvim",
+      enabled = vim.g.enabled_plugins["ghost_text"] == 1,
+      init = function() vim.g.nvim_ghost_autostart = 0 end,
+      keys = {
+        {
+          "<leader>ug",
+          function()
+            if vim.fn.exists(":GhostTextStart") == 2 then
+              vim.cmd("GhostTextStart")
+              vim.notify("GhostText Started")
+            else
+              vim.cmd("GhostTextStop")
+              vim.notify("GhostText Stopped")
+            end
+          end,
+          desc = "GhostText Toggle",
+          silent = true,
+        },
+      },
+      cmd = { "GhostTextStart", "GhostTextStop" },
+    },
+  -- }}}
     {
       "pmizio/typescript-tools.nvim",
       dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+      ft = { "javascript", "typescript" },
       opts = {},
     },
     { "ray-x/guihua.lua", ft = "go" }, -- float term, codeaction and codelens gui support
@@ -281,6 +318,11 @@ require("lazy").setup(
       config = function() require("myrc.config.clangd") end,
     },
     { "pearofducks/ansible-vim", ft = { "yaml", "ansible", "ansible_hosts" } },
+    {
+      "someone-stole-my-name/yaml-companion.nvim",
+      ft = { "yaml" },
+      config = function() require("telescope").load_extension("yaml_schema") end,
+    },
     {
       "dense-analysis/ale",
       lazy = true,
@@ -347,7 +389,6 @@ require("lazy").setup(
     -- LSP {{{2
     {
       "neovim/nvim-lspconfig",
-      -- event = "VeryLazy",
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.lsp") end,
       dependencies = {
@@ -420,7 +461,7 @@ require("lazy").setup(
     {
       "allaman/emoji.nvim",
       version = "4.0", -- optionally pin to a tag
-      ft = {"markdown", "typescript", "text", "lua"}, -- adjust to your needs
+      ft = { "markdown", "typescript", "text", "lua" }, -- adjust to your needs
       opts = {
         -- default is false
         enable_cmp_integration = true,

@@ -86,6 +86,16 @@ vim.api.nvim_create_autocmd({ "BufReadPre" }, {
 vim.api.nvim_create_user_command("Format", function() vim.lsp.buf.format({ async = true }) end, {
   desc = "Format the current buffer",
 })
+vim.api.nvim_create_user_command("InlayHintToggle", function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+  if vim.lsp.inlay_hint.is_enabled() then
+    vim.notify("Inlay hints disabled", vim.log.levels.INFO, { title = "LSP" })
+  else
+    vim.notify("Inlay hints enabled", vim.log.levels.INFO, { title = "LSP" })
+  end
+end, {
+  desc = "Toggle LSP Inlay-Hint",
+})
 -- }}}
 
 -- Close some filetypes with <q> {{{2

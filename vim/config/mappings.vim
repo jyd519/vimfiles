@@ -50,9 +50,9 @@ inoremap <C-e> <Esc>A
 inoremap <C-a> <Esc>I
 cnoremap <C-a> <C-b>
 
-" Better indenting: keep visual mode after indent
-vnoremap < <gv
-vnoremap > >gv
+" " Better indenting: keep visual mode after indent
+" vnoremap < <gv
+" vnoremap > >gv
 
 if !has("mac")
   " Ctrl-V Paste from clipboard

@@ -29,7 +29,7 @@ end
 local function get_typescript_server_path(root_dir)
   local found_ts = ""
   local function check_dir(path)
-    found_ts = table.concat({path, "node_modules", "typescript", "lib"}, "/")
+    found_ts = table.concat({ path, "node_modules", "typescript", "lib" }, "/")
     if vim.loop.fs_stat(found_ts) then return path end
   end
   if util.search_ancestors(root_dir, check_dir) then
@@ -107,7 +107,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local bufnr = event.buf
     local autocmd = api.nvim_create_autocmd
     setup_keymapping(client, bufnr)
-
     if client == nil then return end
 
     local lsp_group = api.nvim_create_augroup("my_lsp_autocmd", { clear = true })
@@ -304,6 +303,51 @@ lspconfig.volar.setup({
     },
   },
 })
+-- }}}
+
+-- yaml {{{2
+--
+local yamlls_cfg = require("yaml-companion").setup{
+  schemas = {
+    {
+      name = "openapi-3.0 local",
+      uri = vim.fn.expand("$VIMFILES/openapi-schema.json"),
+    },
+  },
+  lspconfig = {
+    settings = {
+      redhat = { telemetry = { enabled = false } },
+      http = { proxy = vim.g.proxy },
+      yaml = {
+        hover = true,
+        schemaStore = {
+          enable = true,
+          url = "https://www.schemastore.org/api/json/catalog.json",
+        },
+        schemaDownload = { enable = true },
+        -- Use schemastore
+        -- schemaStore = {
+        --   -- You must disable built-in schemaStore support if you want to use
+        --   -- this plugin and its advanced options like `ignore`.
+        --   enable = false,
+        --   -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
+        --   url = "",
+        -- },
+        -- schemas = require("schemastore").yaml.schemas({
+        --   extra = {
+        --     {
+        --       description = "Local openapi schema",
+        --       fileMatch = "*openapi.yaml",
+        --       name = "openapi.yaml",
+        --       url = vim.fn.expand("$VIMFILES/openapi-schema.json"),
+        --     },
+        --   },
+        -- }),
+      },
+    },
+  }
+}
+lspconfig.yamlls.setup(yamlls_cfg)
 -- }}}
 
 -- other languages {{{2
