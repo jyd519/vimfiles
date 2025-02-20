@@ -52,7 +52,6 @@ function! PreviewMindmap()
   let b:job = jobstart("markmap -w " . expand("%:p"), { "detach": 1})
 endfunction
 
-
 function! TableFormat()
     let l:pos = getpos('.')
     normal! {
@@ -125,6 +124,9 @@ nmap <buffer> <space><space> ysiw`
 
 nmap <buffer> <LocalLeader>p :call mdip#MarkdownClipboardImage()<CR>
 nmap <buffer> <LocalLeader>tf :call TableFormat()<cr>
+
+vnoremap <buffer> <leader>tf :'<,'>!prettier --parser markdown<cr>
+nnoremap <buffer> <leader>tf vip:'<,'>!prettier --parser markdown<cr>
 
 nmap <buffer> <LocalLeader>1 :call setline('.', substitute(getline('.'), '^#* *', '# ', ''))<cr>
 nmap <buffer> <LocalLeader>2 :call setline('.', substitute(getline('.'), '^#* *', '## ', ''))<cr>

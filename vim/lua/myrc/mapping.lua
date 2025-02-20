@@ -215,6 +215,7 @@ if vim.g.mysnippets_dir then
       },
       attach_mappings = function()
         local action_state = require("telescope.actions.state")
+        local actions = require("telescope.actions")
         actions.select_default:replace(function(prompt_bufnr)
           actions.close(prompt_bufnr)
           local selection = action_state.get_selected_entry()

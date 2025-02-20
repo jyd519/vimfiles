@@ -49,8 +49,21 @@ telescope.setup({
             require("telescope.actions").close(prompt_bufnr)
             -- Depending on what you want put `cd`, `lcd`, `tcd`
             vim.cmd(string.format("silent lcd %s", dir))
-          end
-        }
+          end,
+          -- ["h"] =  function(prompt_bufnr)
+          --   -- https://github.com/nvim-telescope/telescope.nvim/issues/2016
+          --   -- local current_picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
+          --   -- put(current_picker)
+          --   -- local opts = {
+          --   --   hidden = true,
+          --   --   default_text = current_picker:_get_prompt(),
+          --   --   -- TODO: copy other relevant state :/
+          --   -- }
+          --   --
+          --   -- require("telescope.actions").close(prompt_bufnr)
+          --   -- require("telescope.builtin").find_files(opts)
+          -- end
+        },
       }
     },
   },
