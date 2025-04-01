@@ -1,6 +1,9 @@
 -- Globals {{{2
 local vim = vim
 local keymap = vim.keymap
+
+vim.g.enable_inlay_hint = true
+
 keymap.amend = prequire("keymap-amend")
 local function augroup(name) return vim.api.nvim_create_augroup("myrc_" .. name, { clear = true }) end
 -- }}}
@@ -87,10 +90,12 @@ vim.api.nvim_create_user_command("Format", function() vim.lsp.buf.format({ async
   desc = "Format the current buffer",
 })
 vim.api.nvim_create_user_command("InlayHintToggle", function()
-  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({bufnr = vim.api.nvim_get_current_buf()}))
   if vim.lsp.inlay_hint.is_enabled() then
+    vim.g.enable_inlay_hint = true
     vim.notify("Inlay hints disabled", vim.log.levels.INFO, { title = "LSP" })
   else
+    vim.g.enable_inlay_hint = false
     vim.notify("Inlay hints enabled", vim.log.levels.INFO, { title = "LSP" })
   end
 end, {
@@ -288,7 +293,7 @@ end, { desc = "Toggle Symbols Outline" })
 --Toggle LSP{{{2
 local toggle_lsp_client = function()
   local buf = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_active_clients({ bufnr = buf })
+  local clients = vim.lsp.get_clients({ bufnr = buf })
   if not vim.tbl_isempty(clients) then
     vim.cmd("LspStop")
   else
@@ -299,7 +304,7 @@ end
 
 local start_lsp_client = function()
   local buf = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_active_clients({ bufnr = buf })
+  local clients = vim.lsp.get_clients({ bufnr = buf })
   if not vim.tbl_isempty(clients) then
     vim.cmd("LspRestart")
     vim.notify("Restarting LSP Server", vim.log.levels.INFO, { title = "LSP" })
@@ -311,6 +316,7 @@ end
 
 vim.keymap.set("n", "<leader>lt", toggle_lsp_client, { desc = "Toggle LSP server" })
 vim.keymap.set("n", "<leader>lr", start_lsp_client, { desc = "Start/Restart LSP Server" })
+vim.keymap.set("n", "<leader>li", "<cmd>InlayHintToggle<cr>", { desc = "Toggle Inlay Hint" })
 --- }}}
 
 -- Supper K {{{2

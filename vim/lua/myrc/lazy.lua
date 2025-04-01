@@ -24,9 +24,14 @@ require("lazy").setup(
     { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
     {
       "nvim-treesitter/nvim-treesitter",
-      -- tag = "v0.9.3",
-      event = { "BufReadPost", "BufNewFile" },
+      version = false, -- last release is way too old and doesn't work on Windows
+      event = { "VeryLazy" },
+      cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
+      lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
       config = function() require("myrc.config.treesitter") end,
+    },
+    {
+      "nvim-treesitter/nvim-treesitter-textobjects"
     },
     {
       "dstein64/vim-startuptime",
@@ -215,6 +220,7 @@ require("lazy").setup(
     },
     {
       "olimorris/codecompanion.nvim",
+      event = { "VeryLazy" },
       dependencies = {
         "nvim-lua/plenary.nvim",
         "nvim-treesitter/nvim-treesitter",
@@ -291,7 +297,7 @@ require("lazy").setup(
       },
       cmd = { "GhostTextStart", "GhostTextStop" },
     },
-  -- }}}
+    -- }}}
     {
       "pmizio/typescript-tools.nvim",
       dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
@@ -495,6 +501,16 @@ require("lazy").setup(
         { "ChristianChiarulli/neovim-codicons", lazy = true },
         { "arkav/lualine-lsp-progress" },
       },
+      init = function()
+        vim.g.lualine_laststatus = vim.o.laststatus
+        if vim.fn.argc(-1) > 0 then
+          -- set an empty statusline till lualine loads
+          vim.o.statusline = " "
+        else
+          -- hide the statusline on the starter page
+          vim.o.laststatus = 0
+        end
+      end,
       config = function() require("myrc.config.lualine") end,
     },
     -- 2}}}

@@ -17,7 +17,7 @@ Hydra({
 
 -- Draw Diagram{{{2
 local venn_hint = [[
- Arrow^^^^^^   Select region with <C-v> 
+ Arrow^^^^^^   Select region with <C-v>
  ^ ^ _K_ ^ ^   _b_: surround it with box
  _H_ ^ ^ _L_
  ^ ^ _J_ ^ ^                      _<Esc>_
@@ -96,9 +96,9 @@ Hydra({
 --
 local dap_hint = [[
  ^_,b_^: ^toggle breakpoint     ^_,S_/_<F5>_^: ^start/continue
- ^_,c_^: ^continue              ^_,r_     ^^^: ^run to cursor        
- ^_,x_: stop  ^^                ^_,p_^: ^open repl ^         _,u_: ^toggle UI             
- ^_,n_/_<F10>_: step over       _,i_/_<F11>_^: ^step into    ^_,o_/_<F12>_^: ^step out  
+ ^_,c_^: ^continue              ^_,r_     ^^^: ^run to cursor
+ ^_,x_: stop  ^^                ^_,p_^: ^open repl ^         _,u_: ^toggle UI
+ ^_,n_/_<F10>_: step over       _,i_/_<F11>_^: ^step into    ^_,o_/_<F12>_^: ^step out
  ^_,T_: ^clear breakpoints ^    ^^_,B_: ^conditional breakpoint
  ^_,e_/_,E_: evaluate input     ^_q_^: ^exit
 ]]
@@ -287,7 +287,7 @@ local telescope_hint = [[
   🭅█ ▁     █🭐
   ██🬿      🭊██   _r_: resume      _u_: undotree
  🭋█🬝🮄🮄🮄🮄🮄🮄🮄🮄🬆█🭀  _h_: vim help    _c_: execute command
- 🭤🭒🬺🬹🬱🬭🬭🬭🬭🬵🬹🬹🭝🭙  _k_: keymaps     _;_: commands history 
+ 🭤🭒🬺🬹🬱🬭🬭🬭🬭🬵🬹🬹🭝🭙  _k_: keymaps     _;_: commands history
                  _O_: options     _?_: search history
  ^
                  _<Enter>_: Telescope           _<Esc>_
