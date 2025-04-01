@@ -1,0 +1,20 @@
+if(ENABLE_FFMPEG)
+  message(INFO ">>>>${ffmpeg_PACKAGE_FOLDER_RELEASE}")
+
+  if(WIN32)
+    file(GLOB FFMPEG_BIN_FILES "$ENV{FFMPEG_ROOT}/bin/*.exe"
+         "$ENV{FFMPEG_ROOT}/bin/*.dll")
+  else()
+    file(GLOB FFMPEG_BIN_FILES "${ffmpeg_PACKAGE_FOLDER_RELEASE}/lib/*")
+  endif()
+
+  message(INFO ">>> COPY FFmpeg shared files: ${FFMPEG_BIN_FILES}")
+
+  add_custom_command(
+    TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different ${FFMPEG_BIN_FILES} $<TARGET_FILE_DIR:${PROJECT_NAME}>
+    COMMAND
+      ${CMAKE_COMMAND} -E copy_if_different ${FFMPEG_BIN_FILES} ${BIN_DIR})
+endif()
