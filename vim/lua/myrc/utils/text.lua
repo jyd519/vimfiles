@@ -29,4 +29,26 @@ function M.getCurrentParagraph()
   return result
 end
 
+M.trim = function(str)
+  return (str:gsub("^%s*(.-)%s*$", "%1"))
+end
+
+M.starts_with = function(str, start)
+  return str:sub(1, #start) == start
+end
+
+M.end_with = function(str, ending)
+  return ending == "" or str:sub(- #ending) == ending
+end
+
+M.split = function(s, delimiter)
+  local result = {}
+  for match in (s .. delimiter):gmatch("(.-)" .. delimiter) do
+    table.insert(result, match)
+  end
+
+  return result
+end
+
+
 return M

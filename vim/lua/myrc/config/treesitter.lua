@@ -13,7 +13,7 @@ treesitter.setup({
   highlight = {
     enable = true, -- false will disable the whole extension
     disable = function(lang, buf)
-      if vim.list_contains({ "vimdoc", "help", }, lang) then return true end
+      if vim.list_contains({ "vimdoc", "help" }, lang) then return true end
 
       -- if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
 
@@ -23,12 +23,12 @@ treesitter.setup({
     -- additional_vim_regex_highlighting = false,
   },
   incremental_selection = {
-    enable = true,
+    enable = false,
     keymaps = {
-      init_selection = "gnn",
-      node_incremental = "grn",
-      scope_incremental = "grc",
-      node_decremental = "grm",
+      init_selection = "<leader>gnn",
+      node_incremental = "<leader>grn",
+      scope_incremental = "<leader>grc",
+      node_decremental = "<leader>grm",
     },
   },
   refactor = {
@@ -44,6 +44,28 @@ treesitter.setup({
 
   -- textobjects
   textobjects = {
+    move = {
+      enable = true,
+      set_jumps = true, -- whether to set jumps in the jumplist
+      goto_next_start = {
+        ["]]"] = "@jsx.element",
+        ["]f"] = "@function.outer",
+        ["]m"] = "@class.outer",
+      },
+      goto_next_end = {
+        ["]F"] = "@function.outer",
+        ["]M"] = "@class.outer",
+      },
+      goto_previous_start = {
+        ["[["] = "@jsx.element",
+        ["[f"] = "@function.outer",
+        ["[m"] = "@class.outer",
+      },
+      goto_previous_end = {
+        ["[F"] = "@function.outer",
+        ["[M"] = "@class.outer",
+      },
+    },
     select = {
       enable = true,
 
@@ -69,9 +91,9 @@ treesitter.setup({
       -- and should return the mode ('v', 'V', or '<c-v>') or a table
       -- mapping query_strings to modes.
       selection_modes = {
-        ['@parameter.outer'] = 'v', -- charwise
-        ['@function.outer'] = 'V', -- linewise
-        ['@class.outer'] = '<c-v>', -- blockwise
+        ["@parameter.outer"] = "v", -- charwise
+        ["@function.outer"] = "V", -- linewise
+        ["@class.outer"] = "<c-v>", -- blockwise
       },
       -- If you set this to `true` (default is `false`) then any textobject is
       -- extended to include preceding or succeeding whitespace. Succeeding
@@ -94,9 +116,7 @@ treesitter.setup({
         ["<leader>sN"] = "@parameter.inner",
       },
     },
-
   },
-
 })
 
 local has_parser = require("nvim-treesitter.parsers").has_parser
@@ -112,4 +132,3 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
-
