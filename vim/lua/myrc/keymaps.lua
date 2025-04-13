@@ -298,7 +298,7 @@ if vim.g.notes_dir then
 end
 
 -- Live grep
-vim.api.nvim_create_user_command("Rg", function(args)
+vim.api.nvim_create_user_command("Grep", function(args)
   local builtin = require("telescope.builtin")
   if args.args ~= "" then
     builtin.grep_string({ search = args.args })
@@ -578,7 +578,7 @@ if vim.fn.executable('rg') == 1 then
   end, { nargs = '*', complete = 'file', bar = true })
 
   -- Jump to definition under cursor
-  vim.keymap.set('n', 'gs', ':Ag <cword><CR>', { silent = true })
+  vim.keymap.set('n', 'gs', ':Rg <C-R><C-W><CR>', { silent = true })
 elseif vim.fn.executable('ag') == 1 then
   -- Use ag over grep
   vim.opt.grepprg = 'ag --vimgrep $*'

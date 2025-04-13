@@ -2,7 +2,7 @@ local g, fn = vim.g, vim.fn
 
 return {
   {
-    "mhinz/vim-startify",   
+    "mhinz/vim-startify",
     enabled = true,
     init = function() g.startify_files_number = 5 end,
   },
@@ -48,6 +48,11 @@ return {
     version = "*",
     event = "VeryLazy",
     config = function() require("myrc.config.hop") end,
+  },
+  {
+    "doums/rg.nvim",
+    cmd = { "Rg", "Rgf", "Rgp", "Rgfp" },
+    config = true,
   },
   {
     "nvimtools/hydra.nvim",
