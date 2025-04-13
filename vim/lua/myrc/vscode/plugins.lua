@@ -22,7 +22,6 @@ require("lazy").setup(
   {
     {
       "nvim-treesitter/nvim-treesitter",
-      -- tag = "v0.9.3",
       event = { "BufReadPost", "BufNewFile" },
       config = function() require("myrc.config.treesitter") end,
     },

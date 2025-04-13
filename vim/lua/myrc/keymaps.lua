@@ -1,11 +1,99 @@
 -- Globals {{{2
 local vim = vim
 local keymap = vim.keymap
+keymap.amend = prequire("keymap-amend")
 
 vim.g.enable_inlay_hint = true
+-- }}}
 
-keymap.amend = prequire("keymap-amend")
-local function augroup(name) return vim.api.nvim_create_augroup("myrc_" .. name, { clear = true }) end
+-- General {{{2
+--
+-- Quick switch to normal mode
+vim.keymap.set('i', 'jj', '<ESC>', { noremap = true })
+-- Insert a blank line
+vim.keymap.set('i', '<C-Return>', '<CR><CR><C-o>k<Tab>"', { noremap = true })
+
+-- Quick editing myvimrc
+vim.keymap.set('n', '<leader>ei', ':e! <C-r>=g:myinitrc<CR><CR>', { noremap = true })
+vim.keymap.set('n', '<leader>ev', ':e! $MYVIMRC<CR>', { noremap = true })
+vim.keymap.set('n', '<leader>ss', ':source %<cr>', { noremap = true })
+
+-- Move to window using the <ctrl> hjkl keys
+vim.keymap.set('n', '<C-j>', '<C-W>j', { noremap = true })
+vim.keymap.set('n', '<C-k>', '<C-W>k', { noremap = true })
+vim.keymap.set('n', '<C-h>', '<C-W>h', { noremap = true })
+vim.keymap.set('n', '<C-l>', '<C-W>l', { noremap = true })
+
+-- Tab management
+vim.keymap.set('n', '<leader>tn', ':tabnew %<cr>', { noremap = true })
+vim.keymap.set('n', '<leader>tc', ':tabclose<cr>', { noremap = true })
+vim.keymap.set('n', '<leader>tm', ':tabmove', { noremap = true })
+
+-- Switch to current dir
+vim.keymap.set('n', '<leader>CD', ':lcd %:p:h<cr>:pwd<cr>', { noremap = true })
+
+-- Delete current line without yanking the line breaks
+vim.keymap.set('n', 'dil', '^d$', { noremap = true })
+-- Yank current line without the line breaks
+vim.keymap.set('n', 'yil', '^y$', { noremap = true })
+vim.keymap.set('v', 'p', '"_dP', { noremap = true })
+
+-- Move to begin of line / end to line
+vim.keymap.set('i', '<C-e>', '<Esc>A', { noremap = true })
+vim.keymap.set('i', '<C-a>', '<Esc>I', { noremap = true })
+vim.keymap.set('c', '<C-a>', '<C-b>', { noremap = true })
+
+-- Ctrl-V Paste from clipboard
+if vim.fn.has("mac") == 0 then
+  vim.keymap.set('c', '<C-V>', '<c-r>+', { noremap = true })
+  vim.keymap.set('i', '<C-V>', '<c-r>+', { noremap = true })
+end
+
+-- Editing a protected file as 'sudo'
+vim.api.nvim_create_user_command('W', 'w !sudo tee % > /dev/null', { bang = true })
+
+-- Open with browser
+if vim.fn.has("win32") == 1 then
+  vim.keymap.set('n', '<leader>o', ':update<cr>:silent !start chrome.exe "file://%:p"<cr>', { noremap = true })
+end
+if vim.fn.has("mac") == 1 then
+  vim.keymap.set('n', '<leader>o', ':update<cr>:silent !open -a "Google Chrome" "%:p"<cr>:redraw!<cr>', { noremap = true })
+end
+
+-- Terminal
+-- to exit terminal-mode
+vim.keymap.set('t', '<Esc>', '<C-\\><C-n>', { noremap = true })
+vim.keymap.set('t', '<C-h>', '<C-\\><C-N><C-w>h', { noremap = true })
+vim.keymap.set('t', '<C-j>', '<C-\\><C-N><C-w>j', { noremap = true })
+vim.keymap.set('t', '<C-k>', '<C-\\><C-N><C-w>k', { noremap = true })
+vim.keymap.set('t', '<C-l>', '<C-\\><C-N><C-w>l', { noremap = true })
+-- Search for visually selected text
+vim.keymap.set('v', '*', function() require('misc').SearchVisualTextDown() end, { silent = true, noremap = true })
+vim.keymap.set('v', '#', function() require('misc').SearchVisualTextUp() end, { silent = true, noremap = true })
+
+-- Zoom / Restore window
+vim.api.nvim_create_user_command('ZoomToggle', function() require('misc').ZoomToggle() end, {})
+vim.keymap.set('n', '<leader>z', function() require('misc').ZoomToggle() end, { silent = true, noremap = true })
+
+-- quickfix
+vim.keymap.set('n', '<F2>', function() require('qf').ToggleQuickFix() end, { silent = true, noremap = true })
+vim.keymap.set('n', '<S-F2>', function() require('qf').ToggleLocationList() end, { silent = true, noremap = true })
+vim.keymap.set('n', '<leader>xq', function() require('qf').ToggleQuickFix() end, { silent = true, noremap = true })
+vim.keymap.set('n', '<leader>xl', function() require('qf').ToggleLocationList() end, { silent = true, noremap = true })
+
+-- enable osc52 copying for remote ssh connection
+if vim.env.SSH_CONNECTION ~= "" and vim.g.is_vim then
+  vim.keymap.set('n', '<leader>y', '<Plug>OSCYankVisual', { noremap = true })
+end
+
+-- Font zoom in/out
+vim.keymap.set('n', '<C-=>', function() require('zoom').ZoomIn() end, { silent = true, noremap = true })
+vim.keymap.set('n', '<C-->', function() require('zoom').ZoomOut() end, { silent = true, noremap = true })
+
+-- aes-vim
+vim.keymap.set('v', '<leader>ec', ':AesEnc<cr>', { noremap = true })
+vim.keymap.set('n', '<leader>ed', ':AesDec<cr>', { noremap = true })
+
 -- }}}
 
 -- Cancel search highlighting {{{2
@@ -53,79 +141,7 @@ end, {
 vim.api.nvim_set_keymap("n", "<leader>td", "<cmd>Dark<CR>", { noremap = true })
 -- }}}
 
--- Handling large file{{{2
--- https://www.reddit.com/r/neovim/comments/z85s1l/disable_lsp_for_very_large_files/
-vim.api.nvim_create_autocmd({ "BufReadPre" }, {
-  callback = function()
-    vim.b.large_buf = false
-    local bufname = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
-    if vim.fn.fnamemodify(bufname, ":e") == "log" then
-      if vim.api.nvim_buf_line_count(vim.api.nvim_get_current_buf()) > 200000 then
-        vim.b.large_buf = true
-        vim.b.copilot_enabled = false
-        vim.b.codeium_enabled = false
-        vim.opt.foldmethod = "manual"
-        vim.opt.spell = false
-      end
-      return
-    end
-    local ok, stats = pcall(vim.loop.fs_stat, bufname)
-    if ok and stats and (stats.size > 1000000) then
-      vim.b.large_buf = true
-      vim.cmd("syntax off")
-      vim.g.indent_blankline_enabled = false
-      vim.b.copilot_enabled = false
-      vim.b.codeium_enabled = false
-      vim.opt.foldmethod = "manual"
-      vim.opt.spell = false
-    end
-  end,
-  group = augroup("large_buf"),
-  pattern = "*",
-})
--- }}}
-
--- Lsp formatting {{{2
-vim.api.nvim_create_user_command("Format", function() vim.lsp.buf.format({ async = true }) end, {
-  desc = "Format the current buffer",
-})
-vim.api.nvim_create_user_command("InlayHintToggle", function()
-  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({bufnr = vim.api.nvim_get_current_buf()}))
-  if vim.lsp.inlay_hint.is_enabled() then
-    vim.g.enable_inlay_hint = true
-    vim.notify("Inlay hints disabled", vim.log.levels.INFO, { title = "LSP" })
-  else
-    vim.g.enable_inlay_hint = false
-    vim.notify("Inlay hints enabled", vim.log.levels.INFO, { title = "LSP" })
-  end
-end, {
-  desc = "Toggle LSP Inlay-Hint",
-})
--- }}}
-
--- Close some filetypes with <q> {{{2
-vim.api.nvim_create_autocmd("FileType", {
-  group = augroup("close_with_q"),
-  pattern = {
-    "PlenaryTestPopup",
-    "help",
-    "lspinfo",
-    "man",
-    "notify",
-    "qf",
-    "query", -- :InspectTree
-    "spectre_panel",
-    "startuptime",
-    "tsplayground",
-  },
-  callback = function(event)
-    vim.bo[event.buf].buflisted = false
-    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
-  end,
-})
--- }}}
-
--- {{{2 Telescope
+-- {{{2 Telescope Mappings
 vim.keymap.set(
   "n",
   "<leader>xa",
@@ -144,7 +160,7 @@ vim.keymap.set(
   "v",
   "<leader>rf",
   "<Esc><cmd>lua require('telescope').extensions.refactoring.refactors()<CR>",
-  { noremap = true, desc = "refactoring" }
+  { noremap = true, desc = "Refactoring" }
 )
 
 vim.keymap.set(
@@ -165,7 +181,19 @@ vim.keymap.set(
   "n",
   "<leader>ff",
   function() require("telescope.builtin").find_files({ previewer = false }) end,
-  { silent = true, desc = "find files" }
+  { silent = true, desc = "Find Files" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>f.",
+  function() require("telescope.builtin").find_files({ cwd = vim.fn.expand("%:p:h") }) end,
+  { silent = true, desc = "Find Files in current directory" }
+)
+vim.keymap.set(
+  "n",
+  "<leader>fw",
+  function() require("telescope.builtin").grep_string({}) end,
+  { silent = true, desc = "Grep the current word" }
 )
 
 vim.keymap.set("n", "<C-p>", "<cmd>Telescope find_files<cr>", { desc = "Find files" })
@@ -179,7 +207,7 @@ vim.keymap.set("n", "<leader>b", "<cmd>Telescope buffers<cr>", { desc = "List bu
 vim.keymap.set("n", "<leader>fp", function()
   require("lazy").load({ plugins = { "project.nvim" } })
   vim.schedule(function() vim.cmd("Telescope projects") end)
-end, { desc = "Find Project" })
+end, { desc = "Find projects" })
 
 vim.keymap.set(
   "n",
@@ -246,7 +274,7 @@ if vim.g.mysnippets_dir then
     nargs = "*",
     desc = "Select a template to use",
   })
-  vim.keymap.set("n", "<leader>ft", "<cmd>Ft<cr>", { desc = "Find in templates" })
+  vim.keymap.set("n", "<leader>ft", "<cmd>Ft<cr>", { desc = "Find templates" })
 end
 
 -- browse my notes
@@ -263,11 +291,43 @@ if vim.g.notes_dir then
     require("telescope.builtin").find_files(find_opts)
   end, {
     nargs = "*",
-    complete = function() return vim.fn.map(vim.fn.globpath(vim.g.notes_dir, "*", 0), "v:val[len(g:notes_dir)+1:]") end,
+    complete = function() return vim.fn.map(vim.fn.globpath(vim.g.notes_dir, "*", false), "v:val[len(g:notes_dir)+1:]") end,
     desc = "Find and view notes",
   })
-  vim.keymap.set("n", "<leader>fn", "<cmd>Notes<cr>", { desc = "Find in notes" })
+  vim.keymap.set("n", "<leader>fn", "<cmd>Notes<cr>", { desc = "Find notes" })
 end
+
+-- Live grep
+vim.api.nvim_create_user_command("Rg", function(args)
+  local builtin = require("telescope.builtin")
+  if args.args ~= "" then
+    builtin.grep_string({ search = args.args })
+  else
+    builtin.live_grep()
+  end
+end, {
+  nargs = "*",
+  desc = "Live grep",
+})
+
+-- }}}
+
+-- Lsp formatting {{{2
+vim.api.nvim_create_user_command("Format", function() vim.lsp.buf.format({ async = true }) end, {
+  desc = "Format the current buffer",
+})
+vim.api.nvim_create_user_command("InlayHintToggle", function()
+  vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = vim.api.nvim_get_current_buf() }))
+  if vim.lsp.inlay_hint.is_enabled() then
+    vim.g.enable_inlay_hint = true
+    vim.notify("Inlay hints disabled", vim.log.levels.INFO, { title = "LSP" })
+  else
+    vim.g.enable_inlay_hint = false
+    vim.notify("Inlay hints enabled", vim.log.levels.INFO, { title = "LSP" })
+  end
+end, {
+  desc = "Toggle LSP Inlay-Hint",
+})
 -- }}}
 
 -- {{{2 Toggle Treesitter
@@ -433,4 +493,154 @@ vim.api.nvim_set_keymap(
 vim.cmd([[cab cc CodeCompanion]])
 vim.cmd([[cab ccc CodeCompanionChat]])
 --}}}
+
+-- Cancel search highlighting {{{2
+if keymap.amend then
+  keymap.amend("n", "<Esc>", function(original)
+    if vim.v.hlsearch and vim.v.hlsearch == 1 then
+      vim.cmd("nohlsearch")
+    end
+    original()
+  end, { desc = "disable search highlight" })
+end
+-- }}}
+
+-- Lookup ansible-doc {{{2
+vim.api.nvim_create_user_command("Adoc", function(args)
+  vim.cmd(
+    "new | setlocal buftype=nofile bufhidden=hide noswapfile ft=man sw=4 |" .. "r !ansible-doc " .. args.args .. ""
+  )
+  vim.defer_fn(function()
+    vim.cmd('exec "norm ggM"')
+  end, 100)
+end, {
+  nargs = "+",
+  desc = "Lookup ansible document",
+})
+-- }}}
+
+-- Toggle Dark-Mode{{{2
+vim.api.nvim_create_user_command("Dark", function(args)
+  if vim.env.LC_TERMINAL ~= "iTerm2" then
+    if vim.o.background == "light" then
+      vim.o.background = "dark"
+    else
+      vim.o.background = "light"
+    end
+    return
+  end
+  --  Switch iTerm2 profile based on light/dark mode
+  if vim.o.background == "light" then
+    vim.o.background = "dark"
+    vim.loop.fs_write(2, "\27Ptmux;\27\27]1337;SetProfile=Default-dark\7\27\\", -1)
+  else
+    vim.o.background = "light"
+    vim.loop.fs_write(2, "\27Ptmux;\27\27]1337;SetProfile=Default\7\27\\", -1)
+  end
+end, {
+  desc = "Toggle dark mode",
+})
+
+vim.api.nvim_set_keymap("n", "<leader>td", "<cmd>Dark<CR>", { noremap = true })
+
+-- Lsp formatting {{{2
+vim.api.nvim_create_user_command("Format", function()
+  vim.lsp.buf.format({ async = true })
+end, {
+  desc = "Format the current buffer",
+})
+-- }}}
+
+if vim.g.enabled_plugins.tmux == 1 then
+  vim.keymap.set('n', '<c-h>', ':TmuxNavigateLeft<cr>', { silent = true })
+  vim.keymap.set('n', '<c-j>', ':TmuxNavigateDown<cr>', { silent = true })
+  vim.keymap.set('n', '<c-k>', ':TmuxNavigateUp<cr>', { silent = true })
+  vim.keymap.set('n', '<c-l>', ':TmuxNavigateRight<cr>', { silent = true })
+end
+
+vim.keymap.set('n', '<leader>L', '<Plug>(ale_lint)', { noremap = true, silent = false })
+vim.keymap.set('n', '<leader>xF', '<Plug>(ale_fix)', { noremap = true, silent = false })
+
+vim.keymap.set("v", "ga", "<Plug>(EasyAlign)")
+vim.keymap.set("x", "ga", "<Plug>(EasyAlign)")
+
+vim.cmd("tnoremap <C-o> <C-\\><C-n>")
+
+-- Fast Search
+if vim.fn.executable('rg') == 1 then
+  -- Use rg over grep
+  vim.opt.grepprg = 'rg --vimgrep --no-heading --smart-case --hidden'
+  vim.opt.grepformat = '%f:%l:%c%m'
+
+  -- Ag command
+  vim.api.nvim_create_user_command('Ag', function(args)
+    vim.cmd('silent! grep! ' .. args.args .. '|cwindow|redraw!')
+  end, { nargs = '*', complete = 'file', bar = true })
+
+  -- Jump to definition under cursor
+  vim.keymap.set('n', 'gs', ':Ag <cword><CR>', { silent = true })
+elseif vim.fn.executable('ag') == 1 then
+  -- Use ag over grep
+  vim.opt.grepprg = 'ag --vimgrep $*'
+  vim.opt.grepformat = '%f:%l:%c%m'
+
+  -- Ag command
+  vim.api.nvim_create_user_command('Ag', function(args)
+    vim.cmd('silent! grep! ' .. args.args .. '|cwindow|redraw!')
+  end, { nargs = '*', complete = 'file', bar = true })
+
+  -- Jump to definition under cursor
+  vim.keymap.set('n', 'gs', ':Ag <cword><CR>', { silent = true })
+end
+
+-- Trailing whitespace and tabs are forbidden, so highlight them.
+vim.cmd([[
+  highlight ForbiddenWhitespace ctermbg=red guibg=red
+]], false)
+
+vim.api.nvim_create_augroup("TrailingSpace", { clear = true })
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  group = "TrailingSpace",
+  pattern = { "python", "c", "sh", "javascript", "typescript", "vim", "lua" },
+  callback = function()
+    vim.cmd("match ForbiddenWhitespace /\\s\\+$/")
+  end,
+})
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  group = "TrailingSpace",
+  pattern = { "python", "c", "cpp", "sh", "javascript", "typescript" },
+  callback = function()
+    vim.cmd("autocmd BufWritePre * :call TrimTrailingWhitespaces()")
+  end,
+})
+
+local function show_spaces(arg)
+  vim.cmd("let @/='\\v(\\s+$)|( +\\ze\\t)'")
+  local old_hlsearch = vim.o.hlsearch
+  if arg == nil then
+    vim.o.hlsearch = not vim.o.hlsearch
+  else
+    vim.o.hlsearch = arg
+  end
+  return old_hlsearch
+end
+
+local function trim_trailing_whitespaces(firstline, lastline)
+  local old_hlsearch = show_spaces(true)
+  vim.cmd(firstline .. "," .. lastline .. "substitute /\\s\\+$//ge")
+  vim.o.hlsearch = old_hlsearch
+end
+
+vim.api.nvim_create_user_command("ShowSpaces", function(opts)
+  if (opts.args == "") then
+    show_spaces(nil)
+  else
+    show_spaces(opts.args == "1")
+  end
+end, { nargs = "?" })
+
+vim.api.nvim_create_user_command("TrimSpaces", function(opts)
+  trim_trailing_whitespaces(opts.line1, opts.line2)
+end, { range = true, nargs = 0 })
+
 -- vim: set fdm=marker fdl=1: }}}

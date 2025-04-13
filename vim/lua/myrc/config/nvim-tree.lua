@@ -33,3 +33,7 @@ require("nvim-tree").setup({
     dotfiles = true,
   },
 })
+
+vim.keymap.set("n", "<F3>", ":NvimTreeToggle<cr>", { desc = "Toggle NvimTree" })
+vim.keymap.set("n", "<leader>nf", ":NvimTreeFindFile<cr>", { desc = "Find File in NvimTree" })
+vim.keymap.set("n", "<leader>nF", ":NvimTreeFindFile!<cr>", { desc = "Find File in NvimTree" })

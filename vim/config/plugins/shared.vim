@@ -1,8 +1,7 @@
 " Plugins shared between neovim and vim8
-" emmet-vim {{{
+" emmet-vim
 "--------------------------------------------------------------------------------
 let g:user_emmet_leader_key=','
-" }}}
 
 " UltiSnips {{{
 "--------------------------------------------------------------------------------
@@ -46,20 +45,17 @@ let g:tex_conceal = ""
 let g:vim_markdown_math = 1
 let g:mdip_imgdir='images'
 
-if g:is_vim
 " vim supports fenced code syntax
 "  -> https://vimtricks.com/p/highlight-syntax-inside-markdown/
-  let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html", "swift",
-        \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml", "cmake", "make",
-        \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
-endif
+let g:markdown_fenced_languages=["cpp", "c", "css", "rust", "lua", "vim", "bash", "sh=bash", "go", "html", "swift",
+      \ "yaml", "yml=yaml", "dockerfile", "objc", "objcpp", "conf", "toml", "cmake", "make",
+      \  "javascript", "js=javascript", "typescript", "ts=typescript", "json=javascript", "python"]
 " }}}
 
 " ALE {{{
 "--------------------------------------------------------------------------------
 let g:ale_enabled = 1
 let g:ale_disable_lsp = 1
-let g:ale_use_neovim_diagnostics_api = g:is_nvim
 let g:ale_set_quickfix = 0
 let g:ale_set_loclist = 1
 let g:ale_open_list=1
@@ -107,37 +103,6 @@ let g:session_autosave_periodic=0
 " }}}
 
 " fzf/telescope {{{1
-if get(g:enabled_plugins, "fzf-lua", 0)
-  " https://github.com/ibhagwan/fzf-lua
-  nnoremap <C-P> <cmd>lua require('fzf-lua').files({cwd_prompt = false, prompt="Files> "})<CR>
-  nnoremap <leader>ff <cmd>lua require('fzf-lua').files({ cwd_prompt = false, prompt="Files> ", fzf_opts = {['--layout'] = 'reverse-list'} })<CR>
-  nnoremap <leader>ft <cmd>lua require('fzf-lua').files({ cwd_prompt = false, prompt="Notes> ", fzf_opts = {['--layout'] = 'reverse-list'}, cwd=vim.g.mysnippets_dir })<CR>
-  nnoremap <leader>fm <cmd>lua require('fzf-lua').marks()<CR>
-  nnoremap <leader>fo <cmd>lua require('fzf-lua').oldfiles()<CR>
-  nnoremap <leader>fb <cmd>lua require('fzf-lua').buffers()<CR>
-  nnoremap <leader>fx <cmd>lua require('fzf-lua').quickfix()<CR>
-  nnoremap <leader>fl <cmd>lua require('fzf-lua').loclist()<CR>
-  nnoremap <leader>fg <cmd>lua require('fzf-lua').git_files()<CR>
-  nnoremap <leader>fs <cmd>lua require('fzf-lua').lsp_document_symbols()<CR>
-  if exists('g:notes_dir') && executable("rg")
-    "RIPGREP_CONFIG_PATH=~/.ripgreprc
-    nnoremap <leader>fn <cmd>lua require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case ---glob "*.md"', cwd = vim.g.notes_dir })<CR>
-    lua << EOF
-    vim.api.nvim_buf_create_user_command(0, 'Notes',
-      function(opts)
-        require('fzf-lua').files({ cwd_prompt=false, cmd='rg --files --hidden --smart-case --glob "*.md" ' .. opts.fargs[1], cwd = vim.g.notes_dir })
-      end,
-      { nargs = 1,
-        complete = function(ArgLead, CmdLine, CursorPos)
-          return vim.fn.readdir(vim.g.notes_dir, function (filename)
-            return  vim.fn.isdirectory(vim.g.notes_dir .. '/' .. filename) == 1 and string.sub(filename, 1, 1) ~= "."
-          end)
-      end,
-      })
-EOF
-  endif
-endif
-
 if get(g:enabled_plugins, "fzf.vim", 0)
   "--------------------------------------------------------------------------------
   " An action can be a reference to a function that processes selected lines
@@ -180,10 +145,6 @@ if get(g:enabled_plugins, "fzf.vim", 0)
       command! -nargs=? Notes call s:find_notes(<q-args>)
       nnoremap <leader>fn :Notes<CR>
     endif
-  endif
-  if has("nvim")
-    " Allow to press esc key to close fzf window
-    autocmd! FileType fzf tnoremap <buffer> <esc> <c-c>
   endif
 endif
 " }}}
@@ -250,15 +211,9 @@ endif
 
 " NERDTree {{{
 "--------------------------------------------------------------------------------
-if g:is_nvim
-  noremap <F3> :NvimTreeToggle<cr>
-  noremap <leader>nf :NvimTreeFindFile<cr>
-  noremap <leader>nF :NvimTreeFindFile!<cr>
-else
-  let g:NERDTreeWinSize=40
-  noremap <F3> :NERDTreeToggle<cr>
-  noremap <leader>nf :NERDTreeFind<cr>
-endif
+let g:NERDTreeWinSize=40
+noremap <F3> :NERDTreeToggle<cr>
+noremap <leader>nf :NERDTreeFind<cr>
 
 " }}}
 
@@ -314,10 +269,10 @@ let g:neoformat_enabled_html = ['prettierd', 'prettier','htmlbeautify']
 let g:neoformat_enabled_python = ['ruff', 'black', 'isort']
 " bugfix: https://github.com/sbdchd/neoformat/issues/486
 let g:neoformat_c_clangformat = {
-            \ 'exe': 'clang-format',
-            \ 'args': ['-assume-filename=', '"%:p"'],
-            \ 'stdin': 1,
-            \ }
+      \ 'exe': 'clang-format',
+      \ 'args': ['-assume-filename=', '"%:p"'],
+      \ 'stdin': 1,
+      \ }
 let g:neoformat_cpp_clangformat = g:neoformat_c_clangformat
 nmap <leader>F :Neoformat<CR>
 " }}}
@@ -325,12 +280,6 @@ nmap <leader>F :Neoformat<CR>
 " vim-test {{{
 "--------------------------------------------------------------------------------
 if get(g:enabled_plugins, "test", 0)
-  if g:is_nvim
-    let g:test#strategy = "neovim"
-    let g:test#neovim#start_normal = 0 " 1: enter normal mode
-    tnoremap <C-o> <C-\><C-n>
-  endif
-
   let test#javascript#runner = 'jest'
   let test#python#djangotest#options = '--keepdb'
   let test#rust#cargotest#options = '-- --nocapture'
@@ -384,32 +333,29 @@ let g:BufKillCreateMappings = 0  " bufkill.vim
 
 " vim plugins {{{
 "--------------------------------------------------------------------------------
-if !g:is_nvim
-  " Pascal configuration
-  "--------------------------------------------------------------------------------
-  autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
+" Pascal configuration
+"--------------------------------------------------------------------------------
+autocmd vimrc BufReadPost *.pas,*.dpr set suffixesadd=.pas,.dpr,.txt,.dfm,.inc
 
-  " vim-json
-  "--------------------------------------------------------------------------------
-  let g:vim_json_syntax_conceal = 0
+" vim-json
+"--------------------------------------------------------------------------------
+let g:vim_json_syntax_conceal = 0
 
-  " tcomment
-  "--------------------------------------------------------------------------------
-  let g:tcomment#options_comments = {'whitespace': 'left'}
-  let g:tcomment#options_commentstring = {'whitespace': 'left'}
+" tcomment
+"--------------------------------------------------------------------------------
+let g:tcomment#options_comments = {'whitespace': 'left'}
+let g:tcomment#options_commentstring = {'whitespace': 'left'}
 
-  " vim-session settings
-  "--------------------------------------------------------------------------------
-  let g:session_autosave='prompt'
-  let g:session_autoload='no'
-  let g:session_autosave_periodic=0
+" vim-session settings
+"--------------------------------------------------------------------------------
+let g:session_autosave='prompt'
+let g:session_autoload='no'
+let g:session_autosave_periodic=0
 
-  " Graphviz
-  "--------------------------------------------------------------------------------
-  let g:WMGraphviz_output = "svg"
-  let g:previm_open_cmd = 'open -a "google chrome"'
-endif
-" }}}
+" Graphviz
+"--------------------------------------------------------------------------------
+let g:WMGraphviz_output = "svg"
+let g:previm_open_cmd = 'open -a "google chrome"'
 
 " floaterm {{{
 if has("win32")
@@ -440,13 +386,6 @@ augroup TrailingSpace
   autocmd FileType python,c,cpp,sh,javascript,typescript autocmd BufWritePre * :call TrimTrailingWhitespaces()
 augroup END
 
-" Do not highlight spaces at the end of line while typing on that line.
-" autocmd InsertEnter * match ForbiddenWhitespace /\s\+\%#\@<!$/
-" match ExtraWhitespace /\s\+$/
-" autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-" autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-" autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-" autocmd BufWinLeave * call clearmatches()
 function ShowSpaces(...)
   let @/='\v(\s+$)|( +\ze\t)'
   let oldhlsearch=&hlsearch
@@ -454,30 +393,28 @@ function ShowSpaces(...)
     let &hlsearch=!&hlsearch
   else
     let &hlsearch=a:1
-  end
-  return oldhlsearch
-endfunction
+    end
+    return oldhlsearch
+  endfunction
 
-function TrimTrailingWhitespaces() range
-  let oldhlsearch=ShowSpaces(1)
-  execute a:firstline.",".a:lastline."substitute ///ge"
-  let &hlsearch=oldhlsearch
-endfunction
+  function TrimTrailingWhitespaces() range
+    let oldhlsearch=ShowSpaces(1)
+    execute a:firstline.",".a:lastline."substitute ///ge"
+    let &hlsearch=oldhlsearch
+  endfunction
 
-command -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
-command -bar -nargs=0 -range=% TrimSpaces <line1>,<line2>call TrimTrailingWhitespaces()
-" }}}
+  command -bar -nargs=? ShowSpaces call ShowSpaces(<args>)
+  command -bar -nargs=0 -range=% TrimSpaces <line1>,<line2>call TrimTrailingWhitespaces()
+  " }}}
 
-" put the quickfix window on bottom always
-autocmd vimrc FileType qf wincmd J
+  " put the quickfix window on bottom always
+  autocmd vimrc FileType qf wincmd J
 
-if get(g:enabled_plugins, "coc", 0)
-  runtime config/plugins/coc.vim
-endif
+  if get(g:enabled_plugins, "coc", 0)
+    runtime config/plugins/coc.vim
+  endif
 
-" log file
-if !g:is_nvim
+  " log file
   autocmd vimrc BufReadPost *.log set ft=log
-endif
-"--------------------------------------------------------------------------------
-" vim: set fdm=marker fen: }}}
+  "--------------------------------------------------------------------------------
+  " vim: set fdm=marker fen: }}}

@@ -1,25 +1,19 @@
-local vim, g, api, fn = vim, vim.g, vim.api, vim.fn
-local actions = require("telescope.actions")
-local builtin = require("telescope.builtin")
+local vim = vim
 local telescope = require("telescope")
-local previewers = require("telescope.previewers")
-
-local new_maker = function(filepath, bufnr, opts)
-  opts = opts or {}
-  filepath = vim.fn.expand(filepath)
-  vim.loop.fs_stat(filepath, function(_, stat)
-    if not stat then return end
-    if stat.size > 100000 then
-      return
-    else
-      previewers.buffer_previewer_maker(filepath, bufnr, opts)
-    end
-  end)
-end
+local actions = require("telescope.actions")
+local action_layout = require("telescope.actions.layout")
 
 telescope.setup({
   defaults = {
-    buffer_previewer_maker = new_maker,
+    filesize_limit = 2, -- MB
+    mappings = {
+      n = {
+        ["<M-p>"] = action_layout.toggle_preview,
+      },
+      i = {
+        ["<M-p>"] = action_layout.toggle_preview,
+      },
+    },
   },
   extensions = {
     ["ui-select"] = { require("telescope.themes").get_dropdown({}) },
@@ -50,21 +44,8 @@ telescope.setup({
             -- Depending on what you want put `cd`, `lcd`, `tcd`
             vim.cmd(string.format("silent lcd %s", dir))
           end,
-          -- ["h"] =  function(prompt_bufnr)
-          --   -- https://github.com/nvim-telescope/telescope.nvim/issues/2016
-          --   -- local current_picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
-          --   -- put(current_picker)
-          --   -- local opts = {
-          --   --   hidden = true,
-          --   --   default_text = current_picker:_get_prompt(),
-          --   --   -- TODO: copy other relevant state :/
-          --   -- }
-          --   --
-          --   -- require("telescope.actions").close(prompt_bufnr)
-          --   -- require("telescope.builtin").find_files(opts)
-          -- end
         },
-      }
+      },
     },
   },
 })

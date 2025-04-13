@@ -1,5 +1,4 @@
 -- My Neovim configuration
--- Jyd  Last-Modified: 2023-08-07
 ----------------------------------------------------------------------------------
 local g, env, fn = vim.g, vim.env, vim.fn
 
@@ -25,18 +24,10 @@ if vim.g.vscode then
    vim.g.did_load_filetypes = 1
    require("myrc.vscode.plugins")
    require("myrc.vscode.setting")
-   return
+else
+  require('myrc.options')
+  require('myrc.lazy')
+  require('myrc.keymaps')
+  require('myrc.autocmds')
 end
 
-require('myrc.lazy') -- load plugins
-require('myrc.mapping')
-
--- load options, mappings and configurations
-local scripts = {'config/options.vim',
-                 'config/mappings.vim',
-                 'config/plugins/shared.vim', -- plugins dependent
-                 'lua/myrc/config/common.lua',
-               }
-for _, s in pairs(scripts) do
-  vim.cmd('runtime ' .. s)
-end
