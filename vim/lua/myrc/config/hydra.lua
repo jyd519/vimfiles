@@ -25,6 +25,8 @@ local venn_hint = [[
 
 Hydra({
   name = "Draw Diagram",
+  mode = "n",
+  body = "<leader>v",
   hint = venn_hint,
   config = {
     color = "pink",
@@ -41,8 +43,6 @@ Hydra({
     },
     on_enter = function() vim.o.virtualedit = "all" end,
   },
-  mode = "n",
-  body = "<leader>v",
   heads = {
     { "H", "<C-v>h:VBox<CR>" },
     { "J", "<C-v>j:VBox<CR>" },
@@ -56,6 +56,8 @@ Hydra({
 -- Window resizing{{{2
 Hydra({
   name = "Window resizing",
+  mode = "n",
+  body = "<leader>W",
   config = {
     color = "pink",
     invoke_on_body = true,
@@ -69,8 +71,6 @@ Hydra({
       },
     },
   },
-  mode = "n",
-  body = "<leader>W",
   heads = {
     { "+", "<C-W>+" },
     { "-", "<C-W>-" },
@@ -105,6 +105,8 @@ local dap_hint = [[
 
 Hydra({
   name = "Dap Debug",
+  mode = { "n" },
+  body = "<leader>D",
   hint = dap_hint,
   config = {
     color = "pink",
@@ -121,8 +123,6 @@ Hydra({
     },
     on_exit = function() vim.cmd("silent! DapTerminate") end,
   },
-  mode = { "n" },
-  body = "<leader>D",
   heads = {
     { ",S", function() require("myrc.utils.dap").debug_test() end, { desc = "Start Debugging" } },
     { "<F5>", function() require("myrc.utils.dap").debug_test() end, { desc = "Start Debugging" } },
@@ -201,17 +201,17 @@ local toggle_diagnostics = function()
   diagnostics_active = not diagnostics_active
   if diagnostics_active then
     vim.api.nvim_echo({ { "Show diagnostics" } }, false, {})
-    vim.diagnostic.enable(0)
+    vim.diagnostic.enable(true)
   else
     vim.api.nvim_echo({ { "Disable diagnostics" } }, false, {})
-    vim.diagnostic.disable(0)
+    vim.diagnostic.enable(false)
   end
 end
 
 local diagnostic_hint = [[
- _n_: next diagnostic   _N_: previous diagnostic  _F_: code action
- _a_: all diagnostics   _l_: buffer diagnostics   _t_: toggle diagnostics
- ^^                     _q_: exit
+ _n_: Next diagnostic   _N_: Previous diagnostic  _F_: Code action
+ _a_: All diagnostics   _l_: Buffer diagnostics   _t_: Toggle diagnostics
+ ^^                     _q_: Exit
 ]]
 
 Hydra({
@@ -236,12 +236,12 @@ Hydra({
   heads = {
     {
       "n",
-      function() vim.diagnostic.goto_next() end,
+      function() vim.diagnostic.jump({count=1}) end,
       { desc = "next diagnostic" },
     },
     {
       "N",
-      function() vim.diagnostic.goto_prev() end,
+      function() vim.diagnostic.jump({count=-1}) end,
       { desc = "previous diagnostic" },
     },
     {

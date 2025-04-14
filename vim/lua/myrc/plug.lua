@@ -3,8 +3,6 @@ local Plug = require("myrc.utils.vimplug")
 
 Plug.begin(g.VIMFILES .. "/plugged")
 
-Plug({ "lewis6991/impatient.nvim" })
-
 Plug({ "mhinz/vim-startify" })
 Plug({ "Mofiqul/vscode.nvim" })
 Plug({

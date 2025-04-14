@@ -22,14 +22,32 @@ local function check_api_key(key_name)
   return api_key
 end
 
+local prompt_library = {
+  ["ExplainIt"] = {
+    strategy = "chat",
+    description = "explain",
+    prompts = {
+      {
+        role = "system",
+        content = "You are an experienced developer",
+      },
+      {
+        role = "user",
+        content = "Explain this code as I'm five years old.",
+      },
+    },
+  },
+}
+
 require("codecompanion").setup({
-  -- display = {
-  --   chat = {
-  --     window = {
-  --       position = "right",
-  --     },
-  --   },
-  -- },
+  display = {
+    chat = {
+      window = {
+        position = "right",
+        width = 0.40,
+      },
+    },
+  },
   strategies = {
     chat = { adapter = default_adapter },
     inline = { adapter = default_adapter },
@@ -66,6 +84,39 @@ require("codecompanion").setup({
       return require("codecompanion.adapters").extend("deepseek", {
         env = {
           api_key = api_key,
+        },
+      })
+    end,
+    openrouter_claude = function()
+      local default_model = "anthropic/claude-3.5-sonnet"
+      local available_models = {
+        "anthropic/claude-3.7-sonnet",
+        "anthropic/claude-3.5-sonnet",
+        "openai/gpt-4o-mini",
+      }
+      local current_model = default_model
+      local function select_model()
+        vim.ui.select(available_models, {
+          prompt = "Select  Model:",
+        }, function(choice)
+          if choice then
+            current_model = choice
+            vim.notify("Selected model: " .. current_model)
+          end
+        end)
+      end
+      local api_key = check_api_key("openrouter_key")
+      if not api_key then return nil end
+      return require("codecompanion.adapters").extend("openai_compatible", {
+        env = {
+          url = "https://openrouter.ai/api",
+          api_key = api_key,
+          chat_url = "/v1/chat/completions",
+        },
+        schema = {
+          model = {
+            default = current_model,
+          },
         },
       })
     end,
@@ -113,6 +164,7 @@ require("codecompanion").setup({
       })
     end,
   },
+  prompt_library = prompt_library,
 })
 
 --- Add commands

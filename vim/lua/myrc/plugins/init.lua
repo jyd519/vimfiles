@@ -56,8 +56,7 @@ return {
   },
   {
     "nvimtools/hydra.nvim",
-    lazy = true,
-    -- event = "VeryLazy",
+    -- lazy = true,
     dependencies = {
       { "jbyuki/venn.nvim" },
     },
@@ -107,6 +106,7 @@ return {
     opts = { silent = false },
   },
   -- }}}
+
   -- Coding {{{2
   { "thinca/vim-quickrun", cmd = { "QuickRun" } },
   { "jyd519/vim-test", event = { "BufReadPost", "BufNewFile" } }, -- Unit-Testing
@@ -276,8 +276,8 @@ return {
   -- Completion Engine {{{2
   {
     "hrsh7th/nvim-cmp",
-    event = "VeryLazy",
-    -- event = { "InsertEnter", "CmdLineEnter" },
+    -- event = "VeryLazy",
+    event = { "InsertEnter", "CmdLineEnter" },
     dependencies = {
       { "hrsh7th/cmp-buffer" },
       { "yehuohan/cmp-path" },
@@ -288,12 +288,6 @@ return {
       -- { "quangnguyen30192/cmp-nvim-tags", ft = { "c", "cpp" } },
       { "saadparwaiz1/cmp_luasnip" },
       { "hrsh7th/cmp-nvim-lsp" },
-      {
-        "tzachar/cmp-tabnine",
-        enabled = false,
-        build = "./install.sh",
-        config = function() require("myrc.config.tabnine") end,
-      },
     },
     config = function() require("myrc.config.cmp") end,
   },
@@ -320,18 +314,8 @@ return {
   -- }}}
   -- File explorer/Fuzzy Finder {{{2
   {
-    "preservim/nerdtree",
-    enabled = false,
-    cmd = {
-      "NERDTree",
-      "NERDTreeToggle",
-      "NERDTreeFind",
-      "NERDTreeFromBookmark",
-    },
-  },
-  {
     "nvim-tree/nvim-tree.lua",
-    tag = "v1.7.1",
+    tag = "v1.11.0",
     config = function() require("myrc.config.nvim-tree") end,
   },
   {
