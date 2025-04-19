@@ -30,7 +30,6 @@ end
 opt.foldlevelstart = 99
 opt.foldcolumn = "3"
 opt.scrolloff = 2
-opt.guioptions:remove "T"
 opt.encoding = "utf-8"
 opt.fileencodings = "ucs-bom,utf-8,gbk,gb18030"
 opt.wildmenu = true -- show a navigable menu for tab completion
@@ -79,7 +78,6 @@ vim.g.mapleader = ","
 vim.g.maplocalleader = ","
 
 -- enable syntax highlighting
-vim.cmd "syntax on"
 vim.cmd "syntax sync minlines=256"
 opt.synmaxcol = 300
 opt.redrawtime = 10000

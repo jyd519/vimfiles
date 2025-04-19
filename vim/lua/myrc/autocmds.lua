@@ -6,6 +6,20 @@ augroup END
 
 local function augroup(name) return vim.api.nvim_create_augroup("myrc_" .. name, { clear = true }) end
 
+-- Check if we need to reload the file when it changed
+vim.api.nvim_create_autocmd({ 'FocusGained', 'TermClose', 'TermLeave' }, {
+    group = augroup('checktime'),
+    command = 'checktime',
+})
+
+-- Highlight on yank
+vim.api.nvim_create_autocmd('TextYankPost', {
+    group = augroup('highlight_yank'),
+    callback = function()
+        vim.highlight.on_yank()
+    end,
+})
+
 -- Handling large file{{{2
 -- https://www.reddit.com/r/neovim/comments/z85s1l/disable_lsp_for_very_large_files/
 vim.api.nvim_create_autocmd({ "BufReadPre" }, {
@@ -37,17 +51,6 @@ vim.api.nvim_create_autocmd({ "BufReadPre" }, {
   pattern = "*",
 })
 -- }}}
-
--- Highlight Yanked Text
-if vim.g.is_nvim then
-  vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-  vim.api.nvim_create_autocmd('TextYankPost', {
-    group = 'YankHighlight',
-    callback = function()
-      vim.highlight.on_yank()
-    end,
-  })
-end
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'vimrc',
@@ -111,3 +114,28 @@ vim.api.nvim_create_autocmd("Filetype", {
     vim.keymap.set("n", "<leader>tf", ":TestFile<cr>", { buffer = true, silent = true })
   end,
 })
+
+-- Strip trailing spaces before write
+vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+    group = augroup('strip_space'),
+    pattern = { "python", "c", "cpp", "sh", "javascript", "typescript" },
+    callback = function()
+        vim.cmd([[ %s/\s\+$//e ]])
+    end,
+})
+
+vim.api.nvim_create_autocmd({ "FileType" }, {
+  group = augroup('strip_space_hl'),
+  pattern = { "python", "c", "sh", "javascript", "typescript", "vim", "lua" },
+  callback = function() vim.cmd("match ForbiddenWhitespace /\\s\\+$/") end,
+})
+
+-- Auto create dir when saving a file, in case some intermediate directory does not exist
+vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
+    group = augroup('auto_create_dir'),
+    callback = function(event)
+        local file = vim.loop.fs_realpath(event.match) or event.match
+        vim.fn.mkdir(vim.fn.fnamemodify(file, ':p:h'), 'p')
+    end,
+})
+

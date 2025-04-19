@@ -12,7 +12,7 @@ return {
     init = function() vim.g.startuptime_tries = 10 end,
   },
   -- Utils {{{2
-  { "folke/which-key.nvim", lazy = true },
+  { "folke/which-key.nvim", enabled = false },
   { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
   {
     "nvim-treesitter/nvim-treesitter",
@@ -78,7 +78,7 @@ return {
   { "gpanders/editorconfig.nvim", enabled = vim.fn.has("nvim-0.9") == 0 },
   {
     "kylechui/nvim-surround",
-    event = { "BufReadPost", "BufNewFile" },
+    event = "VeryLazy",
     config = function() require("myrc.config.surround") end,
   },
   {
@@ -276,8 +276,7 @@ return {
   -- Completion Engine {{{2
   {
     "hrsh7th/nvim-cmp",
-    -- event = "VeryLazy",
-    event = { "InsertEnter", "CmdLineEnter" },
+    event = "VeryLazy",
     dependencies = {
       { "hrsh7th/cmp-buffer" },
       { "yehuohan/cmp-path" },

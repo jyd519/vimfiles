@@ -73,12 +73,6 @@ vim.keymap.set("t", "<C-j>", "<C-\\><C-N><C-w>j", { noremap = true })
 vim.keymap.set("t", "<C-k>", "<C-\\><C-N><C-w>k", { noremap = true })
 vim.keymap.set("t", "<C-l>", "<C-\\><C-N><C-w>l", { noremap = true })
 
--- Search for visually selected text
-vim.cmd([[
-  vnoremap <silent> * :call misc#SearchVisualTextDown()<CR>
-  vnoremap <silent> # :call misc#SearchVisualTextUp()<CR>
-]])
-
 -- Zoom / Restore window
 vim.api.nvim_create_user_command("ZoomToggle", function() vim.fn["misc#ZoomToggle"]() end, {})
 vim.keymap.set("n", "<leader>z", "<cmd>ZoomToggle<CR>", { silent = true, noremap = true })
@@ -95,8 +89,8 @@ if vim.env.SSH_CONNECTION ~= "" and vim.g.is_vim then
 end
 
 -- Font zoom in/out
-vim.keymap.set("n", "<C-=>", function() require("zoom").ZoomIn() end, { silent = true, noremap = true })
-vim.keymap.set("n", "<C-->", function() require("zoom").ZoomOut() end, { silent = true, noremap = true })
+vim.keymap.set("n", "<C-=>", function() vim.fn["zoom#ZoomIn"]() end, { silent = true, noremap = true })
+vim.keymap.set("n", "<C-->", function() vim.fn["zoom#ZoomOut"]() end, { silent = true, noremap = true })
 
 -- aes-vim
 vim.keymap.set("v", "<leader>ec", ":AesEnc<cr>", { noremap = true })
@@ -594,50 +588,11 @@ end
 --- }}}
 
 -- Trailing whitespace {{{2
--- Trailing whitespace and tabs are forbidden, so highlight them.
-vim.cmd(
-  [[
-  highlight ForbiddenWhitespace ctermbg=red guibg=red
-]],
-  false
-)
-
-vim.api.nvim_create_augroup("TrailingSpace", { clear = true })
-vim.api.nvim_create_autocmd({ "FileType" }, {
-  group = "TrailingSpace",
-  pattern = { "python", "c", "sh", "javascript", "typescript", "vim", "lua" },
-  callback = function() vim.cmd("match ForbiddenWhitespace /\\s\\+$/") end,
-})
-vim.api.nvim_create_autocmd({ "FileType" }, {
-  group = "TrailingSpace",
-  pattern = { "python", "c", "cpp", "sh", "javascript", "typescript" },
-  callback = function() vim.cmd("autocmd BufWritePre * :call TrimTrailingWhitespaces()") end,
-})
-
-local function show_spaces(arg)
-  vim.cmd("let @/='\\v(\\s+$)|( +\\ze\\t)'")
-  local old_hlsearch = vim.o.hlsearch
-  if arg == nil then
-    vim.o.hlsearch = not vim.o.hlsearch
-  else
-    vim.o.hlsearch = arg
-  end
-  return old_hlsearch
-end
-
 local function trim_trailing_whitespaces(firstline, lastline)
-  local old_hlsearch = show_spaces(true)
+  local old_hlsearch = vim.o.hlsearch
   vim.cmd(firstline .. "," .. lastline .. "substitute /\\s\\+$//ge")
   vim.o.hlsearch = old_hlsearch
 end
-
-vim.api.nvim_create_user_command("ShowSpaces", function(opts)
-  if opts.args == "" then
-    show_spaces(nil)
-  else
-    show_spaces(opts.args == "1")
-  end
-end, { nargs = "?" })
 
 vim.api.nvim_create_user_command(
   "TrimSpaces",
@@ -652,5 +607,40 @@ vim.keymap.set("n", "<leader>xF", "<Plug>(ale_fix)", { noremap = true, silent = 
 -- EasyAlign
 vim.keymap.set("v", "ga", "<Plug>(EasyAlign)")
 vim.keymap.set("x", "ga", "<Plug>(EasyAlign)")
+
+-- Copy Filename
+local function copy_to_clipboard(content, message)
+    vim.fn.setreg('+', content)
+    vim.notify('Copied "' .. content .. '" to the clipboard!', vim.log.levels.INFO)
+end
+
+vim.api.nvim_create_user_command('CopyRelativePath', function()
+    local path = vim.fn.expand('%')
+    copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
+end, {})
+
+vim.api.nvim_create_user_command('CopyAbsolutePath', function()
+    local path = vim.fn.expand('%:p')
+    copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
+end, {})
+
+vim.api.nvim_create_user_command('CopyRelativePathWithLine', function()
+    local path = vim.fn.expand('%')
+    local line = vim.fn.line('.')
+    local result = path .. ':' .. line
+    copy_to_clipboard(result, 'Copied "' .. result .. '" to the clipboard!')
+end, {})
+
+vim.api.nvim_create_user_command('CopyAbsolutePathWithLine', function()
+    local path = vim.fn.expand('%:p')
+    local line = vim.fn.line('.')
+    local result = path .. ':' .. line
+    copy_to_clipboard(result, 'Copied "' .. result .. '" to the clipboard!')
+end, {})
+
+vim.api.nvim_create_user_command('CopyFileName', function()
+    local path = vim.fn.expand('%:t')
+    copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
+end, {})
 
 -- vim: set fdm=marker fdl=1: }}}

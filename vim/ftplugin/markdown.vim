@@ -7,32 +7,32 @@ endif
 let b:did_markdown_vim = 1
 
 " adjust syntax highlighting
-function! s:adjustSyntax()
-  " hi link mkdLineBreak  CursorLineNr
-  " https://github.com/preservim/vim-markdown/blob/master/syntax/markdown.vim
-  syn clear markdownUrl
-  syn match markdownUrl /https\?:\/\/[^ \t]*/ nextgroup=markdownUrlTitle skipwhite contained
-  syn match  mkdLineBreak    /  \+$/
-  syn match  mkdListItem     /^\s*\%([-*+]\|\d\+\.\)\ze\s\+/ nextgroup=markdownUrl
-  syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$" contains=markdownCode,markdownLinkText,markdownListMarker,markdownUrl
-  syn region mkdBlockquote   start=/^\s*>/                   end=/$/ contains=mkdLineBreak
-
-  hi link mkdLineBreak Underlined
-  hi link mkdBlockquote Comment
-  " hi! mkdListItem gui=bold guifg=#0451a5
-  " hi! markdownH0 guifg=#0451a5 gui=bold
-  " hi! markdownH2 guifg=#0451a5 gui=bold
-  " hi! markdownH3 guifg=#0451a5 gui=bold
-  " hi! markdownH1Delimiter guifg=#0451a5 gui=bold
-  " hi! markdownH2Delimiter guifg=#0451a5 gui=bold
-  " hi! markdownH3Delimiter guifg=#0451a5 gui=bold
-  hi! link markdownUrl htmlLink
-endfunction
-
-augroup mdSyntaxAdjust
-    autocmd!
-    autocmd BufWinEnter <buffer> call s:adjustSyntax()
-augroup end
+" function! s:adjustSyntax()
+"   " hi link mkdLineBreak  CursorLineNr
+"   " https://github.com/preservim/vim-markdown/blob/master/syntax/markdown.vim
+"   syn clear markdownUrl
+"   syn match markdownUrl /https\?:\/\/[^ \t]*/ nextgroup=markdownUrlTitle skipwhite contained
+"   syn match  mkdLineBreak    /  \+$/
+"   syn match  mkdListItem     /^\s*\%([-*+]\|\d\+\.\)\ze\s\+/ nextgroup=markdownUrl
+"   syn region mkdListItemLine start="^\s*\%([-*+]\|\d\+\.\)\s\+" end="$" contains=markdownCode,markdownLinkText,markdownListMarker,markdownUrl
+"   syn region mkdBlockquote   start=/^\s*>/                   end=/$/ contains=mkdLineBreak
+"
+"   hi link mkdLineBreak Underlined
+"   hi link mkdBlockquote Comment
+"   " hi! mkdListItem gui=bold guifg=#0451a5
+"   " hi! markdownH0 guifg=#0451a5 gui=bold
+"   " hi! markdownH2 guifg=#0451a5 gui=bold
+"   " hi! markdownH3 guifg=#0451a5 gui=bold
+"   " hi! markdownH1Delimiter guifg=#0451a5 gui=bold
+"   " hi! markdownH2Delimiter guifg=#0451a5 gui=bold
+"   " hi! markdownH3Delimiter guifg=#0451a5 gui=bold
+"   hi! link markdownUrl htmlLink
+" endfunction
+"
+" augroup mdSyntaxAdjust
+"     autocmd!
+"     autocmd BufWinEnter <buffer> call s:adjustSyntax()
+" augroup end
 
 " folding
 " setlocal foldlevel=1

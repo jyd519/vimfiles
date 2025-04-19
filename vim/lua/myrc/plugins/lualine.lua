@@ -1,7 +1,7 @@
 return {
   {
     "nvim-lualine/lualine.nvim",
-    -- event = "BufRead",
+    event = "BufRead",
     dependencies = {
       -- The icon font for Visual Studio Code
       { "ChristianChiarulli/neovim-codicons", lazy = true },
