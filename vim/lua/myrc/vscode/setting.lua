@@ -14,10 +14,13 @@ keymap.set({"n", "x"}, "<C-k>", "<Cmd>lua require('vscode').action('workbench.ac
 keymap.set({"n"}, "gx", "<Cmd>lua require('vscode').action('editor.action.quickFix')<CR>")
 keymap.set({"n"}, "<leader>ff", "<Cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>")
 
+keymap.set({"n"}, "<leader>nf", "<Cmd>lua require('vscode').action('workbench.files.action.showActiveFileInExplorer')<CR>")
+
 keymap.set({"n"}, "gs", "<Cmd>lua require('vscode').action('workbench.action.findInFiles', { args = { query = vim.fn.expand('<cword>') } })<CR>")
 keymap.set({"n", "v"}, "<leader>F", "<Cmd>lua require('vscode').action('editor.action.formatDocument')<CR>")
 keymap.set({"n"}, "<leader>B", "<Cmd>lua require('vscode').action('workbench.action.tasks.build')<CR>")
 -- keymap.set({"n", "v"}, "<leader>t", "<cmd>lua require('vscode').action('workbench.action.terminal.toggleTerminal')<CR>")
+
 keymap.set("n", "<leader>o", "<Cmd>silent !start chrome.exe file://%:p<CR>")
 keymap.set("n", "<leader>vf", function ()
   vim.fn.jobstart("n.bat " .. vim.fn.expand("%:p"))

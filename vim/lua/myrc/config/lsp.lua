@@ -1,4 +1,4 @@
--- Setup lspconfig.
+-- Setup lspconfig.lsp
 -- >> Reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 -- Globals {{{2
 local api = vim.api
@@ -6,6 +6,7 @@ local fn = vim.fn
 local lsp = vim.lsp
 local lspconfig = require("lspconfig")
 local util = lspconfig.util
+local is_window = vim.fn.has("win32") == 1
 
 require("mason").setup()
 require("mason-lspconfig").setup()
@@ -40,34 +41,7 @@ local function get_typescript_server_path(root_dir)
   end
 end
 
---- Make an on_new_config function that sets the settings
----@param on_new_config function
----@return function
-local make_on_new_config = function(on_new_config)
-  return util.add_hook_before(on_new_config, function(new_config, root_dir)
-    local server_name = new_config.name
-    if vim.b.large_buf then
-      print(server_name .. " disabled for the file is too large")
-      new_config.enabled = false
-      return new_config
-    end
-
-    local nlspsettings = require("nlspsettings")
-    local config = nlspsettings.get_settings(root_dir, server_name)
-
-    local settings = vim.empty_dict()
-    settings = vim.tbl_deep_extend("keep", settings, new_config.settings)
-    settings = vim.tbl_deep_extend("force", settings, config)
-    if server_name == "jsonls" then vim.list_extend(settings.json.schemas, new_config.settings.json.schemas) end
-    new_config.settings = settings
-    return new_config
-  end)
-end
-
 -- }}}
-
-
-
 
 -- key mappings {{{2
 ---@diagnostic disable-next-line: unused-local
@@ -111,6 +85,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local autocmd = api.nvim_create_autocmd
     setup_keymapping(client, bufnr)
     if client == nil then return end
+
+    if client.name == "ruff" then client.server_capabilities.hoverProvider = false end
 
     local lsp_group = api.nvim_create_augroup("my_lsp_autocmd", { clear = true })
 
@@ -169,7 +145,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 util.default_config = vim.tbl_deep_extend("force", util.default_config, {
   capabilities = capabilities,
-  on_new_config = make_on_new_config(util.default_config.on_new_config),
 })
 -- }}}
 
@@ -285,16 +260,60 @@ require("rust-tools").setup({
 })
 -- }}}
 
+local function getPythonPath()
+  local p
+  local python = is_window and "python.exe" or "python"
+  if vim.env.VIRTUAL_ENV then
+    p = vim.fs.joinpath(vim.env.VIRTUAL_ENV, "bin", python)
+    if vim.uv.fs_stat(p) then return p end
+  end
+
+  p = vim.fs.joinpath(".venv", "Scripts", python)
+  if vim.uv.fs_stat(p) then return p end
+  p = vim.fs.joinpath(".venv", "bin", python)
+  if vim.uv.fs_stat(p) then return p end
+
+  return python
+end
+
 -- pyright {{{2
 -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 lspconfig.pyright.setup({
   before_init = function(_, config)
-    local p = "python3"
-    if vim.env.VIRTUAL_ENV then p = table.concat({ vim.env.VIRTUAL_ENV, "bin", "python3" }, "/") end
-    print("Python (pyright): ", p)
+    local p = getPythonPath()
+    vim.defer_fn(function() vim.notify("Python (pyright): " .. p) end, 300)
     config.settings.python.pythonPath = p
   end,
+  settings = {
+    pyright = {
+      -- Using Ruff's import organizer
+      disableOrganizeImports = true,
+    },
+    python = {
+      analysis = {
+        -- Ignore all files for analysis to exclusively use Ruff for linting
+        -- ignore = { '*' },
+        -- typeCheckingMode = "basic",
+        autoSearchPaths = true,
+        diagnosticMode = "openFilesOnly",
+        useLibraryCodeForTypes = true,
+      },
+    },
+  },
 })
+
+-- lspconfig.basedpyright.setup({
+--   basedpyright  = {
+--     analysis = {
+--       -- Ignore all files for analysis to exclusively use Ruff for linting
+--       -- ignore = { '*' },
+--       -- typeCheckingMode = "basic",
+--       autoSearchPaths = true,
+--       diagnosticMode = "openFilesOnly",
+--       useLibraryCodeForTypes = true
+--     },
+--   },
+-- })
 -- }}}
 
 -- vue/volar {{{2
@@ -310,7 +329,7 @@ lspconfig.volar.setup({
 
 -- yaml {{{2
 --
-local yamlls_cfg = require("yaml-companion").setup{
+local yamlls_cfg = require("yaml-companion").setup({
   schemas = {
     {
       name = "openapi-3.0 local",
@@ -348,8 +367,8 @@ local yamlls_cfg = require("yaml-companion").setup{
         -- }),
       },
     },
-  }
-}
+  },
+})
 lspconfig.yamlls.setup(yamlls_cfg)
 -- }}}
 
@@ -366,7 +385,7 @@ local lsp_settings = {
 }
 
 local servers =
-  { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls", "gopls", "emmet_language_server" }
+  { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls", "gopls", "emmet_language_server", "ruff" }
 for _, name in ipairs(servers) do
   local opts = {
     capabilities = capabilities,
@@ -380,48 +399,52 @@ end
 local hover = vim.lsp.buf.hover
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.buf.hover = function()
-    return hover({
-        border = "single",
-        -- max_width = 100,
-        max_width = math.floor(vim.o.columns * 0.7),
-        max_height = math.floor(vim.o.lines * 0.7),
-    })
+  return hover({
+    border = "single",
+    -- max_width = 100,
+    max_width = math.floor(vim.o.columns * 0.7),
+    max_height = math.floor(vim.o.lines * 0.7),
+  })
 end
 
 local signature_help = vim.lsp.buf.signature_help
 ---@diagnostic disable-next-line: duplicate-set-field
 vim.lsp.buf.signature_help = function()
-    return signature_help({
-        border = "single",
-        max_width = math.floor(vim.o.columns * 0.7),
-        max_height = math.floor(vim.o.lines * 0.7),
-    })
+  return signature_help({
+    border = "single",
+    max_width = math.floor(vim.o.columns * 0.7),
+    max_height = math.floor(vim.o.lines * 0.7),
+  })
 end
 -- }}}
 
 -- Diagnostics Settings {{{2
-vim.diagnostic.config({
-  float = {
-    source = "if_many",
-    border = "rounded",
-  },
-})
-
-vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-  signs = {
-    severity = vim.diagnostic.severity.HINT,
-  },
-  virtual_text = {
-    severity = vim.diagnostic.severity.WARN,
-  },
-})
-
-local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+if vim.fn.has("nvim-0.10") == 1 then
+  vim.diagnostic.config({
+    float = {
+      source = "if_many",
+      border = "rounded",
+    },
+    virtual_text = {
+      severity = vim.diagnostic.severity.WARN,
+    },
+    signs = {
+      severity = vim.diagnostic.severity.HINT,
+      text = {
+        [vim.diagnostic.severity.ERROR] = "󰅚 ",
+        [vim.diagnostic.severity.WARN] = "󰀪 ",
+        [vim.diagnostic.severity.HINT] = "󰌶 ",
+        [vim.diagnostic.severity.INFO] = " ",
+      },
+    },
+  })
+else
+  local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
+  for type, icon in pairs(signs) do
+    local hl = "DiagnosticSign" .. type
+    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+  end
 end
-
 -- }}}
 
 -- vim: set fdm=marker fdl=1:

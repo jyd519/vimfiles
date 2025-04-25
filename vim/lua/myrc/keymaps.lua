@@ -590,14 +590,14 @@ end
 -- Trailing whitespace {{{2
 local function trim_trailing_whitespaces(firstline, lastline)
   local old_hlsearch = vim.o.hlsearch
-  vim.cmd(firstline .. "," .. lastline .. "substitute /\\s\\+$//ge")
+  vim.cmd(firstline .. "," .. lastline .. "substitute /\\v\\s+$//ge")
   vim.o.hlsearch = old_hlsearch
 end
 
 vim.api.nvim_create_user_command(
   "TrimSpaces",
   function(opts) trim_trailing_whitespaces(opts.line1, opts.line2) end,
-  { range = true, nargs = 0 }
+  { range = '%', nargs = 0 }
 )
 
 -- ALE
