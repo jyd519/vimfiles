@@ -57,6 +57,7 @@ return {
   {
     "nvimtools/hydra.nvim",
     -- lazy = true,
+    event = "VeryLazy",
     dependencies = {
       { "jbyuki/venn.nvim" },
     },

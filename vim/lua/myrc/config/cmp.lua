@@ -146,18 +146,32 @@ cmp.setup({
     end, { "i", "s" }),
 
     ["<Tab>"] = cmp.mapping(function(fallback)
-      -- local copilot_keys = vim.fn['copilot#Accept']()
-      if cmp.visible() then
-        cmp.select_next_item()
-      elseif luasnip.expand_or_locally_jumpable() then
+      local codeium_keys = vim.fn["codeium#Accept"]()
+      -- vim.fn['copilot#Accept']()
+      if luasnip.jumpable() then
         luasnip.expand_or_jump()
-      -- elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
-      --   vim.api.nvim_feedkeys(copilot_keys, 'i', true)
-      elseif has_words_before() then
-        cmp.complete()
+      elseif is_insert_keys(codeium_keys) then
+        vim.api.nvim_feedkeys(codeium_keys, "i", true)
+      elseif cmp.confirm({ select = true }) then
+        --
+      elseif luasnip.expandable() then
+        luasnip.expand_or_jump()
       else
         fallback()
       end
+
+      -- -- local copilot_keys = vim.fn['copilot#Accept']()
+      -- if cmp.visible() then
+      --   cmp.select_next_item()
+      -- elseif luasnip.expand_or_locally_jumpable() then
+      --   luasnip.expand_or_jump()
+      -- -- elseif copilot_keys ~= '' and type(copilot_keys) == 'string' then
+      -- --   vim.api.nvim_feedkeys(copilot_keys, 'i', true)
+      -- elseif has_words_before() then
+      --   cmp.complete()
+      -- else
+      --   fallback()
+      -- end
     end, { "i", "s" }),
 
     ["<S-Tab>"] = cmp.mapping(function(fallback)
