@@ -24,7 +24,7 @@ snippet SCRIPT_PATH "script path" b
 		SCRIPT_PATH="\$( cd "\$(dirname \$0)" ; pwd -P )"
 
 snippet SCRIPT_PATH2 "script path method2" b
-		FILE=\$\{BASH_SOURCE[0]}
+		FILE=\${BASH_SOURCE[0]}
 		pushd \`dirname \$FILE\` > /dev/null
 		SCRIPT_PATH=\`pwd -P\`
 		popd > /dev/null
