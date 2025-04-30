@@ -40,6 +40,11 @@ local prompt_library = {
 }
 
 require("codecompanion").setup({
+  opts = {
+    language = default_lang,
+    log_level = "ERROR", -- TRACE|DEBUG|ERROR|INFO
+    show_defaults = false,
+  },
   display = {
     chat = {
       window = {
@@ -52,10 +57,6 @@ require("codecompanion").setup({
     chat = { adapter = default_adapter },
     inline = { adapter = default_adapter },
     agent = { adapter = default_adapter },
-  },
-  opts = {
-    language = default_lang,
-    log_level = "ERROR", -- TRACE|DEBUG|ERROR|INFO
   },
   adapters = {
     opts = {

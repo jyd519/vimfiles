@@ -315,7 +315,8 @@ return {
   -- File explorer/Fuzzy Finder {{{2
   {
     "nvim-tree/nvim-tree.lua",
-    tag = "v1.11.0",
+    event = "VeryLazy",
+    version = "*",
     config = function() require("myrc.config.nvim-tree") end,
   },
   {
@@ -338,7 +339,7 @@ return {
   },
   {
     "allaman/emoji.nvim",
-    version = "4.0", -- optionally pin to a tag
+    version = "*",
     ft = { "markdown", "typescript", "text", "lua" }, -- adjust to your needs
     opts = {
       -- default is false
