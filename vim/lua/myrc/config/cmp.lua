@@ -1,5 +1,6 @@
 -- Setup auto completion
 local cmp = require("cmp")
+local luasnip = require("luasnip")
 
 -- Setup nvim-cmp {{{
 -- Source Kind Icons {{{2
@@ -46,7 +47,6 @@ cmp.setup({
   -- REQUIRED - you must specify a snippet engine
   snippet = {
     expand = function(args)
-      local luasnip = require("luasnip")
       luasnip.lsp_expand(args.body) -- For `luasnip` users.
       -- require('snippy').expand_snippet(args.body) -- For `snippy` users.
       -- vim.fn["UltiSnips#Anon"](args.body) -- For `ultisnips` users.
@@ -62,11 +62,9 @@ cmp.setup({
     ["<C-x><C-o>"] = cmp.mapping(function() cmp.complete() end, { "i", "s", "c" }),
     ["<C-e>"] = cmp.mapping(function()
       cmp.abort()
-      local luasnip = require("luasnip")
       luasnip.unlink_current()
     end, { "i" }),
     ["<Esc>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       luasnip.unlink_current()
       fallback()
     end, { "i" }),
@@ -75,7 +73,6 @@ cmp.setup({
 
     -- jump backward
     ["<C-h>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       if luasnip.jumpable(-1) then
         luasnip.jump(-1)
       else
@@ -87,7 +84,6 @@ cmp.setup({
     ["<C-k>"] = cmp.mapping(function(fallback)
       local codeium_keys = vim.fn["codeium#Accept"]()
       -- vim.fn['copilot#Accept']()
-      local luasnip = require("luasnip")
       if luasnip.jumpable() then
         luasnip.expand_or_jump()
       elseif is_insert_keys(codeium_keys) then
@@ -103,7 +99,6 @@ cmp.setup({
 
     -- select previous item
     ["<C-p>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.choice_active() then
@@ -119,7 +114,6 @@ cmp.setup({
 
     -- select next item
     ["<C-n>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.choice_active() then
@@ -135,7 +129,6 @@ cmp.setup({
 
     -- choose alternatives
     ["<C-l>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       if luasnip.choice_active() then
         luasnip.change_choice(-1)
       else
@@ -145,7 +138,6 @@ cmp.setup({
 
     -- choose with vim.ui.select
     ["<C-u>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       if luasnip.choice_active() then
         require("luasnip.extras.select_choice")()
       else
@@ -155,7 +147,6 @@ cmp.setup({
 
     ["<Tab>"] = cmp.mapping(function(fallback)
       local codeium_keys = vim.fn["codeium#Accept"]()
-      local luasnip = require("luasnip")
       -- vim.fn['copilot#Accept']()
       if luasnip.jumpable() then
         luasnip.expand_or_jump()
@@ -184,7 +175,6 @@ cmp.setup({
     end, { "i", "s" }),
 
     ["<S-Tab>"] = cmp.mapping(function(fallback)
-      local luasnip = require("luasnip")
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.jumpable(-1) then

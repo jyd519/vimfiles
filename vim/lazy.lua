@@ -10,6 +10,7 @@ vim.opt.rtp:append(VIMFILES .. '/after')
 
 g.VIMFILES, env.VIMFILES = VIMFILES, VIMFILES
 g.myinitrc=VIMFILES .. '/lazy.lua'
+g.mysnippets_dir=VIMFILES .. '/mysnippets'
 
 if env.DARK ~= nil then
   vim.o.background = env.DARK == "1" and "dark" or "light"

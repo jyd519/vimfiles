@@ -133,7 +133,7 @@ return {
     cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
   },
   {
-    "Exafunction/codeium.vim",
+    "Exafunction/windsurf.vim",
     event = { "BufEnter" },
     config = function() require("myrc.config.codeium") end,
   },
@@ -265,7 +265,7 @@ return {
   },
   {
     "L3MON4D3/LuaSnip",
-    event = { "InsertEnter" },
+    lazy = true,
     dependencies = {
       { "rafamadriz/friendly-snippets" },
       { "honza/vim-snippets" },
@@ -298,8 +298,8 @@ return {
     config = function() require("myrc.config.lsp") end,
     dependencies = {
       { "folke/neodev.nvim", lazy = true },
-      { "williamboman/mason.nvim", cmd = "Mason", config = true },
-      { "williamboman/mason-lspconfig.nvim" },
+      { "mason-org/mason.nvim", cmd = "Mason", config = true },
+      { "mason-org/mason-lspconfig.nvim" },
     },
   },
   -- { "tamago324/nlsp-settings.nvim" },

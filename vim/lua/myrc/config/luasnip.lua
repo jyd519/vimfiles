@@ -13,6 +13,7 @@ require("luasnip.loaders.from_snipmate").lazy_load({ paths = vim.fn.expand("$VIM
 -- require("luasnip.loaders.from_lua").lazy_load({ paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets") })
 
 luasnip.filetype_extend("all", { "_" })
+luasnip.filetype_extend("typescript", { "javascript" })
 
 -- Commands {{{2
 vim.api.nvim_create_user_command(

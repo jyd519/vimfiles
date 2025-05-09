@@ -149,9 +149,6 @@ util.default_config = vim.tbl_deep_extend("force", util.default_config, {
 -- }}}
 
 -- tsserver {{{2
-local mason_registry = require("mason-registry")
-local vue_language_server_path = mason_registry.get_package("vue-language-server"):get_install_path()
-  .. "/node_modules/@vue/language-server"
 require("typescript-tools").setup({
   disable_commands = false, -- prevent the plugin from creating Vim commands
   go_to_source_definition = {

@@ -136,6 +136,11 @@ vim.api.nvim_create_autocmd({ 'BufWritePre' }, {
     callback = function(event)
         local file = vim.loop.fs_realpath(event.match) or event.match
         vim.fn.mkdir(vim.fn.fnamemodify(file, ':p:h'), 'p')
+        -- local fpath = vim.fn.expand("<afile>")
+        -- local dir = vim.fn.fnamemodify(fpath, ":p:h")
+        -- if vim.fn.isdirectory(dir) ~= 1 then
+        --   vim.fn.mkdir(dir, "p")
+        -- end
     end,
 })
 
