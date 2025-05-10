@@ -315,6 +315,7 @@ return {
   -- File explorer/Fuzzy Finder {{{2
   {
     "nvim-tree/nvim-tree.lua",
+    enabled = false,
     event = "VeryLazy",
     version = "*",
     config = function() require("myrc.config.nvim-tree") end,

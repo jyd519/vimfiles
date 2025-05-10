@@ -84,3 +84,8 @@ snippet cmd "add new user command"
         nargs = "*",
         desc = "Say hi to someone",
     })
+
+snippet globf "glob files"
+    for _, file in ipairs(vim.fn.globpath(lsp_dir, "*.lua", false, true)) do
+      -- file: lua filename
+    end
