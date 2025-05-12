@@ -532,3 +532,8 @@ snippet test_cwd "set current working directory for unit test"
 			panic(err)
 		}
 	}
+
+snippet sleep "sleep"
+			  select {
+					case <- time.After({1:5} * time.Second):				  
+			  }	
