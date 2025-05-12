@@ -29,7 +29,6 @@ return {
         window = {
           mappings = {
             ["-"] = "navigate_up",
-            ["o"] = "noop",
             ["O"] = "system_open",
           },
         }
@@ -39,7 +38,7 @@ return {
       },
       window = {
         mappings = {
-          ["o"] = "noop",
+          ["oo"] = "open",
           ["O"] = "system_open",
           ["Y"] = {
             function(state)

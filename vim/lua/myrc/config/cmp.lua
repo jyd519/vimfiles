@@ -93,7 +93,7 @@ cmp.setup({
       elseif luasnip.expandable() then
         luasnip.expand_or_jump()
       else
-        -- fallback()
+        fallback()
       end
     end, { "i", "s" }),
 
