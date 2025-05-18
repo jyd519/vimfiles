@@ -15,16 +15,19 @@ local M = {}
 -- end)
 
 ---@param server_name string
----@param settings_patcher fun(settings: table): table
-function M.patch_lsp_settings(server_name, settings_patcher)
+---@param settings_patcher fun(settings: table): table | nil
+function M.patch_settings(server_name, settings_patcher)
   local function patch_settings(client)
-    client.config.settings = settings_patcher(client.config.settings)
+    local settings = settings_patcher(client.config.settings)
+    if settings then
+      client.config.settings = settings
+    end
     client.notify("workspace/didChangeConfiguration", {
       settings = client.config.settings,
     })
   end
 
-  local clients = vim.lsp.get_active_clients({ name = server_name })
+  local clients = vim.lsp.get_clients({ name = server_name })
   if #clients > 0 then
     patch_settings(clients[1])
     return

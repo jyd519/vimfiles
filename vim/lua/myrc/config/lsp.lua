@@ -2,14 +2,15 @@
 -- >> Reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 -- Globals {{{2
 local api = vim.api
-local fn = vim.fn
 local lsp = vim.lsp
 local lspconfig = require("lspconfig")
 local util = lspconfig.util
 local is_window = vim.fn.has("win32") == 1
 
 require("mason").setup()
-require("mason-lspconfig").setup()
+require("mason-lspconfig").setup({
+  automatic_enable = false,
+})
 
 vim.lsp.set_log_level("warn")
 
@@ -208,10 +209,15 @@ lspconfig["lua_ls"].setup({
     return primary or fallback
   end,
   on_init = function(client)
-    -- local path = client.workspace_folders[1].name
-    -- if vim.loop.fs_stat(path..'/.luarc.json') or vim.loop.fs_stat(path..'/.luarc.jsonc') then
-    --   return
-    -- end
+    if client.workspace_folders then
+      -- local path = client.workspace_folders[1].name
+      -- if
+      --   path ~= vim.fn.stdpath("config")
+      --   and (vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc"))
+      -- then
+      --   return
+      -- end
+    end
     client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
       runtime = {
         -- Tell the language server which version of Lua you're using
@@ -219,8 +225,7 @@ lspconfig["lua_ls"].setup({
         version = "LuaJIT",
       },
       diagnostics = {
-        -- Get the language server to recognize the `vim` global
-        globals = { "hs" },
+        globals = { "hs", "put", "vim" },
       },
       -- Make the server aware of Neovim runtime files
       workspace = {
@@ -235,9 +240,7 @@ lspconfig["lua_ls"].setup({
       },
     })
   end,
-  settings = {
-    Lua = {},
-  },
+  settings = { Lua = {}, },
 })
 -- }}}
 
@@ -395,7 +398,7 @@ end
 -- Rounded border floating windows {{{2
 local hover = vim.lsp.buf.hover
 ---@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.hover = function()
+vim.lsp.buf.hover = function(opts)
   return hover({
     border = "single",
     -- max_width = 100,
@@ -406,7 +409,7 @@ end
 
 local signature_help = vim.lsp.buf.signature_help
 ---@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.signature_help = function()
+vim.lsp.buf.signature_help = function(opts)
   return signature_help({
     border = "single",
     max_width = math.floor(vim.o.columns * 0.7),

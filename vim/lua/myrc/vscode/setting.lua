@@ -6,10 +6,10 @@ vim.notify = vscode.notify
 vim.g.clipboard = vim.g.vscode_clipboard
 vim.opt.clipboard:append "unnamedplus"
 
-keymap.set({"n", "x"}, "<C-h>", "<Cmd>lua require('vscode').action('workbench.action.navigateLeft')<CR>")
-keymap.set({"n", "x"}, "<C-l>", "<Cmd>lua require('vscode').action('workbench.action.navigateRight')<CR>")
-keymap.set({"n", "x"}, "<C-j>", "<Cmd>lua require('vscode').action('workbench.action.navigateDown')<CR>")
-keymap.set({"n", "x"}, "<C-k>", "<Cmd>lua require('vscode').action('workbench.action.navigateUp')<CR>")
+-- keymap.set({"n", "x"}, "<C-h>", "<Cmd>lua require('vscode').action('workbench.action.navigateLeft')<CR>")
+-- keymap.set({"n", "x"}, "<C-l>", "<Cmd>lua require('vscode').action('workbench.action.navigateRight')<CR>")
+-- keymap.set({"n", "x"}, "<C-j>", "<Cmd>lua require('vscode').action('workbench.action.navigateDown')<CR>")
+-- keymap.set({"n", "x"}, "<C-k>", "<Cmd>lua require('vscode').action('workbench.action.navigateUp')<CR>")
 
 keymap.set({"n"}, "gx", "<Cmd>lua require('vscode').action('editor.action.quickFix')<CR>")
 keymap.set({"n"}, "<leader>ff", "<Cmd>lua require('vscode').action('workbench.action.quickOpen')<CR>")

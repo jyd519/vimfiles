@@ -297,7 +297,8 @@ return {
     event = { "BufReadPost", "BufNewFile" },
     config = function() require("myrc.config.lsp") end,
     dependencies = {
-      { "folke/neodev.nvim", lazy = true },
+      -- TODO
+      -- { "folke/neodev.nvim", lazy = true },
       { "mason-org/mason.nvim", cmd = "Mason", config = true },
       { "mason-org/mason-lspconfig.nvim" },
     },

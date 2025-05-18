@@ -1,8 +1,18 @@
-# vim-test 插件配置选项
+# config
+
+## 初始化顺序
+
+`init > exrc > plugins`
+
+> https://neovim.io/doc/user/starting.html#_initialization
+
+## vim-test 插件配置选项
 
 ```vim
 " 禁止cache
 let g:test#go#gotest#options = '-v --count=1'
+
+
 ```
 
 ```lua
@@ -24,3 +34,26 @@ for _, file in ipairs(vim.fn.globpath(lsp_dir, "*.lua", false, true)) do
     end
 end
 ```
+
+
+## exrc
+项目本地配置文件
+
+```
+set exrc
+
+Nvim will execute any .nvim.lua, .nvimrc, or .exrc file found in the current-directory and all parent directories
+(ordered upwards), if the files are in the trust list.
+
+
+```
+
+**To achieve project-local LSP configuration:**
+
+1. Enable 'exrc'.
+2. Place LSP configs at ".nvim/lsp/*.lua" in your project root.
+3. Create ".nvim.lua" in your project root directory with this line:
+
+`vim.cmd[[set runtimepath+=.nvim]]`
+
+> https://neovim.io/doc/user/options.html#'exrc'

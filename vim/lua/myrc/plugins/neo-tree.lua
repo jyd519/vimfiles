@@ -38,6 +38,7 @@ return {
       },
       window = {
         mappings = {
+          ["o"] = "noop",
           ["oo"] = "open",
           ["O"] = "system_open",
           ["Y"] = {

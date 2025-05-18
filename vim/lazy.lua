@@ -16,7 +16,7 @@ if env.DARK ~= nil then
   vim.o.background = env.DARK == "1" and "dark" or "light"
 end
 
-vim.loader.enable(true)
+vim.loader.enable()
 
 -- load global variables
 vim.cmd('runtime config/globals.vim')
