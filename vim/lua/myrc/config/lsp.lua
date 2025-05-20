@@ -7,6 +7,9 @@ local lspconfig = require("lspconfig")
 local util = lspconfig.util
 local is_window = vim.fn.has("win32") == 1
 
+-- $MASON -> ~/.local/share/nvim/mason
+--  vim.fn.exepath("clangd")
+--  vim.fn.expand("$MASON/packages/vue-language-server/")
 require("mason").setup()
 require("mason-lspconfig").setup({
   automatic_enable = false,
@@ -14,38 +17,15 @@ require("mason-lspconfig").setup({
 
 vim.lsp.set_log_level("warn")
 
+-- }}}
+
+-- key mappings {{{2
 local bufmap = function(mode, lhs, rhs, opts)
   local options = { buffer = true }
   if opts then options = vim.tbl_extend("force", options, opts) end
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
-local has_file = function(root, ...)
-  local patterns = vim.iter({ ... }):flatten():totable()
-  for _, name in ipairs(patterns) do
-    if vim.uv.fs_stat(table.concat({ root, name }, "/")) ~= nil then return true end
-  end
-  return false
-end
-
-local function get_typescript_server_path(root_dir)
-  local found_ts = ""
-  local function check_dir(path)
-    found_ts = table.concat({ path, "node_modules", "typescript", "lib" }, "/")
-    if vim.loop.fs_stat(found_ts) then return path end
-  end
-  if util.search_ancestors(root_dir, check_dir) then
-    return found_ts
-  else
-    put(">> typescript/lib not found")
-    return found_ts
-  end
-end
-
--- }}}
-
--- key mappings {{{2
----@diagnostic disable-next-line: unused-local
 local function setup_keymapping(client, bufnr)
   bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", { desc = "Go to definition" })
   bufmap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", { desc = "Go to declaration" })
@@ -80,12 +60,12 @@ end, {})
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
   callback = function(event)
-    local client_id = event.data.client_id
-    local client = vim.lsp.get_client_by_id(client_id)
+    local client = vim.lsp.get_client_by_id(event.data.client_id)
     local bufnr = event.buf
     local autocmd = api.nvim_create_autocmd
-    setup_keymapping(client, bufnr)
     if client == nil then return end
+
+    setup_keymapping(client, bufnr)
 
     if client.name == "ruff" then client.server_capabilities.hoverProvider = false end
 
@@ -149,9 +129,26 @@ util.default_config = vim.tbl_deep_extend("force", util.default_config, {
 })
 -- }}}
 
+-- vue/volar {{{2
+-- https://github.com/vuejs/language-tools
+lspconfig.volar.setup({
+  init_options = {
+    vue = {
+      hybridMode = false,
+    },
+  },
+})
+-- }}}
+
 -- tsserver {{{2
 require("typescript-tools").setup({
-  disable_commands = false, -- prevent the plugin from creating Vim commands
+  filetypes = {
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+  },
+  disable_commands = false,
   go_to_source_definition = {
     fallback = true, -- fall back to standard LSP definition on failure
   },
@@ -162,6 +159,25 @@ require("typescript-tools").setup({
       client.server_capabilities.documentFormattingProvider = false
       client.server_capabilities.documentRangeFormattingProvider = false
     end,
+  },
+  settings = {
+    single_file_support = false,
+    tsserver_file_preferences = {
+      includeInlayParameterNameHints = "all",
+      includeCompletionsForModuleExports = true,
+      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+      includeInlayFunctionParameterTypeHints = true,
+      includeInlayVariableTypeHints = true,
+      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+      includeInlayPropertyDeclarationTypeHints = true,
+      includeInlayFunctionLikeReturnTypeHints = true,
+      includeInlayEnumMemberValueHints = true,
+      quotePreference = "auto",
+    },
+
+    tsserver_plugins = {
+      "@styled/typescript-styled-plugin",
+    },
   },
 })
 -- }}}
@@ -210,13 +226,10 @@ lspconfig["lua_ls"].setup({
   end,
   on_init = function(client)
     if client.workspace_folders then
-      -- local path = client.workspace_folders[1].name
-      -- if
-      --   path ~= vim.fn.stdpath("config")
-      --   and (vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc"))
-      -- then
-      --   return
-      -- end
+      if (vim.fs.root(0, "vimfiles") == nil) and (vim.fs.root(0, { ".luarc.json",  ".luarc.jsonc"}))
+      then
+        return
+      end
     end
     client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
       runtime = {
@@ -240,7 +253,7 @@ lspconfig["lua_ls"].setup({
       },
     })
   end,
-  settings = { Lua = {}, },
+  settings = { Lua = {} },
 })
 -- }}}
 
@@ -314,17 +327,6 @@ lspconfig.pyright.setup({
 --     },
 --   },
 -- })
--- }}}
-
--- vue/volar {{{2
--- https://github.com/vuejs/language-tools
-lspconfig.volar.setup({
-  init_options = {
-    vue = {
-      hybridMode = false,
-    },
-  },
-})
 -- }}}
 
 -- yaml {{{2
