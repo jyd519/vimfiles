@@ -54,11 +54,11 @@ vim.api.nvim_create_autocmd("TermOpen", {
 if vim.fn.has("mac") == 1 and vim.fn.executable("im-select") == 1 then
   vim.api.nvim_create_autocmd("InsertLeave", {
     group = vimrc,
-    callback = function() require("misc").Ime_en() end,
+    callback = function() vim.fn["misc#Ime_en"]() end,
   })
   vim.api.nvim_create_autocmd("InsertEnter", {
     group = vimrc,
-    callback = function() require("misc").Ime_zh() end,
+    callback = function() vim.fn["misc#Ime_zh"]() end,
   })
 end
 

@@ -95,6 +95,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- Enable inlay hints
     if client:supports_method("textDocument/inlayHint") then lsp.inlay_hint.enable(true, { bufnr = event.buf }) end
 
+    if client:supports_method("textDocument/codeLens", bufnr) then
+      vim.lsp.codelens.refresh { bufnr = bufnr }
+      vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
+        buffer = bufnr,
+        callback = function()
+          vim.lsp.codelens.refresh { bufnr = bufnr }
+        end,
+      })
+    end
+
     if client.name == "clangd" then
       -- require("clangd_extensions.inlay_hints").setup_autocmd()
       -- require("clangd_extensions.inlay_hints").set_inlay_hints()
@@ -168,12 +178,12 @@ require("typescript-tools").setup({
     tsserver_file_preferences = {
       includeInlayParameterNameHints = "all",
       includeCompletionsForModuleExports = true,
-      includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-      includeInlayFunctionParameterTypeHints = true,
-      includeInlayVariableTypeHints = true,
-      includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-      includeInlayPropertyDeclarationTypeHints = true,
-      includeInlayFunctionLikeReturnTypeHints = true,
+      -- includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+      -- includeInlayFunctionParameterTypeHints = true,
+      -- includeInlayVariableTypeHints = true,
+      -- includeInlayVariableTypeHintsWhenTypeMatchesName = true,
+      -- includeInlayPropertyDeclarationTypeHints = true,
+      -- includeInlayFunctionLikeReturnTypeHints = true,
       includeInlayEnumMemberValueHints = true,
       quotePreference = "auto",
     },
@@ -256,7 +266,15 @@ lspconfig["lua_ls"].setup({
       },
     })
   end,
-  settings = { Lua = {} },
+  settings = { Lua = {
+    hint = {
+      enable = true,
+      paramName = "Literal",
+    },
+    codeLens = {
+      enable = true,
+    },
+  } },
 })
 -- }}}
 
