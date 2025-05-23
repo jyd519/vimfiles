@@ -102,7 +102,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- Tsserver usually works poorly. Sorry you work with bad languages
     -- You can remove this line if you know what you're doing :)
-    if client.name == "tsserver" then return end
+    if client.name == "tsserver" then
+      lsp.inlay_hint.enable(false, { bufnr = event.buf })
+      return
+    end
 
     -- format on save
     if client.server_capabilities.documentFormattingProvider then
