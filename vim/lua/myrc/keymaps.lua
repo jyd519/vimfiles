@@ -2,8 +2,6 @@
 local vim = vim
 local keymap = vim.keymap
 keymap.amend = prequire("keymap-amend")
-
-vim.g.enable_inlay_hint = true
 -- }}}
 
 -- General {{{2
@@ -78,10 +76,10 @@ vim.api.nvim_create_user_command("ZoomToggle", function() vim.fn["misc#ZoomToggl
 vim.keymap.set("n", "<leader>z", "<cmd>ZoomToggle<CR>", { silent = true, noremap = true })
 
 -- quickfix
-vim.keymap.set("n", "<F2>", function() require("qf").ToggleQuickFix() end, { silent = true, noremap = true })
-vim.keymap.set("n", "<S-F2>", function() require("qf").ToggleLocationList() end, { silent = true, noremap = true })
-vim.keymap.set("n", "<leader>xq", function() require("qf").ToggleQuickFix() end, { silent = true, noremap = true })
-vim.keymap.set("n", "<leader>xl", function() require("qf").ToggleLocationList() end, { silent = true, noremap = true })
+keymap.set("n", "<F2>", function() vim.fn["qf#ToggleQuickFix"]() end, { silent = true, noremap = true, desc="Toggle Quickfix" })
+keymap.set("n", "<leader>xq", function() vim.fn["qf#ToggleQuickFix"]() end, { silent = true, noremap = true, desc="Toggle Quickfix" })
+keymap.set("n", "<S-F2>", function() vim.fn["qf#ToggleLocationList"]() end, { silent = true, noremap = true, desc="Toggle Location List" })
+keymap.set("n", "<leader>xl", function() vim.fn["qf#ToggleLocationList"]() end, { silent = true, noremap = true, desc="Toggle Location List" })
 
 -- enable osc52 copying for remote ssh connection
 if vim.env.SSH_CONNECTION ~= "" and vim.g.is_vim then
@@ -642,5 +640,11 @@ vim.api.nvim_create_user_command('CopyFileName', function()
     local path = vim.fn.expand('%:t')
     copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
 end, {})
+
+-- FloatTerm
+keymap.set("n", "<C-`>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("t", "<C-`>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("n", "<F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("t", "<F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 
 -- vim: set fdm=marker fdl=1: }}}

@@ -1,5 +1,7 @@
 local opt, g = vim.opt, vim.g
 
+g.enable_inlay_hint = true
+
 if g.enabled_plugins == nil then
   g.enabled_plugins = {
     telescope = 1,

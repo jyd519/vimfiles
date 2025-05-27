@@ -29,7 +29,7 @@ return {
   {
     "ojroques/nvim-osc52",
     event = "VimEnter",
-    enabled = vim.env.SSH_CLIENT ~= nil or vim.env.WSL_DISTRO_NAME ~= nil,
+    enabled = vim.fn.has("nvim-0.10") == 0 and vim.env.SSH_CLIENT ~= nil or vim.env.WSL_DISTRO_NAME ~= nil,
     config = function()
       require("osc52").setup()
       vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
