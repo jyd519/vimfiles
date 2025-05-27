@@ -3,7 +3,6 @@ local g, fn = vim.g, vim.fn
 return {
   {
     "mhinz/vim-startify",
-    enabled = true,
     init = function() g.startify_files_number = 5 end,
   },
   {
@@ -12,7 +11,7 @@ return {
     init = function() vim.g.startuptime_tries = 10 end,
   },
   -- Utils {{{2
-  { "folke/which-key.nvim", enabled = false },
+  { "folke/which-key.nvim", enabled = g.enabled_plugins["which_key"] == 1, config = true, event = "VeryLazy" },
   { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
   {
     "nvim-treesitter/nvim-treesitter",
@@ -29,7 +28,7 @@ return {
   {
     "ojroques/nvim-osc52",
     event = "VimEnter",
-    enabled = vim.fn.has("nvim-0.10") == 0 and vim.env.SSH_CLIENT ~= nil or vim.env.WSL_DISTRO_NAME ~= nil,
+    enabled = vim.fn.has("nvim-0.10") == 0 and g.enabled_plugins.osc == 1,
     config = function()
       require("osc52").setup()
       vim.keymap.set("v", "<leader>y", require("osc52").copy_visual)
@@ -118,7 +117,6 @@ return {
   },
   {
     "lukas-reineke/indent-blankline.nvim",
-    enabled = true,
     event = { "BufReadPost", "BufNewFile" },
     config = function() require("myrc.config.indent-blankline") end,
   },
@@ -323,7 +321,7 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
-    enabled = fn.get(g.enabled_plugins, "telescope") == 1,
+    enabled = g.enabled_plugins.telescope == 1,
     cmd = { "Telescope" },
     tag = "0.1.8",
     dependencies = {

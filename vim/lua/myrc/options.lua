@@ -6,6 +6,7 @@ if g.enabled_plugins == nil then
   g.enabled_plugins = {
     telescope = 1,
     fzf = 1,
+    osc = 0,
     node = 0,
     go = 0,
     rust = 0,
@@ -13,6 +14,7 @@ if g.enabled_plugins == nil then
     tmux = 0,
     test = 0,
     ghost_text = 0,
+    which_key = 0,
   }
 end
 

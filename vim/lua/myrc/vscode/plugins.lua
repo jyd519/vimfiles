@@ -100,13 +100,4 @@ require("lazy").setup(
   -- }}}
 )
 
--- Initialize enabled_plugins{{{2
-local plugins = g.enabled_plugins
-local lazyPlugins = require("lazy").plugins()
-for _, plugin in pairs(lazyPlugins) do
-  if type(plugin) == "table" then plugins[plugin.name:lower()] = 1 end
-end
-g.enabled_plugins = plugins
--- }}}
-
 -- vim: set fdm=marker fdl=1: }}}
