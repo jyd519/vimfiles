@@ -63,10 +63,3 @@ require("lazy").setup({
     },
   },
 })
-
-local plugins = g.enabled_plugins
-local lazyPlugins = require("lazy").plugins()
-for _, plugin in pairs(lazyPlugins) do
-  if type(plugin) == "table" then plugins[plugin.name:lower()] = 1 end
-end
-g.enabled_plugins = plugins

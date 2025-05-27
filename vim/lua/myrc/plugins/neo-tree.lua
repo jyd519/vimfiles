@@ -16,14 +16,18 @@ return {
     cmd = { "Neotree", "Neotree float", "Neotree reveal" },
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
+      "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
     },
     opts = {
       -- hide_root_node = true,
       open_files_do_not_replace_types = { "terminal", "Trouble", "trouble", "qf", "Outline" },
       filesystem = {
-        -- bind_to_cwd = false,
+        bind_to_cwd = true,
+        cwd_target = {
+          sidebar = "tab",   -- sidebar is when position = left or right
+          current = "window" -- current is when position = current
+        },
         -- follow_current_file = { enabled = true },
         -- use_libuv_file_watcher = true,
         window = {

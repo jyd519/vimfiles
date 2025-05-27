@@ -34,7 +34,20 @@ for _, file in ipairs(vim.fn.globpath(lsp_dir, "*.lua", false, true)) do
     end
 end
 ```
+## powershell
 
+```lua
+--- Use PowerShell as default Shell on Windows
+if vim.fn.has "win32" == 1 then
+  opt.shell = vim.fn.executable "pwsh" == 1 and "pwsh" or "powershell"
+  opt.shellcmdflag =
+    "-NoLogo -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.UTF8Encoding]::new();$PSDefaultParameterValues['Out-File:Encoding']='utf8';Remove-Alias -Force -ErrorAction SilentlyContinue tee;"
+  opt.shellredir = '2>&1 | %{ "$_" } | Out-File %s; exit $LastExitCode'
+  opt.shellpipe = '2>&1 | %{ "$_" } | tee %s; exit $LastExitCode'
+  opt.shellquote = ""
+  opt.shellxquote = ""
+end
+```
 
 ## exrc
 项目本地配置文件
