@@ -644,7 +644,9 @@ end, {})
 -- FloatTerm
 keymap.set("n", "<C-`>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("t", "<C-`>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set("n", "<F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set("t", "<F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("n", "<F24>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("n", "<S-F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("t", "<F24>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("t", "<S-F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 
 -- vim: set fdm=marker fdl=1: }}}
