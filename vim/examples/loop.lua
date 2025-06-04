@@ -29,3 +29,11 @@ while 1 do
   put(i)
   i = i + 1
 end
+
+-- iter
+put(vim
+      .iter(vim.lsp.get_clients())
+      :map(function(client)
+        return client.name
+      end)
+      :totable())

@@ -367,11 +367,10 @@ local start_lsp_client = function()
   local buf = vim.api.nvim_get_current_buf()
   local clients = vim.lsp.get_clients({ bufnr = buf })
   if not vim.tbl_isempty(clients) then
-    vim.cmd("LspRestart")
+    for _, client in pairs(clients) do
+      vim.cmd("LspRestart " .. client.name)
+    end
     vim.notify("Restarting LSP Server", vim.log.levels.INFO, { title = "LSP" })
-  else
-    vim.cmd("LspStart")
-    vim.notify("Starting LSP Server", vim.log.levels.INFO, { title = "LSP" })
   end
 end
 
