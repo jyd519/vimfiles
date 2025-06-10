@@ -20,7 +20,7 @@ sudo mkdir -p $target
 if [[ "$OS" == "Linux" ]]; then
   sudo mv ./nvim-linux64/* $target
 else
-  sudo mv ./nvim-macos/* $target
+  sudo mv ./nvim-macos-${ARCH}/* $target
 fi
 
 sudo ln -sf $target/bin/nvim /usr/local/bin/
