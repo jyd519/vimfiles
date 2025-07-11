@@ -89,3 +89,9 @@ snippet defineStore "pinia defineStore"
 		return { count, doubleCount, increment }
 	})
 
+
+snippet lazyInit "wrap a function as lazy initialized function"
+		export const lazyInit = <T, A>(fn: (...args: A[]) => T) => {
+			let prom: T = undefined;
+			return (...args: A[]) => (prom = prom || fn(...args));
+		};

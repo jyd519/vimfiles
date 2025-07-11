@@ -98,6 +98,20 @@ require("nvim-surround").buffer_setup(
                     return {{'`'}, {'`'}}
                 end
             },
+            ["C"] = {
+                add = function()
+                    return {{'```'}, {'```'}}
+                end
+            },
+            ["L"] = {
+                add = function()
+                  local config = require("nvim-surround.config")
+                  local result = config.get_input("Enter the language name: ")
+                  if result then
+                      return { { "```" .. result }, { "```" } }
+                  end
+                end
+            },
             ["l"] = {
                 add = function()
                   local config = require("nvim-surround.config")
