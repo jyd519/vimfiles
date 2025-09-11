@@ -1,5 +1,4 @@
 local default_proxy = vim.env.HTTP_PROXY or vim.g.proxy
-local default_adapter = vim.g.llm_adapter or "gemini"
 local default_lang = "English"
 
 -- [codecompanion] system prompt needs to be in C locale
@@ -9,12 +8,14 @@ os.setlocale("C", "time")
 local function set_proxy()
   local config = require("codecompanion.config").config
   config.adapters.http.opts["proxy"] = default_proxy
+  -- vim.notify("codecompanion: " .. tostring(config.adapters.http.opts["proxy"]), vim.log.levels.INFO)
 end
 
 -- Function to unset proxy
 local function unset_proxy()
   local config = require("codecompanion.config").config
   config.adapters.http.opts["proxy"] = nil
+  -- vim.notify("codecompanion: proxy cleared", vim.log.levels.INFO)
 end
 
 local function check_api_key(key_name)
@@ -111,8 +112,7 @@ require("codecompanion").setup({
         allow_insecure = true,
         proxy = default_proxy,
       },
-      gemini = function()
-        set_proxy()
+      gemini = function(a)
         local api_key = check_api_key("gemini_key")
         if not api_key then return nil end
         return require("codecompanion.adapters").extend("gemini", {
@@ -127,7 +127,6 @@ require("codecompanion").setup({
         })
       end,
       deepseek = function()
-        unset_proxy()
         local api_key = check_api_key("deepseek_key")
         if not api_key then return nil end
         return require("codecompanion.adapters").extend("deepseek", {
@@ -175,7 +174,6 @@ require("codecompanion").setup({
         })
       end,
       volengine = function()
-        unset_proxy()
         local api_key = check_api_key("volcengine_key")
         if not api_key then return nil end
         return require("codecompanion.adapters").extend("openai_compatible", {
@@ -198,7 +196,6 @@ require("codecompanion").setup({
         })
       end,
       groq = function()
-        set_proxy()
         local api_key = check_api_key("groq_key")
         if not api_key then return nil end
         return require("codecompanion.adapters").extend("openai_compatible", {
@@ -239,7 +236,7 @@ vim.api.nvim_create_user_command("AIConfig", function(args)
   for _, v in pairs(args.fargs) do
     if v == "proxy" then
       default_proxy = vim.env.HTTP_PROXY or vim.g.proxy
-      config.adapters.opts["proxy"] = vim.g.proxy
+      config.adapters.http.opts["proxy"] = vim.g.proxy
       vim.notify("codecompanion: " .. tostring(config.adapters.http.opts["proxy"]), vim.log.levels.INFO)
     end
     if v == "noproxy" then
@@ -260,3 +257,36 @@ end, {
   desc = "Config codecompanion: proxy, language",
   complete = function() return { "proxy", "noproxy", "zh", "en" } end,
 })
+
+--
+-- Set or unset proxy based on the adapter name to avoid conflicts with specific services
+local no_proxy = {
+   deepseek = true,
+   volengine = true,
+}
+
+local http = require("codecompanion.http");
+local origin_http_new = http.new
+http.new = function(opts)
+  if no_proxy[opts.adapter.name] then
+    unset_proxy()
+  else
+    set_proxy()
+  end
+  return origin_http_new(opts)
+end
+
+-- local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
+-- vim.api.nvim_create_autocmd({ "User" }, {
+--   pattern = "CodeCompanionChatAdapter",
+--   group = group,
+--   callback = function(request)
+--     if no_proxy[request.data.adapter.name] then
+--       unset_proxy()
+--     else
+--       set_proxy()
+--     end
+--   end,
+-- })
+
+
