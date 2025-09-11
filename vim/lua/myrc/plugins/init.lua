@@ -150,7 +150,28 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "ravitemer/codecompanion-history.nvim", -- Save and load conversation history
+      {
+        "ravitemer/mcphub.nvim", -- Manage MCP servers
+        cmd = "MCPHub",
+        build = "npm install -g mcp-hub@latest",
+        config = true,
+      },
       { "MeanderingProgrammer/render-markdown.nvim", lazy = true, ft = { "codecompanion" } },
+      {
+        "HakonHarnes/img-clip.nvim", -- Share images with the chat buffer
+        event = "VeryLazy",
+        cmd = "PasteImage",
+        opts = {
+          filetypes = {
+            codecompanion = {
+              prompt_for_file_name = false,
+              template = "[Image]($FILE_PATH)",
+              use_absolute_path = true,
+            },
+          },
+        },
+      },
     },
     config = function() require("myrc.config.codecompanion") end,
   },

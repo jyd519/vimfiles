@@ -13,6 +13,7 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
+    enabled = true,
     cmd = { "Neotree", "Neotree float", "Neotree reveal" },
     dependencies = {
       "nvim-lua/plenary.nvim",

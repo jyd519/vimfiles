@@ -27,7 +27,7 @@ vim.keymap.set("n", "<leader>tc", ":tabclose<cr>", { noremap = true })
 vim.keymap.set("n", "<leader>tm", ":tabmove", { noremap = true })
 
 -- Switch to current dir
-vim.keymap.set("n", "<leader>CD", ":lcd %:p:h<cr>:pwd<cr>", { noremap = true })
+vim.keymap.set("n", "<leader>cd", ":lcd %:p:h<cr>:pwd<cr>", { noremap = true, desc = "Change current dir to file dir" })
 
 -- Delete current line without yanking the line breaks
 vim.keymap.set("n", "dil", "^d$", { noremap = true })
@@ -648,4 +648,4 @@ keymap.set("n", "<S-F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Togg
 keymap.set("t", "<F24>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("t", "<S-F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 
--- vim: set fdm=marker fdl=1: }}}
+-- vim: set fdm=marker fdl=0: }}}

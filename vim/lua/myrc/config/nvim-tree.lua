@@ -1,5 +1,5 @@
-local function my_on_attach(bufnr)
-  local api = require("nvim-tree.api")
+local function nvim_tree_on_attach(bufnr)
+  local api = require "nvim-tree.api"
 
   local function opts(desc)
     return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
@@ -9,25 +9,20 @@ local function my_on_attach(bufnr)
   api.config.mappings.default_on_attach(bufnr)
 
   -- custom mappings
-  vim.keymap.set("n", "?", api.tree.toggle_help, opts("Help"))
+  vim.keymap.set("n", "<C-t>", api.tree.change_root_to_parent,        opts("Up"))
+  vim.keymap.set("n", "?",     api.tree.toggle_help,                  opts("Help"))
 end
 
 require("nvim-tree").setup({
-  sync_root_with_cwd = true,
-  git = {
-    enable = false
-  },
-  on_attach = my_on_attach,
-  -- respect_buf_cwd = true,
-  -- update_focused_file = {
-  --   enable = true,
-  --   update_root = true
-  -- },
+  on_attach = nvim_tree_on_attach,
   view = {
     width = 40,
   },
   renderer = {
-    group_empty = true,
+    root_folder_label = function (path)
+      path = path:gsub(vim.loop.os_homedir(), "~", 1)
+      return path:gsub("([a-zA-Z])[a-z]+", "%1") .. path:gsub(".*[^a-zA-Z].?", "")
+    end
   },
   filters = {
     dotfiles = true,
