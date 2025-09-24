@@ -3,8 +3,6 @@
 -- Globals {{{2
 local api = vim.api
 local lsp = vim.lsp
-local lspconfig = require("lspconfig")
-local util = lspconfig.util
 local is_window = vim.fn.has("win32") == 1
 
 -- $MASON -> ~/.local/share/nvim/mason
@@ -135,22 +133,23 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 -- }}}
 
--- default lspconfig {{{2
+-- default lsp config {{{2
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-util.default_config = vim.tbl_deep_extend("force", util.default_config, {
-  capabilities = capabilities,
+vim.lsp.config("*", {
+  capabilities = capabilities
 })
 -- }}}
 
 -- vue/volar {{{2
 -- https://github.com/vuejs/language-tools
-lspconfig.volar.setup({
+vim.lsp.config("vue_ls", {
   init_options = {
     vue = {
       hybridMode = false,
     },
   },
 })
+vim.lsp.enable("vue_ls")
 -- }}}
 
 -- tsserver {{{2
@@ -230,12 +229,11 @@ local function get_lua_library()
   return library
 end
 
-lspconfig["lua_ls"].setup({
-  root_dir = function(fname)
-    local primary =
-      util.root_pattern(".luarc.json", ".luarc.jsonc", ".project", "package.json", "pyproject.toml", ".git")(fname)
+vim.lsp.config("lua_ls", {
+  root_dir = function(bufnr, on_dir)
+    local primary = vim.fs.root(bufnr, {".luarc.json", ".luarc.jsonc", ".project", "package.json", "pyproject.toml", ".git"})
     local fallback = vim.loop.cwd()
-    return primary or fallback
+    on_dir(primary or fallback)
   end,
   on_init = function(client)
     if client.workspace_folders then
@@ -276,6 +274,7 @@ lspconfig["lua_ls"].setup({
     },
   } },
 })
+vim.lsp.enable("lua_ls")
 -- }}}
 
 -- rust {{{2
@@ -312,7 +311,7 @@ end
 
 -- pyright {{{2
 -- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-lspconfig.pyright.setup({
+vim.lsp.config("pyright", {
   before_init = function(_, config)
     local p = getPythonPath()
     vim.defer_fn(function() vim.notify("Python (pyright): " .. p) end, 300)
@@ -336,6 +335,7 @@ lspconfig.pyright.setup({
   },
 })
 
+vim.lsp.enable("pyright")
 -- lspconfig.basedpyright.setup({
 --   basedpyright  = {
 --     analysis = {
@@ -392,7 +392,8 @@ local yamlls_cfg = require("yaml-companion").setup({
     },
   },
 })
-lspconfig.yamlls.setup(yamlls_cfg)
+vim.lsp.config("yamlls", yamlls_cfg)
+vim.lsp.enable("yamlls")
 -- }}}
 
 -- other languages {{{2
@@ -414,7 +415,8 @@ for _, name in ipairs(servers) do
     capabilities = capabilities,
   }
   if lsp_settings[name] then opts = vim.tbl_deep_extend("force", opts, lsp_settings[name]) end
-  lspconfig[name].setup(opts)
+  vim.lsp.config(name, opts)
+  vim.lsp.enable(name)
 end
 -- }}}
 

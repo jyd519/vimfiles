@@ -313,7 +313,7 @@ return {
   -- LSP {{{2
   {
     "neovim/nvim-lspconfig",
-    event = { "BufReadPost", "BufNewFile" },
+    -- event = { "BufReadPost", "BufNewFile" },
     config = function() require("myrc.config.lsp") end,
     dependencies = {
       -- TODO
