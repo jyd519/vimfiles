@@ -1,5 +1,48 @@
 # My VIM Configuratiosn
 
+This repository contains a comprehensive Vim/Neovim configuration designed for developers who want a powerful, efficient, and modern editing environment. The configuration supports both traditional Vim and modern Neovim with Lua-based configurations.
+
+## Features
+
+### Modular Configuration
+- **Dual Support**: Separate configurations for Vim (`basic.vim`) and Neovim (`lazy.lua`)
+- **Plugin Management**: Uses vim-plug for Vim and lazy.nvim for Neovim
+- **Conditional Loading**: Plugins can be enabled/disabled based on user needs
+- **Performance Optimized**: Lazy loading and efficient plugin management
+
+### Rich Plugin Ecosystem
+- **Code Completion**: Multiple completion engines (YouCompleteMe, CoC, nvim-cmp)
+- **Language Support**: Extensive support for JavaScript/TypeScript, Go, Rust, Python, C/C++, and more
+- **Navigation**: Fuzzy finders (fzf, telescope), file explorers (NERDTree, nvim-tree)
+- **Development Tools**: LSP integration, DAP debugging, testing frameworks
+- **Productivity**: Snippets, auto-pairs, surround operations, commenting tools
+
+### Modern Development Workflow
+- **LSP Integration**: Full language server protocol support
+- **Debugging**: Built-in DAP support for multiple languages
+- **Version Control**: Git integration with fugitive and gitgutter
+- **Terminal Integration**: Built-in terminal support with floaterm
+- **Formatting**: Code formatting with neoformat
+
+## Project Structure
+
+```
+.
+├── README.md              # This file
+├── install-nvim.ps1       # Neovim installer for Windows
+├── install-nvim.sh        # Neovim installer for Unix-like systems
+├── vim/                   # Main Vim configuration directory
+│   ├── basic.vim          # Entry point for Vim configuration
+│   ├── lazy.lua           # Entry point for Neovim configuration
+│   ├── config/            # Shared configuration files
+│   ├── lua/               # Neovim Lua modules
+│   │   └── myrc/          # Custom Neovim configuration
+│   │       ├── plugins/   # Plugin specifications
+│   │       └── config/    # Plugin configurations
+│   └── plugged/           # Vim-plug managed plugins (Vim)
+└── lazy/                  # Lazy.nvim managed plugins (Neovim)
+```
+
 ## Install
 
 1. Get Vim Files

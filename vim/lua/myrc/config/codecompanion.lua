@@ -43,7 +43,7 @@ local prompt_library = {
       ignore_system_prompt = true,
       adapter = {
         name = "deepseek",
-        model = "deepseek-chat"
+        model = "deepseek-chat",
       },
     },
     prompts = {
@@ -110,6 +110,7 @@ require("codecompanion").setup({
       opts = {
         show_defaults = false,
         allow_insecure = true,
+        show_model_choices = true,
         proxy = default_proxy,
       },
       gemini = function(a)
@@ -121,7 +122,7 @@ require("codecompanion").setup({
           },
           schema = {
             model = {
-              default = "gemini-2.0-flash-exp",
+              default = "gemini-2.5-flash",
             },
           },
         })
@@ -215,6 +216,18 @@ require("codecompanion").setup({
         })
       end,
     },
+    acp = {
+      opts = {},
+      qwen_cli = function()
+        return require("codecompanion.adapters").extend("gemini_cli", {
+          commands = {
+            default = {
+              "C:\\Users\\jiyongdong\\AppData\\Local\\fnm_multishells\\27020_1757380319936\\qwen.cmd",
+            },
+          },
+        })
+      end,
+    },
   },
   prompt_library = prompt_library,
   extensions = {
@@ -261,11 +274,11 @@ end, {
 --
 -- Set or unset proxy based on the adapter name to avoid conflicts with specific services
 local no_proxy = {
-   deepseek = true,
-   volengine = true,
+  deepseek = true,
+  volengine = true,
 }
 
-local http = require("codecompanion.http");
+local http = require("codecompanion.http")
 local origin_http_new = http.new
 http.new = function(opts)
   if no_proxy[opts.adapter.name] then
@@ -288,5 +301,3 @@ end
 --     end
 --   end,
 -- })
-
-
