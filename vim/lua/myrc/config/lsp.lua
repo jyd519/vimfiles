@@ -3,7 +3,6 @@
 -- Globals {{{2
 local api = vim.api
 local lsp = vim.lsp
-local is_window = vim.fn.has("win32") == 1
 
 -- $MASON -> ~/.local/share/nvim/mason
 --  vim.fn.exepath("clangd")
@@ -14,7 +13,6 @@ require("mason-lspconfig").setup({
 })
 
 vim.lsp.set_log_level("warn")
-
 -- }}}
 
 -- key mappings {{{2
@@ -94,12 +92,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- if client:supports_method("textDocument/inlayHint") then lsp.inlay_hint.enable(true, { bufnr = event.buf }) end
 
     if client:supports_method("textDocument/codeLens", bufnr) then
-      vim.lsp.codelens.refresh { bufnr = bufnr }
+      vim.lsp.codelens.refresh({ bufnr = bufnr })
       vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
         buffer = bufnr,
-        callback = function()
-          vim.lsp.codelens.refresh { bufnr = bufnr }
-        end,
+        callback = function() vim.lsp.codelens.refresh({ bufnr = bufnr }) end,
       })
     end
 
@@ -133,314 +129,36 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 -- }}}
 
--- default lsp config {{{2
-local capabilities = require("cmp_nvim_lsp").default_capabilities()
-vim.lsp.config("*", {
-  capabilities = capabilities
+-- Languages {{{2
+vim.lsp.enable({
+  "cmake",
+  "bashls",
+  "yamlls",
+  "clangd",
+  "angularls",
+  "vue_ls",
+  "cssls",
+  "ansiblels",
+  "jsonls",
+  "gopls",
+  "emmet_language_server",
+  "pyright",
+  "ruff",
+  "lua_ls",
 })
--- }}}
-
--- vue/volar {{{2
--- https://github.com/vuejs/language-tools
-vim.lsp.config("vue_ls", {
-  init_options = {
-    vue = {
-      hybridMode = false,
-    },
-  },
-})
-vim.lsp.enable("vue_ls")
--- }}}
-
--- tsserver {{{2
-require("typescript-tools").setup({
-  filetypes = {
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact",
-  },
-  disable_commands = false,
-  go_to_source_definition = {
-    fallback = true, -- fall back to standard LSP definition on failure
-  },
-  server = {
-    on_attach = function(client, bufnr)
-      client.server_capabilities.document_formatting = false
-      client.server_capabilities.document_range_formatting = false
-      client.server_capabilities.documentFormattingProvider = false
-      client.server_capabilities.documentRangeFormattingProvider = false
-    end,
-  },
-  settings = {
-    single_file_support = false,
-    tsserver_file_preferences = {
-      includeInlayParameterNameHints = "all",
-      includeCompletionsForModuleExports = true,
-      -- includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-      -- includeInlayFunctionParameterTypeHints = true,
-      -- includeInlayVariableTypeHints = true,
-      -- includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-      -- includeInlayPropertyDeclarationTypeHints = true,
-      -- includeInlayFunctionLikeReturnTypeHints = true,
-      includeInlayEnumMemberValueHints = true,
-      quotePreference = "auto",
-    },
-
-    tsserver_plugins = {
-      "@styled/typescript-styled-plugin",
-    },
-  },
-})
--- }}}
-
--- lua lsp {{{2
-local function get_lua_library()
-  local library = {}
-  local path = vim.split(package.path, ";")
-
-  -- this is the ONLY correct way to setup your path
-  table.insert(path, "lua/?.lua")
-  table.insert(path, "lua/?/init.lua")
-
-  local function add(lib)
-    for _, p in pairs(vim.fn.expand(lib, false, true)) do
-      local rp = vim.loop.fs_realpath(p)
-      if rp then table.insert(library, rp) end
-    end
-  end
-
-  -- add runtime
-  add("$VIMRUNTIME")
-
-  -- add your config
-  add("$VIMFILES/lua")
-
-  -- add plugins
-  add("$VIMFILES/lazy/plenary.nvim/lua")
-  add("$VIMFILES/lazy/nvim-cmp/lua")
-  add("$VIMFILES/lazy/nvim-lspconfig/lua")
-  -- TOO SLOW
-  -- local paths = vim.api.nvim_get_runtime_file("", true)
-  -- for _, p in pairs(paths) do
-  --   table.insert(library, p)
-  -- end
-  table.insert(library, "${3rd}/luv/library")
-  return library
-end
-
-vim.lsp.config("lua_ls", {
-  root_dir = function(bufnr, on_dir)
-    local primary = vim.fs.root(bufnr, {".luarc.json", ".luarc.jsonc", ".project", "package.json", "pyproject.toml", ".git"})
-    local fallback = vim.loop.cwd()
-    on_dir(primary or fallback)
-  end,
-  on_init = function(client)
-    if client.workspace_folders then
-      if (vim.fs.root(0, "vimfiles") == nil) and (vim.fs.root(0, { ".luarc.json",  ".luarc.jsonc"}))
-      then
-        return
-      end
-    end
-    client.config.settings.Lua = vim.tbl_deep_extend("force", client.config.settings.Lua, {
-      runtime = {
-        -- Tell the language server which version of Lua you're using
-        -- (most likely LuaJIT in the case of Neovim)
-        version = "LuaJIT",
-      },
-      diagnostics = {
-        globals = { "hs", "put", "vim" },
-      },
-      -- Make the server aware of Neovim runtime files
-      workspace = {
-        checkThirdParty = false,
-        -- Make the server aware of Neovim runtime files
-        library = get_lua_library(),
-        -- or pull in all of 'runtimepath'. NOTE: this is a lot slower
-        -- library = vim.api.nvim_get_runtime_file("", true)
-        -- maxPreload = 1000,
-        -- preloadFileSize = 500,
-        -- checkThirdParty = false,
-      },
-    })
-  end,
-  settings = { Lua = {
-    hint = {
-      enable = true,
-      paramName = "Literal",
-    },
-    codeLens = {
-      enable = true,
-    },
-  } },
-})
-vim.lsp.enable("lua_ls")
--- }}}
-
--- rust {{{2
-require("rust-tools").setup({
-  server = {
-    on_attach = function(client, bufnr)
-      local set_option = api.nvim_set_option_value
-      set_option("formatexpr", "v:lua.vim.lsp.formatexpr()", { buf = bufnr })
-      set_option("omnifunc", "v:lua.vim.lsp.omnifunc", { buf = bufnr })
-      set_option("tagfunc", "v:lua.vim.lsp.tagfunc", { buf = bufnr })
-    end,
-    dap = {
-      adapter = require("dap").adapters.codelldb,
-    },
-  },
-})
--- }}}
-
-local function getPythonPath()
-  local p
-  local python = is_window and "python.exe" or "python"
-  if vim.env.VIRTUAL_ENV then
-    p = vim.fs.joinpath(vim.env.VIRTUAL_ENV, "bin", python)
-    if vim.uv.fs_stat(p) then return p end
-  end
-
-  p = vim.fs.joinpath(".venv", "Scripts", python)
-  if vim.uv.fs_stat(p) then return p end
-  p = vim.fs.joinpath(".venv", "bin", python)
-  if vim.uv.fs_stat(p) then return p end
-
-  return python
-end
-
--- pyright {{{2
--- https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-vim.lsp.config("pyright", {
-  before_init = function(_, config)
-    local p = getPythonPath()
-    vim.defer_fn(function() vim.notify("Python (pyright): " .. p) end, 300)
-    config.settings.python.pythonPath = p
-  end,
-  settings = {
-    pyright = {
-      -- Using Ruff's import organizer
-      disableOrganizeImports = true,
-    },
-    python = {
-      analysis = {
-        -- Ignore all files for analysis to exclusively use Ruff for linting
-        -- ignore = { '*' },
-        -- typeCheckingMode = "basic",
-        autoSearchPaths = true,
-        diagnosticMode = "openFilesOnly",
-        useLibraryCodeForTypes = true,
-      },
-    },
-  },
-})
-
-vim.lsp.enable("pyright")
--- lspconfig.basedpyright.setup({
---   basedpyright  = {
---     analysis = {
---       -- Ignore all files for analysis to exclusively use Ruff for linting
---       -- ignore = { '*' },
---       -- typeCheckingMode = "basic",
---       autoSearchPaths = true,
---       diagnosticMode = "openFilesOnly",
---       useLibraryCodeForTypes = true
---     },
---   },
--- })
--- }}}
-
--- yaml {{{2
---
-local yamlls_cfg = require("yaml-companion").setup({
-  schemas = {
-    {
-      name = "openapi-3.0 local",
-      uri = vim.fn.expand("$VIMFILES/openapi-schema.json"),
-    },
-  },
-  lspconfig = {
-    settings = {
-      redhat = { telemetry = { enabled = false } },
-      http = { proxy = vim.g.proxy },
-      yaml = {
-        hover = true,
-        schemaStore = {
-          enable = true,
-          url = "https://www.schemastore.org/api/json/catalog.json",
-        },
-        schemaDownload = { enable = true },
-        -- Use schemastore
-        -- schemaStore = {
-        --   -- You must disable built-in schemaStore support if you want to use
-        --   -- this plugin and its advanced options like `ignore`.
-        --   enable = false,
-        --   -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-        --   url = "",
-        -- },
-        -- schemas = require("schemastore").yaml.schemas({
-        --   extra = {
-        --     {
-        --       description = "Local openapi schema",
-        --       fileMatch = "*openapi.yaml",
-        --       name = "openapi.yaml",
-        --       url = vim.fn.expand("$VIMFILES/openapi-schema.json"),
-        --     },
-        --   },
-        -- }),
-      },
-    },
-  },
-})
-vim.lsp.config("yamlls", yamlls_cfg)
-vim.lsp.enable("yamlls")
--- }}}
-
--- other languages {{{2
-local lsp_settings = {
-  jsonls = {
-    settings = {
-      json = {
-        schemas = require("schemastore").json.schemas(),
-        validate = { enable = true },
-      },
-    },
-  },
-}
-
-local servers =
-  { "cmake", "bashls", "clangd", "angularls", "cssls", "ansiblels", "jsonls", "gopls", "emmet_language_server", "ruff" }
-for _, name in ipairs(servers) do
-  local opts = {
-    capabilities = capabilities,
-  }
-  if lsp_settings[name] then opts = vim.tbl_deep_extend("force", opts, lsp_settings[name]) end
-  vim.lsp.config(name, opts)
-  vim.lsp.enable(name)
-end
 -- }}}
 
 -- Rounded border floating windows {{{2
-local hover = vim.lsp.buf.hover
+-- local hover = vim.lsp.buf.hover
 ---@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.hover = function(opts)
-  return hover({
-    border = "single",
-    -- max_width = 100,
-    max_width = math.floor(vim.o.columns * 0.7),
-    max_height = math.floor(vim.o.lines * 0.7),
-  })
-end
-
-local signature_help = vim.lsp.buf.signature_help
----@diagnostic disable-next-line: duplicate-set-field
-vim.lsp.buf.signature_help = function(opts)
-  return signature_help({
-    border = "single",
-    max_width = math.floor(vim.o.columns * 0.7),
-    max_height = math.floor(vim.o.lines * 0.7),
-  })
-end
+-- vim.lsp.buf.hover = function(opts)
+--   return hover({
+--     border = "single",
+--     -- max_width = 100,
+--     max_width = math.floor(vim.o.columns * 0.7),
+--     max_height = math.floor(vim.o.lines * 0.7),
+--   })
+-- end
 -- }}}
 
 -- Diagnostics Settings {{{2

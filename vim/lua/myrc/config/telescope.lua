@@ -12,6 +12,7 @@ telescope.setup({
       },
       i = {
         ["<M-p>"] = action_layout.toggle_preview,
+        ["<C-u>"] = false
       },
     },
   },
@@ -43,6 +44,34 @@ telescope.setup({
             require("telescope.actions").close(prompt_bufnr)
             -- Depending on what you want put `cd`, `lcd`, `tcd`
             vim.cmd(string.format("silent lcd %s", dir))
+          end,
+        },
+      },
+    },
+    git_branches = {
+      mappings = {
+        i = {
+          ["<CR>"] = function(prompt_bufnr)
+            -- get the selected file name
+            local entry = require("telescope.actions.state").get_selected_entry()
+            -- close telescope
+            require("telescope.actions").close(prompt_bufnr)
+            -- open diffview
+            vim.cmd("DiffviewOpen " .. entry.name)
+          end,
+        },
+      },
+    },
+    git_commits = {
+      mappings = {
+        i = {
+          ["<CR>"] = function(prompt_bufnr)
+            -- get the selected commit hash
+            local entry = require("telescope.actions.state").get_selected_entry()
+            -- close telescope
+            require("telescope.actions").close(prompt_bufnr)
+            -- open diffview
+            vim.cmd("DiffviewOpen " .. entry.value)
           end,
         },
       },

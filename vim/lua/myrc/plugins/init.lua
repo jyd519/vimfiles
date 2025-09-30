@@ -128,7 +128,7 @@ return {
   },
   {
     "sindrets/diffview.nvim",
-    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" },
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewFileHistory" },
   },
   {
     "Exafunction/windsurf.vim",
@@ -236,13 +236,6 @@ return {
     ft = { "go", "gomod" },
     config = function() require("go").setup() end,
   },
-  {
-    "rust-lang/rust.vim",
-    ft = { "rust", "rs" },
-    init = function() vim.g.rustfmt_autosave = 1 end,
-  },
-  { "simrat39/rust-tools.nvim", ft = { "rust" } },
-  { "saecki/crates.nvim", config = true, ft = { "toml" } },
   {
     "p00f/clangd_extensions.nvim",
     ft = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },

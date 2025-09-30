@@ -232,6 +232,16 @@ vim.keymap.set(
   { desc = "Find vim docs" }
 )
 
+
+vim.keymap.set(
+  "n",
+  "<leader>gd",
+  function()
+    require("telescope.builtin").git_status()
+  end,
+  { desc = "Find git diff" }
+)
+
 vim.cmd([[com! Maps :Telescope keymaps]])
 
 -- integrate with t.vim
