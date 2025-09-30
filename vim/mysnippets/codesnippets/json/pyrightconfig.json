@@ -1,0 +1,20 @@
+{
+  "pythonPlatform": "Linux",
+  "venvPath": "./venv",
+  "pythonVersion": "3.11",
+  "include": ["backend"],
+  "exclude": [
+    "**/node_modules",
+    "./venv",
+    "./frontend-admin",
+    "./frontend-tenant",
+    "./frontend-evaluator",
+    "./doc"
+  ],
+  "executionEnvironments": [
+      {"root": "backend"}
+  ],
+  "extraPaths": ["./venv/lib/python3.11/site-packages"],
+  "reportMissingImports": true,
+  "reportUnusedImport": true
+}
