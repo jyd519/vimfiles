@@ -127,8 +127,8 @@ vim.api.nvim_create_autocmd("FileType", {
   desc = "enable treesitter folding",
   callback = function()
     if has_parser(vim.bo.filetype) then
-      vim.o.foldmethod = "expr"
-      vim.o.foldexpr = "nvim_treesitter#foldexpr()"
+      vim.wo.foldmethod = "expr"
+      vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
     end
   end,
 })

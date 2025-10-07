@@ -43,7 +43,8 @@ opt.signcolumn = "yes" -- always show signcolumns
 
 if vim.o.foldmethod == "manual" then opt.foldmethod = "indent" end
 
-opt.foldlevelstart = 99
+opt.foldlevel = 99
+opt.foldlevelstart = 1
 opt.foldcolumn = "3"
 opt.scrolloff = 2
 opt.encoding = "utf-8"

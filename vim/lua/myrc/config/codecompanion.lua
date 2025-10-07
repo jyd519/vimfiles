@@ -111,7 +111,6 @@ require("codecompanion").setup({
         show_defaults = false,
         allow_insecure = true,
         show_model_choices = true,
-        proxy = default_proxy,
       },
       gemini = function(a)
         local api_key = check_api_key("gemini_key")
@@ -196,6 +195,19 @@ require("codecompanion").setup({
           },
         })
       end,
+      kimi = function()
+        -- https://platform.moonshot.cn/console/account
+        local api_key = check_api_key("kimi_key")
+        if not api_key then return nil end
+        return require("codecompanion.adapters").extend("openai_compatible", {
+          formatted_name = "Kimi",
+          env = {
+            url = "https://api.moonshot.cn",
+            api_key = api_key,
+            chat_url = "/v1/chat/completions",
+          },
+        })
+      end,
       groq = function()
         local api_key = check_api_key("groq_key")
         if not api_key then return nil end
@@ -271,33 +283,20 @@ end, {
   complete = function() return { "proxy", "noproxy", "zh", "en" } end,
 })
 
---
--- Set or unset proxy based on the adapter name to avoid conflicts with specific services
-local no_proxy = {
-  deepseek = true,
-  volengine = true,
+-- Set or unset proxy based on the adapter name
+local adapter_proxy = {
+  gemini = true,
+  openrouter_claude = true,
+  groq = true,
 }
 
 local http = require("codecompanion.http")
 local origin_http_new = http.new
 http.new = function(opts)
-  if no_proxy[opts.adapter.name] then
-    unset_proxy()
-  else
+  if adapter_proxy[opts.adapter.name] then
     set_proxy()
+  else
+    unset_proxy()
   end
   return origin_http_new(opts)
 end
-
--- local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
--- vim.api.nvim_create_autocmd({ "User" }, {
---   pattern = "CodeCompanionChatAdapter",
---   group = group,
---   callback = function(request)
---     if no_proxy[request.data.adapter.name] then
---       unset_proxy()
---     else
---       set_proxy()
---     end
---   end,
--- })
