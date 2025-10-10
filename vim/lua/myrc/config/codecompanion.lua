@@ -40,7 +40,6 @@ local prompt_library = {
       auto_submit = true,
       user_prompt = false,
       stop_context_insertion = true,
-      ignore_system_prompt = true,
       adapter = {
         name = "deepseek",
         model = "deepseek-chat",
@@ -102,8 +101,20 @@ require("codecompanion").setup({
   },
   strategies = {
     chat = { adapter = "gemini" },
-    inline = { adapter = "deepseek" },
-    agent = { adapter = "deepseek" },
+    inline = {
+      adapter = "kimi",
+      keymaps = {
+        accept_change = {
+          modes = { n = "ga" },
+          description = "Accept the suggested change",
+        },
+        reject_change = {
+          modes = { n = "gr" },
+          description = "Reject the suggested change",
+        },
+      },
+    },
+    agent = { adapter = "kimi" },
   },
   adapters = {
     http = {
@@ -141,23 +152,8 @@ require("codecompanion").setup({
         })
       end,
       openrouter_claude = function()
-        local default_model = "anthropic/claude-3.5-sonnet"
-        local available_models = {
-          "anthropic/claude-3.7-sonnet",
-          "anthropic/claude-3.5-sonnet",
-          "openai/gpt-4o-mini",
-        }
+        local default_model = "anthropic/claude-sonnet-4.5"
         local current_model = default_model
-        local function select_model()
-          vim.ui.select(available_models, {
-            prompt = "Select  Model:",
-          }, function(choice)
-            if choice then
-              current_model = choice
-              vim.notify("Selected model: " .. current_model)
-            end
-          end)
-        end
         local api_key = check_api_key("openrouter_key")
         if not api_key then return nil end
         return require("codecompanion.adapters").extend("openai_compatible", {
@@ -185,11 +181,14 @@ require("codecompanion").setup({
           },
           schema = {
             model = {
-              default = "ep-20250207214324-pqmgx",
+              default = "doubao-seed-1-6-flash-250828",
               choices = {
-                "ep-20250207214324-pqmgx",
-                ["ep-20250209143728-fqwwh"] = { opts = { can_reason = true } },
-                "ep-20250207214959-56z42",
+                "doubao-seed-1-6-flash-250828",
+                "doubao-seed-1-6-250615",
+                ["doubao-seed-1-6-thinking-250715"] = { opts = { can_reason = true } },
+                ["deepseek-r1-250528"] = { opts = { can_reason = true } },
+                "deepseek-v3-1-terminus",
+                "kimi-k2-250905",
               },
             },
           },
@@ -230,19 +229,28 @@ require("codecompanion").setup({
     },
     acp = {
       opts = {},
-      qwen_cli = function()
-        return require("codecompanion.adapters").extend("gemini_cli", {
-          commands = {
-            default = {
-              "C:\\Users\\jiyongdong\\AppData\\Local\\fnm_multishells\\27020_1757380319936\\qwen.cmd",
-            },
+      gemini_cli = function() return require("codecompanion.adapters").extend("gemini_cli", {
+        commands = {
+          default = {
+            "gemini",
+            "--experimental-acp",
+            "--proxy",
+            default_proxy,
           },
-        })
-      end,
+          yolo = {
+            "gemini",
+            "--yolo",
+            "--experimental-acp",
+            "--proxy",
+            default_proxy,
+          },
+        },
+      }) end,
     },
   },
   prompt_library = prompt_library,
   extensions = {
+    spinner = {},
     mcphub = {
       callback = "mcphub.extensions.codecompanion",
       opts = {
@@ -260,14 +268,10 @@ vim.api.nvim_create_user_command("AIConfig", function(args)
   if #args.fargs == 0 then put(config.opts["language"], config.adapters.http.opts) end
   for _, v in pairs(args.fargs) do
     if v == "proxy" then
-      default_proxy = vim.env.HTTP_PROXY or vim.g.proxy
       config.adapters.http.opts["proxy"] = vim.g.proxy
       vim.notify("codecompanion: " .. tostring(config.adapters.http.opts["proxy"]), vim.log.levels.INFO)
     end
-    if v == "noproxy" then
-      default_proxy = nil
-      config.adapters.http.opts["proxy"] = nil
-    end
+    if v == "noproxy" then config.adapters.http.opts["proxy"] = nil end
     if v == "zh" then
       default_lang = "Chinese"
       config.opts.language = "Chinese"

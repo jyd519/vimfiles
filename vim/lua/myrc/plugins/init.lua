@@ -150,6 +150,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "franco-ruggeri/codecompanion-spinner.nvim",
       "ravitemer/codecompanion-history.nvim", -- Save and load conversation history
       {
         "ravitemer/mcphub.nvim", -- Manage MCP servers

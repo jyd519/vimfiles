@@ -4,7 +4,7 @@ local g = vim.g
 local lazypath = g.VIMFILES .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath .. "/lua") then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", lazyrepo, "--branch=stable", lazypath })
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
@@ -33,6 +33,14 @@ require("lazy").setup({
     rtp = {
       reset = false, -- no reset the runtime path to $VIMRUNTIME and your config directory
     },
+  },
+  rocks = {
+    enabled = false,
+    -- use hererocks to install luarocks?
+    -- set to `nil` to use hererocks when luarocks is not found
+    -- set to `true` to always use hererocks
+    -- set to `false` to always use luarocks
+    hererocks = nil,
   },
   install = {
     missing = vim.env.SSH_CONNECTION == nil,

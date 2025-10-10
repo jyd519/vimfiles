@@ -2,6 +2,7 @@ return {
   { "Mofiqul/vscode.nvim", lazy = true },
   { "NLKNguyen/papercolor-theme", lazy = true },
   { "rakr/vim-one", lazy = true },
+  { "ellisonleao/gruvbox.nvim", priority = 1000, config = true, opts={transparent_mode = true} },
   { "navarasu/onedark.nvim", lazy = true },
   {
     "catppuccin/nvim",
