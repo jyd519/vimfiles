@@ -255,6 +255,7 @@ vim.keymap.set(
 vim.keymap.set("n", "<leader>gd", function() require("telescope.builtin").git_status() end, { desc = "Find git diff" })
 
 vim.cmd([[com! Maps :Telescope keymaps]])
+vim.cmd([[com! Colors :Telescope colorscheme]])
 
 -- integrate with t.vim
 if vim.g.mysnippets_dir then
@@ -619,15 +620,15 @@ vim.api.nvim_create_user_command(
   { range = "%", nargs = 0 }
 )
 
--- ALE
+-- ALE{{{2
 vim.keymap.set("n", "<leader>L", "<Plug>(ale_lint)", { noremap = true, silent = false })
 vim.keymap.set("n", "<leader>xF", "<Plug>(ale_fix)", { noremap = true, silent = false })
 
--- EasyAlign
+-- EasyAlign{{{2
 vim.keymap.set("v", "ga", "<Plug>(EasyAlign)")
 vim.keymap.set("x", "ga", "<Plug>(EasyAlign)")
 
--- Copy Filename
+-- Copy Filename{{{2
 local function copy_to_clipboard(content, message)
   vim.fn.setreg("+", content)
   vim.notify('Copied "' .. content .. '" to the clipboard!', vim.log.levels.INFO)
@@ -662,16 +663,34 @@ vim.api.nvim_create_user_command("CopyFileName", function()
   copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
 end, {})
 
--- FloatTerm
+-- FloatTerm{{{2
 keymap.set(
-  "n",
-  "<A-t><A-t>",
-  function() vim.cmd(vim.v.count1 .. "ToggleTerm") end,
+  { "n", "i", "t" },
+  "<A-`>",
+  function() vim.cmd(vim.v.count .. "ToggleTerm") end,
   { noremap = true, desc = "Toggle FloatTerm" }
 )
+keymap.set(
+  "n",
+  "<A-t>v",
+  function() vim.cmd(vim.v.count1 .. "ToggleTerm direction=vertical") end,
+  { noremap = true, desc = "Toggle Vertical FloatTerm " }
+)
+keymap.set(
+  "n",
+  "<A-t>h",
+  function() vim.cmd(vim.v.count1 .. "ToggleTerm direction=horizontal") end,
+  { noremap = true, desc = "Toggle horizontal FloatTerm" }
+)
+keymap.set("n", "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
+keymap.set("t", "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 keymap.set("n", "<S-F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("t", "<S-F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("n", "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 keymap.set("t", "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
-
+vim.cmd([[
+com! TermNewV :TermNew direction=vertical
+com! TermNewH :TermNew direction=horizontal
+com! TermNewT :TermNew direction=tab
+]])
 -- vim: set fdm=marker fdl=0: }}}
