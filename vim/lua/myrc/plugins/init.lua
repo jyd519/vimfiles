@@ -122,7 +122,7 @@ return {
   },
   {
     "akinsho/toggleterm.nvim",
-    version = "*",
+    branch= "main",
     event = "VeryLazy",
     config = function() require("myrc.config.toggleterm") end,
   },

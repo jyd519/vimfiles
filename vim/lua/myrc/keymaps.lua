@@ -76,10 +76,30 @@ vim.api.nvim_create_user_command("ZoomToggle", function() vim.fn["misc#ZoomToggl
 vim.keymap.set("n", "<leader>z", "<cmd>ZoomToggle<CR>", { silent = true, noremap = true })
 
 -- quickfix
-keymap.set("n", "<F2>", function() vim.fn["qf#ToggleQuickFix"]() end, { silent = true, noremap = true, desc="Toggle Quickfix" })
-keymap.set("n", "<leader>xq", function() vim.fn["qf#ToggleQuickFix"]() end, { silent = true, noremap = true, desc="Toggle Quickfix" })
-keymap.set("n", "<S-F2>", function() vim.fn["qf#ToggleLocationList"]() end, { silent = true, noremap = true, desc="Toggle Location List" })
-keymap.set("n", "<leader>xl", function() vim.fn["qf#ToggleLocationList"]() end, { silent = true, noremap = true, desc="Toggle Location List" })
+keymap.set(
+  "n",
+  "<F2>",
+  function() vim.fn["qf#ToggleQuickFix"]() end,
+  { silent = true, noremap = true, desc = "Toggle Quickfix" }
+)
+keymap.set(
+  "n",
+  "<leader>xq",
+  function() vim.fn["qf#ToggleQuickFix"]() end,
+  { silent = true, noremap = true, desc = "Toggle Quickfix" }
+)
+keymap.set(
+  "n",
+  "<S-F2>",
+  function() vim.fn["qf#ToggleLocationList"]() end,
+  { silent = true, noremap = true, desc = "Toggle Location List" }
+)
+keymap.set(
+  "n",
+  "<leader>xl",
+  function() vim.fn["qf#ToggleLocationList"]() end,
+  { silent = true, noremap = true, desc = "Toggle Location List" }
+)
 
 -- enable osc52 copying for remote ssh connection
 if vim.env.SSH_CONNECTION ~= "" and vim.g.is_vim then
@@ -232,15 +252,7 @@ vim.keymap.set(
   { desc = "Find vim docs" }
 )
 
-
-vim.keymap.set(
-  "n",
-  "<leader>gd",
-  function()
-    require("telescope.builtin").git_status()
-  end,
-  { desc = "Find git diff" }
-)
+vim.keymap.set("n", "<leader>gd", function() require("telescope.builtin").git_status() end, { desc = "Find git diff" })
 
 vim.cmd([[com! Maps :Telescope keymaps]])
 
@@ -604,7 +616,7 @@ end
 vim.api.nvim_create_user_command(
   "TrimSpaces",
   function(opts) trim_trailing_whitespaces(opts.line1, opts.line2) end,
-  { range = '%', nargs = 0 }
+  { range = "%", nargs = 0 }
 )
 
 -- ALE
@@ -617,45 +629,49 @@ vim.keymap.set("x", "ga", "<Plug>(EasyAlign)")
 
 -- Copy Filename
 local function copy_to_clipboard(content, message)
-    vim.fn.setreg('+', content)
-    vim.notify('Copied "' .. content .. '" to the clipboard!', vim.log.levels.INFO)
+  vim.fn.setreg("+", content)
+  vim.notify('Copied "' .. content .. '" to the clipboard!', vim.log.levels.INFO)
 end
 
-vim.api.nvim_create_user_command('CopyRelativePath', function()
-    local path = vim.fn.expand('%')
-    copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
+vim.api.nvim_create_user_command("CopyRelativePath", function()
+  local path = vim.fn.expand("%")
+  copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
 end, {})
 
-vim.api.nvim_create_user_command('CopyAbsolutePath', function()
-    local path = vim.fn.expand('%:p')
-    copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
+vim.api.nvim_create_user_command("CopyAbsolutePath", function()
+  local path = vim.fn.expand("%:p")
+  copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
 end, {})
 
-vim.api.nvim_create_user_command('CopyRelativePathWithLine', function()
-    local path = vim.fn.expand('%')
-    local line = vim.fn.line('.')
-    local result = path .. ':' .. line
-    copy_to_clipboard(result, 'Copied "' .. result .. '" to the clipboard!')
+vim.api.nvim_create_user_command("CopyRelativePathWithLine", function()
+  local path = vim.fn.expand("%")
+  local line = vim.fn.line(".")
+  local result = path .. ":" .. line
+  copy_to_clipboard(result, 'Copied "' .. result .. '" to the clipboard!')
 end, {})
 
-vim.api.nvim_create_user_command('CopyAbsolutePathWithLine', function()
-    local path = vim.fn.expand('%:p')
-    local line = vim.fn.line('.')
-    local result = path .. ':' .. line
-    copy_to_clipboard(result, 'Copied "' .. result .. '" to the clipboard!')
+vim.api.nvim_create_user_command("CopyAbsolutePathWithLine", function()
+  local path = vim.fn.expand("%:p")
+  local line = vim.fn.line(".")
+  local result = path .. ":" .. line
+  copy_to_clipboard(result, 'Copied "' .. result .. '" to the clipboard!')
 end, {})
 
-vim.api.nvim_create_user_command('CopyFileName', function()
-    local path = vim.fn.expand('%:t')
-    copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
+vim.api.nvim_create_user_command("CopyFileName", function()
+  local path = vim.fn.expand("%:t")
+  copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
 end, {})
 
 -- FloatTerm
-keymap.set("n", "<C-`>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set("t", "<C-`>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set("n", "<F24>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set(
+  "n",
+  "<A-t><A-t>",
+  function() vim.cmd(vim.v.count1 .. "ToggleTerm") end,
+  { noremap = true, desc = "Toggle FloatTerm" }
+)
 keymap.set("n", "<S-F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set("t", "<F24>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("t", "<S-F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
+keymap.set("n", "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
+keymap.set("t", "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 
 -- vim: set fdm=marker fdl=0: }}}
