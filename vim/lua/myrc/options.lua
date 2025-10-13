@@ -40,7 +40,6 @@ opt.history = 100
 opt.updatetime = 300 -- Smaller updatetime for CursorHold & CursorHoldI
 opt.shortmess:append("c") -- don't give |ins-completion-menu| messages.
 opt.signcolumn = "yes" -- always show signcolumns
-opt.guicursor = "n-v-c:block-Cursor,i-ci-ve:ver25-lCursor,r-cr:hor20,a:blinkwait700-blinkoff400-blinkon250"
 
 if vim.o.foldmethod == "manual" then opt.foldmethod = "indent" end
 

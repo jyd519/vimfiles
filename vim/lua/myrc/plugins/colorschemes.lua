@@ -1,9 +1,10 @@
 return {
-  { "Mofiqul/vscode.nvim", lazy = true },
-  { "NLKNguyen/papercolor-theme", lazy = true },
-  { "rakr/vim-one", lazy = true },
-  { "ellisonleao/gruvbox.nvim", config = true, opts={transparent_mode = true} },
-  { "navarasu/onedark.nvim", lazy = true },
+  { "Mofiqul/vscode.nvim" },
+  { "NLKNguyen/papercolor-theme" },
+  { "rakr/vim-one" },
+  { "ellisonleao/gruvbox.nvim", opts = { transparent_mode = true } },
+  { "navarasu/onedark.nvim" },
+  { "marko-cerovac/material.nvim" },
   {
     "catppuccin/nvim",
     name = "catppuccin",
@@ -18,10 +19,5 @@ return {
         transparent_background = true,
       })
     end,
-  },
-  {
-    "marko-cerovac/material.nvim",
-    lazy = true,
-    config = function() vim.g.material_style = "lighter" end,
   },
 }
