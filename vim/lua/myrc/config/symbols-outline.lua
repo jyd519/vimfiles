@@ -10,7 +10,7 @@ require("outline").setup({
   },
   keymaps = {
     show_help = "?",
-    close = { "<Esc>", "q" },
+    close = { "q" },
     -- Jump to symbol under cursor.
     -- It can auto close the outline window when triggered, see
     -- 'auto_close' option above.
@@ -23,7 +23,7 @@ require("outline").setup({
     -- 'Opposite' of goto/peek_location.
     restore_location = "<C-g>",
     -- Open LSP/provider-dependent symbol hover information
-    hover_symbol = "<C-space>",
+    -- hover_symbol = "<space>h",
     -- Preview location code of the symbol under cursor
     toggle_preview = "K",
     rename_symbol = "r",
@@ -42,7 +42,7 @@ require("outline").setup({
     -- Move down/up by one line and peek_location immediately.
     -- You can also use outline_window.auto_jump=true to do this for any
     -- j/k/<down>/<up>.
-    down_and_jump = "<C-j>",
-    up_and_jump = "<C-k>",
+    down_and_jump = "<down>",
+    up_and_jump = "<up>",
   },
 })
