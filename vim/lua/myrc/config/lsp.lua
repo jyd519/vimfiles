@@ -9,7 +9,7 @@ local lsp = vim.lsp
 --  vim.fn.expand("$MASON/packages/vue-language-server/")
 require("mason").setup()
 require("mason-lspconfig").setup({
-  automatic_enable = false,
+  automatic_enable = true,
 })
 
 vim.lsp.set_log_level("warn")
@@ -126,25 +126,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
     end
   end,
-})
--- }}}
-
--- Languages {{{2
-vim.lsp.enable({
-  "cmake",
-  "bashls",
-  "yamlls",
-  "clangd",
-  "ts_ls",
-  "angularls",
-  "cssls",
-  "ansiblels",
-  "jsonls",
-  "gopls",
-  "emmet_language_server",
-  "basedpyright",
-  "ruff",
-  "lua_ls",
 })
 -- }}}
 

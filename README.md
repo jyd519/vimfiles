@@ -120,6 +120,33 @@ colors papercolor
 " endif
 ```
 
+### **Manual enable LSP server**
+
+```lua
+require("mason-lspconfig").setup({
+  automatic_enable = false,
+})
+
+-- Languages {{{2
+vim.lsp.enable({
+  "cmake",
+  "bashls",
+  "yamlls",
+  "clangd",
+  "ts_ls",
+  "angularls",
+  "cssls",
+  "ansiblels",
+  "jsonls",
+  "gopls",
+  "emmet_language_server",
+  "basedpyright",
+  "ruff",
+  "lua_ls",
+})
+-- }}}
+```
+
 ## Dependencies
 
 ### git
