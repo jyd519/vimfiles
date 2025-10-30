@@ -316,7 +316,6 @@ return {
       { "mason-org/mason-lspconfig.nvim" },
     },
   },
-  -- { "tamago324/nlsp-settings.nvim" },
   {
     "hedyhli/outline.nvim",
     lazy = true,

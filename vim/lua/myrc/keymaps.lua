@@ -607,7 +607,7 @@ elseif vim.fn.executable("ag") == 1 then
 end
 --- }}}
 
--- Trailing whitespace {{{2
+-- Trailing whitespace / Line endings {{{2
 local function trim_trailing_whitespaces(firstline, lastline)
   local old_hlsearch = vim.o.hlsearch
   vim.cmd(firstline .. "," .. lastline .. "substitute /\\v\\s+$//ge")
@@ -617,8 +617,27 @@ end
 vim.api.nvim_create_user_command(
   "TrimSpaces",
   function(opts) trim_trailing_whitespaces(opts.line1, opts.line2) end,
-  { range = "%", nargs = 0 }
+  { range = true, nargs = 0, desc = "Trim trailing whitespaces" }
 )
+vim.api.nvim_create_user_command(
+  "FixLineEndings",
+  "%s/\r$//ge",
+  { nargs = 0, desc = "Fix line endings" }
+)
+
+-- Custom actions {{{2
+vim.keymap.set("n", "<leader>gx", function()
+  local custom_actions = require("myrc.utils.custom_actions")
+  custom_actions.pick_actions()
+  if not custom_actions.registered then
+    local register_action = require("myrc.utils.custom_actions").register_action
+    register_action("Fix line endings", function() vim.cmd("%s/\r$//ge") end, { override = true })
+    register_action("Trim trailing whitespaces", function() vim.cmd("%TrimSpaces") end, { override = true })
+    register_action("Run Jest test", function() vim.cmd("silent !npm test -- %") end, { ft = "javascript" })
+    custom_actions.registered = true
+  end
+end, { desc = "Pick custom actions" })
+-- }}}
 
 -- ALE{{{2
 vim.keymap.set("n", "<leader>L", "<Plug>(ale_lint)", { noremap = true, silent = false })
