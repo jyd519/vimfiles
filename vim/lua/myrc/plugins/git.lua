@@ -16,7 +16,7 @@ return {
           item = { "", "" },
           hunk = { "", "" },
         },
-        integrations = { diffview = true }, -- adds integration with diffview.nvim
+        integrations = { diffview = true, telescope = true },
       })
     end,
   },

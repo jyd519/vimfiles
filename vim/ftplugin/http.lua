@@ -29,7 +29,7 @@ end
 -- 现在设置选项
 vim.opt_local.foldmethod = "expr"
 vim.opt_local.foldexpr = "v:lua.get_http_fold_level(v:lnum)"
-vim.opt_local.foldlevel = 0
+vim.opt_local.foldlevel = 1
 vim.opt_local.foldminlines = 0
 vim.opt_local.foldtext = "v:lua.http_fold_text()"
 
@@ -67,8 +67,8 @@ local function go_to_prev_fold()
 end
 
 -- 快捷键
--- local opts = { buffer = true, desc = "Next HTTP request" }
--- vim.keymap.set("n", "<space>j", go_to_next_fold, opts)
---
--- opts = { buffer = true, desc = "Previous HTTP request" }
--- vim.keymap.set("n", "<space>k", go_to_prev_fold, opts)
+local opts = { buffer = true, desc = "Next HTTP request" }
+vim.keymap.set("n", "]r", go_to_next_fold, opts)
+
+opts = { buffer = true, desc = "Previous HTTP request" }
+vim.keymap.set("n", "[r", go_to_prev_fold, opts)
