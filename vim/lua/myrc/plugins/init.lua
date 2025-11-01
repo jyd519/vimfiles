@@ -1,17 +1,19 @@
 local g, fn = vim.g, vim.fn
 
 return {
-  {
-    "mhinz/vim-startify",
-    init = function() g.startify_files_number = 5 end,
-  },
+  { "mhinz/vim-startify", init = function() g.startify_files_number = 5 end },
   {
     "dstein64/vim-startuptime",
     cmd = "StartupTime",
     init = function() vim.g.startuptime_tries = 10 end,
   },
   -- Utils {{{2
-  { "folke/which-key.nvim", enabled = g.enabled_plugins["which_key"] == 1, config = true, event = "VeryLazy" },
+  {
+    "folke/which-key.nvim",
+    enabled = g.enabled_plugins["which_key"] == 1,
+    config = true,
+    event = "VeryLazy",
+  },
   { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
   {
     "nvim-treesitter/nvim-treesitter",
@@ -20,11 +22,12 @@ return {
     cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
     lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
     config = function() require("myrc.config.treesitter") end,
-    dependencies = {
-      { "nvim-treesitter/nvim-treesitter-textobjects" },
-    },
+    dependencies = { { "nvim-treesitter/nvim-treesitter-textobjects" } },
   },
-  { "christoomey/vim-tmux-navigator", enabled = fn.has("win32") == 0 and fn.executable("tmux") == 1 },
+  {
+    "christoomey/vim-tmux-navigator",
+    enabled = fn.has("win32") == 0 and fn.executable("tmux") == 1,
+  },
   {
     "ojroques/nvim-osc52",
     event = "VimEnter",
@@ -48,17 +51,11 @@ return {
     event = "VeryLazy",
     config = function() require("myrc.config.hop") end,
   },
-  {
-    "doums/rg.nvim",
-    cmd = { "Rg", "Rgf", "Rgp", "Rgfp" },
-    config = true,
-  },
+  { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" }, config = true },
   {
     "nvimtools/hydra.nvim",
     lazy = true,
-    dependencies = {
-      { "jbyuki/venn.nvim" },
-    },
+    dependencies = { { "jbyuki/venn.nvim" } },
     config = function() require("myrc.config.hydra") end,
   },
   { "AndrewRadev/splitjoin.vim", event = "VeryLazy" },
@@ -100,20 +97,30 @@ return {
   },
   { dir = g.VIMFILES .. "/locals/t.nvim", cmd = { "T", "TS" } },
   { dir = g.VIMFILES .. "/locals/vim-a", cmd = { "A", "AH" } },
-  {
-    dir = g.VIMFILES .. "/locals/nvim-projectconfig",
-    opts = { silent = false },
-  },
+  { dir = g.VIMFILES .. "/locals/nvim-projectconfig", opts = { silent = false } },
   -- }}}
 
   -- Coding {{{2
   { "thinca/vim-quickrun", cmd = { "QuickRun" } },
-  { "jyd519/vim-test", event = { "BufReadPost", "BufNewFile" } }, -- Unit-Testing
-  -- https://github.com/ThePrimeagen/refactoring.nvim#installation
   {
+    "jyd519/vim-test", -- Unit-Testing
+    enabled = g.enabled_plugins.test == 1,
+    event = { "BufReadPost", "BufNewFile" },
+  },
+  {
+    -- https://github.com/ThePrimeagen/refactoring.nvim#installation
     "ThePrimeagen/refactoring.nvim",
     config = true,
-    ft = { "typescript", "javascript", "go", "rust", "python", "lua", "c", "cpp" },
+    ft = {
+      "typescript",
+      "javascript",
+      "go",
+      "rust",
+      "python",
+      "lua",
+      "c",
+      "cpp",
+    },
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -128,7 +135,13 @@ return {
   },
   {
     "sindrets/diffview.nvim",
-    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles", "DiffviewFileHistory" },
+    cmd = {
+      "DiffviewOpen",
+      "DiffviewClose",
+      "DiffviewToggleFiles",
+      "DiffviewFocusFiles",
+      "DiffviewFileHistory",
+    },
   },
   {
     "Exafunction/windsurf.vim",
@@ -146,7 +159,12 @@ return {
   },
   {
     "olimorris/codecompanion.nvim",
-    cmd = { "CodeCompanion", "CodeCompanionCmd", "CodeCompanionChat", "CodeCompanionActions" },
+    cmd = {
+      "CodeCompanion",
+      "CodeCompanionCmd",
+      "CodeCompanionChat",
+      "CodeCompanionActions",
+    },
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
@@ -158,7 +176,11 @@ return {
         build = "npm install -g mcp-hub@latest",
         config = true,
       },
-      { "MeanderingProgrammer/render-markdown.nvim", lazy = true, ft = { "codecompanion" } },
+      {
+        "MeanderingProgrammer/render-markdown.nvim",
+        lazy = true,
+        ft = { "codecompanion" },
+      },
       {
         "HakonHarnes/img-clip.nvim", -- Share images with the chat buffer
         event = "VeryLazy",
@@ -202,9 +224,7 @@ return {
     enabled = false,
     config = function()
       vim.g.firenvim_config = {
-        localSettings = {
-          [".*"] = { takeover = "never" },
-        },
+        localSettings = { [".*"] = { takeover = "never" } },
       }
     end,
   },
@@ -235,6 +255,7 @@ return {
   {
     "ray-x/go.nvim",
     ft = { "go", "gomod" },
+    enabled = vim.g.enabled_plugins.go == 1,
     config = function() require("go").setup() end,
   },
   {
@@ -249,17 +270,11 @@ return {
     config = function() require("telescope").load_extension("yaml_schema") end,
   },
   {
-    "dense-analysis/ale",
+    "dense-analysis/ale", -- linter
     lazy = true,
-    cmd = {
-      "ALEToggle",
-      "ALEInfo",
-      "ALEDetail",
-      "ALELint",
-      "ALEFix",
-    },
+    cmd = { "ALEToggle", "ALEInfo", "ALEDetail", "ALELint", "ALEFix" },
     keys = { "<Plug>(ale_lint)", "<Plug>(ale_fix)" },
-  }, -- linter
+  },
   -- Markdown, reStructuredText, textile
   {
     "yaocccc/nvim-hl-mdcodeblock.lua",

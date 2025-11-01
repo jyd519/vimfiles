@@ -32,7 +32,7 @@ if exists('+termguicolors')
 endif
 
 " enable plugins
-let g:enabled_plugins = { "fzf.vim": 1, "node": 1, "go": 1, "rust": 1, "python": 1, "nvim-treesitter": 0, "test": 1}
+let g:enabled_plugins = {"telescope": 1, "fzf.vim": 1, "node": 0, "go": 0, "rust": 0, "python": 0, "nvim-treesitter": 0, "test": 0}
 
 if $NVIM_APP == ""
   let $NVIM_APP = "lazy" " lazy, minimal, basic

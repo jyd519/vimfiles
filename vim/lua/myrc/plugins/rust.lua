@@ -2,6 +2,7 @@ return {
   {
     "rust-lang/rust.vim",
     ft = { "rust", "rs" },
+    enabled = vim.g.enabled_plugins.rust == 1,
     init = function() vim.g.rustfmt_autosave = 1 end,
     config = function()
       local api = vim.api

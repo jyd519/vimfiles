@@ -31,6 +31,7 @@ return {
 
   {
     "dmmulroy/ts-error-translator.nvim",
+    enabled = vim.g.enabled_plugins.node == 1,
     config = true
   },
 
@@ -39,6 +40,7 @@ return {
     opts = {
       min_chars = 50,
     },
+    enabled = vim.g.enabled_plugins.node == 1,
     dependencies = { "nvim-treesitter/nvim-treesitter" },
     ft = { "html", "svelte", "astro", "vue", "typescriptreact" },
   },
@@ -47,6 +49,7 @@ return {
     keys = {
       { "<Leader>cv", "<CMD>TWValues<CR>", desc = "Tailwind CSS values" },
     },
+    enabled = vim.g.enabled_plugins.node == 1,
     opts = {
       -- border = EcoVim.ui.float.border or "rounded", -- Valid window border style,
       show_unknown_classes = true                   -- Shows the unknown classes popup
@@ -59,6 +62,7 @@ return {
       "TailwindSort",
       "TailwindSortOnSaveToggle"
     },
+    enabled = vim.g.enabled_plugins.node == 1,
     keys = {
       { "<Leader>cS", "<CMD>TailwindSortOnSaveToggle<CR>", desc = "toggle Tailwind CSS classes sort on save" },
 

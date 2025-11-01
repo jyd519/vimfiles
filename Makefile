@@ -12,10 +12,24 @@ simple:
 		7z a simple.zip -x'r!.git' -x'r!.DS_Store' $(plugins)  > /dev/null 2>&1
 
 full:
+	# excludes some large plugins
 	rm -rf full.zip
-	7z a full.zip -x'!vim/pack' -x'r!.git' -x'r!.DS_Store' -x'!vim/plugged' \
+	7z a full.zip -x'!vim/pack' -x'r!.git' -x'r!.DS_Store' \
+		-x'r!tests/' \
+		-x'!vim/plugged' \
+		-x'!vim/lazy/ale' \
+		-x'!vim/lazy/vim-test' \
+		-x'!vim/lazy/go.nvim' -x'!vim/lazy/nvim-dap-go.nvim' \
+		-x'!vim/lazy/tailwin*' \
+		-x'!vim/lazy/ts-*' \
+		-x'!vim/lazy/refactoring.nvim' \
+		-x'!vim/lazy/splitjoin.vim' \
+		-x'!vim/lazy/kulala.nvim' \
+		-x'!vim/lazy/codecompanion.nvim' \
+		-x'!vim/lazy/crates.nvim' \
+		-x'!vim/lazy/mcphub.nvim' \
 		README.md example.vim ./vim >/dev/null 2>&1
-	7z a full.zip -x'r!.git' -x'r!.DS_Store' vim/lazy > /dev/null 2>&1
+
 
 clean:
 	rm -rf simple.zip full.zip
