@@ -1,7 +1,8 @@
 -- https://github.com/anuvyklack/hydra.nvim
+--  {{{2 globals
 local Hydra = require("hydra")
 local cmd = require("hydra.keymap-util").cmd
-
+--}}
 -- Side scroll{{{2
 Hydra({
   name = "Side scroll",
@@ -33,8 +34,6 @@ Hydra({
     invoke_on_body = true,
     hint = {
       float_opts = {
-          -- row, col, height, width, relative, and anchor should not be
-          -- overridden
           style = "minimal",
           focusable = false,
           noautocmd = true,
@@ -92,40 +91,42 @@ Hydra({
   },
 })
 
--- Dap{{{2
+-- Dap {{{2
 --
 local dap_hint = [[
- ^_,b_^: ^toggle breakpoint     ^_,S_/_<F5>_^: ^start/continue
- ^_,c_^: ^continue              ^_,r_     ^^^: ^run to cursor
- ^_,x_: stop  ^^                ^_,p_^: ^open repl ^         _,u_: ^toggle UI
- ^_,n_/_<F10>_: step over       _,i_/_<F11>_^: ^step into    ^_,o_/_<F12>_^: ^step out
- ^_,T_: ^clear breakpoints ^    ^^_,B_: ^conditional breakpoint
- ^_,e_/_,E_: evaluate input     ^_q_^: ^exit
+ ^_<F9>_/_,b_^: ^Toggle breakpoint  ^^^^^_,S_/_<F5>_^: ^Start/Continue
+ ^_,r_^: ^Continue                ^^^^^^^_,c_^: ^Run to cursor
+ ^_,x_: Stop  ^^                  ^^^^^^^_,p_^: ^Open repl          ^^^^^^^^^^^^_,u_: ^Toggle UI
+ ^_,n_/_<F10>_: Step over         ^^^^^^^_,i_/_<F11>_^: ^Step into    ^_,o_/_<F12>_^: ^Step out
+ ^_,T_^^^: Clear breakpoints       ^^^^^^_,B_: ^Conditional breakpoint
+ ^_,e_/_,E_: Evaluate input       ^^^^^^^_q_^:  Exit
 ]]
 
 Hydra({
   name = "Dap Debug",
-  mode = { "n" },
-  body = "<leader>D",
+  mode = "n",
+  body = "<leader>dd",
   hint = dap_hint,
   config = {
     color = "pink",
     invoke_on_body = true,
     hint = {
       float_opts = {
-          -- row, col, height, width, relative, and anchor should not be
-          -- overridden
           style = "minimal",
           focusable = false,
           noautocmd = true,
+          border = "single",
       },
-      position = "bottom-right",
+      position = "top-right",
     },
-    on_exit = function() vim.cmd("silent! DapTerminate") end,
+    on_exit = function()
+      require("dapui").close()
+      vim.cmd("silent! DapTerminate")
+    end,
   },
   heads = {
-    { ",S", function() require("myrc.utils.dap").debug_test() end, { desc = "Start Debugging" } },
-    { "<F5>", function() require("myrc.utils.dap").debug_test() end, { desc = "Start Debugging" } },
+    { ",S", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
+    { "<F5>", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
 
     { "<F12>", function() require("dap").step_out() end, { desc = "step out" } },
     { ",o", function() require("dap").step_out() end, { desc = "step out" } },
@@ -134,8 +135,8 @@ Hydra({
     { ",i", function() require("dap").step_into() end, { desc = "step into" } },
     { "<F11>", function() require("dap").step_into() end, { desc = "step into" } },
 
-    { ",r", function() require("dap").run_to_cursor() end, { desc = "run to cursor" } },
-    { ",c", function() require("dap").continue() end, { desc = "continue" } },
+    { ",c", function() require("dap").run_to_cursor() end, { desc = "run to cursor" } },
+    { ",r", function() require("dap").continue() end, { desc = "continue" } },
     { ",b", function() require("dap").toggle_breakpoint() end, { desc = "toggle breakpoint" } },
     { "<F9>", function() require("dap").toggle_breakpoint() end, { desc = false } },
     {
@@ -407,5 +408,4 @@ Hydra({
       { 'q', nil, { exit = true, nowait = true, desc = 'exit' } },
    }
 })
-
 -- vim: set foldlevel=1 fdm=marker:

@@ -1,3 +1,18 @@
+local function get_project_root()
+  -- Define patterns that indicate a project root
+  local root_patterns = { ".git", "pyproject.toml", "Cargo.toml", "package.json" }
+
+  -- Find the closest directory containing any of these patterns, searching upwards
+  local root_dir = vim.fs.dirname(vim.fs.find(root_patterns, { upward = true })[1])
+
+  -- If no pattern is found, fallback to the current working directory
+  if not root_dir then
+    root_dir = vim.loop.cwd() or ""
+  end
+
+  return root_dir
+end
+
 return {
   {
     "oysandvik94/curl.nvim",
@@ -39,6 +54,9 @@ return {
         ["$randomEmail"] = function()
           local random = math.random(1000, 9999)
           return "user" .. random .. "@example.com"
+        end,
+        ["$projectRoot"] = function()
+          return get_project_root()
         end,
       },
     },

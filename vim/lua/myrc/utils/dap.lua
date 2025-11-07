@@ -43,7 +43,7 @@ M.add = function(language, setting)
   table.insert(dap.configurations[language], setting)
 end
 
-M.debug_test = functin()
+M.start_debug = function()
   local dap = require("dap")
   if dap.session() then
     dap.continue()
@@ -55,11 +55,6 @@ M.debug_test = functin()
   if ft == "go" then
     if string.match(file, ".*_test.go") then
       require("dap-go").debug_test()
-      return
-    end
-  elseif ft == "typescript" or ft == "javascript" then
-    if string.match(file, ".*test%.[jt]s") then
-      require("myrc.config.dap-jest").debug()
       return
     end
   elseif ft == "python" then

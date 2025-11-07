@@ -3,7 +3,7 @@
 local dap = require("dap")
 _G.dap = dap
 
-local is_windows = vim.fn.has('win32') == 1
+local is_windows = vim.fn.has("win32") == 1
 
 local dap_breakpoint = {
   error = {
@@ -26,18 +26,10 @@ local dap_breakpoint = {
   },
 }
 
---
--- vim.highlight.create('DapBreakpoint', { ctermbg=0, guifg='#993939', guibg='#31353f' }, false)
--- vim.highlight.create('DapLogPoint', { ctermbg=0, guifg='#61afef', guibg='#31353f' }, false)
--- vim.highlight.create('DapStopped', { ctermbg=0, guifg='#98c379', guibg='#31353f' }, false)
-
 vim.fn.sign_define("DapBreakpoint", dap_breakpoint.error)
 vim.fn.sign_define("DapStopped", dap_breakpoint.stopped)
 vim.fn.sign_define("DapBreakpointRejected", dap_breakpoint.rejected)
 
--- vim.fn.sign_define('DapBreakpoint', { text='', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl='DapBreakpoint' })
--- vim.fn.sign_define('DapBreakpointRejected', { text='', texthl='DapBreakpoint', linehl='DapBreakpoint', numhl= 'DapBreakpoint' })
--- vim.fn.sign_define('DapStopped', { text='', texthl='DapStopped', linehl='DapStopped', numhl= 'DapStopped' })
 vim.fn.sign_define(
   "DapBreakpointCondition",
   { text = "ﳁ", texthl = "DapBreakpoint", linehl = "DapBreakpoint", numhl = "DapBreakpoint" }
@@ -52,42 +44,15 @@ require("nvim-dap-virtual-text").setup({
   commented = true,
 })
 
+-- {{{1 dapui
 local dapui = require("dapui")
 _G.dapui = dapui
 
-dapui.setup({
-  icons = { expanded = "▾", collapsed = "▸", current_frame = "▸" },
-  controls = {
-    enabled = true,
-    element = "repl",
-    icons = {
-      pause = "",
-      play = "",
-      step_into = "",
-      step_over = "",
-      step_out = "",
-      step_back = "",
-      run_last = "↻",
-      terminate = "ﱢ",
-    },
-  },
-})
-dap.listeners.after.event_initialized["dapui_config"] = function()
-  dapui.open()
-end
-dap.listeners.before.event_terminated["dapui_config"] = function()
-  -- local ft = vim.bo.filetype
-  -- if ft == "javascript" or ft == "typescript" then
-  --     -- FIXME: typescript/javascript
-  --     if string.match(dap.status(), "^Running.+") then
-  --         return
-  --     end
-  -- end
-  dapui.close()
-end
-dap.listeners.before.event_exited["dapui_config"] = function()
-  dapui.close()
-end
+dapui.setup({})
+dap.listeners.before.attach.dapui_config = function() dapui.open() end
+dap.listeners.before.launch.dapui_config = function() dapui.open() end
+-- close Dap UI with :DapCloseUI
+vim.api.nvim_create_user_command("DapCloseUI", function() require("dapui").close() end, {})
 -- }}}
 
 -- Configure Debuggers {{{1
@@ -103,9 +68,7 @@ dap.configurations.lua = {
     name = "Attach to running Neovim instance",
     host = function()
       local value = vim.fn.input("Host [127.0.0.1]: ")
-      if value ~= "" then
-        return value
-      end
+      if value ~= "" then return value end
       return "127.0.0.1"
     end,
     port = function()
@@ -116,18 +79,14 @@ dap.configurations.lua = {
   },
 }
 
-dap.adapters.nlua = function(callback, config)
-  callback({ type = "server", host = config.host, port = config.port })
-end
+dap.adapters.nlua = function(callback, config) callback({ type = "server", host = config.host, port = config.port }) end
 
 -- python {{{1
 -- https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
 local getPythonPath = function()
   local venv_path = os.getenv("VIRTUAL_ENV")
   if venv_path then
-    if is_windows then
-      return venv_path .. "\\Scripts\\python.exe"
-    end
+    if is_windows then return venv_path .. "\\Scripts\\python.exe" end
     return venv_path .. "/bin/python"
   end
   local cwd = vim.fn.getcwd()
@@ -141,9 +100,7 @@ local getPythonPath = function()
 end
 
 local enrich_config = function(config, on_config)
-  if not config.pythonPath and not config.python then
-    config.pythonPath = getPythonPath()
-  end
+  if not config.pythonPath and not config.python then config.pythonPath = getPythonPath() end
   on_config(config)
 end
 
@@ -241,14 +198,10 @@ require("dap-go").setup({})
 local getLLDBPath = function()
   local llvm_root = os.getenv("LLVM_ROOT")
   if llvm_root ~= nil then
-    return is_windows and  llvm_root .. "/bin/lldb-vscode" or llvm_root .. "/bin/lldb-vscode.exe"
+    return is_windows and llvm_root .. "/bin/lldb-vscode" or llvm_root .. "/bin/lldb-vscode.exe"
   end
-  if vim.fn.executable("/usr/local/bin/lldb-vscode") == 1 then
-    return "/usr/local/bin/lldb-vscode"
-  end
-  if vim.fn.executable("/usr/local/opt/llvm/bin/lldb-vscode") == 1 then
-    return "/usr/local/opt/llvm/bin/lldb-vscode"
-  end
+  if vim.fn.executable("/usr/local/bin/lldb-vscode") == 1 then return "/usr/local/bin/lldb-vscode" end
+  if vim.fn.executable("/usr/local/opt/llvm/bin/lldb-vscode") == 1 then return "/usr/local/opt/llvm/bin/lldb-vscode" end
   return "lldb-vscode"
 end
 
@@ -268,15 +221,13 @@ dap.adapters.codelldb = {
     detach = not vim.fn.has("win32"),
   },
 }
- 
+
 dap.configurations.cpp = {
   {
     name = "Launch - codelldb",
     type = "codelldb",
     request = "launch",
-    program = function()
-      return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-    end,
+    program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file") end,
     cwd = "${workspaceFolder}",
     stopOnEntry = false,
     args = {},
@@ -285,9 +236,7 @@ dap.configurations.cpp = {
     name = "Launch - vscode-lldb",
     type = "lldb",
     request = "launch",
-    program = function()
-      return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-    end,
+    program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file") end,
     cwd = "${workspaceFolder}",
     stopOnEntry = false,
     args = {},
@@ -317,48 +266,89 @@ dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = dap.configurations.cpp
 
 -- javascript {{{1
-local vscode_js_debug_path = vim.fn.globpath(vim.loop.os_homedir() .. "/.vscode/extensions", "*vscode.js-debug*")
-require("dap-vscode-js").setup({
-  node_path = vim.g.node_path or "node", -- Path of node executable. Defaults to $NODE_PATH, and then "node"
-  adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "node-terminal", "pwa-extensionHost" }, -- which adapters to register in nvim-dap
-  -- Path to vscode-js-debug installation.
-  debugger_path = vscode_js_debug_path,
-})
-
-for _, language in ipairs({ "typescript", "javascript" }) do
-  require("dap").configurations[language] = {
-    {
-      type = "pwa-node",
-      request = "launch",
-      name = "Launch file",
-      program = "${file}",
-      cwd = "${workspaceFolder}",
-    },
-    {
-      type = "pwa-node",
-      request = "attach",
-      name = "Attach",
-      processId = require("dap.utils").pick_process,
-      cwd = "${workspaceFolder}",
-    },
-    {
-      type = "pwa-node",
-      request = "launch",
-      name = "Debug Jest Tests",
-      trace = true, -- include debugger info
-      runtimeExecutable = "node",
-      runtimeArgs = {
-        "./node_modules/jest/bin/jest.js",
-        "--runInBand",
-        "--runTestsByPath",
-        "${file}",
-      },
-      rootPath = "${workspaceFolder}",
-      cwd = "${workspaceFolder}",
-      console = "integratedTerminal",
-      internalConsoleOptions = "neverOpen",
+local vscode_js_debug_path =
+  vim.fn.globpath(vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src", "dapDebugServer.js")
+if vscode_js_debug_path ~= "" then
+  dap.adapters["pwa-node"] = {
+    type = "server",
+    host = "localhost",
+    port = "${port}", --let both ports be the same for now...
+    executable = {
+      command = "node",
+      args = { vscode_js_debug_path, "${port}" },
     },
   }
+
+  if not dap.adapters["node"] then
+    dap.adapters["node"] = function(cb, config)
+      if config.type == "node" then config.type = "pwa-node" end
+      local nativeAdapter = dap.adapters["pwa-node"]
+      if type(nativeAdapter) == "function" then
+        nativeAdapter(cb, config)
+      else
+        cb(nativeAdapter)
+      end
+    end
+  end
+  for _, language in ipairs({ "typescript", "javascript" }) do
+    dap.configurations[language] = {
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Launch file",
+        program = "${file}",
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        protocol = "inspector",
+        console = "integratedTerminal",
+      },
+      {
+        type = "pwa-node",
+        request = "attach",
+        name = "Attach",
+        port = 9229,
+        address = "127.0.0.1",
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        protocol = "inspector",
+      },
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Launch Current File (tsx)",
+        cwd = "${workspaceFolder}",
+        program = "${file}",
+        runtimeExecutable = "tsx",
+        -- args = { '${file}' },
+        sourceMaps = true,
+        protocol = "inspector",
+        console = "integratedTerminal",
+        outFiles = { "${workspaceFolder}/**/**/*", "!**/node_modules/**" },
+        skipFiles = { "<node_internals>/**", "node_modules/**" },
+        resolveSourceMapLocations = {
+          "${workspaceFolder}/**",
+          "!**/node_modules/**",
+        },
+      },
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Debug Jest Tests",
+        trace = true, -- include debugger info
+        runtimeExecutable = "node",
+        runtimeArgs = {
+          "./node_modules/jest/bin/jest.js",
+          "--runInBand",
+          "--runTestsByPath",
+          "${file}",
+        },
+        rootPath = "${workspaceFolder}",
+        cwd = "${workspaceFolder}",
+        console = "integratedTerminal",
+        internalConsoleOptions = "neverOpen",
+      },
+    }
+  end
 end
 
 -- vim: set fdm=marker fdl=0: }}}

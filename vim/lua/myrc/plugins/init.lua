@@ -54,7 +54,6 @@ return {
   { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" }, config = true },
   {
     "nvimtools/hydra.nvim",
-    lazy = true,
     dependencies = { { "jbyuki/venn.nvim" } },
     config = function() require("myrc.config.hydra") end,
   },
@@ -202,8 +201,7 @@ return {
   -- DAP Debugging {{{2
   {
     "mfussenegger/nvim-dap",
-    -- event = { "BufReadPost", "BufNewFile" },
-    keys = { "<leader>D" },
+    event = { "BufReadPost", "BufNewFile" },
     ft = { "go", "python", "lua", "rust", "typescript", "javascript" },
     config = function() require("myrc.config.dap") end,
     dependencies = {
@@ -213,7 +211,6 @@ return {
       { "nvim-telescope/telescope-dap.nvim" },
       { "leoluz/nvim-dap-go" },
       { "jbyuki/one-small-step-for-vimkind", module = "osv" },
-      { "mxsdev/nvim-dap-vscode-js" },
     },
   },
   -- }}}
