@@ -101,6 +101,7 @@ end
 
 local enrich_config = function(config, on_config)
   if not config.pythonPath and not config.python then config.pythonPath = getPythonPath() end
+  config.console = "integratedTerminal"
   on_config(config)
 end
 
@@ -152,8 +153,36 @@ dap.configurations.python = {
     -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
     program = "${file}",
     pythonPath = getPythonPath,
+    console = "integratedTerminal", -- Or "externalTerminal"
     -- stopOnEntry = true,
     -- env = {}
+  },
+  {
+    type = "python",
+    request = "launch",
+    name = "Launch Django Server (8000)",
+    program = "${workspaceFolder}/manage.py", -- Path to your manage.py
+    args = { "runserver", "0.0.0.0:8000" }, -- Arguments for runserver
+    pythonPath = getPythonPath,
+    console = "integratedTerminal", -- Or "externalTerminal"
+    justMyCode = false, -- Set to true to skip debugging library code
+  },
+  {
+    type = "python",
+    request = "launch",
+    name = "Launch Django Server (Prompt)",
+    program = "${workspaceFolder}/manage.py", -- Path to your manage.py
+    args = {
+      "runserver",
+      function()
+        local addr = vim.fn.input("listen: ", "0.0.0.0:8001")
+        if addr ~= "" then return addr end
+        return addr
+      end,
+    },
+    pythonPath = getPythonPath,
+    console = "integratedTerminal", -- Or "externalTerminal"
+    justMyCode = false, -- Set to true to skip debugging library code
   },
   {
     type = "python",
