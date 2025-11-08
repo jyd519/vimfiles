@@ -154,7 +154,7 @@ dap.configurations.python = {
     program = "${file}",
     pythonPath = getPythonPath,
     console = "integratedTerminal", -- Or "externalTerminal"
-    -- stopOnEntry = true,
+    stopOnEntry = true,
     -- env = {}
   },
   {
@@ -218,7 +218,7 @@ dap.configurations.python = {
   },
 }
 
--- go {{{2
+-- go {{{1
 -- https://github.com/leoluz/nvim-dap-go/blob/main/lua/dap-go.lua
 require("dap-go").setup({})
 

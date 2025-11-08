@@ -52,7 +52,7 @@ end
 
 local spinner_symbols = { "🌑 ", "🌒 ", "🌓 ", "🌔 ", "🌕 ", "🌖 ", "🌗 ", "🌘 " }
 local ale_spinner = 0
-
+local _, hydra = pcall(require, "hydra.statusline")
 local default_sections = {
   lualine_a = { "mode" },
   lualine_b = {
@@ -95,7 +95,18 @@ local default_sections = {
     },
     "lsp_progress",
   },
-  lualine_x = { "encoding", "fileformat", "filetype" },
+  lualine_x = {
+    {
+      -- Hydra.nvim
+      function()
+        if hydra and hydra.is_active() then return hydra.get_name() end
+        return ""
+      end,
+    },
+    "encoding",
+    "fileformat",
+    "filetype",
+  },
   lualine_y = { "progress" },
   lualine_z = { "location" },
 }

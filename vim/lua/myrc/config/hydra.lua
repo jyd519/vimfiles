@@ -1,4 +1,4 @@
--- https://github.com/anuvyklack/hydra.nvim
+-- https://github.com/nvimtools/hydra.nvim
 --  {{{2 globals
 local Hydra = require("hydra")
 local cmd = require("hydra.keymap-util").cmd
