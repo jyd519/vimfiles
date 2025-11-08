@@ -712,4 +712,10 @@ com! TermNewV :TermNew direction=vertical
 com! TermNewH :TermNew direction=horizontal
 com! TermNewT :TermNew direction=tab
 ]])
+
+
+-- DAP{{{2
+keymap.set("n", "<leader>db", function() require("dap").toggle_breakpoint() end, { desc = "Toggle Breakpoint" });
+keymap.set("n", "<leader>dc", function() require("dap").continue() end, { desc = "Continue" });
+
 -- vim: set fdm=marker fdl=0: }}}

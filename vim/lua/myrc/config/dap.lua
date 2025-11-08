@@ -55,6 +55,29 @@ dap.listeners.before.launch.dapui_config = function() dapui.open() end
 vim.api.nvim_create_user_command("DapCloseUI", function() require("dapui").close() end, {})
 -- }}}
 
+-- {{{1 Commands
+vim.api.nvim_create_user_command("DapAdapterDoc", function(args)
+  local open_url = require("myrc.utils.system").open_url
+  open_url("https://codeberg.org/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation")
+end, {
+  nargs = "*",
+  desc = "Open Debug-Adapter installation page",
+})
+
+vim.api.nvim_create_user_command("DapOSVListen", function(args)
+  local port = args.args or 8086
+  require"osv".launch({port=tonumber(port)})
+end, {
+  nargs = "*",
+  desc = "Launch DAP Server (OSV)",
+})
+vim.api.nvim_create_user_command("DapOSVStop", function()
+  require"osv".stop()
+end, {
+  desc = "Stop OSV DAP Server",
+})
+-- }}}
+
 -- Configure Debuggers {{{1
 --
 -- https://github.com/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation
@@ -220,7 +243,19 @@ dap.configurations.python = {
 
 -- go {{{1
 -- https://github.com/leoluz/nvim-dap-go/blob/main/lua/dap-go.lua
-require("dap-go").setup({})
+require("dap-go").setup()
+table.insert(dap.configurations.go, {
+  -- first: start debuggee as bellow
+  -- dlv debug -l 127.0.0.1:38697 --headless .\main.go
+  type = "go",
+  request = "attach",
+  name = "Attach Remote (Prompt)",
+  mode = "remote",
+  port = function()
+    local port = vim.fn.input("dlv listen port: ", "38697")
+    return port
+  end,
+})
 
 -- c/c++/rust {{{1
 -- codelldb ref: https://github.com/vadimcn/vscode-lldb/blob/master/MANUAL.md#launching-a-new-process

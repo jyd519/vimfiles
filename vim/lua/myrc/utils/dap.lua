@@ -63,11 +63,6 @@ M.start_debug = function()
       return
     end
   end
-  if ft == "lua" then
-    require("osv").run_this()
-    return
-  end
-
   dap.continue()
 end
 

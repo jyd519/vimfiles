@@ -94,16 +94,19 @@ Hydra({
 -- Dap {{{2
 --
 local dap_hint = [[
- ^_<F9>_/_,b_^: ^Toggle breakpoint  ^^^^^_,S_/_<F5>_^: ^Start/Continue
+ ^_<F9>_^: ^Toggle breakpoint     ^^_,S_/_<F5>_^: ^Start/Continue
  ^_,r_^: ^Continue                ^^^^^^^_,c_^: ^Run to cursor
  ^_,x_: Stop  ^^                  ^^^^^^^_,p_^: ^Open repl          ^^^^^^^^^^^^_,u_: ^Toggle UI
  ^_,n_/_<F10>_: Step over         ^^^^^^^_,i_/_<F11>_^: ^Step into    ^_,o_/_<F12>_^: ^Step out
  ^_,T_^^^: Clear breakpoints       ^^^^^^_,B_: ^Conditional breakpoint
- ^_,e_/_,E_: Evaluate input       ^^^^^^^_q_^:  Exit
+ ^_,e_/_,E_: Evaluate input       ^^^^^^^_,q_^:  Exit
 ]]
 
+local my_hydra = {}
+_G.my_hydra = my_hydra
+
 Hydra({
-  name = "Dap Debug",
+  name = "Dap",
   mode = "n",
   body = "<leader>dd",
   hint = dap_hint,
@@ -117,14 +120,20 @@ Hydra({
           noautocmd = true,
           border = "single",
       },
+      hide_on_load = true,
       position = "top-right",
     },
-    on_exit = function()
+    on_enter = function(self)
+      my_hydra[0] = _G.Hydra
+    end,
+    on_exit = function(self)
+      my_hydra[0] = nil
       require("dapui").close()
       vim.cmd("silent! DapTerminate")
     end,
   },
   heads = {
+    { ",H", function() my_hydra[0].hint:show() end, { desc = false } },
     { ",S", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
     { "<F5>", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
 
@@ -137,7 +146,6 @@ Hydra({
 
     { ",c", function() require("dap").run_to_cursor() end, { desc = "run to cursor" } },
     { ",r", function() require("dap").continue() end, { desc = "continue" } },
-    { ",b", function() require("dap").toggle_breakpoint() end, { desc = "toggle breakpoint" } },
     { "<F9>", function() require("dap").toggle_breakpoint() end, { desc = false } },
     {
       ",B",
@@ -158,7 +166,7 @@ Hydra({
       desc = "Evaluate Input",
     },
     { ",p", function() require("dap").repl.open() end, { desc = "open repl" } },
-    { "q", nil, { exit = true, nowait = true, desc = "exit" } },
+    { ",q", nil, { exit = true, nowait = true, desc = "exit" } },
   },
 })
 

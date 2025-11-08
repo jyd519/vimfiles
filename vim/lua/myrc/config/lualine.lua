@@ -57,6 +57,14 @@ local default_sections = {
   lualine_a = { "mode" },
   lualine_b = {
     "branch",
+    {
+      -- Hydra.nvim
+      function()
+        if hydra and hydra.is_active() then return " " .. hydra.get_name() end
+        return ""
+      end,
+      color = { bg = "red", fg = "white" },
+    },
     { "diff", source = diff_source },
     {
       "diagnostics",
@@ -96,13 +104,6 @@ local default_sections = {
     "lsp_progress",
   },
   lualine_x = {
-    {
-      -- Hydra.nvim
-      function()
-        if hydra and hydra.is_active() then return hydra.get_name() end
-        return ""
-      end,
-    },
     "encoding",
     "fileformat",
     "filetype",

@@ -19,4 +19,24 @@ M.system_open = function(path)
   if sysname:match("Linux") then vim.fn.jobstart({ "xdg-open", path }, { detach = true }) end
 end
 
+M.open_url = function (url)
+  if not url or url == "" then
+    print("Usage: OpenURL <url>")
+    return
+  end
+
+  local job = nil
+  if vim.fn.has("win32") == 1 then
+    job = vim.fn.jobstart({"cmd", "/c", "start", "", url})
+  elseif vim.fn.has("mac") == 1 then
+    job = vim.fn.jobstart({"open", url})
+  else
+    job = vim.fn.jobstart({"xdg-open", url})
+  end
+
+  if job <= 0 then
+    print("Failed to open URL: " .. url)
+  end
+end
+
 return M
