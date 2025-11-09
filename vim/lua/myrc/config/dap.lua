@@ -369,9 +369,38 @@ if vscode_js_debug_path ~= "" then
       {
         type = "pwa-node",
         request = "attach",
-        name = "Attach",
+        name = "Attach (9229)",
         port = 9229,
         address = "127.0.0.1",
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        protocol = "inspector",
+        restart = true,
+      },
+      {
+        type = "pwa-node",
+        request = "attach",
+        name = "Attach (Prompt)",
+        port = function ()
+          local val = tonumber(vim.fn.input("Listening Port: ", "9229"))
+          assert(val, "Please provide a port number")
+          return val
+        end,
+        address = function ()
+          local val = vim.fn.input("Address: ", "127.0.0.1")
+          assert(val, "Please provide an address")
+          return val
+        end,
+        cwd = "${workspaceFolder}",
+        sourceMaps = true,
+        protocol = "inspector",
+        restart = true,
+      },
+      {
+        type = "pwa-node",
+        request = "attach",
+        name = "Attach (Select Process)",
+        processId = require('dap.utils').pick_process,
         cwd = "${workspaceFolder}",
         sourceMaps = true,
         protocol = "inspector",
