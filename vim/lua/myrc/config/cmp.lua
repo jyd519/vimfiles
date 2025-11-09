@@ -280,6 +280,11 @@ cmp.setup.cmdline(":", {
   }),
 })
 
+cmp.setup.filetype({ "dap-repl", "dapui_watches", "dapui_hover" }, {
+  sources = {
+    { name = "dap" },
+  },
+})
 -- default lsp config {{{2
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 vim.lsp.config("*", {

@@ -4,7 +4,7 @@ vim.g.codeium_enabled = true
 
 local mapkey = require("keymap-amend")
 
--- vim.g.codeium_filetypes = { markdown = false, json = false, jsonc = false}
+vim.g.codeium_filetypes = { ["dap-repl"] = false }
 
 vim.keymap.set("i", "<C-g>", function() return vim.fn["codeium#Accept"]() end, { expr = true, desc = "Accept Codeium" })
 

@@ -312,6 +312,7 @@ return {
       -- { "quangnguyen30192/cmp-nvim-tags", ft = { "c", "cpp" } },
       { "saadparwaiz1/cmp_luasnip" },
       { "hrsh7th/cmp-nvim-lsp" },
+      { "rcarriga/cmp-dap" },
     },
     config = function() require("myrc.config.cmp") end,
   },
@@ -336,6 +337,15 @@ return {
     config = function() require("myrc.config.symbols-outline") end,
   },
   { "b0o/schemastore.nvim", lazy = true },
+  {
+    "Bekaboo/dropbar.nvim",
+    config = function()
+      local dropbar_api = require("dropbar.api")
+      vim.keymap.set("n", "<leader>;", dropbar_api.pick, { desc = "Pick symbols in winbar" })
+      vim.keymap.set("n", "[;", dropbar_api.goto_context_start, { desc = "Go to start of current context" })
+      vim.keymap.set("n", "];", dropbar_api.select_next_context, { desc = "Select next context" })
+    end,
+  },
   -- }}}
   -- File explorer/Fuzzy Finder {{{2
   {
