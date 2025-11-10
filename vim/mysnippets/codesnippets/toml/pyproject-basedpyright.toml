@@ -1,0 +1,10 @@
+[tool.basedpyright]
+pythonVersion = "3.10"
+reportGeneralTypeIssues = false
+include = ["common", "config", "dashboard", "exam", "ops", "sync"]
+exclude = ["venv", "**/__pycache__", "deploy", "docs", "mysqldata", "test_data"]
+reportUnknownArgumentType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnusedCallResult = false

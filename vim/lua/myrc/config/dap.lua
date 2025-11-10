@@ -66,14 +66,12 @@ end, {
 
 vim.api.nvim_create_user_command("DapOSVListen", function(args)
   local port = args.args or 8086
-  require"osv".launch({port=tonumber(port)})
+  require("osv").launch({ port = tonumber(port) })
 end, {
   nargs = "*",
   desc = "Launch DAP Server (OSV)",
 })
-vim.api.nvim_create_user_command("DapOSVStop", function()
-  require"osv".stop()
-end, {
+vim.api.nvim_create_user_command("DapOSVStop", function() require("osv").stop() end, {
   desc = "Stop OSV DAP Server",
 })
 -- }}}
@@ -168,18 +166,39 @@ dap.adapters.python = function(cb, config)
   end
 end
 
+-- remember the last args of python program
+dap.python_last_args = ""
+
 dap.configurations.python = {
   {
     type = "python",
     request = "launch",
     name = "Launch file",
-    -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
     program = "${file}",
     pythonPath = getPythonPath,
-    console = "integratedTerminal", -- Or "externalTerminal"
+    console = "integratedTerminal",
+    -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
     stopOnEntry = true,
     cwd = "${workspaceFolder}",
+    args = function()
+      return vim.fn.split(dap.python_last_args, " ", false)
+    end,
     -- env = {}
+  },
+  {
+    type = "python",
+    request = "launch",
+    name = "Launch file (Arguments)",
+    program = "${file}",
+    pythonPath = getPythonPath,
+    console = "integratedTerminal",
+    stopOnEntry = true,
+    cwd = "${workspaceFolder}",
+    args = function()
+      local arg = vim.fn.input("Arguments: ", dap.python_last_args)
+      dap.python_last_args = arg
+      return vim.fn.split(arg, " ", false)
+    end,
   },
   {
     type = "python",
@@ -390,12 +409,12 @@ if vscode_js_debug_path ~= "" then
         type = "pwa-node",
         request = "attach",
         name = "Attach (Prompt)",
-        port = function ()
+        port = function()
           local val = tonumber(vim.fn.input("Listening Port: ", "9229"))
           assert(val, "Please provide a port number")
           return val
         end,
-        address = function ()
+        address = function()
           local val = vim.fn.input("Address: ", "127.0.0.1")
           assert(val, "Please provide an address")
           return val
@@ -409,7 +428,7 @@ if vscode_js_debug_path ~= "" then
         type = "pwa-node",
         request = "attach",
         name = "Attach (Select Process)",
-        processId = require('dap.utils').pick_process,
+        processId = require("dap.utils").pick_process,
         cwd = "${workspaceFolder}",
         sourceMaps = true,
         protocol = "inspector",
