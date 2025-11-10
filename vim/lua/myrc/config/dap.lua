@@ -178,6 +178,7 @@ dap.configurations.python = {
     pythonPath = getPythonPath,
     console = "integratedTerminal", -- Or "externalTerminal"
     stopOnEntry = true,
+    cwd = "${workspaceFolder}",
     -- env = {}
   },
   {
@@ -186,6 +187,7 @@ dap.configurations.python = {
     name = "Launch Django Server (8000)",
     program = "${workspaceFolder}/manage.py", -- Path to your manage.py
     args = { "runserver", "0.0.0.0:8000" }, -- Arguments for runserver
+    cwd = "${workspaceFolder}",
     pythonPath = getPythonPath,
     console = "integratedTerminal", -- Or "externalTerminal"
     justMyCode = false, -- Set to true to skip debugging library code
@@ -195,6 +197,7 @@ dap.configurations.python = {
     request = "launch",
     name = "Launch Django Server (Prompt)",
     program = "${workspaceFolder}/manage.py", -- Path to your manage.py
+    cwd = "${workspaceFolder}",
     args = {
       "runserver",
       function()
@@ -216,6 +219,7 @@ dap.configurations.python = {
       port = 5678,
     },
     pythonPath = getPythonPath,
+    cwd = "${workspaceFolder}",
     -- pathMappings = {
     --   {
     --     localRoot= "${workspaceFolder}",
@@ -238,6 +242,7 @@ dap.configurations.python = {
     },
     pythonPath = getPythonPath,
     justMyCode = false,
+    cwd = "${workspaceFolder}",
   },
 }
 
@@ -254,6 +259,7 @@ table.insert(dap.configurations.go, {
   request = "attach",
   name = "Attach Remote (Prompt)",
   mode = "remote",
+  cwd = "${workspaceFolder}",
   port = function()
     local port = vim.fn.input("dlv listen port: ", "38697")
     return port
