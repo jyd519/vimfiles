@@ -34,10 +34,10 @@ Hydra({
     invoke_on_body = true,
     hint = {
       float_opts = {
-          style = "minimal",
-          focusable = false,
-          noautocmd = true,
-          border = "rounded",
+        style = "minimal",
+        focusable = false,
+        noautocmd = true,
+        border = "rounded",
       },
     },
     on_enter = function() vim.o.virtualedit = "all" end,
@@ -62,11 +62,11 @@ Hydra({
     invoke_on_body = true,
     hint = {
       float_opts = {
-          -- row, col, height, width, relative, and anchor should not be
-          -- overridden
-          style = "minimal",
-          focusable = false,
-          noautocmd = true,
+        -- row, col, height, width, relative, and anchor should not be
+        -- overridden
+        style = "minimal",
+        focusable = false,
+        noautocmd = true,
       },
     },
   },
@@ -102,10 +102,18 @@ local dap_hint = [[
  ^_,e_/_,E_: Evaluate input       ^^^^^^^_,q_^:  Exit
 ]]
 
-local my_hydra = {}
-_G.my_hydra = my_hydra
+local dap_hydra = nil
+local function toggle_dap_hint()
+  if dap_hydra then
+    if dap_hydra.hint.win == nil then
+      dap_hydra.hint:show()
+    else
+      dap_hydra.hint:close()
+    end
+  end
+end
 
-Hydra({
+dap_hydra = Hydra({
   name = "Dap",
   mode = "n",
   body = "<leader>dd",
@@ -115,25 +123,24 @@ Hydra({
     invoke_on_body = true,
     hint = {
       float_opts = {
-          style = "minimal",
-          focusable = false,
-          noautocmd = true,
-          border = "single",
+        style = "minimal",
+        focusable = false,
+        noautocmd = true,
+        border = "single",
       },
       hide_on_load = true,
       position = "top-right",
     },
-    on_enter = function(self)
-      my_hydra[0] = _G.Hydra
+    on_enter = function()
+      require("dap").set_breakpoint()
     end,
-    on_exit = function(self)
-      my_hydra[0] = nil
+    on_exit = function()
       require("dapui").close()
       vim.cmd("silent! DapTerminate")
     end,
   },
   heads = {
-    { ",H", function() my_hydra[0].hint:show() end, { desc = false } },
+    { ",H", function() toggle_dap_hint() end, { desc = false } },
     { ",S", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
     { "<F5>", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
 
@@ -233,24 +240,24 @@ Hydra({
     color = "pink",
     hint = {
       float_opts = {
-          -- row, col, height, width, relative, and anchor should not be
-          -- overridden
-          style = "minimal",
-          focusable = false,
-          noautocmd = true,
-          border = "double",
+        -- row, col, height, width, relative, and anchor should not be
+        -- overridden
+        style = "minimal",
+        focusable = false,
+        noautocmd = true,
+        border = "double",
       },
     },
   },
   heads = {
     {
       "n",
-      function() vim.diagnostic.jump({count=1}) end,
+      function() vim.diagnostic.jump({ count = 1 }) end,
       { desc = "next diagnostic" },
     },
     {
       "N",
-      function() vim.diagnostic.jump({count=-1}) end,
+      function() vim.diagnostic.jump({ count = -1 }) end,
       { desc = "previous diagnostic" },
     },
     {
@@ -311,12 +318,12 @@ Hydra({
     hint = {
       position = "middle",
       float_opts = {
-          -- row, col, height, width, relative, and anchor should not be
-          -- overridden
-          style = "minimal",
-          focusable = false,
-          noautocmd = true,
-          border = "double",
+        -- row, col, height, width, relative, and anchor should not be
+        -- overridden
+        style = "minimal",
+        focusable = false,
+        noautocmd = true,
+        border = "double",
       },
     },
     on_enter = function() vim.cmd([[Lazy load telescope.nvim]]) end,
@@ -352,68 +359,72 @@ local git_hint = [[
 ]]
 
 Hydra({
-   name = 'Git',
-   hint = git_hint,
-   config = {
-      color = 'pink',
-      invoke_on_body = true,
-      hint = {
-        float_opts = {
-            -- row, col, height, width, relative, and anchor should not be
-            -- overridden
-            style = "minimal",
-            focusable = false,
-            noautocmd = true,
-        },
+  name = "Git",
+  hint = git_hint,
+  config = {
+    color = "pink",
+    invoke_on_body = true,
+    hint = {
+      float_opts = {
+        -- row, col, height, width, relative, and anchor should not be
+        -- overridden
+        style = "minimal",
+        focusable = false,
+        noautocmd = true,
       },
-      on_enter = function()
-         vim.cmd 'mkview'
-         vim.cmd 'silent! %foldopen!'
-         vim.bo.modifiable = false
-         local gs = require("gitsigns")
-         gs.toggle_signs(true)
-         gs.toggle_linehl(true)
+    },
+    on_enter = function()
+      vim.cmd("mkview")
+      vim.cmd("silent! %foldopen!")
+      vim.bo.modifiable = false
+      local gs = require("gitsigns")
+      gs.toggle_signs(true)
+      gs.toggle_linehl(true)
+    end,
+    on_exit = function()
+      local cursor_pos = vim.api.nvim_win_get_cursor(0)
+      vim.cmd("loadview")
+      vim.api.nvim_win_set_cursor(0, cursor_pos)
+      vim.cmd("normal zv")
+      local gs = require("gitsigns")
+      gs.toggle_signs(false)
+      gs.toggle_linehl(false)
+      gs.toggle_deleted(false)
+    end,
+  },
+  mode = { "n", "x" },
+  body = "<leader>g",
+  heads = {
+    {
+      "J",
+      function()
+        if vim.wo.diff then return "]c" end
+        local gs = require("gitsigns")
+        vim.schedule(function() gs.next_hunk() end)
+        return "<Ignore>"
       end,
-      on_exit = function()
-         local cursor_pos = vim.api.nvim_win_get_cursor(0)
-         vim.cmd 'loadview'
-         vim.api.nvim_win_set_cursor(0, cursor_pos)
-         vim.cmd 'normal zv'
-         local gs = require("gitsigns")
-         gs.toggle_signs(false)
-         gs.toggle_linehl(false)
-         gs.toggle_deleted(false)
+      { expr = true, desc = "next hunk" },
+    },
+    {
+      "K",
+      function()
+        if vim.wo.diff then return "[c" end
+        local gs = require("gitsigns")
+        vim.schedule(function() gs.prev_hunk() end)
+        return "<Ignore>"
       end,
-   },
-   mode = {'n','x'},
-   body = '<leader>g',
-   heads = {
-      { 'J',
-         function()
-            if vim.wo.diff then return ']c' end
-            local gs = require("gitsigns")
-            vim.schedule(function() gs.next_hunk() end)
-            return '<Ignore>'
-         end,
-         { expr = true, desc = 'next hunk' } },
-      { 'K',
-         function()
-            if vim.wo.diff then return '[c' end
-            local gs = require("gitsigns")
-            vim.schedule(function() gs.prev_hunk() end)
-            return '<Ignore>'
-         end,
-         { expr = true, desc = 'prev hunk' } },
-      { 's', ':Gitsigns stage_hunk<CR>', { silent = true, desc = 'stage hunk' } },
-      { 'u', require("gitsigns").undo_stage_hunk, { desc = 'undo last stage' } },
-      { 'S', require("gitsigns").stage_buffer, { desc = 'stage buffer' } },
-      { 'p', require("gitsigns").preview_hunk, { desc = 'preview hunk' } },
-      { 'd', require("gitsigns").toggle_deleted, { nowait = true, desc = 'toggle deleted' } },
-      { 'b', require("gitsigns").blame_line, { desc = 'blame' } },
-      { 'B', function() require("gitsigns").blame_line{ full = true } end, { desc = 'blame show full' } },
-      { '/', require("gitsigns").show, { exit = true, desc = 'show base file' } }, -- show the base of the file
-      { '<Enter>', '<Cmd>Neogit<CR>', { exit = true, desc = 'Neogit' } },
-      { 'q', nil, { exit = true, nowait = true, desc = 'exit' } },
-   }
+      { expr = true, desc = "prev hunk" },
+    },
+    { "s", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "stage hunk" } },
+    { "u", require("gitsigns").undo_stage_hunk, { desc = "undo last stage" } },
+    { "S", require("gitsigns").stage_buffer, { desc = "stage buffer" } },
+    { "p", require("gitsigns").preview_hunk, { desc = "preview hunk" } },
+    { "d", require("gitsigns").toggle_deleted, { nowait = true, desc = "toggle deleted" } },
+    { "b", require("gitsigns").blame_line, { desc = "blame" } },
+    { "B", function() require("gitsigns").blame_line({ full = true }) end, { desc = "blame show full" } },
+    { "/", require("gitsigns").show, { exit = true, desc = "show base file" } }, -- show the base of the file
+    { "<Enter>", "<Cmd>Neogit<CR>", { exit = true, desc = "Neogit" } },
+    { "q", nil, { exit = true, nowait = true, desc = "exit" } },
+  },
 })
 -- vim: set foldlevel=1 fdm=marker:

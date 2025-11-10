@@ -247,6 +247,9 @@ require("dap-go").setup()
 table.insert(dap.configurations.go, {
   -- first: start debuggee as bellow
   -- dlv debug -l 127.0.0.1:38697 --headless .\main.go
+  -- or
+  -- go build -gcflags="all=-N -l" -o myapp main.go
+  -- dlv exec --headless --listen=:38697 --api-version=2 --accept-multiclient ./myapp
   type = "go",
   request = "attach",
   name = "Attach Remote (Prompt)",
