@@ -140,13 +140,11 @@ end
 
 dap.adapters.python = function(cb, config)
   if config.request == "attach" then
-    ---@diagnostic disable-next-line: undefined-field
-    local port = (config.connect or config).port
-    ---@diagnostic disable-next-line: undefined-field
-    local host = (config.connect or config).host or "127.0.0.1"
+    local port = config.port
+    local host = config.host or "127.0.0.1"
     cb({
       type = "server",
-      port = assert(port, "`connect.port` is required for a python `attach` configuration"),
+      port = assert(port, "`port` is required for a python `attach` configuration"),
       host = host,
       enrich_config = enrich_config,
       options = {
@@ -168,7 +166,7 @@ end
 
 -- remember the last args of python program
 dap.python_last_args = ""
-
+dap.stopOnEntry = false
 dap.configurations.python = {
   {
     type = "python",
@@ -178,9 +176,10 @@ dap.configurations.python = {
     pythonPath = getPythonPath,
     console = "integratedTerminal",
     -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
-    stopOnEntry = true,
+    stopOnEntry = dap.stopOnEntry,
     cwd = "${workspaceFolder}",
     args = function()
+      print(dap.python_last_args)
       return vim.fn.split(dap.python_last_args, " ", false)
     end,
     -- env = {}
@@ -192,7 +191,7 @@ dap.configurations.python = {
     program = "${file}",
     pythonPath = getPythonPath,
     console = "integratedTerminal",
-    stopOnEntry = true,
+    stopOnEntry = dap.stopOnEntry,
     cwd = "${workspaceFolder}",
     args = function()
       local arg = vim.fn.input("Arguments: ", dap.python_last_args)
@@ -233,10 +232,8 @@ dap.configurations.python = {
     type = "python",
     request = "attach",
     name = "Attach Running Process (5678)",
-    connect = {
-      host = "127.0.0.1",
-      port = 5678,
-    },
+    host = "127.0.0.1",
+    port = 5678,
     pythonPath = getPythonPath,
     cwd = "${workspaceFolder}",
     -- pathMappings = {
@@ -251,14 +248,12 @@ dap.configurations.python = {
     type = "python",
     request = "attach",
     name = "Attach Running Process (Prompt)",
-    connect = {
-      host = "127.0.0.1",
-      port = function()
-        local val = tonumber(vim.fn.input("Port: ", "5678"))
-        assert(val, "Please provide a port number")
-        return val
-      end,
-    },
+    host = "127.0.0.1",
+    port = function()
+      local val = tonumber(vim.fn.input("Port: ", "5678"))
+      assert(val, "Please provide a port number")
+      return val
+    end,
     pythonPath = getPythonPath,
     justMyCode = false,
     cwd = "${workspaceFolder}",
@@ -359,8 +354,11 @@ dap.configurations.rust = dap.configurations.cpp
 
 -- javascript {{{1
 local vscode_js_debug_path =
-  vim.fn.globpath(vim.fn.stdpath("data") .. "/mason/packages/js-debug-adapter/js-debug/src", "dapDebugServer.js")
+  vim.fn.globpath(vim.fn.expand("$MASON/packages/js-debug-adapter/js-debug/src"), "dapDebugServer.js")
 if vscode_js_debug_path ~= "" then
+  dap.pwa_port = 9229
+  dap.pwa_addr = "127.0.0.1"
+  dap.js_last_args = ""
   dap.adapters["pwa-node"] = {
     type = "server",
     host = "localhost",
@@ -392,17 +390,19 @@ if vscode_js_debug_path ~= "" then
         cwd = "${workspaceFolder}",
         sourceMaps = true,
         protocol = "inspector",
+        args = function() return vim.fn.split(dap.js_last_args, " ", false) end,
         console = "integratedTerminal",
       },
       {
         type = "pwa-node",
         request = "attach",
-        name = "Attach (9229)",
-        port = 9229,
-        address = "127.0.0.1",
+        name = "Attach",
+        port = dap.pwa_port,
+        address = dap.pwa_addr,
         cwd = "${workspaceFolder}",
         sourceMaps = true,
         protocol = "inspector",
+        args = function() return vim.fn.split(dap.js_last_args, " ", false) end,
         restart = true,
       },
       {
@@ -410,13 +410,15 @@ if vscode_js_debug_path ~= "" then
         request = "attach",
         name = "Attach (Prompt)",
         port = function()
-          local val = tonumber(vim.fn.input("Listening Port: ", "9229"))
+          local val = tonumber(vim.fn.input("Listening Port: ", tostring(dap.pwa_port)))
           assert(val, "Please provide a port number")
+          dap.pwa_port = val
           return val
         end,
         address = function()
-          local val = vim.fn.input("Address: ", "127.0.0.1")
+          local val = vim.fn.input("Address: ", dap.pwa_addr)
           assert(val, "Please provide an address")
+          dap.pwa_addr = val
           return val
         end,
         cwd = "${workspaceFolder}",
@@ -440,7 +442,7 @@ if vscode_js_debug_path ~= "" then
         cwd = "${workspaceFolder}",
         program = "${file}",
         runtimeExecutable = "tsx",
-        -- args = { '${file}' },
+        args = function() return vim.fn.split(dap.js_last_args, " ", false) end,
         sourceMaps = true,
         protocol = "inspector",
         console = "integratedTerminal",
