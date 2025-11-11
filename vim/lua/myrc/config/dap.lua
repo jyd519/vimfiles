@@ -93,6 +93,7 @@ if local_lua_dap ~= "" then
       local_lua_dap,
     },
     enrich_config = function(config, on_config)
+      config.stopOnEntry = dap.stopOnEntry
       if not config["extensionPath"] then
         local c = vim.deepcopy(config)
         --  If this is missing or wrong you'll see
@@ -146,7 +147,7 @@ dap.configurations.lua = {
       lua = 'nlua',
       file = '${file}',
     },
-    -- console = "integratedTerminal",
+    console = "integratedTerminal",
     args = function ()
       print(dap.lua_last_args)
       return vim.fn.split(dap.lua_last_args, " ", false)
@@ -190,6 +191,7 @@ end
 local enrich_config = function(config, on_config)
   if not config.pythonPath and not config.python then config.pythonPath = getPythonPath() end
   config.console = "integratedTerminal"
+  config.stopOnEntry = dap.stopOnEntry
   on_config(config)
 end
 
@@ -219,6 +221,7 @@ dap.adapters.python = function(cb, config)
       },
     })
   else
+    config.stopOnEntry = dap.stopOnEntry
     cb({
       type = "executable",
       command = getPythonPath(),
@@ -243,7 +246,6 @@ dap.configurations.python = {
     pythonPath = getPythonPath,
     console = "integratedTerminal",
     -- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
-    stopOnEntry = dap.stopOnEntry,
     cwd = "${workspaceFolder}",
     args = function()
       print(dap.python_last_args)
@@ -258,7 +260,6 @@ dap.configurations.python = {
     program = "${file}",
     pythonPath = getPythonPath,
     console = "integratedTerminal",
-    stopOnEntry = dap.stopOnEntry,
     cwd = "${workspaceFolder}",
     args = function()
       local arg = vim.fn.input("Arguments: ", dap.python_last_args)
@@ -383,7 +384,6 @@ dap.configurations.cpp = {
     request = "launch",
     program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file") end,
     cwd = "${workspaceFolder}",
-    stopOnEntry = false,
     args = {},
   },
   {
@@ -392,7 +392,6 @@ dap.configurations.cpp = {
     request = "launch",
     program = function() return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file") end,
     cwd = "${workspaceFolder}",
-    stopOnEntry = false,
     args = {},
     env = function()
       local variables = {}
