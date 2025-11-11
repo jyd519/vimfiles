@@ -1,4 +1,3 @@
----@diagnostic disable: missing-parameter
 -- configure DAP {{{1
 local dap = require("dap")
 _G.dap = dap
@@ -82,7 +81,77 @@ vim.api.nvim_create_user_command("DapOSVStop", function() require("osv").stop() 
 --
 
 -- lua {{{1
+dap.lua_last_args = ""
+dap.adapters.nlua = function(callback, config) callback({ type = "server", host = config.host, port = config.port }) end
+local local_lua_dap =
+  vim.fn.globpath(vim.fn.expand("$MASON/packages/local-lua-debugger-vscode/extension/extension"), "debugAdapter.js")
+if local_lua_dap ~= "" then
+  dap.adapters["local-lua"] = {
+    type = "executable",
+    command = "node",
+    args = {
+      local_lua_dap,
+    },
+    enrich_config = function(config, on_config)
+      if not config["extensionPath"] then
+        local c = vim.deepcopy(config)
+        --  If this is missing or wrong you'll see
+        -- "module 'lldebugger' not found" errors in the dap-repl when trying to launch a debug session
+        c.extensionPath = vim.fn.expand("$MASON/packages/local-lua-debugger-vscode/extension")
+        on_config(c)
+      else
+        on_config(config)
+      end
+    end,
+  }
+end
+
 dap.configurations.lua = {
+  {
+    name = "Launch current file (local-lua)",
+    type = "local-lua",
+    request = "launch",
+    cwd = "${workspaceFolder}",
+    program = {
+      lua = "lua5.1",
+      file = "${file}",
+    },
+    console = "integratedTerminal",
+    args = function ()
+      print(dap.lua_last_args)
+      return vim.fn.split(dap.lua_last_args, " ", false)
+    end,
+  },
+  {
+    name = "Launch current file (local-lua, Prompt)",
+    type = "local-lua",
+    request = "launch",
+    cwd = "${workspaceFolder}",
+    program = {
+      lua = "lua5.1",
+      file = "${file}",
+    },
+    console = "integratedTerminal",
+    args = function ()
+      dap.lua_last_args = vim.fn.input("Arguments: ")
+      return vim.fn.split(dap.lua_last_args, " ", false)
+    end,
+  },
+  {
+    name = 'Launch current file (nlua.lua)',
+    type = 'local-lua',
+    request = 'launch',
+    cwd = '${workspaceFolder}',
+    program = {
+      lua = 'nlua',
+      file = '${file}',
+    },
+    -- console = "integratedTerminal",
+    args = function ()
+      print(dap.lua_last_args)
+      return vim.fn.split(dap.lua_last_args, " ", false)
+    end,
+  },
   {
     type = "nlua",
     request = "attach",
@@ -99,8 +168,6 @@ dap.configurations.lua = {
     end,
   },
 }
-
-dap.adapters.nlua = function(callback, config) callback({ type = "server", host = config.host, port = config.port }) end
 
 -- python {{{1
 -- https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
@@ -474,4 +541,26 @@ if vscode_js_debug_path ~= "" then
   end
 end
 
+-- {{{1 ansible
+-- python -m pip install ansibug
+dap.adapters.ansible = {
+  type = "executable",
+  command = "python",
+  args = { "-m", "ansibug", "dap" },
+}
+dap.ansible_last_args = ""
+dap.configurations["yaml.ansible"] = {
+  {
+    type = "ansible",
+    request = "launch",
+    name = "Debug playbook",
+    playbook = "${file}",
+    args = function()
+      local arg = vim.fn.input("Arguments: ", dap.ansible_last_args)
+      dap.ansible_last_args = arg
+      return vim.fn.split(arg, " ", false)
+    end,
+  },
+}
+--}}}
 -- vim: set fdm=marker fdl=0: }}}
