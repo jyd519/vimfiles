@@ -30,5 +30,6 @@ else
   require('myrc.lazy')
   require('myrc.keymaps')
   require('myrc.autocmds')
+  require('myrc.utils.rg')
 end
 

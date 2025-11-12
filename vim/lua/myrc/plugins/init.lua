@@ -51,7 +51,7 @@ return {
     event = "VeryLazy",
     config = function() require("myrc.config.hop") end,
   },
-  { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" }, config = true },
+  { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" }, lazy = true },
   {
     "nvimtools/hydra.nvim",
     dependencies = { { "jbyuki/venn.nvim" } },

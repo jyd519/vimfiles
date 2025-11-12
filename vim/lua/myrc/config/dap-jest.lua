@@ -7,7 +7,7 @@ local global_options = {
   expressions = { "call_expression" },
   prepend = { "describe" },
   regexStartEnd = true,
-  escapeRegex = true,
+  escapeRegex = false,
   dap = {
     type = "pwa-node",
     request = "launch",
@@ -25,6 +25,8 @@ local global_options = {
     cwd = "${workspaceFolder}",
     console = "integratedTerminal",
     internalConsoleOptions = "neverOpen",
+    protocol = 'inspector',
+    skipFiles = {'<node_internals>/**/*.js'},
   },
   cache = { -- used to store the information about the last run
     last_run = nil,
@@ -124,7 +126,7 @@ local function get_identifier(node, stringCharacters)
 end
 
 local function regexEscape(str)
-  return vim.fn.escape(str, '!"().+-*?^[]')
+  return vim.fn.escape(str, '!"().+-*?^[]$')
 end
 
 local function get_result(o)
@@ -245,7 +247,6 @@ local function run(o)
     end
   end
   global_options.cache.last_run = { result = result, file = file, cmd = cmd }
-  -- file = regexEscape(file)
 
   if options.func then
     -- debug_jest
@@ -317,9 +318,7 @@ local function debug_last(o)
     o.func = debug_jest
   end
   o.run_last = true
-  terminate(function()
-    return run(o)
-  end)
+  return run(o)
 end
 
 local function run_file(o)
