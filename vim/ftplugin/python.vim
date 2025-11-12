@@ -53,3 +53,5 @@ endfunction
 noremap <buffer> <leader>i :call <SID>PyPostSave()<cr>
 command! PyImport call <SID>PyPostSave()
 
+" dap
+command! -buffer DebugTest lua require("dap-python").test_method()

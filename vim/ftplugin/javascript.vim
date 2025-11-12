@@ -1,4 +1,3 @@
-
 function! ConvertToFunction(line)
   if getline(a:line) =~ '\v^\s*(\w+):\s*function\s*\(.*$'
     let new = substitute(getline(a:line), '\v^\s*(\w+):\s*function(.+)$', 'export function \1\2', '')

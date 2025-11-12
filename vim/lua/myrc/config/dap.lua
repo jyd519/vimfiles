@@ -73,11 +73,6 @@ end, {
 vim.api.nvim_create_user_command("DapOSVStop", function() require("osv").stop() end, {
   desc = "Stop OSV DAP Server",
 })
-vim.api.nvim_create_user_command("JestDebug", function()
-  require("myrc.config.dap-jest").debug()
-end, {
-  desc = "Debug Jest test",
-})
 -- }}}
 
 -- Configure Debuggers {{{1
@@ -226,6 +221,10 @@ dap.adapters.python = function(cb, config)
       },
     })
   else
+    if config.name == "Debug Test" then
+      require("dap-python").test_method()
+      return
+    end
     config.stopOnEntry = dap.stopOnEntry
     cb({
       type = "executable",
@@ -271,6 +270,15 @@ dap.configurations.python = {
       dap.python_last_args = arg
       return vim.fn.split(arg, " ", false)
     end,
+  },
+  {
+    type = "python",
+    request = "launch",
+    name = "Debug Test",
+    program = "${file}",
+    pythonPath = getPythonPath,
+    console = "integratedTerminal",
+    cwd = "${workspaceFolder}",
   },
   {
     type = "python",
