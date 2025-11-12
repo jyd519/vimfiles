@@ -30,17 +30,40 @@ local M = {}
 --     justMyCode = false,
 -- })
 
-
+-- Add new configuration
 ---@param language string
 ---@param setting table
 M.add = function(language, setting)
   local dap = require("dap")
   for i = #dap.configurations[language], 1, -1 do
-    if dap.configurations.python[i].name == setting.name then
+    if dap.configurations[language][i].name == setting.name then
       table.remove(dap.configurations[language], i)
     end
   end
   table.insert(dap.configurations[language], setting)
+end
+
+-- Extend existing configuration
+---@param language string
+---@param setting table
+M.extend = function(language, setting)
+  local dap = require("dap")
+  if not dap.configurations[language] then
+    return
+  end
+
+  for _, t1 in ipairs(dap.configurations[language]) do
+    for k, v in pairs(setting) do
+      if type(v) == "table" then
+        if not t1[k] or type(t1[k]) ~= "table" then
+          t1[k] = {}
+        end
+        t1[k] = vim.tbl_extend("force", t1[k], v)
+      else
+        t1[k] = v
+      end
+    end
+  end
 end
 
 M.start_debug = function()

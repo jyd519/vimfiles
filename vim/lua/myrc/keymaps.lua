@@ -5,8 +5,6 @@ keymap.amend = prequire("keymap-amend")
 -- }}}
 
 -- General {{{2
--- Quick switch to normal mode
-vim.keymap.set("i", "jj", "<ESC>", { noremap = true })
 -- Insert a blank line
 vim.keymap.set("i", "<C-Return>", '<CR><CR><C-o>k<Tab>"', { noremap = true })
 

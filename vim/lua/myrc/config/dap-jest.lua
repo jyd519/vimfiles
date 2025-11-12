@@ -15,6 +15,7 @@ local global_options = {
     runtimeExecutable = "node",
     runtimeArgs = {
       "./node_modules/jest/bin/jest.js",
+      "--no-cache",
       "--no-coverage",
       "--runInBand",
       "--runTestsByPath",
@@ -78,7 +79,7 @@ local function find_nearest_node_obj(identifiers, prepend, expressions)
   while node do
     local node_type = node:type()
     if has_value(expressions, node_type) then
-      local node_text = vim.treesitter.query.get_node_text(node, 0)
+      local node_text = vim.treesitter.get_node_text(node, 0)
       local identifier = string.match(node_text, "^[a-zA-Z0-9]*")
       if has_value(identifiers, identifier) then
         return { node = node, from_identifier = true }
@@ -98,7 +99,7 @@ local function prepend_node(current_node, prepend, expressions)
   while node do
     local node_type = node:type()
     if has_value(expressions, node_type) then
-      local node_text = vim.treesitter.query.get_node_text(node, 0)
+      local node_text = vim.treesitter.get_node_text(node, 0)
       local identifier = string.match(node_text, "^[a-zA-Z0-9]*")
       if has_value(prepend, identifier) then
         return node
@@ -119,7 +120,7 @@ end
 local function get_identifier(node, stringCharacters)
   local child = node:child(1)
   local arguments = child:child(1)
-  return remove_quotations(stringCharacters, vim.treesitter.query.get_node_text(arguments, 0))
+  return remove_quotations(stringCharacters, vim.treesitter.get_node_text(arguments, 0))
 end
 
 local function regexEscape(str)
@@ -171,12 +172,13 @@ local function debug_jest(o)
     cwd = vim.fn.getcwd()
   end
 
-  local runtimeArgs = o.dap.runtimeArgs
+  local runtimeArgs = vim.deepcopy(o.dap.runtimeArgs)
   if result then
     table.insert(runtimeArgs, 3, "-t")
     table.insert(runtimeArgs, 4, result)
   end
 
+  print("Running: " .. table.concat(runtimeArgs, " "))
   local config =
     vim.tbl_deep_extend("force", o.dap, { type = type, request = request, cwd = cwd, runtimeArgs = runtimeArgs })
   dap.run(config)
@@ -192,6 +194,18 @@ local function adjust_cmd(cmd, result, file)
   end
   -- adjusted_cmd = adjusted_cmd:gsub("\\", "\\\\") -- needs double escaping
   return adjusted_cmd
+end
+
+local function get_test_name(o)
+  if not o then
+    o = {}
+  end
+  local options = vim.tbl_deep_extend("force", global_options, o)
+  local result = get_result(options)
+  if not result then
+    return
+  end
+  return result
 end
 
 local function run(o)
@@ -231,7 +245,7 @@ local function run(o)
     end
   end
   global_options.cache.last_run = { result = result, file = file, cmd = cmd }
-  file = regexEscape(file)
+  -- file = regexEscape(file)
 
   if options.func then
     -- debug_jest
@@ -273,6 +287,7 @@ end
 
 local function terminate(cb)
   local dap = require("dap")
+
   if dap.terminate then
     dap.terminate(nil, nil, function()
       cb()
@@ -290,9 +305,7 @@ local function debug(o)
   if o.func == nil then
     o.func = debug_jest
   end
-  terminate(function()
-    return run(o)
-  end)
+  return run(o)
 end
 
 local function debug_last(o)
@@ -348,4 +361,5 @@ return {
   debug = debug,
   debug_last = debug_last,
   debug_file = debug_file,
+  get_test_name = get_test_name,
 }

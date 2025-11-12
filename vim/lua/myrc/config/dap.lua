@@ -54,7 +54,7 @@ dap.listeners.before.launch.dapui_config = function() dapui.open() end
 vim.api.nvim_create_user_command("DapCloseUI", function() require("dapui").close() end, {})
 -- }}}
 
--- {{{1 Commands
+-- {{{1 User Commands
 vim.api.nvim_create_user_command("DapAdapterDoc", function(args)
   local open_url = require("myrc.utils.system").open_url
   open_url("https://codeberg.org/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation")
@@ -72,6 +72,11 @@ end, {
 })
 vim.api.nvim_create_user_command("DapOSVStop", function() require("osv").stop() end, {
   desc = "Stop OSV DAP Server",
+})
+vim.api.nvim_create_user_command("JestDebug", function()
+  require("myrc.config.dap-jest").debug()
+end, {
+  desc = "Debug Jest test",
 })
 -- }}}
 
@@ -118,7 +123,7 @@ dap.configurations.lua = {
       file = "${file}",
     },
     console = "integratedTerminal",
-    args = function ()
+    args = function()
       print(dap.lua_last_args)
       return vim.fn.split(dap.lua_last_args, " ", false)
     end,
@@ -133,22 +138,22 @@ dap.configurations.lua = {
       file = "${file}",
     },
     console = "integratedTerminal",
-    args = function ()
+    args = function()
       dap.lua_last_args = vim.fn.input("Arguments: ")
       return vim.fn.split(dap.lua_last_args, " ", false)
     end,
   },
   {
-    name = 'Launch current file (nlua.lua)',
-    type = 'local-lua',
-    request = 'launch',
-    cwd = '${workspaceFolder}',
+    name = "Launch current file (nlua.lua)",
+    type = "local-lua",
+    request = "launch",
+    cwd = "${workspaceFolder}",
     program = {
-      lua = 'nlua',
-      file = '${file}',
+      lua = "nlua",
+      file = "${file}",
     },
     console = "integratedTerminal",
-    args = function ()
+    args = function()
       print(dap.lua_last_args)
       return vim.fn.split(dap.lua_last_args, " ", false)
     end,
@@ -461,6 +466,73 @@ if vscode_js_debug_path ~= "" then
       },
       {
         type = "pwa-node",
+        request = "launch",
+        name = "Launch Current File (tsx)",
+        cwd = "${workspaceFolder}",
+        program = "${file}",
+        runtimeExecutable = "tsx",
+        args = function() return vim.fn.split(dap.js_last_args, " ", false) end,
+        sourceMaps = true,
+        protocol = "inspector",
+        console = "integratedTerminal",
+        outFiles = { "${workspaceFolder}/**/**/*", "!**/node_modules/**" },
+        skipFiles = { "<node_internals>/**", "node_modules/**" },
+        resolveSourceMapLocations = {
+          "${workspaceFolder}/**",
+          "!**/node_modules/**",
+        },
+      },
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Debug Jest Tests",
+        trace = true, -- include debugger info
+        runtimeExecutable = "node",
+        runtimeArgs = {
+          "./node_modules/jest/bin/jest.js",
+          "--runInBand",
+          "--runTestsByPath",
+          "${file}",
+        },
+        rootPath = "${workspaceFolder}",
+        cwd = "${workspaceFolder}",
+        console = "integratedTerminal",
+        internalConsoleOptions = "neverOpen",
+      },
+      {
+        type = "pwa-node",
+        request = "launch",
+        name = "Debug Jest Tests (Single)",
+        trace = true, -- include debugger info
+        runtimeExecutable = "node",
+        runtimeArgs = function()
+          local args = {
+              "./node_modules/jest/bin/jest.js",
+              "--runInBand",
+              "--runTestsByPath",
+              "${file}",
+          }
+          local test_name = require("myrc.config.dap-jest").get_test_name()
+          if test_name then
+            table.insert(args, "-t")
+            table.insert(args, test_name)
+          else
+            test_name = vim.fn.input("Test: ", test_name)
+            if test_name ~= "" then
+              table.insert(args, "-t")
+              table.insert(args, test_name)
+            end
+          end
+          print(table.concat(args, " "))
+          return args
+        end,
+        rootPath = "${workspaceFolder}",
+        cwd = "${workspaceFolder}",
+        console = "integratedTerminal",
+        internalConsoleOptions = "neverOpen",
+      },
+      {
+        type = "pwa-node",
         request = "attach",
         name = "Attach",
         port = dap.pwa_port,
@@ -500,41 +572,6 @@ if vscode_js_debug_path ~= "" then
         cwd = "${workspaceFolder}",
         sourceMaps = true,
         protocol = "inspector",
-      },
-      {
-        type = "pwa-node",
-        request = "launch",
-        name = "Launch Current File (tsx)",
-        cwd = "${workspaceFolder}",
-        program = "${file}",
-        runtimeExecutable = "tsx",
-        args = function() return vim.fn.split(dap.js_last_args, " ", false) end,
-        sourceMaps = true,
-        protocol = "inspector",
-        console = "integratedTerminal",
-        outFiles = { "${workspaceFolder}/**/**/*", "!**/node_modules/**" },
-        skipFiles = { "<node_internals>/**", "node_modules/**" },
-        resolveSourceMapLocations = {
-          "${workspaceFolder}/**",
-          "!**/node_modules/**",
-        },
-      },
-      {
-        type = "pwa-node",
-        request = "launch",
-        name = "Debug Jest Tests",
-        trace = true, -- include debugger info
-        runtimeExecutable = "node",
-        runtimeArgs = {
-          "./node_modules/jest/bin/jest.js",
-          "--runInBand",
-          "--runTestsByPath",
-          "${file}",
-        },
-        rootPath = "${workspaceFolder}",
-        cwd = "${workspaceFolder}",
-        console = "integratedTerminal",
-        internalConsoleOptions = "neverOpen",
       },
     }
   end
