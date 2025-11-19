@@ -350,10 +350,12 @@ Hydra({
   },
 })
 
+-- Git {{{2
+--
 local git_hint = [[
  _J_: next hunk   _s_: stage hunk        _d_: show deleted   _b_: blame line
- _K_: prev hunk   _u_: undo last stage   _p_: preview hunk   _B_: blame show full 
- ^ ^              _S_: stage buffer      ^ ^                 _/_: show base file
+ _K_: prev hunk   _u_: undo last stage   _p_: preview hunk   _B_: blame show full
+ ^ ^              _S_: stage buffer      ^ ^
  ^
  ^ ^              _<Enter>_: Neogit              _q_: exit
 ]]
@@ -393,7 +395,7 @@ Hydra({
     end,
   },
   mode = { "n", "x" },
-  body = "<leader>g",
+  body = "<leader>G",
   heads = {
     {
       "J",
@@ -420,9 +422,9 @@ Hydra({
     { "S", require("gitsigns").stage_buffer, { desc = "stage buffer" } },
     { "p", require("gitsigns").preview_hunk, { desc = "preview hunk" } },
     { "d", require("gitsigns").toggle_deleted, { nowait = true, desc = "toggle deleted" } },
-    { "b", require("gitsigns").blame_line, { desc = "blame" } },
+    { "b", require("gitsigns").toggle_current_line_blame, { desc = "toggle current line blame" } },
+    { "w", require("gitsigns").toggle_word_diff, { desc = "toggle word diff" } },
     { "B", function() require("gitsigns").blame_line({ full = true }) end, { desc = "blame show full" } },
-    { "/", require("gitsigns").show, { exit = true, desc = "show base file" } }, -- show the base of the file
     { "<Enter>", "<Cmd>Neogit<CR>", { exit = true, desc = "Neogit" } },
     { "q", nil, { exit = true, nowait = true, desc = "exit" } },
   },
