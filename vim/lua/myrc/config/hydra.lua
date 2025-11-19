@@ -355,7 +355,7 @@ Hydra({
 local git_hint = [[
  _J_: next hunk   _s_: stage hunk        _d_: show deleted   _b_: blame line
  _K_: prev hunk   _u_: undo last stage   _p_: preview hunk   _B_: blame show full
- ^ ^              _S_: stage buffer      ^ ^
+ ^ ^              _S_: stage buffer      ^ ^                 _w_: toggle word diff
  ^
  ^ ^              _<Enter>_: Neogit              _q_: exit
 ]]
