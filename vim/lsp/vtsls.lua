@@ -17,31 +17,24 @@ local vue_plugin = {
 }
 
 return {
-  init_options = {
-    plugins = {
-      vue_plugin,
-    },
-  },
-  -- to disable this plugin
-  --  make filetypes empty or make root_dir unfunction
-  filetypes = tsserver_filetypes,
-  root_dir = function(bufnr, on_dir)
-  end,
   settings = {
-    typescript = {
+    vtsls = {
       tsserver = {
-        useSyntaxServer = false,
+        globalPlugins = {
+          vue_plugin,
+        },
       },
+    },
+    typescript = {
       inlayHints = {
-        includeInlayParameterNameHints = "all",
-        includeInlayParameterNameHintsWhenArgumentMatchesName = true,
-        includeInlayFunctionParameterTypeHints = true,
-        includeInlayVariableTypeHints = true,
-        includeInlayVariableTypeHintsWhenTypeMatchesName = true,
-        includeInlayPropertyDeclarationTypeHints = true,
-        includeInlayFunctionLikeReturnTypeHints = true,
-        includeInlayEnumMemberValueHints = true,
+        parameterNames = { enabled = "literals" },
+        parameterTypes = { enabled = true },
+        variableTypes = { enabled = true },
+        propertyDeclarationTypes = { enabled = true },
+        functionLikeReturnTypes = { enabled = true },
+        enumMemberValues = { enabled = true },
       },
     },
   },
+  filetypes = tsserver_filetypes,
 }

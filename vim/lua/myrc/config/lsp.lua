@@ -22,6 +22,15 @@ local bufmap = function(mode, lhs, rhs, opts)
   vim.keymap.set(mode, lhs, rhs, options)
 end
 
+local show_code_actions = function(client, bufnr)
+  local clients = vim.lsp.get_clients({ name="vtsls",  bufnr = bufnr })
+  if #clients > 0 then
+    require('vtsls').commands.source_actions(bufnr)
+    return
+  end
+  vim.lsp.buf.code_action()
+end
+
 local function setup_keymapping(client, bufnr)
   bufmap("n", "gd", "<cmd>lua vim.lsp.buf.definition()<cr>", { desc = "Go to definition" })
   bufmap("n", "gD", "<cmd>lua vim.lsp.buf.declaration()<cr>", { desc = "Go to declaration" })
@@ -37,8 +46,8 @@ local function setup_keymapping(client, bufnr)
   bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
 
   -- Selects a code action available at the current cursor position
-  bufmap("n", "gx", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code action" })
-  bufmap("n", "<leader>ca", "<cmd>lua vim.lsp.buf.code_action()<cr>", { desc = "Code action" })
+  bufmap("n", "gx", show_code_actions, { desc = "Code action" })
+  bufmap("n", "<leader>ca", show_code_actions, { desc = "Code action" })
 
   -- codelens
   bufmap("n", "<leader>cc", "<cmd>lua vim.lsp.codelens.run()<cr>", { desc = "Run Codelens" })

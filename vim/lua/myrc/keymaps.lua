@@ -62,7 +62,7 @@ end
 
 -- Terminal
 -- to exit terminal-mode
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true })
+-- vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true }) -- conflict with lazygit
 vim.keymap.set("t", "<C-o>", "<C-\\><C-N>", { noremap = true })
 vim.keymap.set("t", "<C-h>", "<C-\\><C-N><C-w>h", { noremap = true })
 vim.keymap.set("t", "<C-j>", "<C-\\><C-N><C-w>j", { noremap = true })
@@ -615,7 +615,7 @@ end
 vim.api.nvim_create_user_command(
   "TrimSpaces",
   function(opts) trim_trailing_whitespaces(opts.line1, opts.line2) end,
-  { range = true, nargs = 0, desc = "Trim trailing whitespaces" }
+  { range = '%', nargs = 0, desc = "Trim trailing whitespaces" }
 )
 vim.api.nvim_create_user_command(
   "FixLineEndings",
@@ -699,12 +699,14 @@ keymap.set(
   function() vim.cmd(vim.v.count1 .. "ToggleTerm direction=horizontal") end,
   { noremap = true, desc = "Toggle horizontal FloatTerm" }
 )
-keymap.set("n", "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
-keymap.set("t", "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
+
+keymap.set("v", "<space>s", function()
+  require("toggleterm").send_lines_to_terminal("single_line", true, { args = vim.v.count })
+end)
+keymap.set({"n", "t"}, "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 keymap.set("n", "<S-F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("t", "<S-F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set("n", "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
-keymap.set("t", "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
+keymap.set({"n", "t"}, "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 vim.cmd([[
 com! TermNewV :TermNew direction=vertical
 com! TermNewH :TermNew direction=horizontal

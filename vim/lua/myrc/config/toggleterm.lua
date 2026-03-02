@@ -6,15 +6,15 @@ require("toggleterm").setup({
   persist_mode  = false,
   size = function (term)
     if term.direction == "horizontal" then
-      return 15
+      return math.floor(vim.o.lines * 0.3)
     elseif term.direction == "vertical" then
-      return vim.o.columns * 0.4
+      return math.floor(vim.o.columns * 0.4)
     end
   end,
   float_opts = {
     border = 'single',
     -- like `size`, width and height can be a number or function which is passed the current terminal
     width = math.ceil(0.9 * vim.o.columns),
-    -- height = <value>,
+    title_pos  = 'center',
   },
 })

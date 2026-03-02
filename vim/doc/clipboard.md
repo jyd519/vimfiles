@@ -8,6 +8,17 @@ set -s set-clipboard on
 
 # 2) nvim设置
 
+" 最简单的配置
+let g:clipboard='osc52'
+
+" 可选
+set clipboard=unnamedplus
+augroup highlight_yank
+    autocmd!
+    au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=200 }
+augroup END
+
+
 # :h osc52
 vim.g.clipboard = {
   name = 'OSC 52',
@@ -16,15 +27,8 @@ vim.g.clipboard = {
     ['*'] = require('vim.ui.clipboard.osc52').copy('*'),
   },
   paste = {
-    ['+'] = require('vim.ui.clipboard.osc52').paste('+'),
-    ['*'] = require('vim.ui.clipboard.osc52').paste('*'),
+    ['+'] = nil,
+    ['*'] = nil,
   },
 }
-
-# 可选
-set clipboard=unnamedplus
-augroup highlight_yank
-    autocmd!
-    au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=200 }
-augroup END
-
+```

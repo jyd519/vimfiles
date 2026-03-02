@@ -11,7 +11,9 @@
 ---   cmd = cmd,
 --- })
 --- ```
-
+---
+-- https://github.com/vuejs/language-tools/wiki/Neovim
+--
 -- Angular requires a node_modules directory to probe for @angular/language-service and typescript
 -- in order to use your projects configured versions.
 local root_dir = vim.fn.getcwd()
@@ -82,5 +84,10 @@ return {
     default_angular_core_version,
   },
   filetypes = { 'typescript', 'html', 'typescriptreact', 'typescript.tsx', 'htmlangular' },
-  root_markers = { 'angular.json', 'nx.json' },
+  root_dir = function(bufnr, on_dir)
+    local dir = vim.fs.root(bufnr, { 'angular.json', 'nx.json' })
+    if dir then
+      on_dir(dir)
+    end
+  end,
 }
