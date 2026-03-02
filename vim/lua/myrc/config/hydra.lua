@@ -357,7 +357,7 @@ local git_hint = [[
  _K_: prev hunk   _u_: undo last stage   _p_: preview hunk   _B_: blame show full
  ^ ^              _S_: stage buffer      ^ ^                 _w_: toggle word diff
  ^
- ^ ^              _<Enter>_: Neogit              _q_: exit
+ ^ ^              _<Enter>_: Neogit      _g_: lazygit        _q_: exit
 ]]
 
 Hydra({
@@ -426,6 +426,7 @@ Hydra({
     { "w", require("gitsigns").toggle_word_diff, { desc = "toggle word diff" } },
     { "B", function() require("gitsigns").blame_line({ full = true }) end, { desc = "blame show full" } },
     { "<Enter>", "<Cmd>Neogit<CR>", { exit = true, desc = "Neogit" } },
+    { "g", "<Cmd>TermExec cmd=lazygit<CR>", { exit = true, desc = "Lazygit" } },
     { "q", nil, { exit = true, nowait = true, desc = "exit" } },
   },
 })
