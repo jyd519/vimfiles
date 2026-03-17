@@ -486,7 +486,7 @@ vim.api.nvim_create_user_command(
 
 -- AI {{{2
 -- https://github.com/olimorris/codecompanion.nvim
-vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "AI assistant" })
+vim.keymap.set("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Code Companion Chat" })
 vim.api.nvim_set_keymap("v", "<leader>ae", "", {
   desc = "Explain code",
   callback = function() require("codecompanion").prompt("explain") end,
