@@ -68,6 +68,8 @@ vim.keymap.set("t", "<C-h>", "<C-\\><C-N><C-w>h", { noremap = true })
 vim.keymap.set("t", "<C-j>", "<C-\\><C-N><C-w>j", { noremap = true })
 vim.keymap.set("t", "<C-k>", "<C-\\><C-N><C-w>k", { noremap = true })
 vim.keymap.set("t", "<C-l>", "<C-\\><C-N><C-w>l", { noremap = true })
+vim.keymap.set('t', '<C-v>', '<C-\\><C-n>"+Pi', { noremap = true })
+vim.keymap.set('t', '<sc-v>', '<C-\\><C-n>"+Pi', {noremap = true})
 
 -- Zoom / Restore window
 vim.api.nvim_create_user_command("ZoomToggle", function() vim.fn["misc#ZoomToggle"]() end, {})
@@ -486,7 +488,7 @@ vim.api.nvim_create_user_command(
 
 -- AI {{{2
 -- https://github.com/olimorris/codecompanion.nvim
-vim.keymap.set("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Code Companion Chat" })
+vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Code Companion Chat" })
 vim.api.nvim_set_keymap("v", "<leader>ae", "", {
   desc = "Explain code",
   callback = function() require("codecompanion").prompt("explain") end,

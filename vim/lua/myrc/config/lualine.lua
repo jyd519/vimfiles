@@ -20,8 +20,13 @@ end
 local function codecompanion_current_model_name()
   local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
   if not chat then return nil end
-
   return chat.settings.model
+end
+
+local function kuala_env()
+  local _, mod = pcall(require, "kulala")
+  if not mod then return nil end
+  return "🔨 " .. mod.get_selected_env()
 end
 
 local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
@@ -124,8 +129,7 @@ end
 
 -- Create the http sections based on default and then modify
 local http_lualine_sections = deep_copy(default_sections)
--- Modify only the lualine_x section for http
-table.insert(http_lualine_sections.lualine_x, 1, "kulala") -- Insert "kulala" at the beginning
+table.insert(http_lualine_sections.lualine_x, 1, kuala_env) -- Insert "kulala" at the beginning
 
 require("lualine").setup({
   options = {

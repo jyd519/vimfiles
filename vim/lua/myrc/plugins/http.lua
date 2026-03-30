@@ -15,16 +15,9 @@ end
 
 return {
   {
-    "oysandvik94/curl.nvim",
-    cmd = { "CurlOpen" },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-    },
-    config = true,
-  },
-  {
     -- https://neovim.getkulala.net/docs/getting-started/configuration-options/
     "mistweaverco/kulala.nvim",
+    lazy = true,
     ft = { "http", "rest" },
     opts = {
       default_env = "dev",

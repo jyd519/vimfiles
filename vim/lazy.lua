@@ -32,4 +32,3 @@ else
   require('myrc.autocmds')
   require('myrc.utils.rg')
 end
-

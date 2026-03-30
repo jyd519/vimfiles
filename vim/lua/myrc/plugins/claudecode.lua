@@ -2,6 +2,7 @@
 return {
   {
     "coder/claudecode.nvim",
+    enabled = false,
     dependencies = { "folke/snacks.nvim" },
     config = true,
     opts = {
@@ -38,8 +39,8 @@ return {
         ft = { "NvimTree", "neo-tree", "oil", "minifiles", "netrw" },
       },
       -- Diff management
-      { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
-      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
+      -- { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
+      -- { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
     },
   },
 }

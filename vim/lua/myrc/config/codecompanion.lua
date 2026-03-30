@@ -100,7 +100,7 @@ require("codecompanion").setup({
     },
   },
   strategies = {
-    chat = { adapter = "gemini" },
+    chat = { adapter = "kimi" },
     inline = {
       adapter = "kimi",
       keymaps = {
