@@ -66,7 +66,14 @@ telescope.setup({
       mappings = {
         i = {
           ["<CR>"] = function(prompt_bufnr)
-            -- get the selected commit hash
+            --  Diff the changes introduced by a specific commit (kind of like `git show d4a7b0d`):
+            local entry = require("telescope.actions.state").get_selected_entry()
+            -- close Telescope window properly prior to switching windows
+            actions.close(prompt_bufnr)
+            vim.cmd(("DiffviewOpen %s^!"):format(entry.value))
+          end,
+          ["<C-d>"] = function(prompt_bufnr)
+            -- Diff the working tree against a specific commit:
             local entry = require("telescope.actions.state").get_selected_entry()
             -- close telescope
             require("telescope.actions").close(prompt_bufnr)
