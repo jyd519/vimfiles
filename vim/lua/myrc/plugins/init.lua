@@ -71,7 +71,8 @@ return {
     cmd = { "MarksListBuf" },
     config = function() require("myrc.config.marks") end,
   },
-  { "numToStr/Comment.nvim", event = "VeryLazy", config = true },
+  -- { "numToStr/Comment.nvim", event = "VeryLazy", config = true },
+  { 'nvim-mini/mini.nvim', version = false },
   { "gpanders/editorconfig.nvim", enabled = vim.fn.has("nvim-0.9") == 0 },
   {
     "kylechui/nvim-surround",
