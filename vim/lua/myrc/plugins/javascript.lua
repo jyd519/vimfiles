@@ -41,7 +41,6 @@ return {
       min_chars = 50,
     },
     enabled = vim.g.enabled_plugins.node == 1,
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
     ft = { "html", "svelte", "astro", "vue", "typescriptreact" },
   },
   {
@@ -67,7 +66,6 @@ return {
       { "<Leader>cS", "<CMD>TailwindSortOnSaveToggle<CR>", desc = "toggle Tailwind CSS classes sort on save" },
 
     },
-    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-lua/plenary.nvim" },
     build = "cd formatter && npm i && npm run build",
     config = true,
   },

@@ -19,11 +19,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     main = "nvim-treesitter",
     branch = "main",
-    cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
-    lazy = false,
     config = function() require("myrc.config.treesitter") end,
-    init = function()
-    end,
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
@@ -172,7 +168,6 @@ return {
     },
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "nvim-treesitter/nvim-treesitter",
       "franco-ruggeri/codecompanion-spinner.nvim",
       "ravitemer/codecompanion-history.nvim", -- Save and load conversation history
       {

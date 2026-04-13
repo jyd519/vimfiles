@@ -5,6 +5,9 @@
 #
 # install plug.vim
 #   curl  -fLo ./vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+#
+# download tree-sitter cli
+#   curl -fLo tree-sitter-linux-x64.gz https://github.com/tree-sitter/tree-sitter/releases/download/v0.25.10/tree-sitter-linux-x64.gz
 
 SCRIPT_PATH="$( cd "$(dirname $0)" ; pwd -P )"
 
