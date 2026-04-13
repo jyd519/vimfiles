@@ -1,4 +1,4 @@
-local treesitter = require("nvim-treesitter.configs")
+local treesitter = require("nvim-treesitter")
 
 ---@diagnostic disable-next-line: missing-fields
 treesitter.setup({
@@ -10,18 +10,6 @@ treesitter.setup({
   -- Automatically install missing parsers when entering buffer
   auto_install = false,
 
-  highlight = {
-    enable = true, -- false will disable the whole extension
-    disable = function(lang, buf)
-      if vim.list_contains({ "vimdoc", "help" }, lang) then return true end
-
-      -- if lang == "markdown" and vim.g.markdown_treesitter ~= 1 then return true end
-
-      ---@diagnostic disable-next-line: undefined-field
-      if vim.b.large_buf then return true end
-    end,
-    -- additional_vim_regex_highlighting = false,
-  },
   incremental_selection = {
     enable = false,
     keymaps = {
@@ -41,7 +29,6 @@ treesitter.setup({
       },
     },
   },
-
   -- textobjects
   textobjects = {
     move = {
@@ -119,16 +106,11 @@ treesitter.setup({
   },
 })
 
-local has_parser = require("nvim-treesitter.parsers").has_parser
-local tfgroup = vim.api.nvim_create_augroup("treesitter_fold", { clear = true })
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "cpp", "c", "typescript", "lua", "rust", "markdown" },
-  group = tfgroup,
-  desc = "enable treesitter folding",
   callback = function()
-    if has_parser(vim.bo.filetype) then
-      vim.wo.foldmethod = "expr"
-      vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
-    end
+    -- Enable treesitter highlighting and disable regex syntax
+    pcall(vim.treesitter.start)
+    -- Enable treesitter-based indentation
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
   end,
 })

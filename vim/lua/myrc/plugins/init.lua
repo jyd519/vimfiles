@@ -17,12 +17,18 @@ return {
   { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
   {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows
-    event = { "VeryLazy" },
+    main = "nvim-treesitter",
+    branch = "main",
     cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
-    lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
+    lazy = false,
     config = function() require("myrc.config.treesitter") end,
-    dependencies = { { "nvim-treesitter/nvim-treesitter-textobjects" } },
+    init = function()
+    end,
+  },
+  {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main",
+    enabled = false,
   },
   {
     "christoomey/vim-tmux-navigator",
@@ -359,7 +365,6 @@ return {
     "nvim-telescope/telescope.nvim",
     enabled = g.enabled_plugins.telescope == 1,
     cmd = { "Telescope" },
-    tag = "0.1.8",
     dependencies = {
       {
         "nvim-telescope/telescope-ui-select.nvim",
