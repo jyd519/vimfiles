@@ -12,7 +12,7 @@ require("mason-lspconfig").setup({
   automatic_enable = true,
 })
 
-vim.lsp.set_log_level("warn")
+vim.lsp.log.set_level("warn")
 -- }}}
 
 -- key mappings {{{2
@@ -51,7 +51,7 @@ local function setup_keymapping(client, bufnr)
 
   -- codelens
   bufmap("n", "<leader>cc", "<cmd>lua vim.lsp.codelens.run()<cr>", { desc = "Run Codelens" })
-  bufmap("n", "<leader>cC", "<cmd>lua vim.lsp.codelens.refresh()<cr>", { desc = "Refresh & Display Codelens" })
+  bufmap("n", "<leader>ct", "<cmd>lua vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled())<cr>", { desc = "Toggle Codelens" })
 end
 
 local format_is_enabled = false

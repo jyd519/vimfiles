@@ -309,7 +309,7 @@ return {
       { "yehuohan/cmp-path" },
       { "hrsh7th/cmp-cmdline" },
       { "hrsh7th/cmp-nvim-lua" },
-      { "Snikimonkd/cmp-go-pkgs" },
+      -- { "Snikimonkd/cmp-go-pkgs" }, broken with nvim-treesitter
       -- { "hrsh7th/cmp-nvim-lsp-document-symbol" },
       -- { "quangnguyen30192/cmp-nvim-tags", ft = { "c", "cpp" } },
       { "saadparwaiz1/cmp_luasnip" },
