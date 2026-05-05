@@ -101,16 +101,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- if client:supports_method("textDocument/inlayHint") then lsp.inlay_hint.enable(true, { bufnr = event.buf }) end
 
     if client:supports_method("textDocument/codeLens", bufnr) then
-      vim.lsp.codelens.refresh({ bufnr = bufnr })
+      vim.lsp.codelens.enable(true, { bufnr = bufnr })
       vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
         buffer = bufnr,
-        callback = function() vim.lsp.codelens.refresh({ bufnr = bufnr }) end,
+        callback = function() vim.lsp.codelens.enable(true, { bufnr = bufnr }) end,
       })
-    end
-
-    if client.name == "clangd" then
-      -- require("clangd_extensions.inlay_hints").setup_autocmd()
-      -- require("clangd_extensions.inlay_hints").set_inlay_hints()
     end
 
     -- Tsserver usually works poorly. Sorry you work with bad languages

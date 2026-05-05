@@ -42,7 +42,7 @@ local prompt_library = {
       stop_context_insertion = true,
       adapter = {
         name = "deepseek",
-        model = "deepseek-chat",
+        model = "deepseek-v4-flash",
       },
     },
     prompts = {
@@ -146,7 +146,7 @@ require("codecompanion").setup({
           },
           schema = {
             model = {
-              default = "deepseek-chat",
+              default = "deepseek-v4-flash",
             },
           },
         })

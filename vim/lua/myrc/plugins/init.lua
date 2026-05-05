@@ -110,21 +110,6 @@ return {
     event = { "BufReadPost", "BufNewFile" },
   },
   {
-    -- https://github.com/ThePrimeagen/refactoring.nvim#installation
-    "ThePrimeagen/refactoring.nvim",
-    config = true,
-    ft = {
-      "typescript",
-      "javascript",
-      "go",
-      "rust",
-      "python",
-      "lua",
-      "c",
-      "cpp",
-    },
-  },
-  {
     "lukas-reineke/indent-blankline.nvim",
     event = { "BufReadPost", "BufNewFile" },
     config = function() require("myrc.config.indent-blankline") end,
@@ -250,13 +235,6 @@ return {
     cmd = { "GhostTextStart", "GhostTextStop" },
   },
   -- }}}
-  { "ray-x/guihua.lua", ft = "go" }, -- float term, codeaction and codelens gui support
-  {
-    "ray-x/go.nvim",
-    ft = { "go", "gomod" },
-    enabled = vim.g.enabled_plugins.go == 1,
-    config = function() require("go").setup() end,
-  },
   {
     "p00f/clangd_extensions.nvim",
     ft = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
