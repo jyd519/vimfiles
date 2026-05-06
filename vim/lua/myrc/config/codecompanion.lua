@@ -1,5 +1,5 @@
 local default_proxy = vim.env.HTTP_PROXY or vim.g.proxy
-local default_lang = "English"
+local default_lang = "Chinese"
 
 -- [codecompanion] system prompt needs to be in C locale
 os.setlocale("C", "time")
@@ -27,63 +27,6 @@ local function check_api_key(key_name)
   return api_key
 end
 
-local prompt_library = {
-  ["DeepSeek Explain In Chinese"] = {
-    strategy = "chat",
-    description = "解释代码",
-    opts = {
-      index = 5,
-      is_default = true,
-      is_slash_cmd = false,
-      modes = { "v" },
-      short_name = "explain in chinese",
-      auto_submit = true,
-      user_prompt = false,
-      stop_context_insertion = true,
-      adapter = {
-        name = "deepseek",
-        model = "deepseek-v4-flash",
-      },
-    },
-    prompts = {
-      {
-        role = "system",
-        content = [[当被要求解释代码时，请遵循以下步骤：
-
-  1. 识别编程语言。
-  2. 描述代码的目的，并引用该编程语言的核心概念。
-  3. 解释每个函数或重要的代码块，包括参数和返回值。
-  4. 突出说明使用的任何特定函数或方法及其作用。
-  5. 如果适用，提供该代码如何融入更大应用程序的上下文。]],
-        opts = {
-          visible = false,
-        },
-      },
-      {
-        role = "user",
-        content = function(context)
-          local input = require("codecompanion.helpers.actions").get_code(context.start_line, context.end_line)
-
-          return string.format(
-            [[请解释 buffer %d 中的这段代码:
-
-  ```%s
-  %s
-  ```
-  ]],
-            context.bufnr,
-            context.filetype,
-            input
-          )
-        end,
-        opts = {
-          contains_code = true,
-        },
-      },
-    },
-  },
-}
-
 -- setup
 require("codecompanion").setup({
   opts = {
@@ -100,9 +43,9 @@ require("codecompanion").setup({
     },
   },
   strategies = {
-    chat = { adapter = "kimi" },
+    chat = { adapter = "deepseek" },
     inline = {
-      adapter = "kimi",
+      adapter = "deepseek",
       keymaps = {
         accept_change = {
           modes = { n = "ga" },
@@ -114,14 +57,14 @@ require("codecompanion").setup({
         },
       },
     },
-    agent = { adapter = "kimi" },
+    agent = { adapter = "deepseek" },
   },
   adapters = {
     http = {
       opts = {
+        show_model_choices = true,
         show_defaults = false,
         allow_insecure = true,
-        show_model_choices = true,
       },
       gemini = function(a)
         local api_key = check_api_key("gemini_key")
@@ -146,7 +89,8 @@ require("codecompanion").setup({
           },
           schema = {
             model = {
-              default = "deepseek-v4-flash",
+              -- 需要与choices中定义的模型名称保持一致
+              -- default = "deepseek-v4-flash",
             },
           },
         })
@@ -203,7 +147,6 @@ require("codecompanion").setup({
           env = {
             url = "https://api.moonshot.cn",
             api_key = api_key,
-            chat_url = "/v1/chat/completions",
           },
         })
       end,
@@ -229,36 +172,45 @@ require("codecompanion").setup({
     },
     acp = {
       opts = {},
-      gemini_cli = function() return require("codecompanion.adapters").extend("gemini_cli", {
-        commands = {
-          default = {
-            "gemini",
-            "--experimental-acp",
-            "--proxy",
-            default_proxy,
+      gemini_cli = function()
+        return require("codecompanion.adapters").extend("gemini_cli", {
+          commands = {
+            default = {
+              "gemini",
+              "--experimental-acp",
+              "--proxy",
+              default_proxy,
+            },
+            yolo = {
+              "gemini",
+              "--yolo",
+              "--experimental-acp",
+              "--proxy",
+              default_proxy,
+            },
           },
-          yolo = {
-            "gemini",
-            "--yolo",
-            "--experimental-acp",
-            "--proxy",
-            default_proxy,
-          },
-        },
-      }) end,
+        })
+      end,
     },
   },
-  prompt_library = prompt_library,
-  extensions = {
-    spinner = {},
-    mcphub = {
-      callback = "mcphub.extensions.codecompanion",
-      opts = {
-        make_vars = true,
-        make_slash_commands = true,
-        show_result_in_chat = true,
+  prompt_library = {
+    markdown = {
+      dirs = {
+        vim.fn.getcwd() .. "/.prompts",
+        vim.g.VIMFILES .. "/prompts",
       },
     },
+  },
+  extensions = {
+    spinner = {},
+    -- mcphub = {
+    --   callback = "mcphub.extensions.codecompanion",
+    --   opts = {
+    --     make_vars = true,
+    --     make_slash_commands = true,
+    --     show_result_in_chat = true,
+    --   },
+    -- },
   },
 })
 
