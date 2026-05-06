@@ -1,17 +1,41 @@
 # Ussage: python manage.py closepoll <poll_ids>.
 
-
 from django.core.management.base import BaseCommand, CommandError
+
+# from django.core.management import call_command
+# call_command("flush", "--no-input")
 from polls.models import Question as Poll
 
+# progress bar
+# try:
+#     from tqdm import tqdm
+#     HAS_TQDM = True
+# except ImportError:
+#     HAS_TQDM = False
 
 class Command(BaseCommand):
     help = "Closes the specified poll for voting"
 
     def add_arguments(self, parser):
+        # Django uses argparse under the hood
         parser.add_argument("poll_ids", nargs="+", type=int)
 
     def handle(self, *args, **options):
+        # if HAS_TQDM:
+        #      # Rich progress bar with tqdm
+        #      iterator = tqdm(
+        #          records,
+        #          desc="Migrating",
+        #          unit="record",
+        #          ncols=80
+        #      )
+        #  else:
+        #      # Fallback to simple iteration
+        #      iterator = records
+        #      self.stdout.write(f"Processing {len(records)} records...")
+        # for record in iterator:
+        #    pass
+
         for poll_id in options["poll_ids"]:
             try:
                 poll = Poll.objects.get(pk=poll_id)
