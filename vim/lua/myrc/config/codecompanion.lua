@@ -38,7 +38,7 @@ require("codecompanion").setup({
     chat = {
       window = {
         position = "right",
-        width = 0.40,
+        width = 0.50,
       },
     },
   },
@@ -89,8 +89,10 @@ require("codecompanion").setup({
           },
           schema = {
             model = {
-              -- 需要与choices中定义的模型名称保持一致
-              -- default = "deepseek-v4-flash",
+              default = "deepseek-v4-flash",
+            },
+            temperature = {
+              default = 0.0,
             },
           },
         })
@@ -169,6 +171,15 @@ require("codecompanion").setup({
           },
         })
       end,
+      tavily = function()
+        local api_key = check_api_key("tavily_key")
+        if not api_key then return nil end
+        return require("codecompanion.adapters").extend("tavily", {
+          env = {
+            api_key = api_key,
+          },
+        })
+      end,
     },
     acp = {
       opts = {},
@@ -203,14 +214,13 @@ require("codecompanion").setup({
   },
   extensions = {
     spinner = {},
-    -- mcphub = {
-    --   callback = "mcphub.extensions.codecompanion",
-    --   opts = {
-    --     make_vars = true,
-    --     make_slash_commands = true,
-    --     show_result_in_chat = true,
-    --   },
-    -- },
+  },
+  mcp = {
+    servers = {
+      ["context7"] = {
+        cmd = { "npx", "-y", "@upstash/context7-mcp@latest", "--api-key", "ctx7sk-d036a870-7911-454f-82c4-bf1de82c0ef1" },
+      },
+    },
   },
 })
 
