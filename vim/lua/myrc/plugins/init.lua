@@ -155,6 +155,7 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "franco-ruggeri/codecompanion-spinner.nvim",
+      "georgeharker/codecompanion-kimi.nvim",
       "ravitemer/codecompanion-history.nvim", -- Save and load conversation history
       {
         "ravitemer/mcphub.nvim", -- Manage MCP servers

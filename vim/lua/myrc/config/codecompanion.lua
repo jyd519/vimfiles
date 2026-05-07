@@ -32,7 +32,7 @@ require("codecompanion").setup({
   opts = {
     language = default_lang,
     log_level = "ERROR", -- TRACE|DEBUG|ERROR|INFO
-    show_defaults = false,
+    show_defaults = true,
   },
   display = {
     chat = {
@@ -97,9 +97,28 @@ require("codecompanion").setup({
           },
         })
       end,
+      deepseek2 = function()
+        -- none thinking mode
+        local api_key = check_api_key("deepseek_key")
+        if not api_key then return nil end
+        return require("codecompanion.adapters").extend("deepseek", {
+          env = {
+            api_key = api_key,
+          },
+          schema = {
+            model = {
+              default = "deepseek-v4-flash",
+            },
+            ["thinking.type"] = {
+              default = "disabled",
+            },
+            temperature = {
+              default = 0.0,
+            },
+          },
+        })
+      end,
       openrouter_claude = function()
-        local default_model = "anthropic/claude-sonnet-4.5"
-        local current_model = default_model
         local api_key = check_api_key("openrouter_key")
         if not api_key then return nil end
         return require("codecompanion.adapters").extend("openai_compatible", {
@@ -110,7 +129,7 @@ require("codecompanion").setup({
           },
           schema = {
             model = {
-              default = current_model,
+              default = "anthropic/claude-sonnet-4.6",
             },
           },
         })
@@ -132,9 +151,6 @@ require("codecompanion").setup({
                 "doubao-seed-1-6-flash-250828",
                 "doubao-seed-1-6-250615",
                 ["doubao-seed-1-6-thinking-250715"] = { opts = { can_reason = true } },
-                ["deepseek-r1-250528"] = { opts = { can_reason = true } },
-                "deepseek-v3-1-terminus",
-                "kimi-k2-250905",
               },
             },
           },
@@ -144,8 +160,7 @@ require("codecompanion").setup({
         -- https://platform.moonshot.cn/console/account
         local api_key = check_api_key("kimi_key")
         if not api_key then return nil end
-        return require("codecompanion.adapters").extend("openai_compatible", {
-          formatted_name = "Kimi",
+        return require("codecompanion.adapters").extend("kimi", {
           env = {
             url = "https://api.moonshot.cn",
             api_key = api_key,
@@ -218,7 +233,13 @@ require("codecompanion").setup({
   mcp = {
     servers = {
       ["context7"] = {
-        cmd = { "npx", "-y", "@upstash/context7-mcp@latest", "--api-key", "ctx7sk-d036a870-7911-454f-82c4-bf1de82c0ef1" },
+        cmd = {
+          "npx",
+          "-y",
+          "@upstash/context7-mcp@latest",
+          "--api-key",
+          "ctx7sk-d036a870-7911-454f-82c4-bf1de82c0ef1",
+        },
       },
     },
   },
@@ -250,7 +271,7 @@ end, {
 })
 
 -- Set or unset proxy based on the adapter name
-local adapter_proxy = {
+local proxy_adapters = {
   gemini = true,
   openrouter_claude = true,
   groq = true,
@@ -259,7 +280,7 @@ local adapter_proxy = {
 local http = require("codecompanion.http")
 local origin_http_new = http.new
 http.new = function(opts)
-  if adapter_proxy[opts.adapter.name] then
+  if proxy_adapters[opts.adapter.name] then
     set_proxy()
   else
     unset_proxy()
