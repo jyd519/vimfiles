@@ -55,6 +55,15 @@ local function show_git_show(hash)
   end
 end
 
+-- 用diffview查看修改
+local function diffview_open(hash)
+  vim.fn.execute('DiffviewOpen ' .. hash)
+end
+-- 用diffview查看commit
+local function diffview_show_commit(hash)
+  vim.fn.execute('DiffviewOpen ' .. hash .. '^!')
+end
+
 vim.keymap.set('n', '<enter>', function()
   -- 获取并清洁光标单词
   local raw_word = vim.fn.expand('<cword>')
@@ -84,3 +93,32 @@ vim.keymap.set('n', 'K', function()
 
   show_git_show(word)
 end, { buf = 0, noremap = true, silent = true, desc = 'Git show commit under cursor' })
+
+vim.keymap.set('n', 'D', function()
+  -- 获取并清洁光标单词
+  local raw_word = vim.fn.expand('<cword>')
+  local word = vim.trim(raw_word)   -- 去掉不可见字符/前后空格
+
+  -- 宽松匹配：十六进制（大小写），长度 7~40
+  if not (word:match('^[0-9a-fA-F]+$') and #word >= 7 and #word <= 40) then
+    vim.notify('Not a commit hash: "' .. word .. '"', vim.log.levels.WARN)
+    return
+  end
+
+  diffview_show_commit(word)
+end, { buf = 0, noremap = true, silent = true, desc = 'Diffview diff under cursor' })
+
+
+vim.keymap.set('n', 'gd', function()
+  -- 获取并清洁光标单词
+  local raw_word = vim.fn.expand('<cword>')
+  local word = vim.trim(raw_word)   -- 去掉不可见字符/前后空格
+
+  -- 宽松匹配：十六进制（大小写），长度 7~40
+  if not (word:match('^[0-9a-fA-F]+$') and #word >= 7 and #word <= 40) then
+    vim.notify('Not a commit hash: "' .. word .. '"', vim.log.levels.WARN)
+    return
+  end
+
+  diffview_open(word)
+end, { buf = 0, noremap = true, silent = true, desc = 'DiffView show commit under cursor' })
