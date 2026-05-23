@@ -166,7 +166,17 @@ return {
       {
         "MeanderingProgrammer/render-markdown.nvim",
         lazy = true,
-        ft = { "codecompanion" },
+        opts = {
+          enabled = false,
+          on = {
+              attach = function()
+                if vim.bo.ft == "codecompanion" then
+                  require("render-markdown").buf_enable()
+                end
+              end,
+          },
+        },
+        ft = { "markdown", "codecompanion" },
       },
       {
         "HakonHarnes/img-clip.nvim", -- Share images with the chat buffer
