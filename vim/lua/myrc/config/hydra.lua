@@ -99,7 +99,7 @@ local dap_hint = [[
  ^_,x_: Stop  ^^                  ^^^^^^^_,p_^: ^Open repl          ^^^^^^^^^^^^_,u_: ^Toggle UI
  ^_,n_/_<F10>_: Step over         ^^^^^^^_,i_/_<F11>_^: ^Step into    ^_,o_/_<F12>_^: ^Step out
  ^_,T_^^^: Clear breakpoints       ^^^^^^_,B_: ^Conditional breakpoint
- ^_,e_/_,E_: Evaluate input       ^^^^^^^_,q_^:  Exit
+ ^_,e_/_,E_: Evaluate input       ^^^^^^^_q_^:  Exit
 ]]
 
 local dap_hydra = nil
@@ -140,7 +140,7 @@ dap_hydra = Hydra({
     end,
   },
   heads = {
-    { ",H", function() toggle_dap_hint() end, { desc = false } },
+    { ",h", function() toggle_dap_hint() end, { desc = false } },
     { ",S", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
     { "<F5>", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
 
@@ -173,7 +173,7 @@ dap_hydra = Hydra({
       desc = "Evaluate Input",
     },
     { ",p", function() require("dap").repl.open() end, { desc = "open repl" } },
-    { ",q", nil, { exit = true, nowait = true, desc = "exit" } },
+    { "q", nil, { exit = true, nowait = true, desc = "exit" } },
   },
 })
 

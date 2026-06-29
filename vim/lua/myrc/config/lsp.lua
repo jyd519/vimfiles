@@ -1,4 +1,4 @@
--- Setup lspconfig.lsp
+-- Setup LSP
 -- >> Reference: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 -- Globals {{{2
 local api = vim.api
@@ -13,9 +13,37 @@ require("mason-lspconfig").setup({
 })
 
 vim.lsp.log.set_level("warn")
+
+if vim.fn.has("nvim-0.12") == 1 then
+  -- Simply enable the built-in automation
+  vim.lsp.codelens.enable(true)
+end
 -- }}}
 
 -- key mappings {{{2
+vim.keymap.set(
+  "n",
+  "<leader>xt",
+  function()
+    vim.diagnostic.config({
+      virtual_lines = not vim.diagnostic.config().virtual_lines,
+      virtual_text = not vim.diagnostic.config().virtual_text,
+    })
+  end,
+  { desc = "Toggle diagnostic virtual lines and virtual text" }
+)
+
+vim.api.nvim_create_user_command(
+  "DiagnosticToggle",
+  function()
+    vim.diagnostic.config({
+      virtual_lines = not vim.diagnostic.config().virtual_lines,
+      virtual_text = not vim.diagnostic.config().virtual_text,
+    })
+  end,
+  { desc = "Toggle diagnostic virtual lines and virtual text" }
+)
+
 local bufmap = function(mode, lhs, rhs, opts)
   local options = { buffer = true }
   if opts then options = vim.tbl_extend("force", options, opts) end
@@ -23,9 +51,9 @@ local bufmap = function(mode, lhs, rhs, opts)
 end
 
 local show_code_actions = function(client, bufnr)
-  local clients = vim.lsp.get_clients({ name="vtsls",  bufnr = bufnr })
+  local clients = vim.lsp.get_clients({ name = "vtsls", bufnr = bufnr })
   if #clients > 0 then
-    require('vtsls').commands.source_actions(bufnr)
+    require("vtsls").commands.source_actions(bufnr)
     return
   end
   vim.lsp.buf.code_action()
@@ -51,14 +79,25 @@ local function setup_keymapping(client, bufnr)
 
   -- codelens
   bufmap("n", "<leader>cc", "<cmd>lua vim.lsp.codelens.run()<cr>", { desc = "Run Codelens" })
-  bufmap("n", "<leader>ct", "<cmd>lua vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled())<cr>", { desc = "Toggle Codelens" })
+  bufmap(
+    "n",
+    "<leader>ct",
+    "<cmd>lua vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled())<cr>",
+    { desc = "Toggle Codelens" }
+  )
 end
 
 local format_is_enabled = false
 vim.api.nvim_create_user_command("FormatToggle", function()
   format_is_enabled = not format_is_enabled
   vim.notify("Autoformatting " .. (format_is_enabled and "enabled" or "disabled"))
-end, {})
+end, { desc = "Toggle autoformatting" })
+
+vim.api.nvim_create_user_command(
+  "CodelensToggle",
+  function() vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled()) end,
+  { desc = "Toggle Codelens" }
+)
 
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
@@ -78,12 +117,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     -- The blow command will highlight the current variable and its usages in the buffer.
     if client.server_capabilities.documentHighlightProvider then
-      vim.cmd([[
-        hi! link LspReferenceRead Visual
-        hi! link LspReferenceText Visual
-        hi! link LspReferenceWrite Visual
-      ]])
-
       autocmd("CursorHold", {
         group = lsp_group,
         buffer = bufnr,
@@ -97,17 +130,19 @@ vim.api.nvim_create_autocmd("LspAttach", {
       })
     end
 
-    -- Enable inlay hints
-    -- if client:supports_method("textDocument/inlayHint") then lsp.inlay_hint.enable(true, { bufnr = event.buf }) end
-
-    if client:supports_method("textDocument/codeLens", bufnr) then
-      vim.lsp.codelens.enable(true, { bufnr = bufnr })
-      vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
-        buffer = bufnr,
-        callback = function() vim.lsp.codelens.enable(true, { bufnr = bufnr }) end,
-      })
+    -- codelens
+    if vim.fn.has("nvim-0.12") == 0 then
+      if client:supports_method("textDocument/codeLens", bufnr) then
+        vim.lsp.codelens.enable(true, { bufnr = bufnr })
+        vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
+          buffer = bufnr,
+          callback = function() vim.lsp.codelens.enable(true, { bufnr = bufnr }) end,
+        })
+      end
     end
 
+    -- Enable inlay hints
+    -- if client:supports_method("textDocument/inlayHint") then lsp.inlay_hint.enable(true, { bufnr = event.buf }) end
     -- Tsserver usually works poorly. Sorry you work with bad languages
     -- You can remove this line if you know what you're doing :)
     if client.name == "tsserver" then
@@ -133,46 +168,23 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 -- }}}
 
--- Rounded border floating windows {{{2
--- local hover = vim.lsp.buf.hover
----@diagnostic disable-next-line: duplicate-set-field
--- vim.lsp.buf.hover = function(opts)
---   return hover({
---     border = "single",
---     -- max_width = 100,
---     max_width = math.floor(vim.o.columns * 0.7),
---     max_height = math.floor(vim.o.lines * 0.7),
---   })
--- end
--- }}}
-
 -- Diagnostics Settings {{{2
-if vim.fn.has("nvim-0.10") == 1 then
-  vim.diagnostic.config({
-    float = {
-      source = "if_many",
-      border = "rounded",
+vim.diagnostic.config({
+  float = {
+    source = "if_many",
+    border = "rounded",
+  },
+  virtual_text = { severity = vim.diagnostic.severity.WARN },
+  signs = {
+    severity = vim.diagnostic.severity.HINT,
+    text = {
+      [vim.diagnostic.severity.ERROR] = "󰅚 ",
+      [vim.diagnostic.severity.WARN] = "󰀪 ",
+      [vim.diagnostic.severity.HINT] = "󰌶 ",
+      [vim.diagnostic.severity.INFO] = " ",
     },
-    virtual_text = {
-      severity = vim.diagnostic.severity.WARN,
-    },
-    signs = {
-      severity = vim.diagnostic.severity.HINT,
-      text = {
-        [vim.diagnostic.severity.ERROR] = "󰅚 ",
-        [vim.diagnostic.severity.WARN] = "󰀪 ",
-        [vim.diagnostic.severity.HINT] = "󰌶 ",
-        [vim.diagnostic.severity.INFO] = " ",
-      },
-    },
-  })
-else
-  local signs = { Error = "󰅚 ", Warn = "󰀪 ", Hint = "󰌶 ", Info = " " }
-  for type, icon in pairs(signs) do
-    local hl = "DiagnosticSign" .. type
-    vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-  end
-end
+  },
+})
 -- }}}
 
 -- vim: set fdm=marker fdl=1:

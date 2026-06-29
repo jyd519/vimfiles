@@ -1,22 +1,48 @@
-###
+### normal-prompt
 
-# The order of the environment variables resolution is as follows:
-# - System environment variables
-# - http-client.env.json file
-# - .env file
-  
+# @kulala-prompt "What is your name?" MY_VAR_NAME
 
-### Basic GET request
+POST https://echo.kulala.app/post HTTP/1.1
+Content-Type: application/json
 
-GET https://api.thecatapi.com/v1/images/search HTTP/1.1
+{
+  "name": "{{ MY_VAR_NAME }}"
+}
 
-@BASE_URL = https://api.thecatapi.com/v1
-@API_KEY = your_api_key_here
+### password-prompt
 
-### GET request with variables and request parameters
+# @kulala-prompt "What is your password?" MY_VAR_PASSWORD { type: "password" }
 
-GET {{BASE_URL}}/images/search?limit=3 HTTP/1.1
+POST https://echo.kulala.app/post HTTP/1.1
+Content-Type: application/json
 
-### Request with environment variables
+{
+  "password": "{{ MY_VAR_PASSWORD }}"
+}
 
-GET {{FROM_ENV_FILE_URL}}/breeds HTTP/1.1
+### Iterate over arrays
+
+< {%
+  request.variables.set("users", [
+    { name: "Alice" },
+    { name: "Bob" },
+  ])
+%}
+
+GET https://echo.kulala.app/get?user={{users[*].name}} HTTP/1.1
+Content-Type: application/json
+### FOO2
+# 使用共享变量
+GET https://echo.kulala.app/get?user={{users[*].name}} HTTP/1.1
+
+### HTTP_1_0_REQUEST
+
+GET https://httpbun.com/any HTTP/1.0
+
+### HTTP_1_1_REQUEST
+
+GET https://httpbun.com/any HTTP/1.1
+
+### HTTP_2_0_REQUEST
+
+GET https://httpbun.com/any HTTP/2

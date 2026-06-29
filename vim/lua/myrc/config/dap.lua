@@ -1,21 +1,24 @@
--- configure DAP {{{1
+-- Configure DAP {{{1
 local dap = require("dap")
 _G.dap = dap
 
 local is_windows = vim.fn.has("win32") == 1
-vim.fn.sign_define('DapBreakpoint', { text = '🔴', texthl = '', linehl = '', numhl = '' })
-vim.fn.sign_define('DapBreakpointCondition', { text = '🟠', texthl = '', linehl = '', numhl = '' })
-vim.fn.sign_define('DapStopped', { text = '🟢', texthl = '', linehl = '', numhl = '' })
-vim.fn.sign_define('DapBreakpointRejected', { text = '🚫', texthl = '', linehl = '', numhl = '' })
+vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, fg = "#ff0000", bg = "" })
+vim.api.nvim_set_hl(0, "DapLogPoint", { ctermbg = 0, fg = "#61afef", bg = "" })
+vim.api.nvim_set_hl(0, "DapStopped", { ctermbg = 0, fg = "#98c379", bg = "" })
+vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DapBreakpoint", linehl = "", numhl = "DapBreakpoint" })
+vim.fn.sign_define("DapBreakpointCondition", { text = "ﳁ", texthl = "DapBreakpoint", linehl = "", numhl = "" })
 vim.fn.sign_define(
-  "DapLogPoint",
-  { text = "", texthl = "DapLogPoint", linehl = "DapLogPoint", numhl = "DapLogPoint" }
+  "DapBreakpointRejected",
+  { text = "", texthl = "DapBreakpoint", linehl = "", numhl = "DapBreakpoint" }
 )
+vim.fn.sign_define("DapLogPoint", { text = "", texthl = "DapLogPoint", linehl = "", numhl = "" })
+vim.fn.sign_define("DapStopped", { text = "", texthl = "DapStopped", linehl = "DapStopped", numhl = "DapStopped" })
 
--- Configure Extensions: daui/dap-virtual-text {{{1
 require("nvim-dap-virtual-text").setup({
   commented = true,
 })
+-- }}}
 
 -- {{{1 dapui
 local dapui = require("dapui")
@@ -24,29 +27,41 @@ _G.dapui = dapui
 dapui.setup({})
 dap.listeners.before.attach.dapui_config = function() dapui.open() end
 dap.listeners.before.launch.dapui_config = function() dapui.open() end
--- close Dap UI with :DapCloseUI
-vim.api.nvim_create_user_command("DapCloseUI", function() require("dapui").close() end, {})
+dap.listeners.before.event_terminated.dapui_config = function() dapui.close() end
+dap.listeners.before.event_exited.dapui_config = function() dapui.close() end
 -- }}}
 
+-- {{{1  Global keymaps
+vim.keymap.set("n", "<leader>dt", function() require("dap").toggle_breakpoint() end, { desc = "Toggle Breakpoint" })
+vim.keymap.set("n", "<leader>dc", function() require("dap").continue() end, { desc = "Continue" })
+-- }}}
 -- {{{1 User Commands
-vim.api.nvim_create_user_command("DapAdapterDoc", function(args)
+local create_user_command = vim.api.nvim_create_user_command
+-- close Dap UI with :DapCloseUI
+create_user_command("DapCloseUI", function() require("dapui").close() end, {})
+create_user_command("DapAdapterDoc", function(args)
   local open_url = require("myrc.utils.system").open_url
   open_url("https://codeberg.org/mfussenegger/nvim-dap/wiki/Debug-Adapter-installation")
 end, {
   nargs = "*",
   desc = "Open Debug-Adapter installation page",
 })
-
-vim.api.nvim_create_user_command("DapOSVListen", function(args)
+create_user_command("DapOSVListen", function(args)
   local port = args.args or 8086
   require("osv").launch({ port = tonumber(port) })
 end, {
   nargs = "*",
   desc = "Launch DAP Server (OSV)",
 })
-vim.api.nvim_create_user_command("DapOSVStop", function() require("osv").stop() end, {
+create_user_command("DapOSVStop", function() require("osv").stop() end, {
   desc = "Stop OSV DAP Server",
 })
+create_user_command("DapDebugTest", function() require("dap.go").debug_test() end, { desc = "Debug Test" })
+create_user_command(
+  "DapDebugLastTest",
+  function() require("dap-go").debug_last_test() end,
+  { desc = "Debug Last Test" }
+)
 -- }}}
 
 -- Configure Debuggers {{{1
@@ -489,10 +504,10 @@ if vscode_js_debug_path ~= "" then
         runtimeExecutable = "node",
         runtimeArgs = function()
           local args = {
-              "./node_modules/jest/bin/jest.js",
-              "--runInBand",
-              "--runTestsByPath",
-              "${file}",
+            "./node_modules/jest/bin/jest.js",
+            "--runInBand",
+            "--runTestsByPath",
+            "${file}",
           }
           local test_name = require("myrc.config.dap-jest").get_test_name()
           if test_name then

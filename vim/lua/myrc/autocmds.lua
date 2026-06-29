@@ -85,7 +85,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- }}}
 
 -- vim-test
-vim.api.nvim_create_autocmd("Filetype", {
+vim.api.nvim_create_autocmd("FileType", {
   pattern = { "javascript", "typescript", "go", "rust", "python" },
   group = vimrc,
   callback = function()
@@ -94,7 +94,7 @@ vim.api.nvim_create_autocmd("Filetype", {
   end,
 })
 
-vim.api.nvim_create_autocmd("Filetype", {
+vim.api.nvim_create_autocmd("FileType", {
   pattern = { "javascript", "typescript", "go", "python" },
   group = vimrc,
   callback = function() vim.keymap.set("n", "<leader>tf", ":TestFile<cr>", { buffer = true, silent = true }) end,

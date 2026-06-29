@@ -68,8 +68,8 @@ vim.keymap.set("t", "<C-h>", "<C-\\><C-N><C-w>h", { noremap = true })
 vim.keymap.set("t", "<C-j>", "<C-\\><C-N><C-w>j", { noremap = true })
 vim.keymap.set("t", "<C-k>", "<C-\\><C-N><C-w>k", { noremap = true })
 vim.keymap.set("t", "<C-l>", "<C-\\><C-N><C-w>l", { noremap = true })
-vim.keymap.set('t', '<C-v>', '<C-\\><C-n>"+Pi', { noremap = true })
-vim.keymap.set('t', '<sc-v>', '<C-\\><C-n>"+Pi', {noremap = true})
+vim.keymap.set("t", "<C-v>", '<C-\\><C-n>"+Pi', { noremap = true })
+vim.keymap.set("t", "<sc-v>", '<C-\\><C-n>"+Pi', { noremap = true })
 
 -- Zoom / Restore window
 vim.api.nvim_create_user_command("ZoomToggle", function() vim.fn["misc#ZoomToggle"]() end, {})
@@ -618,13 +618,9 @@ end
 vim.api.nvim_create_user_command(
   "TrimSpaces",
   function(opts) trim_trailing_whitespaces(opts.line1, opts.line2) end,
-  { range = '%', nargs = 0, desc = "Trim trailing whitespaces" }
+  { range = "%", nargs = 0, desc = "Trim trailing whitespaces" }
 )
-vim.api.nvim_create_user_command(
-  "FixLineEndings",
-  "%s/\r$//ge",
-  { nargs = 0, desc = "Fix line endings" }
-)
+vim.api.nvim_create_user_command("FixLineEndings", "%s/\r$//ge", { nargs = 0, desc = "Fix line endings" })
 
 -- Custom actions {{{2
 vim.keymap.set("n", "<leader>gx", function()
@@ -703,22 +699,19 @@ keymap.set(
   { noremap = true, desc = "Toggle horizontal FloatTerm" }
 )
 
-keymap.set("v", "<space>s", function()
-  require("toggleterm").send_lines_to_terminal("single_line", true, { args = vim.v.count })
-end)
-keymap.set({"n", "t"}, "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
+keymap.set(
+  "v",
+  "<space>s",
+  function() require("toggleterm").send_lines_to_terminal("single_line", true, { args = vim.v.count }) end
+)
+keymap.set({ "n", "t" }, "<A-s>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 keymap.set("n", "<S-F12>", "<cmd>ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
 keymap.set("t", "<S-F12>", "<C-\\><C-n>:ToggleTerm<CR>", { noremap = true, desc = "Toggle FloatTerm" })
-keymap.set({"n", "t"}, "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
+keymap.set({ "n", "t" }, "<S-F11>", "<cmd>TermSelect<CR>", { noremap = true, desc = "Select Terminal" })
 vim.cmd([[
 com! TermNewV :TermNew direction=vertical
 com! TermNewH :TermNew direction=horizontal
 com! TermNewT :TermNew direction=tab
 ]])
-
-
--- DAP{{{2
-keymap.set("n", "<leader>db", function() require("dap").toggle_breakpoint() end, { desc = "Toggle Breakpoint" });
-keymap.set("n", "<leader>dc", function() require("dap").continue() end, { desc = "Continue" });
 
 -- vim: set fdm=marker fdl=0: }}}

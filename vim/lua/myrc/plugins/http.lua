@@ -20,6 +20,7 @@ return {
     lazy = true,
     ft = { "http", "rest" },
     opts = {
+      debug = 4,
       default_env = "dev",
       global_keymaps_prefix = "<leader>k",
       kulala_keymaps_prefix = "",
@@ -51,6 +52,25 @@ return {
         ["$projectRoot"] = function()
           return get_project_root()
         end,
+      },
+      -- Kulala UI keymaps; override with custom keymaps as required
+      -- (see docs or lua/kulala/config/keymaps.lua)
+      ---@type boolean|table
+      kulala_keymaps = {
+         ["Previous tab"] = {
+            "<c-left>",
+            function()
+              require("kulala.ui").show_previous_tab()
+            end,
+            mode = { "n" },
+          },
+          ["Next tab"] = {
+            "<c-right>",
+            function()
+              require("kulala.ui").show_next_tab()
+            end,
+            mode = { "n" },
+          },
       },
     },
   },
