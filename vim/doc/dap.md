@@ -90,6 +90,7 @@ dap.adapters.node2 = {
 + 手动启动debugpy
 
 ```bash
+# django
 python3 -m debugpy --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000 --nothreading --noreload
 ```
 ```lua

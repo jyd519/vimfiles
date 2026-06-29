@@ -1,12 +1,12 @@
 ## clipboard问题
 
-通过ssh连接到远程服务器，在tmux中使用neovim时无法复制文本到本机系统。
+通过ssh连接到远程服务器，在`tmux`中使用`neovim`时无法复制文本到本机系统。
 
-```
-# 1) tmux设置
-set -s set-clipboard on
+```vim
+" 1) tmux设置
+" set -s set-clipboard on
 
-# 2) nvim设置
+" 2) nvim设置
 
 " 最简单的配置
 let g:clipboard='osc52'
@@ -18,8 +18,7 @@ augroup highlight_yank
     au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=200 }
 augroup END
 
-
-# :h osc52
+" :h osc52
 vim.g.clipboard = {
   name = 'OSC 52',
   copy = {

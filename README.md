@@ -63,7 +63,7 @@ Below is the example for `~/.config/nvim/init.vim`
 let g:loaded_perl_provider = 0
 let g:loaded_ruby_provider = 0
 " path to python3
-let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
+"let g:python3_host_prog = expand('~/.pyenv/versions/3.10.2/bin/python3.10')
 let g:loaded_python3_provider = 1
 " npm i -g neovim
 let g:node_host_prog = '/usr/local/bin/neovim-node-host'
@@ -77,11 +77,12 @@ let g:node_path = $NODE_PATH != "" ? $NODE_PATH :  'node'
 
 " enable plugins
 " let g:enabled_plugins = { "fzf": 1, "node": 0, "go": 0, "rust": 0, "python": 0 \
-"   "fzf-lua": 0, "markdown": 0, \
+"   "fzf-lua": 0, "markdown": 0, "osc": 1, \
 "   "netrw": 0, "telescope": 1, "test": 0 , "tmux": 0, "nvim-treesitter": 0 \
 "}
 "
-let test#go#gotest#options = '-v'
+let g:test#go#gotest#options = '-v -count=1'
+let g:test#python#pytest#options = '-s'
 
 " HACK: work around bad detection of background in Tmux (no OSC11 support)
 " https://github.com/neovim/neovim/issues/17070
