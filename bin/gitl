@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# 生成临时文件
+tmpfile=$(mktemp)
+
+# 定义输出到临时文件的函数
+output_to_file() {
+    echo "$1" >> "$tmpfile"
+}
+
+# 将提交日志格式化输出到临时文件
+git log --follow --pretty=format:"  %h | %an | %ad | %s" --date=iso "$@" >> "$tmpfile"
+output_to_file ""
+output_to_file ""
+
+# 最后用 vim 打开临时文件
+nvim "$tmpfile" -c "set ft=log"
+
+# 可选：退出 vim 后删除临时文件（如需要可取消下一行注释）
+rm -f "$tmpfile"
