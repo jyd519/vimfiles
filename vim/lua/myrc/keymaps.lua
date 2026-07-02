@@ -335,6 +335,17 @@ end, {
   desc = "Live grep",
 })
 
+-- Find in plugins
+vim.api.nvim_create_user_command("FindInPlugins", function(args)
+  local builtin = require("telescope.builtin")
+  builtin.find_files({
+    cwd = vim.g.VIMFILES .. "/lazy/",
+    search_file = args.args,
+  })
+end, {
+  nargs = "*",
+  desc = "Find files in plugins",
+})
 -- }}}
 
 -- Lsp formatting {{{2

@@ -41,7 +41,6 @@ return {
         },
       },
       ui = {
-        default_winbar_panes = { "body", "headers", "headers_body", "verbose", "script_output", "status", "report" },
       },
       ---@type { [string]: fun():string }
       custom_dynamic_variables = {
