@@ -24,4 +24,4 @@ endfunction
 command! -nargs=0 -buffer -range=% Mf :<line1>,<line2>call ToFreeFunction()
 
 " dap
-command! -buffer DebugTest lua require("myrc.config.dap-jest").debug()
+command! -buffer DebugTest lua require("myrc.utils.dap-jest").debug()

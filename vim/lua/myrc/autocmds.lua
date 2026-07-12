@@ -1,21 +1,22 @@
 local function augroup(name) return vim.api.nvim_create_augroup("myrc_" .. name, { clear = true }) end
 local vimrc = vim.api.nvim_create_augroup("myrc", { clear = true })
+local autocmd = vim.api.nvim_create_autocmd
 
 -- Check if we need to reload the file when it changed
-vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
+autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup("checktime"),
   command = "checktime",
 })
 
 -- Highlight on yank
-vim.api.nvim_create_autocmd("TextYankPost", {
+autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
   callback = function() vim.highlight.on_yank() end,
 })
 
 -- Handling large file{{{2
 -- https://www.reddit.com/r/neovim/comments/z85s1l/disable_lsp_for_very_large_files/
-vim.api.nvim_create_autocmd({ "BufReadPre" }, {
+autocmd({ "BufReadPre" }, {
   group = augroup("large_buf"),
   callback = function()
     vim.b.large_buf = false
@@ -45,25 +46,27 @@ vim.api.nvim_create_autocmd({ "BufReadPre" }, {
 })
 -- }}}
 
-vim.api.nvim_create_autocmd("TermOpen", {
+--- Close terminal with <q> {{{2
+autocmd("TermOpen", {
   group = vimrc,
   callback = function() vim.keymap.set("n", "q", "<c-w>c", { buffer = true, noremap = true }) end,
 })
+-- }}}
 
 -- Auto switching IME
 if vim.fn.has("mac") == 1 and vim.fn.executable("im-select") == 1 then
-  vim.api.nvim_create_autocmd("InsertLeave", {
+  autocmd("InsertLeave", {
     group = vimrc,
     callback = function() vim.fn["misc#Ime_en"]() end,
   })
-  vim.api.nvim_create_autocmd("InsertEnter", {
+  autocmd("InsertEnter", {
     group = vimrc,
     callback = function() vim.fn["misc#Ime_zh"]() end,
   })
 end
 
 -- Close some filetypes with <q> {{{2
-vim.api.nvim_create_autocmd("FileType", {
+autocmd("FileType", {
   group = augroup("close_with_q"),
   pattern = {
     "PlenaryTestPopup",
@@ -84,37 +87,21 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 -- }}}
 
--- vim-test
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "javascript", "typescript", "go", "rust", "python" },
-  group = vimrc,
-  callback = function()
-    vim.keymap.set("n", "<leader>rt", ":TestNearest<cr>", { buffer = true, silent = true })
-    vim.keymap.set("n", "<leader>tt", ":TestNearest<cr>", { buffer = true, silent = true })
-  end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "javascript", "typescript", "go", "python" },
-  group = vimrc,
-  callback = function() vim.keymap.set("n", "<leader>tf", ":TestFile<cr>", { buffer = true, silent = true }) end,
-})
-
 -- Strip trailing spaces before write
-vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+autocmd({ "BufWritePre" }, {
   group = augroup("strip_space"),
   pattern = { "python", "c", "cpp", "sh", "javascript", "typescript" },
   callback = function() vim.cmd([[ %s/\s\+$//e ]]) end,
 })
 
-vim.api.nvim_create_autocmd({ "FileType" }, {
+autocmd({ "FileType" }, {
   group = augroup("strip_space_hl"),
   pattern = { "python", "c", "sh", "javascript", "typescript", "vim", "lua" },
   callback = function() vim.cmd("match ForbiddenWhitespace /\\s\\+$/") end,
 })
 
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
-vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+autocmd({ "BufWritePre" }, {
   group = augroup("auto_create_dir"),
   callback = function(event)
     local file = vim.loop.fs_realpath(event.match) or event.match

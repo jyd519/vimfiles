@@ -6,6 +6,12 @@ g.is_vim = not g.is_nvim
 
 -- 初始化 enabled_plugins
 if g.enabled_plugins == nil then
+  ---@class myrc.PluginConfig
+  ---@field fzf integer
+  ---@field osc integer
+  ---@field go integer
+  ---@field node integer
+  ---@field [string] integer
   g.enabled_plugins = {
     telescope = 1,
     fzf = 1,

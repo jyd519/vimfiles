@@ -238,7 +238,6 @@ vim.keymap.set("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap 
 vim.keymap.set("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
 -- }}}
 
-
 -- Cancel search highlighting {{{2
 if keymap.amend then
   keymap.amend("n", "<Esc>", function(original)
@@ -406,4 +405,4 @@ com! TermNewH :TermNew direction=horizontal
 com! TermNewT :TermNew direction=tab
 ]])
 
--- vim: set fdm=marker fdl=0: }}}
+-- vim: set fdm=marker fdl=1: }}}

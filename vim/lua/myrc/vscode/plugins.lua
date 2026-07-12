@@ -23,7 +23,20 @@ require("lazy").setup(
     {
       "nvim-treesitter/nvim-treesitter",
       event = { "BufReadPost", "BufNewFile" },
-      config = function() require("myrc.config.treesitter") end,
+      config = function()
+        local treesitter = require("nvim-treesitter")
+        ---@diagnostic disable-next-line: missing-fields
+        treesitter.setup({
+          sync_install = false,
+          auto_install = false,
+        })
+        vim.api.nvim_create_autocmd("FileType", {
+          callback = function()
+            pcall(vim.treesitter.start)
+            vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end,
+        })
+      end,
     },
     { "tpope/vim-unimpaired", event = "VeryLazy" },
     { "tpope/vim-scriptease", lazy = true, cmd = "Breakadd" },
@@ -32,7 +45,15 @@ require("lazy").setup(
       "smoka7/hop.nvim",
       version = "*",
       event = "VeryLazy",
-      config = function() require("myrc.config.hop") end,
+      config = function()
+        local hop = require("hop")
+        hop.setup({ keys = "etovxqpdygfblzhckisuran" })
+        vim.keymap.set({ "n", "v" }, "s", "<cmd>HopChar2AC<CR>", { noremap = false })
+        vim.keymap.set({ "n", "v" }, "<leader>ll", function() return hop.hint_lines({}) end, { silent = true, noremap = true, desc = "Hop to down line" })
+        vim.keymap.set({ "n", "v" }, "<leader>ww", function() return hop.hint_words({}) end, { silent = true, noremap = true, desc = "Hop to up line" })
+        vim.keymap.set("n", "<leader>jw", "<cmd>HopWord<cr>", { desc = "Hop to word" })
+        vim.keymap.set("n", "<leader>jl", "<cmd>HopLine<cr>", { desc = "Hop to line" })
+      end,
     },
     { "mattn/emmet-vim", ft = { "html", "jsx", "vue", "javascriptreact", "javascript", "css", "scss" } },
     {
@@ -56,7 +77,16 @@ require("lazy").setup(
     {
       "kylechui/nvim-surround",
       event = { "BufReadPost", "BufNewFile" },
-      config = function() require("myrc.config.surround") end,
+      opts = {
+        indent_lines = false,
+        surrounds = {
+          ["f"] = {
+            add = function()
+              return { { "💥" }, { "💥" } }
+            end,
+          },
+        },
+      },
     },
     { dir = g.VIMFILES .. "/locals/vim-a", cmd = { "A", "AH" } },
     { "jyd519/neoformat", cmd = { "Neoformat" } },
