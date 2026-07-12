@@ -73,9 +73,6 @@ return {
         enable = true,
         paramName = "Literal",
       },
-      codeLens = {
-        enable = true,
-      },
     },
   },
 }

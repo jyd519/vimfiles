@@ -4,6 +4,15 @@ return {
     "jyd519/vim-test", -- Unit-Testing
     enabled = vim.g.enabled_plugins.test == 1,
     event = { "BufReadPost", "BufNewFile" },
+    init = function()
+      local g = vim.g
+      g.test_strategy = "neovim"
+      g.test_neovim_start_normal = 0
+      g.test_javascript_runner = "jest"
+      g.test_python_djangotest_options = "--keepdb"
+      g.test_rust_cargotest_options = "-- --nocapture"
+      g.test_go_test_options = "-v"
+    end,
     config = function()
       local autocmd = vim.api.nvim_create_autocmd
       local testg = vim.api.nvim_create_augroup("test", { clear = true })

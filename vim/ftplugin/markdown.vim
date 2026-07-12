@@ -34,10 +34,6 @@ let b:did_markdown_vim = 1
 "     autocmd BufWinEnter <buffer> call s:adjustSyntax()
 " augroup end
 
-" folding
-" setlocal foldlevel=1
-" set foldmethod=expr
-" set foldexpr=nvim_treesitter#foldexpr()
 
 set textwidth=120
 
@@ -80,6 +76,10 @@ let g:surround_{char2nr('L')}="```\r```"
 let g:surround_{char2nr('l')}="```\1lang:\1\r```"
 if g:is_nvim
   lua  <<END
+-- vim.opt_local.foldlevel=1
+-- vim.opt.foldmethod = "expr"
+-- vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+
 require("nvim-surround").buffer_setup(
     {
         surrounds = {

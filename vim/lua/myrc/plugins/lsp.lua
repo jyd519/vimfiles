@@ -79,7 +79,7 @@ return {
         bufmap("n", "<leader>xd", "<cmd>lua vim.diagnostic.open_float()<cr>", { desc = "Show diagnostics" })
 
         -- Selects a code action available at the current cursor position
-        bufmap("n", "gx", show_code_actions, { desc = "Code action" })
+        bufmap("n", "ga", show_code_actions, { desc = "Code action" })
         bufmap("n", "<leader>ca", show_code_actions, { desc = "Code action" })
 
         -- codelens
@@ -135,6 +135,9 @@ return {
           end
 
           -- codelens
+          if client.name == "lua_ls" then
+            vim.lsp.codelens.enable(false, { bufnr = bufnr })
+          end
           if vim.fn.has("nvim-0.12") == 0 then
             if client:supports_method("textDocument/codeLens", bufnr) then
               vim.lsp.codelens.enable(true, { bufnr = bufnr })
@@ -279,4 +282,4 @@ return {
   },
 -- }}}
 }
--- vim: set fdm=marker fdl=1:
+-- vim: set fdm=marker fdl=0:

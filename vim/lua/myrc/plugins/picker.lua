@@ -28,11 +28,24 @@ return {
     },
     keys = vim.list_extend({
       { "<leader>xa", function() require("telescope.builtin").diagnostics({}) end, desc = "Show all diagnostics" },
-      { "<leader>xb", function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end, desc = "Show buffer diagnostics" },
-      { "<leader>rf", function() require("telescope").extensions.refactoring.refactors() end, mode = "v", desc = "Refactoring" },
+      {
+        "<leader>xb",
+        function() require("telescope.builtin").diagnostics({ bufnr = 0 }) end,
+        desc = "Show buffer diagnostics",
+      },
+      {
+        "<leader>rf",
+        function() require("telescope").extensions.refactoring.refactors() end,
+        mode = "v",
+        desc = "Refactoring",
+      },
       { "<leader>fx", function() require("telescope.builtin").quickfix({ bufnr = 0 }) end, desc = "Find in Quickfix" },
-      { "<leader>fm", function() require("telescope").extensions.bookmarks.list({ bufnr = 0 }) end, desc = "Find in bookmarks" },
-      { "<leader>f.", function() require("telescope.builtin").find_files({ cwd = vim.fn.expand("%:p:h") }) end, desc = "Find Files in current directory" },
+      -- { "<leader>fm", function() require("telescope").extensions.bookmarks.list({ bufnr = 0 }) end, desc = "Find in bookmarks" },
+      {
+        "<leader>f.",
+        function() require("telescope.builtin").find_files({ cwd = vim.fn.expand("%:p:h") }) end,
+        desc = "Find Files in current directory",
+      },
       { "<leader>fw", function() require("telescope.builtin").grep_string({}) end, desc = "Grep the current word" },
       { "<C-p>", "<cmd>Telescope find_files<cr>", desc = "Find files" },
       { "<leader>fo", "<cmd>Telescope oldfiles<cr>", desc = "Find in oldfiles" },
@@ -51,8 +64,16 @@ return {
         end,
         desc = "Find projects",
       },
-      { "<leader>fv", function() require("telescope.builtin").find_files({ cwd = g.VIMFILES }) end, desc = "Find vimfiles" },
-      { "<leader>fd", function() require("telescope.builtin").find_files({ cwd = g.VIMFILES .. "/doc" }) end, desc = "Find vim docs" },
+      {
+        "<leader>fv",
+        function() require("telescope.builtin").find_files({ cwd = g.VIMFILES }) end,
+        desc = "Find vimfiles",
+      },
+      {
+        "<leader>fd",
+        function() require("telescope.builtin").find_files({ cwd = g.VIMFILES .. "/doc" }) end,
+        desc = "Find vim docs",
+      },
       { "<leader>gd", function() require("telescope.builtin").git_status() end, desc = "Find git diff" },
     }, extra_keys),
     config = function()
@@ -127,7 +148,7 @@ return {
       })
 
       telescope.load_extension("ui-select")
-      telescope.load_extension("bookmarks")
+      -- telescope.load_extension("bookmarks")
       telescope.load_extension("fzf")
       telescope.load_extension("projects")
 
@@ -136,12 +157,16 @@ return {
       vim.cmd([[com! Maps :Telescope keymaps]])
       vim.cmd([[com! Colors :Telescope colorscheme]])
 
-      cmd("FindInPlugins", function(args)
-        require("telescope.builtin").find_files({
-          cwd = g.VIMFILES .. "/lazy/",
-          search_file = args.args,
-        })
-      end, { nargs = "*", desc = "Find files in plugins" })
+      cmd(
+        "FindInPlugins",
+        function(args)
+          require("telescope.builtin").find_files({
+            cwd = g.VIMFILES .. "/lazy/",
+            search_file = args.args,
+          })
+        end,
+        { nargs = "*", desc = "Find files in plugins" }
+      )
 
       cmd("Grep", function(args)
         local builtin = require("telescope.builtin")

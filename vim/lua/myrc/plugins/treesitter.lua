@@ -1,5 +1,5 @@
 return {
--- Treesitter {{{1
+  -- Treesitter {{{1
   {
     "nvim-treesitter/nvim-treesitter",
     main = "nvim-treesitter",
@@ -12,7 +12,7 @@ return {
         sync_install = false,
         auto_install = false,
         incremental_selection = {
-          enable = false,
+          enable = true,
           keymaps = {
             init_selection = "<leader>gnn",
             node_incremental = "<leader>grn",
@@ -84,19 +84,36 @@ return {
 
       vim.api.nvim_create_autocmd("FileType", {
         callback = function()
-          pcall(vim.treesitter.start)
-          vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          local ft = vim.bo.filetype
+          if ft == "" then return end
+
+          -- 检查是否能启动 treesitter
+          local ok, parser = pcall(vim.treesitter.language.add, ft)
+          if not ok then return end
+
+          -- 分别检查 folds 和 indents 查询是否存在
+          local has_folds = pcall(vim.treesitter.query.get, ft, "folds")
+          local has_indents = pcall(vim.treesitter.query.get, ft, "indents")
+
+          if has_folds then
+            vim.opt_local.foldmethod = "expr"
+            vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+          else
+            vim.opt_local.foldmethod = "indent"
+            vim.opt_local.foldexpr = ""
+          end
+
+          if has_indents then vim.opt_local.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" end
         end,
       })
     end,
   },
--- }}}
--- Treesitter Textobjects {{{1
+  -- }}}
+  -- Treesitter Textobjects {{{1
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "main",
     enabled = false,
   },
--- }}}
+  -- }}}
 }
--- vim: set fdm=marker fdl=1:

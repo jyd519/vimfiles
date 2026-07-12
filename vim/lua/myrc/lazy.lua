@@ -71,3 +71,18 @@ require("lazy").setup({
     },
   },
 })
+
+function _G.is_plugin_loaded(name)
+  local plugins = require("lazy").plugins()
+  for _, plugin in pairs(plugins) do
+    if vim.stricmp(plugin.name, name) == 0 then return not not plugin._.loaded end
+  end
+  return false
+end
+function _G.has_plugin(name)
+  local plugins = require("lazy").plugins()
+  for _, plugin in pairs(plugins) do
+    if vim.stricmp(plugin.name, name) == 0 then return true end
+  end
+  return false
+end

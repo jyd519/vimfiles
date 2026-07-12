@@ -110,6 +110,8 @@ vim.keymap.set("n", "<C-->", function() vim.fn["zoom#ZoomOut"]() end, { silent =
 vim.keymap.set("v", "<leader>ec", ":AesEnc<cr>", { noremap = true })
 vim.keymap.set("n", "<leader>ed", ":AesDec<cr>", { noremap = true })
 
+-- fold
+
 -- }}}
 
 -- Cancel search highlighting {{{2
@@ -136,23 +138,28 @@ end, { desc = "Toggle treesitter" })
 
 --Toggle LSP{{{2
 local toggle_lsp_client = function()
-  local buf = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_clients({ bufnr = buf })
-  if not vim.tbl_isempty(clients) then
-    vim.cmd("LspStop")
+  local filetype = vim.bo.filetype
+  local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() })
+  put(clients)
+  if #clients > 0 then
+    for _, client in ipairs(clients) do
+      vim.lsp.enable(client.name, false)
+      client:stop()
+    end
+    vim.notify("LSP Server stopped", vim.log.levels.INFO, { title = "LSP" })
   else
-    vim.cmd("LspStart")
+    vim.lsp.enable(filetype)
     vim.notify("Starting LSP Server", vim.log.levels.INFO, { title = "LSP" })
   end
 end
 
 local start_lsp_client = function()
+  local filetype = vim.bo.filetype
+  if filetype == "" then return end
   local buf = vim.api.nvim_get_current_buf()
   local clients = vim.lsp.get_clients({ bufnr = buf })
   if not vim.tbl_isempty(clients) then
-    for _, client in pairs(clients) do
-      vim.cmd("LspRestart " .. client.name)
-    end
+    vim.lsp.enable(filetype)
     vim.notify("Restarting LSP Server", vim.log.levels.INFO, { title = "LSP" })
   end
 end
