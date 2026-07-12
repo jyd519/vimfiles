@@ -1,7 +1,10 @@
 local opt, g = vim.opt, vim.g
 
-g.enable_inlay_hint = true
+-- 检测 Neovim 或 Vim
+g.is_nvim = vim.fn.has('nvim') == 1
+g.is_vim = not g.is_nvim
 
+-- 初始化 enabled_plugins
 if g.enabled_plugins == nil then
   g.enabled_plugins = {
     telescope = 1,
@@ -16,6 +19,69 @@ if g.enabled_plugins == nil then
     ghost_text = 0,
     which_key = 0,
   }
+end
+
+-- 禁用内置插件
+g.loaded_gzip = 1
+g.loaded_zip = 1
+g.loaded_zipPlugin = 1
+g.loaded_tar = 1
+g.loaded_tarPlugin = 1
+g.loaded_getscript = 1
+g.loaded_getscriptPlugin = 1
+g.loaded_vimball = 1
+g.loaded_vimballPlugin = 1
+g.loaded_matchit = 1
+g.loaded_matchparen = 1
+g.loaded_logiPat = 1
+g.loaded_rrhelper = 1
+
+-- netrw 配置
+if (g.enabled_plugins.netrw or 0) == 1 then
+  g.netrw_banner = 0
+  g.netrw_liststyle = 3
+  g.netrw_browse_split = 0
+  g.netrw_altv = 1
+  g.netrw_winsize = 25
+else
+  g.loaded_netrw = 1
+  g.loaded_netrwPlugin = 1
+  g.loaded_netrwSettings = 1
+  g.loaded_netrwFileHandlers = 1
+end
+
+-- 启用内嵌语法高亮
+g.vimsyn_embed = 'lP'
+
+-- 设置 leader 键
+g.mapleader = ","
+g.maplocalleader = ","
+
+-- surround 插件配置
+g.surround_no_insert_mappings = 1
+
+-- 设置 $HOME（如果为空）
+if vim.env.HOME == "" then
+  vim.env.HOME = vim.fn.expand("~")
+end
+
+-- Neovim 特有功能
+if g.is_nvim then
+  -- prequire 函数
+  function _G.prequire(m)
+    local ok, err = pcall(require, m)
+    if not ok then
+      return nil, err
+    end
+    return err
+  end
+
+  -- put/dump 函数
+  function _G.put(...)
+    local objects = vim.tbl_map(vim.inspect, {...})
+    print(table.unpack(objects))
+  end
+  _G.dump = _G.put
 end
 
 opt.shiftwidth = 2
@@ -88,11 +154,6 @@ end
 
 -- status line
 opt.laststatus = 2
-
--- define leader char
--- --------------------------------------------------------------------------------
-vim.g.mapleader = ","
-vim.g.maplocalleader = ","
 
 -- enable syntax highlighting
 vim.cmd("syntax sync minlines=256")

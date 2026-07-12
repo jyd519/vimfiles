@@ -1,0 +1,386 @@
+return {
+  {
+    "nvimtools/hydra.nvim",
+    -- dependencies = { "jbyuki/venn.nvim" },
+    lazy = true,
+    keys = {
+      { "z", desc = "Side scroll (Hydra)", mode = "n" },
+      { "<leader>v", desc = "Draw Diagram (Hydra)", mode = "n" },
+      { "<leader>W", desc = "Window resizing (Hydra)", mode = "n" },
+      { "<leader>dd", desc = "Dap (Hydra)", mode = "n" },
+      { "<leader>cs", desc = "Switch colorscheme (Hydra)", mode = "n" },
+      { "<leader>X", desc = "Diagnostics (Hydra)", mode = "n" },
+      { "<space>f", desc = "Picker (Hydra)", mode = "n" },
+      { "<leader>G", desc = "Git (Hydra)", mode = { "n", "x" } },
+    },
+    cmd = { "SwitchCS" },
+    config = function()
+      local Hydra = require("hydra")
+      local cmd = require("hydra.keymap-util").cmd
+
+      -- Side scroll
+      Hydra({
+        name = "Side scroll",
+        mode = "n",
+        body = "z",
+        heads = {
+          { "h", "5zh" },
+          { "l", "5zl", { desc = "←/→" } },
+          { "H", "zH" },
+          { "L", "zL", { desc = "half screen ←/→" } },
+        },
+      })
+
+      -- Draw Diagram
+      local venn_hint = [[
+ Arrow^^^^^^   Select region with <C-v>
+ ^ ^ _K_ ^ ^   _b_: surround it with box
+ _H_ ^ ^ _L_
+ ^ ^ _J_ ^ ^                      _<Esc>_
+]]
+
+      Hydra({
+        name = "Draw Diagram",
+        mode = "n",
+        body = "<leader>v",
+        hint = venn_hint,
+        config = {
+          color = "pink",
+          invoke_on_body = true,
+          hint = {
+            float_opts = {
+              style = "minimal",
+              focusable = false,
+              noautocmd = true,
+              border = "rounded",
+            },
+          },
+          on_enter = function() vim.o.virtualedit = "all" end,
+        },
+        heads = {
+          { "H", "<C-v>h:VBox<CR>" },
+          { "J", "<C-v>j:VBox<CR>" },
+          { "K", "<C-v>k:VBox<CR>" },
+          { "L", "<C-v>l:VBox<CR>" },
+          { "b", ":VBox<CR>", { mode = "v" } },
+          { "<Esc>", nil, { exit = true } },
+        },
+      })
+
+      -- Window resizing
+      Hydra({
+        name = "Window resizing",
+        mode = "n",
+        body = "<leader>W",
+        config = {
+          color = "pink",
+          invoke_on_body = true,
+          hint = {
+            float_opts = {
+              style = "minimal",
+              focusable = false,
+              noautocmd = true,
+            },
+          },
+        },
+        heads = {
+          { "+", "<C-W>+" },
+          { "-", "<C-W>-" },
+          { "r", "<C-W>r" },
+          { "R", "<C-W>R" },
+          { "B", "<C-W>>", { desc = "← →" } },
+          { "S", "<C-W><", { desc = "→ ←" } },
+          { "s", "<C-w>s" },
+          { "v", "<C-w>v" },
+          { ">", "<C-w>>", { desc = "← →" } },
+          { "<", "<C-w><", { desc = "→ ←" } },
+          { "=", "<C-w>=", { desc = "==" } },
+          { "c", "<cmd>close<CR>", { desc = "close" } },
+          { "o", "<cmd>only<CR>", { desc = "only" } },
+          { "_", "<C-w>_" },
+          { "|", "<C-w>|" },
+          { "q", nil, { exit = true } },
+          { "<Esc>", nil, { exit = true } },
+        },
+      })
+
+      -- Dap
+      local dap_hint = [[
+ ^_<F9>_^: ^Toggle breakpoint     ^^_,S_/_<F5>_^: ^Start/Continue
+ ^_,r_^: ^Continue                ^^^^^^^_,c_^: ^Run to cursor
+ ^_,x_: Stop  ^^                  ^^^^^^^_,p_^: ^Open repl          ^^^^^^^^^^^^_,u_: ^Toggle UI
+ ^_,n_/_<F10>_: Step over         ^^^^^^^_,i_/_<F11>_^: ^Step into    ^_,o_/_<F12>_^: ^Step out
+ ^_,T_^^^: Clear breakpoints       ^^^^^^_,B_: ^Conditional breakpoint
+ ^_,e_/_,E_: Evaluate input       ^^^^^^^_q_^:  Exit
+]]
+
+      local dap_hydra = nil
+      local function toggle_dap_hint()
+        if dap_hydra then
+          if dap_hydra.hint.win == nil then
+            dap_hydra.hint:show()
+          else
+            dap_hydra.hint:close()
+          end
+        end
+      end
+
+      dap_hydra = Hydra({
+        name = "Dap",
+        mode = "n",
+        body = "<leader>dd",
+        hint = dap_hint,
+        config = {
+          color = "pink",
+          invoke_on_body = true,
+          hint = {
+            float_opts = {
+              style = "minimal",
+              focusable = false,
+              noautocmd = true,
+              border = "single",
+            },
+            hide_on_load = true,
+            position = "top-right",
+          },
+          on_enter = function() require("dap").set_breakpoint() end,
+          on_exit = function()
+            require("dapui").close()
+            vim.cmd("silent! DapTerminate")
+          end,
+        },
+        heads = {
+          { ",h", function() toggle_dap_hint() end, { desc = false } },
+          { ",S", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
+          { "<F5>", function() require("myrc.utils.dap").start_debug() end, { desc = "Start Debugging" } },
+          { "<F12>", function() require("dap").step_out() end, { desc = "step out" } },
+          { ",o", function() require("dap").step_out() end, { desc = "step out" } },
+          { "<F10>", function() require("dap").step_over() end, { desc = "step over" } },
+          { ",n", function() require("dap").step_over() end, { desc = "step over" } },
+          { ",i", function() require("dap").step_into() end, { desc = "step into" } },
+          { "<F11>", function() require("dap").step_into() end, { desc = "step into" } },
+          { ",c", function() require("dap").run_to_cursor() end, { desc = "run to cursor" } },
+          { ",r", function() require("dap").continue() end, { desc = "continue" } },
+          { "<F9>", function() require("dap").toggle_breakpoint() end, { desc = false } },
+          { ",B", function() require("dap").set_breakpoint(vim.fn.input("[Condition] > ")) end, desc = "Conditional Breakpoint" },
+          { ",T", function() require("dap").clear_breakpoints() end, { desc = "clear breakpoints" } },
+          { ",x", function() require("dap").close() end, { desc = "stop" } },
+          { ",u", function() require("dapui").toggle() end, desc = "Toggle UI" },
+          { ",e", function() require("dapui").eval() end, { desc = "evaluate variable" } },
+          { ",E", function() require("dapui").eval(vim.fn.input("[Expression] > ")) end, desc = "Evaluate Input" },
+          { ",p", function() require("dap").repl.open() end, { desc = "open repl" } },
+          { "q", nil, { exit = true, nowait = true, desc = "exit" } },
+        },
+      })
+
+      -- Switch colorschemes
+      local function toggle_background()
+        if vim.o.background == "light" then
+          vim.o.background = "dark"
+        else
+          vim.o.background = "light"
+        end
+      end
+
+      local hydra_cs = Hydra({
+        name = "Switch colorscheme",
+        mode = { "n" },
+        body = "<leader>cs",
+        config = {
+          color = "pink",
+          hint = { type = "window" },
+          invoke_on_body = true,
+          on_enter = function() print(vim.g.colors_name, vim.go.background) end,
+          on_key = function() print(vim.g.colors_name or "", vim.go.background) end,
+        },
+        heads = {
+          { "<left>", "<cmd>NextCS<cr>", { desc = "←" } },
+          { "<right>", "<cmd>PreviousCS<cr>", { desc = "→" } },
+          { "<space>", toggle_background, { desc = "dark/light" } },
+          { "s", function() Snacks.picker.colorschemes() end, { exit = true, desc = "select colorscheme" } },
+          { "q", nil, { exit = true } },
+          { "<Esc>", nil, { exit = true } },
+        },
+      })
+
+      vim.api.nvim_create_user_command("SwitchCS", function() hydra_cs:activate() end, {})
+
+      -- Diagnostics
+      local diagnostics_active = true
+      local function toggle_diagnostics()
+        diagnostics_active = not diagnostics_active
+        if diagnostics_active then
+          vim.api.nvim_echo({ { "Show diagnostics" } }, false, {})
+          vim.diagnostic.enable(true)
+        else
+          vim.api.nvim_echo({ { "Disable diagnostics" } }, false, {})
+          vim.diagnostic.enable(false)
+        end
+      end
+
+      local diagnostic_hint = [[
+ _n_: Next diagnostic   _N_: Previous diagnostic  _F_: Code action
+ _a_: All diagnostics   _l_: Buffer diagnostics   _t_: Toggle diagnostics
+ ^^                     _q_: Exit
+]]
+
+      Hydra({
+        name = "Diagnostics",
+        mode = { "n" },
+        body = "<leader>X",
+        hint = diagnostic_hint,
+        config = {
+          invoke_on_body = true,
+          color = "pink",
+          hint = {
+            float_opts = {
+              style = "minimal",
+              focusable = false,
+              noautocmd = true,
+              border = "double",
+            },
+          },
+        },
+        heads = {
+          { "n", function() vim.diagnostic.jump({ count = 1 }) end, { desc = "next diagnostic" } },
+          { "N", function() vim.diagnostic.jump({ count = -1 }) end, { desc = "previous diagnostic" } },
+          { "L", function() vim.diagnostic.setloclist() end, { desc = "setloclist" } },
+          { "a", function() Snacks.picker.diagnostics() end, { desc = "diagnostics", exit = true, nowait = true } },
+          { "t", toggle_diagnostics, { desc = "toggle diagnostics" } },
+          { "l", function() Snacks.picker.diagnostics_buffer() end, { desc = "buffer diagnostics", exit = true, nowait = true } },
+          { "b", function() Snacks.picker.diagnostics_buffer() end, { desc = "buffer diagnostics", exit = true, nowait = true } },
+          { "F", function() vim.lsp.buf.code_action(); return "<Ignore>" end },
+          { "q", nil, { exit = true, nowait = true } },
+        },
+      })
+
+      -- Picker
+      local picker_hint = [[
+                 _f_: files       _m_: marks
+   🭇🬭🬭🬭🬭🬭🬭🬭🬭🬼    _o_: old files   _g_: live grep
+  🭉🭁🭠🭘    🭣🭕🭌🬾   _p_: projects    _/_: search in file
+  🭅█ ▁     █🭐
+  ██🬿      🭊██   _r_: resume      _u_: undotree
+ 🭋█🬝🮄🮄🮄🮄🮄🮄🮄🮄🬆█🭀  _h_: vim help    _c_: execute command
+ 🭤🭒🬺🬹🬱🬭🬭🬭🬭🬵🬹🬹🭝🭙  _k_: keymaps     _;_: commands history
+                 _O_: options     _?_: search history
+ ^
+                 _<Enter>_: Pickers             _<Esc>_
+]]
+
+      Hydra({
+        name = "Picker",
+        hint = picker_hint,
+        config = {
+          color = "teal",
+          invoke_on_body = true,
+          hint = {
+            position = "middle",
+            float_opts = {
+              style = "minimal",
+              focusable = false,
+              noautocmd = true,
+              border = "double",
+            },
+          },
+        },
+        mode = "n",
+        body = "<space>f",
+        heads = {
+          { "f", function() Snacks.picker.files() end },
+          { "g", function() Snacks.picker.grep() end },
+          { "o", function() Snacks.picker.recent() end, { desc = "recently opened files" } },
+          { "h", function() Snacks.picker.help() end, { desc = "vim help" } },
+          { "m", cmd("MarksListBuf"), { desc = "marks" } },
+          { "k", function() Snacks.picker.keymaps() end },
+          { "O", function() Snacks.picker.pick("vim_options") end },
+          { "r", function() Snacks.picker.resume() end },
+          { "p", function() Snacks.picker.projects() end, { desc = "projects" } },
+          { "/", function() Snacks.picker.lines() end, { desc = "search in file" } },
+          { "?", function() Snacks.picker.search_history() end, { desc = "search history" } },
+          { ";", function() Snacks.picker.command_history() end, { desc = "command-line history" } },
+          { "c", function() Snacks.picker.commands() end, { desc = "execute command" } },
+          { "u", cmd("silent! %foldopen! | UndotreeToggle"), { desc = "undotree" } },
+          { "<Enter>", function() Snacks.picker.pickers() end, { exit = true, desc = "list all pickers" } },
+          { "<Esc>", nil, { exit = true, nowait = true } },
+        },
+      })
+
+      -- Git
+      local git_hint = [[
+ _J_: next hunk   _s_: stage hunk        _d_: show deleted   _b_: blame line
+ _K_: prev hunk   _u_: undo last stage   _p_: preview hunk   _B_: blame show full
+ ^ ^              _S_: stage buffer      ^ ^                 _w_: toggle word diff
+ ^
+ ^ ^              _<Enter>_: Neogit      _g_: lazygit        _q_: exit
+]]
+
+      Hydra({
+        name = "Git",
+        hint = git_hint,
+        config = {
+          color = "pink",
+          invoke_on_body = true,
+          hint = {
+            float_opts = {
+              style = "minimal",
+              focusable = false,
+              noautocmd = true,
+            },
+          },
+          on_enter = function()
+            vim.cmd("mkview")
+            vim.cmd("silent! %foldopen!")
+            vim.bo.modifiable = false
+            local gs = require("gitsigns")
+            gs.toggle_signs(true)
+            gs.toggle_linehl(true)
+          end,
+          on_exit = function()
+            local cursor_pos = vim.api.nvim_win_get_cursor(0)
+            vim.cmd("loadview")
+            vim.api.nvim_win_set_cursor(0, cursor_pos)
+            vim.cmd("normal zv")
+            local gs = require("gitsigns")
+            gs.toggle_signs(false)
+            gs.toggle_linehl(false)
+            gs.toggle_deleted(false)
+          end,
+        },
+        mode = { "n", "x" },
+        body = "<leader>G",
+        heads = {
+          {
+            "J",
+            function()
+              if vim.wo.diff then return "]c" end
+              vim.schedule(function() require("gitsigns").next_hunk() end)
+              return "<Ignore>"
+            end,
+            { expr = true, desc = "next hunk" },
+          },
+          {
+            "K",
+            function()
+              if vim.wo.diff then return "[c" end
+              vim.schedule(function() require("gitsigns").prev_hunk() end)
+              return "<Ignore>"
+            end,
+            { expr = true, desc = "prev hunk" },
+          },
+          { "s", ":Gitsigns stage_hunk<CR>", { silent = true, desc = "stage hunk" } },
+          { "u", function() require("gitsigns").undo_stage_hunk() end, { desc = "undo last stage" } },
+          { "S", function() require("gitsigns").stage_buffer() end, { desc = "stage buffer" } },
+          { "p", function() require("gitsigns").preview_hunk() end, { desc = "preview hunk" } },
+          { "d", function() require("gitsigns").toggle_deleted() end, { nowait = true, desc = "toggle deleted" } },
+          { "b", function() require("gitsigns").toggle_current_line_blame() end, { desc = "toggle current line blame" } },
+          { "w", function() require("gitsigns").toggle_word_diff() end, { desc = "toggle word diff" } },
+          { "B", function() require("gitsigns").blame_line({ full = true }) end, { desc = "blame show full" } },
+          { "<Enter>", "<Cmd>Neogit<CR>", { exit = true, desc = "Neogit" } },
+          { "g", "<Cmd>TermExec cmd=lazygit<CR>", { exit = true, desc = "Lazygit" } },
+          { "q", nil, { exit = true, nowait = true, desc = "exit" } },
+        },
+      })
+    end,
+  },
+}

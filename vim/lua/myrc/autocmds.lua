@@ -126,3 +126,5 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     -- end
   end,
 })
+
+-- vim: set fdm=marker fdl=1: }}}

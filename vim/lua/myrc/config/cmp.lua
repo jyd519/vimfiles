@@ -193,7 +193,6 @@ cmp.setup({
       vim_item.menu = ({
         copilot = "[Copilot]",
         luasnip = "[Snippet]",
-        cmp_tabnine = "[TN]",
         codeium = "[Codeium]",
         nvim_lua = "[NVim Lua]",
         nvim_lsp = "[LSP]",
@@ -211,7 +210,6 @@ cmp.setup({
     { name = "path" },
     { name = "codeium" },
     -- { name = "copilot" },
-    -- { name = 'cmp_tabnine' },
     { name = "crates" },
   }, {
     { name = "buffer" },

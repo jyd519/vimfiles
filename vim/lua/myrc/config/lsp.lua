@@ -3,6 +3,9 @@
 -- Globals {{{2
 local api = vim.api
 local lsp = vim.lsp
+local map = vim.keymap.set
+local cmd = vim.api.nvim_create_user_command
+local autocmd = api.nvim_create_autocmd
 
 -- $MASON -> ~/.local/share/nvim/mason
 --  vim.fn.exepath("clangd")
@@ -21,7 +24,7 @@ end
 -- }}}
 
 -- key mappings {{{2
-vim.keymap.set(
+map(
   "n",
   "<leader>xt",
   function()
@@ -33,7 +36,7 @@ vim.keymap.set(
   { desc = "Toggle diagnostic virtual lines and virtual text" }
 )
 
-vim.api.nvim_create_user_command(
+cmd(
   "DiagnosticToggle",
   function()
     vim.diagnostic.config({
@@ -88,12 +91,12 @@ local function setup_keymapping(client, bufnr)
 end
 
 local format_is_enabled = false
-vim.api.nvim_create_user_command("FormatToggle", function()
+cmd("FormatToggle", function()
   format_is_enabled = not format_is_enabled
   vim.notify("Autoformatting " .. (format_is_enabled and "enabled" or "disabled"))
 end, { desc = "Toggle autoformatting" })
 
-vim.api.nvim_create_user_command(
+cmd(
   "CodelensToggle",
   function() vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled()) end,
   { desc = "Toggle Codelens" }
@@ -101,12 +104,11 @@ vim.api.nvim_create_user_command(
 
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
-vim.api.nvim_create_autocmd("LspAttach", {
+autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspConfig", { clear = true }),
   callback = function(event)
     local client = vim.lsp.get_client_by_id(event.data.client_id)
     local bufnr = event.buf
-    local autocmd = api.nvim_create_autocmd
     if client == nil then return end
 
     setup_keymapping(client, bufnr)
@@ -134,7 +136,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     if vim.fn.has("nvim-0.12") == 0 then
       if client:supports_method("textDocument/codeLens", bufnr) then
         vim.lsp.codelens.enable(true, { bufnr = bufnr })
-        vim.api.nvim_create_autocmd({ "BufEnter", "InsertLeave" }, {
+        autocmd({ "BufEnter", "InsertLeave" }, {
           buffer = bufnr,
           callback = function() vim.lsp.codelens.enable(true, { bufnr = bufnr }) end,
         })

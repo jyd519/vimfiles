@@ -1,7 +1,14 @@
 local g, fn = vim.g, vim.fn
 
 return {
-  { "mhinz/vim-startify", init = function() g.startify_files_number = 5 end },
+  {
+    "mhinz/vim-startify",
+    init = function()
+      g.startify_change_to_dir = 0
+      g.startify_change_to_vcs_root = 1
+      g.startify_files_number = 5
+    end,
+  },
   {
     "dstein64/vim-startuptime",
     cmd = "StartupTime",
@@ -10,9 +17,8 @@ return {
   -- Utils {{{2
   {
     "folke/which-key.nvim",
-    enabled = g.enabled_plugins["which_key"] == 1,
     config = true,
-    event = "VeryLazy",
+    cmd = {"WhichKey"},
   },
   { "nvim-lua/plenary.nvim", lazy = true }, -- some useful lua functions
   {
@@ -53,12 +59,7 @@ return {
     event = "VeryLazy",
     config = function() require("myrc.config.hop") end,
   },
-  { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" }, lazy = true },
-  {
-    "nvimtools/hydra.nvim",
-    dependencies = { { "jbyuki/venn.nvim" } },
-    config = function() require("myrc.config.hydra") end,
-  },
+  { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" } },
   { "AndrewRadev/splitjoin.vim", event = "VeryLazy" },
   { "tmhedberg/matchit", event = "VeryLazy" },
   { "junegunn/vim-easy-align", event = { "BufReadPost", "BufNewFile" } },
@@ -71,8 +72,7 @@ return {
     cmd = { "MarksListBuf" },
     config = function() require("myrc.config.marks") end,
   },
-  -- { "numToStr/Comment.nvim", event = "VeryLazy", config = true },
-  { 'nvim-mini/mini.nvim', version = false },
+  { "nvim-mini/mini.nvim", version = false },
   { "gpanders/editorconfig.nvim", enabled = vim.fn.has("nvim-0.9") == 0 },
   {
     "kylechui/nvim-surround",
@@ -84,7 +84,6 @@ return {
     lazy = true,
     config = function()
       require("nvim-web-devicons").setup({
-        -- Used by telescope
         -- https://github.com/nvim-tree/nvim-web-devicons
         -- https://www.nerdfonts.com/font-downloads
         color_icons = true,
@@ -129,71 +128,6 @@ return {
       "DiffviewFocusFiles",
       "DiffviewFileHistory",
     },
-  },
-  {
-    "Exafunction/windsurf.vim",
-    event = { "BufEnter" },
-    config = function() require("myrc.config.codeium") end,
-  },
-  {
-    "github/copilot.vim",
-    enabled = false,
-    config = function()
-      vim.g.copilot_no_tab_map = true
-      vim.g.copilot_assume_mapped = true
-      vim.g.copilot_tab_fallback = ""
-    end,
-  },
-  {
-    "olimorris/codecompanion.nvim",
-    cmd = {
-      "CodeCompanion",
-      "CodeCompanionCmd",
-      "CodeCompanionChat",
-      "CodeCompanionActions",
-    },
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "franco-ruggeri/codecompanion-spinner.nvim",
-      "georgeharker/codecompanion-kimi.nvim",
-      "ravitemer/codecompanion-history.nvim", -- Save and load conversation history
-      {
-        "ravitemer/mcphub.nvim", -- Manage MCP servers
-        cmd = "MCPHub",
-        build = "npm install -g mcp-hub@latest",
-        config = true,
-      },
-      {
-        "MeanderingProgrammer/render-markdown.nvim",
-        lazy = true,
-        opts = {
-          enabled = false,
-          on = {
-              attach = function()
-                if vim.bo.ft == "codecompanion" then
-                  require("render-markdown").buf_enable()
-                end
-              end,
-          },
-        },
-        ft = { "markdown", "codecompanion" },
-      },
-      {
-        "HakonHarnes/img-clip.nvim", -- Share images with the chat buffer
-        event = "VeryLazy",
-        cmd = "PasteImage",
-        opts = {
-          filetypes = {
-            codecompanion = {
-              prompt_for_file_name = false,
-              template = "[Image]($FILE_PATH)",
-              use_absolute_path = true,
-            },
-          },
-        },
-      },
-    },
-    config = function() require("myrc.config.codecompanion") end,
   },
   -- }}}
   -- DAP Debugging {{{2
@@ -252,11 +186,6 @@ return {
     config = function() require("myrc.config.clangd") end,
   },
   { "pearofducks/ansible-vim", ft = { "yaml", "ansible", "ansible_hosts" } },
-  {
-    "someone-stole-my-name/yaml-companion.nvim",
-    ft = { "yaml" },
-    config = function() require("telescope").load_extension("yaml_schema") end,
-  },
   {
     "dense-analysis/ale", -- linter
     lazy = true,
@@ -341,27 +270,10 @@ return {
   -- File explorer/Fuzzy Finder {{{2
   {
     "nvim-tree/nvim-tree.lua",
-    enabled = false,
+    cond = false,
     event = "VeryLazy",
     version = "*",
     config = function() require("myrc.config.nvim-tree") end,
-  },
-  {
-    "nvim-telescope/telescope.nvim",
-    enabled = g.enabled_plugins.telescope == 1,
-    cmd = { "Telescope" },
-    dependencies = {
-      {
-        "nvim-telescope/telescope-ui-select.nvim",
-        "piersolenski/telescope-import.nvim",
-        {
-          "nvim-telescope/telescope-fzf-native.nvim",
-          enabled = vim.fn.executable("cmake") == 1,
-          build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
-        },
-      },
-    },
-    config = function() require("myrc.config.telescope") end,
   },
   {
     "allaman/emoji.nvim",
@@ -370,14 +282,14 @@ return {
     opts = {
       -- default is false
       enable_cmp_integration = true,
+      picker = { enabeld = true },
       -- optional if your plugin installation directory
       -- is not vim.fn.stdpath("data") .. "/lazy/
       plugin_path = g.VIMFILES .. "/lazy/",
     },
     config = function(_, opts)
       require("emoji").setup(opts)
-      local ts = require("telescope").load_extension("emoji")
-      vim.keymap.set("n", "<leader>se", ts.emoji, { desc = "[S]earch [E]moji" })
+      vim.keymap.set("n", "<leader>se", function() require("emoji").insert() end, { desc = "[S]earch [E]moji" })
     end,
   },
   {
@@ -392,3 +304,5 @@ return {
   },
   -- }}}
 }
+
+-- vim: et:fdm=marker:

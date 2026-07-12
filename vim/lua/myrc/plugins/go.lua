@@ -2,7 +2,7 @@ return {
   {
     "ray-x/go.nvim",
     ft = { "go", "gomod" },
-    enabled = vim.g.enabled_plugins.go == 1,
+    cond = vim.g.enabled_plugins.go == 1,
     dependencies = { "ray-x/guihua.lua" },
     config = function()
       local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})

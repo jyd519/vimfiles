@@ -57,7 +57,6 @@ end
 
 local spinner_symbols = { "🌑 ", "🌒 ", "🌓 ", "🌔 ", "🌕 ", "🌖 ", "🌗 ", "🌘 " }
 local ale_spinner = 0
-local _, hydra = pcall(require, "hydra.statusline")
 local default_sections = {
   lualine_a = { "mode" },
   lualine_b = {
@@ -65,6 +64,8 @@ local default_sections = {
     {
       -- Hydra.nvim
       function()
+        if package.loaded["hydra"] == nil then return "" end
+        local _, hydra = pcall(require, "hydra.statusline")
         if hydra and hydra.is_active() then return " " .. hydra.get_name() end
         return ""
       end,

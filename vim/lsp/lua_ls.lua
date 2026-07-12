@@ -23,6 +23,7 @@ local function get_lua_library()
   add("$VIMFILES/lazy/plenary.nvim/lua")
   add("$VIMFILES/lazy/nvim-cmp/lua")
   add("$VIMFILES/lazy/nvim-lspconfig/lua")
+  add("$VIMFILES/lazy/snacks.nvim/lua")
   -- TOO SLOW
   -- local paths = vim.api.nvim_get_runtime_file("", true)
   -- for _, p in pairs(paths) do

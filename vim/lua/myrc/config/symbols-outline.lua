@@ -1,3 +1,10 @@
+-- {{{2 Toggle Symbols Outline
+vim.keymap.set("n", "<leader>to", function()
+  local outline = require("outline")
+  outline.toggle_outline()
+end, { desc = "Toggle Symbols Outline" })
+--- }}}
+
 require("outline").setup({
   symbol_folding = {
     autofold_depth = 1,

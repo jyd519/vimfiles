@@ -3,6 +3,9 @@ return {
     "jyd519/neoformat",
     lazy = true,
     cmd = { "Neoformat" },
+    keys = {
+      { "<leader>F", ":Neoformat<CR>", desc = "Format the current buffer" },
+    },
     init = function()
       vim.g.neoformat_try_node_exe = 1
       vim.g.neoformat_basic_format_align = 1
@@ -19,8 +22,6 @@ return {
         stdin = 1,
       }
       vim.g.neoformat_cpp_clangformat = vim.g.neoformat_c_clangformat
-
-      vim.keymap.set("n", "<leader>F", ":Neoformat<CR>")
     end,
   },
 }

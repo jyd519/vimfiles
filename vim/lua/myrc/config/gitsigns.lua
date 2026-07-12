@@ -55,7 +55,7 @@ end
 gs.setup({
   current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
   on_attach = function(bufnr)
-    -- setupBufMapping(bufnr)
+    setupBufMapping(bufnr)
   end,
 })
 

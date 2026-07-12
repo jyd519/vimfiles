@@ -17,18 +17,15 @@ if env.DARK ~= nil then
 end
 
 vim.loader.enable()
-
--- load global variables
-vim.cmd('runtime config/globals.vim')
-
-if vim.g.vscode then
-   vim.g.did_load_filetypes = 1
+if g.vscode then
+   g.did_load_filetypes = 1
    require("myrc.vscode.plugins")
    require("myrc.vscode.setting")
 else
   require('myrc.options')
-  require('myrc.lazy')
   require('myrc.keymaps')
   require('myrc.autocmds')
+  require('myrc.commands')
+  require('myrc.lazy')
   require('myrc.utils.rg')
 end
