@@ -44,13 +44,6 @@ return {
           _G.dd = function(...) Snacks.debug.inspect(...) end
           _G.bt = function() Snacks.debug.backtrace() end
 
-          -- Override print to use snacks for `:=` command
-          if vim.fn.has("nvim-0.11") == 1 then
-            vim._print = function(_, ...) dd(...) end
-          else
-            vim.print = _G.dd
-          end
-
           Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
           Snacks.toggle.diagnostics():map("<leader>ud")
           Snacks.toggle.line_number():map("<leader>ul")

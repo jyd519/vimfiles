@@ -196,14 +196,7 @@ opt.tags = "./tags,tags,./.tags,.tags"
 -- emmet-vim
 g.user_emmet_leader_key = ","
 
-g.floaterm_shell = "pwsh.exe"
-
 -- markdown
-g.tex_conceal = ""
-g.vim_markdown_folding_disabled = 1
-g.vim_markdown_folding_style_pythonic = 1
-g.vim_markdown_conceal = 0
-g.vim_markdown_math = 1
 g.mdip_imgdir = "images"
 
 --- Enable OSC 52 for copying to system clipboard in SSH
