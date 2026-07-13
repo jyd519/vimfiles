@@ -1,5 +1,4 @@
 return {
-  -- Treesitter {{{1
   {
     "nvim-treesitter/nvim-treesitter",
     main = "nvim-treesitter",
@@ -108,12 +107,21 @@ return {
       })
     end,
   },
-  -- }}}
-  -- Treesitter Textobjects {{{1
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
     branch = "main",
     enabled = false,
   },
-  -- }}}
+  {
+    "Wansmer/treesj",
+    keys = { "<space>m", "<space>j", "<space>s" },
+    dependencies = { "nvim-treesitter/nvim-treesitter" }, -- if you install parsers with `nvim-treesitter`
+    config = function()
+      require("treesj").setup({
+        ---@type boolean Use default keymaps (<space>m - toggle, <space>j - join, <space>s - split)
+        use_default_keymaps = true,
+      })
+    end,
+  },
 }
+-- vim: set fdl=2 fdm=expr:

@@ -111,7 +111,12 @@ vim.keymap.set("v", "<leader>ec", ":AesEnc<cr>", { noremap = true })
 vim.keymap.set("n", "<leader>ed", ":AesDec<cr>", { noremap = true })
 
 -- fold
-
+for i = 0, 5 do
+  vim.keymap.set("n", "z" .. i, function()
+    vim.wo.foldlevel = i
+    vim.wo.foldenable = true
+  end, { noremap = true })
+end
 -- }}}
 
 -- Cancel search highlighting {{{2
