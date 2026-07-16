@@ -17,27 +17,40 @@ return {
         desc = "Toggle Codeium",
       },
     },
-    config = function()
+    init = function()
       vim.g.codeium_no_map_tab = 1
       vim.g.codeium_enabled = true
       vim.g.codeium_filetypes = { ["dap-repl"] = false }
-
-      local mapkey = require("keymap-amend")
-      vim.keymap.set("i", "<C-g>", function() return vim.fn["codeium#Accept"]() end, { expr = true, desc = "Accept Codeium" })
-      vim.keymap.set("i", "<C-;>", function() return vim.fn["codeium#CycleOrComplete"]() end, { expr = true, desc = "Trigger autocompletion" })
-      mapkey("i", "<C-j>", function(fallback)
-        if vim.b._codeium_completions ~= nil then
-          return vim.fn["codeium#Clear"]()
-        else
-          fallback()
-        end
-      end, { silent = true, desc = "Clear Codeium Completions" })
+    end,
+    config = function()
+      vim.keymap.set(
+        "i",
+        "<C-g>",
+        function() return vim.fn["codeium#Accept"]() end,
+        { expr = true, desc = "Accept Codeium" }
+      )
+      vim.keymap.set(
+        "i",
+        "<C-;>",
+        function() return vim.fn["codeium#CycleOrComplete"]() end,
+        { expr = true, desc = "Trigger autocompletion" }
+      )
+      local mapkey = prequire("keymap-amend")
+      if mapkey then
+        mapkey("i", "<C-j>", function(fallback)
+          if vim.b._codeium_completions ~= nil then
+            return vim.fn["codeium#Clear"]()
+          else
+            fallback()
+          end
+        end, { silent = true, desc = "Clear Codeium Completions" })
+      end
     end,
   },
   {
     "github/copilot.vim",
     enabled = false,
-    config = function()
+    init = function()
       vim.g.copilot_no_tab_map = true
       vim.g.copilot_assume_mapped = true
       vim.g.copilot_tab_fallback = ""
@@ -133,6 +146,17 @@ return {
             window = {
               position = "right",
               width = 0.50,
+            },
+          },
+          action_palette = {
+            width = 95,
+            height = 10,
+            prompt = "Prompt ", -- Prompt used for interactive LLM calls
+            provider = "default", -- Can be "default", "telescope", "fzf_lua", "mini_pick" or "snacks". If not specified, the plugin will autodetect installed providers.
+            opts = {
+              show_preset_actions = true, -- Show the preset actions in the action palette?
+              show_preset_prompts = true, -- Show the preset prompts in the action palette?
+              title = "CodeCompanion actions", -- The title of the action palette
             },
           },
         },
@@ -246,9 +270,7 @@ return {
                   chat_url = "/v1/chat/completions",
                 },
                 handlers = {
-                  form_parameters = function()
-                    return { model = "llama-3.3-70b-versatile" }
-                  end,
+                  form_parameters = function() return { model = "llama-3.3-70b-versatile" } end,
                 },
               })
             end,

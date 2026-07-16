@@ -48,7 +48,20 @@ return {
   { "tpope/vim-scriptease", lazy = true, cmd = "Breakadd" },
   -- }}}
   -- Basic plugins {{{2
-  { "anuvyklack/keymap-amend.nvim", layzy = true },
+  {
+    "anuvyklack/keymap-amend.nvim",
+    priority = 100,
+    config = function()
+      local amend = require("keymap-amend")
+      vim.keymap.amend = amend
+
+      -- Cancel search highlighting
+      amend("n", "<Esc>", function(original)
+        if vim.v.hlsearch and vim.v.hlsearch == 1 then vim.cmd("nohlsearch") end
+        original()
+      end, { desc = "Clear Search Highlight" })
+    end,
+  },
   { "doums/rg.nvim", cmd = { "Rg", "Rgf", "Rgp", "Rgfp" } },
   { "AndrewRadev/splitjoin.vim", event = "VeryLazy" },
   { "tmhedberg/matchit", event = "VeryLazy" },

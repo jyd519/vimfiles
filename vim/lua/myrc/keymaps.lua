@@ -1,7 +1,6 @@
 -- Globals {{{2
 local vim = vim
 local keymap = vim.keymap
-keymap.amend = prequire("keymap-amend")
 -- }}}
 
 -- General {{{2
@@ -119,13 +118,6 @@ for i = 0, 5 do
 end
 -- }}}
 
--- Cancel search highlighting {{{2
-if keymap.amend then
-  keymap.amend("n", "<Esc>", function(original)
-    if vim.v.hlsearch and vim.v.hlsearch == 1 then vim.cmd("nohlsearch") end
-    original()
-  end, { desc = "disable search highlight" })
-end
 -- }}}
 
 -- {{{2 Toggle Treesitter
@@ -206,7 +198,7 @@ local function show_documentation()
     elseif vim.fn.expand("%:t") == "Cargo.toml" then
       require("crates").show_popup()
     elseif filetype == "rust" then
-      vim.cmd("RustHoverActions")
+      vim.cmd.RustLsp { 'hover', 'range' }
     else
       vim.lsp.buf.hover()
     end

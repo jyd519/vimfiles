@@ -1,5 +1,5 @@
 return {
--- LSP Core {{{1
+  -- LSP Core {{{1
   {
     "neovim/nvim-lspconfig",
     -- event = { "BufReadPost", "BufNewFile" },
@@ -135,9 +135,7 @@ return {
           end
 
           -- codelens
-          if client.name == "lua_ls" then
-            vim.lsp.codelens.enable(false, { bufnr = bufnr })
-          end
+          if client.name == "lua_ls" then vim.lsp.codelens.enable(false, { bufnr = bufnr }) end
           if vim.fn.has("nvim-0.12") == 0 then
             if client:supports_method("textDocument/codeLens", bufnr) then
               vim.lsp.codelens.enable(true, { bufnr = bufnr })
@@ -194,16 +192,35 @@ return {
       })
       -- }}}
     end,
-    dependencies = {
-      -- TODO
-      -- { "folke/neodev.nvim", lazy = true },
-      { "mason-org/mason.nvim", cmd = "Mason", config = true },
-      { "mason-org/mason-lspconfig.nvim", opts = { automatic_enable = true } },
+  },
+  -- { "folke/neodev.nvim", lazy = true },
+  -- }}}
+
+  -- Mason {{{1
+  { "mason-org/mason.nvim", cmd = "Mason", config = true },
+  {
+    "mason-org/mason-lspconfig.nvim",
+    opts = {
+      automatic_enable = {
+        exclude = {
+          "rust_analyzer",
+        },
+      },
     },
   },
--- }}}
+  -- }}}
 
--- Outline {{{1
+  -- Lsp-notify {{{1
+  {
+    "mrded/nvim-lsp-notify",
+    config = function()
+      require("lsp-notify").setup({
+        notify = require("notify"),
+      })
+    end,
+  },
+  -- }}}
+  -- Outline {{{1
   {
     "hedyhli/outline.nvim",
     lazy = true,
@@ -243,9 +260,9 @@ return {
       })
     end,
   },
--- }}}
+  -- }}}
 
--- Clangd {{{1
+  -- Clangd {{{1
   {
     "p00f/clangd_extensions.nvim",
     ft = { "c", "cpp", "objc", "objcpp", "cuda", "proto" },
@@ -266,9 +283,9 @@ return {
       },
     },
   },
--- }}}
+  -- }}}
 
--- Other LSP plugins {{{1
+  -- Other LSP plugins {{{1
   { "b0o/schemastore.nvim", lazy = true },
   { "pearofducks/ansible-vim", ft = { "yaml", "ansible", "ansible_hosts" } },
   {
@@ -280,6 +297,6 @@ return {
       vim.keymap.set("n", "];", dropbar_api.select_next_context, { desc = "Select next context" })
     end,
   },
--- }}}
+  -- }}}
 }
 -- vim: set fdm=marker fdl=0:

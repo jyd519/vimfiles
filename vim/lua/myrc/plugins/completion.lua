@@ -1,10 +1,8 @@
 local g = vim.g
 
 return {
--- LuaSnip {{{1
   {
     "L3MON4D3/LuaSnip",
-    lazy = true,
     dependencies = {
       { "rafamadriz/friendly-snippets" },
       { "honza/vim-snippets" },
@@ -20,14 +18,9 @@ return {
       -- require("luasnip.loaders.from_snipmate").lazy_load()
       require("luasnip.loaders.from_snipmate").lazy_load({ paths = vim.fn.expand("$VIMFILES/mysnippets/snippets") })
 
-      -- luasnip format
-      ---@diagnostic disable-next-line: missing-parameter
-      -- require("luasnip.loaders.from_lua").lazy_load({ paths = vim.fn.expand("$VIMFILES/mysnippets/luasnippets") })
-
       luasnip.filetype_extend("all", { "_" })
       luasnip.filetype_extend("typescript", { "javascript" })
 
-      -- Commands {{{2
       vim.api.nvim_create_user_command(
         "ReloadSnippet",
         function()
@@ -35,16 +28,6 @@ return {
         end,
         { nargs = 0 }
       )
-
-      -- vim.api.nvim_create_user_command("EditLuaSnippet", function(args)
-      --   local typ = args.args
-      --   if typ == "" then typ = vim.bo.filetype end
-      --   if typ == "" then typ = "all" end
-      --   local _, dot = string.find(typ, "%.")
-      --   if dot ~= nil then typ = string.sub(typ, dot + 1, -1) end
-      --   local snippet_file = vim.fn.expand("$VIMFILES/mysnippets/luasnippets/" .. typ .. ".lua")
-      --   vim.cmd("e " .. snippet_file)
-      -- end, { nargs = "?" })
 
       vim.api.nvim_create_user_command("EditSnippet", function(args)
         local typ = args.args
@@ -56,14 +39,8 @@ return {
         vim.cmd("e " .. snippet_file)
       end, { nargs = "?" })
 
-      -- }}}
-
-      -- Virtual Text {{{2
       local types = require("luasnip.util.types")
-      luasnip.config.set_config({
-        -- history = true, --keep around last snippet local to jump back
-        updateevents = "TextChanged,TextChangedI", --update changes as you type
-        -- enable_autosnippets = true,
+      luasnip.config.setup({
         ext_opts = {
           [types.choiceNode] = {
             active = {
@@ -76,26 +53,17 @@ return {
             },
           },
         },
-      }) --}}}
-
-      -- Key Mapping --{{{2
-      -- vim.cmd(
-      --   [[autocmd BufEnter */mysnippets/luasnippets/*.lua nnoremap <silent> <buffer> <CR> /-- End SNIPPETS --<CR>kI<Esc>O]]
-      -- )
+      })
     end,
   },
--- }}}
 
--- UltiSnips {{{1
   {
     "SirVer/ultisnips",
     lazy = true,
-    enabled = g.enabled_plugins.python == 1 and vim.fn.has("python3") == 1,
+    enabled = false,
     event = { "BufReadPost", "BufNewFile" },
   },
--- }}}
 
--- nvim-cmp {{{1
   {
     "hrsh7th/nvim-cmp",
     event = "VeryLazy",
@@ -406,6 +374,4 @@ return {
       -- }}}
     end,
   },
--- }}}
 }
--- vim: set fdm=marker fdl=1:

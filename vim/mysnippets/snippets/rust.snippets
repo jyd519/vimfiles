@@ -3,13 +3,13 @@ snippet error "custom error type"
 		#[derive(Debug)]
 		enum $1 {
 				/// Represents an empty source. For example, an empty text file being given
-				/// as input to `count_words()`.
+				/// as input to \`count_words()\`.
 				EmptySource,
 
 				/// Represents a failure to read from input.
 				ReadError { source: std::io::Error },
 
-				/// Represents all other cases of `std::io::Error`.
+				/// Represents all other cases of \`std::io::Error\`.
 				IOError(std::io::Error),
 		}
 

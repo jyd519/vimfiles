@@ -2,11 +2,10 @@ return {
 -- Lualine {{{1
   {
     "nvim-lualine/lualine.nvim",
-    -- event = "VeryLazy",
+    event = "VeryLazy",
     dependencies = {
       -- The icon font for Visual Studio Code
       { "ChristianChiarulli/neovim-codicons", lazy = true },
-      { "arkav/lualine-lsp-progress" },
     },
     init = function()
       vim.g.lualine_laststatus = vim.o.laststatus
@@ -30,15 +29,25 @@ return {
         end
       end
 
-      local function codecompanion_adapter_name()
-        local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
-        if not chat then return nil end
+      -- Cache chat lookup to avoid duplicate buf_get_chat calls per refresh
+      local _chat_cache_buf, _chat_cache
+      local function get_codecompanion_chat()
+        local buf = vim.api.nvim_get_current_buf()
+        if _chat_cache_buf ~= buf then
+          _chat_cache_buf = buf
+          _chat_cache = require("codecompanion").buf_get_chat(buf)
+        end
+        return _chat_cache
+      end
 
+      local function codecompanion_adapter_name()
+        local chat = get_codecompanion_chat()
+        if not chat then return nil end
         return chat.adapter.formatted_name
       end
 
       local function codecompanion_current_model_name()
-        local chat = require("codecompanion").buf_get_chat(vim.api.nvim_get_current_buf())
+        local chat = get_codecompanion_chat()
         if not chat then return nil end
         return chat.settings.model
       end
@@ -49,34 +58,11 @@ return {
         return "🔨 " .. mod.get_selected_env()
       end
 
-      local group = vim.api.nvim_create_augroup("CodeCompanionHooks", {})
-      local ai_processing = false
-      local ai_spinner_symbols = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
-
-      local ai_spinner_index = 1
-      vim.api.nvim_create_autocmd({ "User" }, {
-        pattern = "CodeCompanionRequest*",
-        group = group,
-        callback = function(request)
-          if request.match == "CodeCompanionRequestStarted" then
-            ai_processing = true
-          elseif request.match == "CodeCompanionRequestFinished" then
-            ai_processing = false
-          end
-        end,
-      })
-
-      local function ai_status()
-        if ai_processing then
-          ai_spinner_index = (ai_spinner_index % #ai_spinner_symbols) + 1
-          return ai_spinner_symbols[ai_spinner_index]
-        else
-          return ""
-        end
-      end
-
-      local spinner_symbols = { "🌑 ", "🌒 ", "🌓 ", "🌔 ", "🌕 ", "🌖 ", "🌗 ", "🌘 " }
+      local ale_spinner_symbols = { "🌑 ", "🌒 ", "🌓 ", "🌔 ", "🌕 ", "🌖 ", "🌗 ", "🌘 " }
       local ale_spinner = 0
+      local _ale_checking = false
+      local _ale_check_time = 0
+      local _hydra_statusline
       local default_sections = {
         lualine_a = { "mode" },
         lualine_b = {
@@ -85,8 +71,13 @@ return {
             -- Hydra.nvim
             function()
               if package.loaded["hydra"] == nil then return "" end
-              local _, hydra = pcall(require, "hydra.statusline")
-              if hydra and hydra.is_active() then return " " .. hydra.get_name() end
+              if _hydra_statusline == nil then
+                local ok, mod = pcall(require, "hydra.statusline")
+                if ok then _hydra_statusline = mod end
+              end
+              if _hydra_statusline and _hydra_statusline.is_active() then
+                return " " .. _hydra_statusline.get_name()
+              end
               return ""
             end,
             color = { bg = "red", fg = "white" },
@@ -98,10 +89,15 @@ return {
           },
           {
             function()
-              local ok, data = pcall(vim.fn["ale#engine#IsCheckingBuffer"], vim.api.nvim_get_current_buf())
-              if ok and data == 1 then
-                ale_spinner = (ale_spinner + 1) % #spinner_symbols
-                return spinner_symbols[ale_spinner] .. "Checking ..."
+              local now = vim.uv.now()
+              if now - _ale_check_time > 500 then
+                _ale_check_time = now
+                local ok, data = pcall(vim.fn["ale#engine#IsCheckingBuffer"], vim.api.nvim_get_current_buf())
+                _ale_checking = (ok and data == 1)
+              end
+              if _ale_checking then
+                ale_spinner = (ale_spinner % #ale_spinner_symbols) + 1
+                return ale_spinner_symbols[ale_spinner] .. "Checking ..."
               end
               return ""
             end,
@@ -127,7 +123,6 @@ return {
               newfile = "[New]", -- Text to show for newly created file before first write
             },
           },
-          "lsp_progress",
         },
         lualine_x = {
           "encoding",
@@ -138,18 +133,8 @@ return {
         lualine_z = { "location" },
       }
 
-      -- Deep copy function for tables (simplified for this use case)
-      local function deep_copy(t)
-        if type(t) ~= "table" then return t end
-        local new_t = {}
-        for k, v in pairs(t) do
-          new_t[k] = deep_copy(v)
-        end
-        return new_t
-      end
-
       -- Create the http sections based on default and then modify
-      local http_lualine_sections = deep_copy(default_sections)
+      local http_lualine_sections = vim.deepcopy(default_sections)
       table.insert(http_lualine_sections.lualine_x, 1, kuala_env) -- Insert "kulala" at the beginning
 
       require("lualine").setup({
@@ -174,9 +159,6 @@ return {
               lualine_c = {
                 codecompanion_current_model_name,
               },
-              lualine_x = {
-                { ai_status, color = { fg = "white" } },
-              },
               lualine_y = {
                 "progress",
               },
@@ -190,9 +172,6 @@ return {
                 codecompanion_adapter_name,
               },
               lualine_c = {},
-              lualine_x = {
-                { ai_status, color = { fg = "white" } },
-              },
               lualine_y = {
                 "progress",
               },
