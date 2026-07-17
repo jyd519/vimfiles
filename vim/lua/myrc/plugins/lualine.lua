@@ -1,5 +1,4 @@
 return {
--- Lualine {{{1
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
@@ -18,6 +17,19 @@ return {
       end
     end,
     config = function()
+      if vim.g.neocodeium_enable ~= nil then
+        vim.api.nvim_create_autocmd("User", {
+          pattern = {
+            "NeoCodeiumServer*",
+            "NeoCodeiumEnabled",
+            "NeoCodeiumDisabled",
+          },
+          callback = function()
+            require("lualine").refresh()
+          end,
+        })
+      end
+
       local function diff_source()
         local gitsigns = vim.b.gitsigns_status_dict
         if gitsigns then
@@ -123,6 +135,10 @@ return {
               newfile = "[New]", -- Text to show for newly created file before first write
             },
           },
+          {
+            require("myrc.utils.lualine.neocodeium").component,
+            color = { fg = "#ffff00" },
+          },
         },
         lualine_x = {
           "encoding",
@@ -186,6 +202,4 @@ return {
       })
     end,
   },
--- }}}
 }
--- vim: set fdm=marker fdl=1:

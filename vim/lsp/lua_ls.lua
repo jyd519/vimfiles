@@ -21,7 +21,7 @@ local function get_lua_library()
 
   -- add plugins
   add("$VIMFILES/lazy/plenary.nvim/lua")
-  add("$VIMFILES/lazy/nvim-cmp/lua")
+  add("$VIMFILES/lazy/blink.cmp/lua")
   add("$VIMFILES/lazy/nvim-lspconfig/lua")
   add("$VIMFILES/lazy/snacks.nvim/lua")
   -- TOO SLOW

@@ -26,5 +26,14 @@ return {
     cond = vim.g.enabled_plugins.rust == 1,
     lazy = false,
   },
-  { "saecki/crates.nvim", config = true, ft = { "toml" } },
+  {
+    "saecki/crates.nvim",
+    ft = { "toml" },
+    opts = {
+      completion = {
+        cmp = { enabled = false },
+        blink = { enabled = true },
+      },
+    },
+  },
 }

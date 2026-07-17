@@ -73,6 +73,9 @@ return {
   {
     "kylechui/nvim-surround",
     event = "VeryLazy",
+    init = function()
+      vim.g.nvim_surround_no_insert_mappings = true
+    end,
     opts = {
       indent_lines = false,
       surrounds = {

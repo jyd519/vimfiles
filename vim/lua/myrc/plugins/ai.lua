@@ -1,24 +1,42 @@
 return {
   {
+    "monkoose/neocodeium",
+    event = "VeryLazy",
+    init = function() vim.g.neocodeium_enable = true end,
+    config = function()
+      local neocodeium = require("neocodeium")
+      local map = vim.keymap.set
+      neocodeium.setup({
+        filter = function(bufnr)
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
+          if vim.endswith(bufname, ".env") or vim.startswith(bufname, ".env") then return false end
+          return true
+        end,
+      })
+      map("i", "<C-g>", neocodeium.accept, { desc = "Accept Suggestions" })
+      map("i", "<C-;>", neocodeium.cycle_or_complete, { desc = "Trigger Suggestions" })
+      map("i", "<A-w>", neocodeium.accept_word, { desc = "Accept Word" })
+      map("i", "<A-a>", neocodeium.accept_line, { desc = "Accept Line" })
+      local mapkey = prequire("keymap-amend")
+      if mapkey then
+        mapkey("i", "<C-j>", function(fallback)
+          if neocodeium.visible() then
+            neocodeium.clear()
+          else
+            fallback()
+          end
+        end, { silent = true, desc = "Clear Codeium Completions" })
+      end
+    end,
+  },
+  {
     "Exafunction/windsurf.vim",
     event = { "BufEnter" },
-    keys = {
-      {
-        "<leader>ait",
-        function()
-          if not vim.fn["codeium#Enabled"]() then
-            vim.cmd("CodeiumEnable")
-            vim.defer_fn(function() vim.notify("Codeium enabled", vim.log.levels.INFO, { title = "Codeium" }) end, 100)
-          else
-            vim.cmd("CodeiumDisable")
-            vim.defer_fn(function() vim.notify("Codeium disabled", vim.log.levels.WARN, { title = "Codeium" }) end, 100)
-          end
-        end,
-        desc = "Toggle Codeium",
-      },
-    },
+    cond = false,
     init = function()
+      vim.g.windsurf_vim_enable = true
       vim.g.codeium_no_map_tab = 1
+      vim.g.codeium_disable_bindings = 1
       vim.g.codeium_enabled = true
       vim.g.codeium_filetypes = { ["dap-repl"] = false }
     end,
@@ -33,7 +51,7 @@ return {
         "i",
         "<C-;>",
         function() return vim.fn["codeium#CycleOrComplete"]() end,
-        { expr = true, desc = "Trigger autocompletion" }
+        { desc = "Trigger autocompletion" }
       )
       local mapkey = prequire("keymap-amend")
       if mapkey then

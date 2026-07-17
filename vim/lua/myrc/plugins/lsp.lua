@@ -111,7 +111,20 @@ return {
         callback = function(event)
           local client = vim.lsp.get_client_by_id(event.data.client_id)
           local bufnr = event.buf
+          local bufname = vim.api.nvim_buf_get_name(bufnr)
           if client == nil then return end
+
+          -- 检测如果是 diffview 或 fugitive 的 buffer，直接断开所有挂载的 LSP client
+          if bufname:match("diffview://") or bufname:match("fugitive://") then
+            vim.schedule(function()
+              if vim.api.nvim_buf_is_valid(bufnr) then
+                -- 禁用该缓冲区的诊断
+                vim.diagnostic.enable(false, { bufnr = bufnr })
+                -- 强制卸载刚刚附加的 LSP client
+                vim.lsp.buf_detach_client(bufnr, event.data.client_id)
+              end
+            end)
+          end
 
           setup_keymapping(client, bufnr)
 

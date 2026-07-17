@@ -14,7 +14,7 @@ autocmd("TextYankPost", {
   callback = function() vim.highlight.on_yank() end,
 })
 
--- Handling large file{{{2
+-- Handling large file
 -- https://www.reddit.com/r/neovim/comments/z85s1l/disable_lsp_for_very_large_files/
 autocmd({ "BufReadPre" }, {
   group = augroup("large_buf"),
@@ -44,14 +44,28 @@ autocmd({ "BufReadPre" }, {
   end,
   pattern = "*",
 })
--- }}}
 
---- Close terminal with <q> {{{2
+--- Close terminal with <q>
 autocmd("TermOpen", {
   group = vimrc,
   callback = function() vim.keymap.set("n", "q", "<c-w>c", { buffer = true, noremap = true }) end,
 })
--- }}}
+
+-- Close some filetypes with <q>
+autocmd("FileType", {
+  group = augroup("close_with_q"),
+  -- stylua: ignore start
+  pattern = {
+    "PlenaryTestPopup", "help", "lspinfo", "man",
+    "notify", "qf", "query", -- :InspectTree
+    "spectre_panel", "startuptime", "tsplayground",
+  },
+  -- stylua: ignore end
+  callback = function(event)
+    vim.bo[event.buf].buflisted = false
+    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
+  end,
+})
 
 -- Auto switching IME
 if vim.fn.has("mac") == 1 and vim.fn.executable("im-select") == 1 then
@@ -65,35 +79,14 @@ if vim.fn.has("mac") == 1 and vim.fn.executable("im-select") == 1 then
   })
 end
 
--- Close some filetypes with <q> {{{2
-autocmd("FileType", {
-  group = augroup("close_with_q"),
-  pattern = {
-    "PlenaryTestPopup",
-    "help",
-    "lspinfo",
-    "man",
-    "notify",
-    "qf",
-    "query", -- :InspectTree
-    "spectre_panel",
-    "startuptime",
-    "tsplayground",
-  },
-  callback = function(event)
-    vim.bo[event.buf].buflisted = false
-    vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
-  end,
-})
--- }}}
-
 -- Strip trailing spaces before write
 autocmd({ "BufWritePre" }, {
   group = augroup("strip_space"),
-  pattern = { "python", "c", "cpp", "sh", "javascript", "typescript" },
+  pattern = { "python", "c", "cpp", "sh", "javascript", "typescript", "go", },
   callback = function() vim.cmd([[ %s/\s\+$//e ]]) end,
 })
 
+-- Highlight trailing spaces
 autocmd({ "FileType" }, {
   group = augroup("strip_space_hl"),
   pattern = { "python", "c", "sh", "javascript", "typescript", "vim", "lua" },
@@ -113,5 +106,3 @@ autocmd({ "BufWritePre" }, {
     -- end
   end,
 })
-
--- vim: set fdm=marker fdl=1: }}}

@@ -17,6 +17,7 @@ local vue_plugin = {
 }
 
 return {
+  ---@type lspconfig.settings.vtsls
   settings = {
     vtsls = {
       tsserver = {

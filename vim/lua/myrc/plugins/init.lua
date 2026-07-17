@@ -175,7 +175,7 @@ return {
     ft = { "markdown", "typescript", "text", "lua" }, -- adjust to your needs
     opts = {
       -- default is false
-      enable_cmp_integration = true,
+      enable_cmp_integration = false,
       picker = { enabeld = true },
       -- optional if your plugin installation directory
       -- is not vim.fn.stdpath("data") .. "/lazy/
