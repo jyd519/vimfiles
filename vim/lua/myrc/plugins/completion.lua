@@ -59,16 +59,14 @@ return {
   {
     "SirVer/ultisnips",
     lazy = true,
-    config = function()
-      vim.keymap.set({ "i", "s" }, "<C-l>", "<C-R>=UltiSnips#ListSnippets()<CR>", { silent = true })
-    end,
+    config = function() vim.keymap.set({ "i", "s" }, "<C-l>", "<C-R>=UltiSnips#ListSnippets()<CR>", { silent = true }) end,
     event = { "BufReadPost", "BufNewFile" },
   },
 
   {
     "saghen/blink.cmp",
     event = "VeryLazy",
-    version = '1.*',
+    version = "1.*",
     dependencies = {
       { "saghen/blink.lib" },
     },
@@ -248,21 +246,37 @@ return {
         },
 
         sources = {
-          default = { "lsp", "snippets", "path", "buffer", },
+          default = { "lsp", "snippets", "path", "buffer" },
           providers = {
             lsp = { max_items = 20 },
-            -- codeium = { name = 'Codeium', module = 'codeium.blink', async = true },
+            -- cmdline = {
+            --   min_keyword_length = function(ctx)
+            --     -- when typing a command, only show when the keyword is 3 characters or longer
+            --     if ctx.mode == 'cmdline' and string.find(ctx.line, ' ') == nil then return 3 end
+            --     return 0
+            --   end
+            -- },
           },
         },
         cmdline = {
           keymap = {
             ["<Tab>"] = { "accept" },
-            ["<CR>"] = { "accept_and_enter", "fallback" },
+            ["<C-y>"] = { "accept_and_enter", "fallback" },
           },
-          completion = { menu = { auto_show = true } },
+          completion = {
+            list = {
+              selection = {
+                preselect = true,
+                auto_insert = true,
+              },
+            },
+            menu = { auto_show = true },
+          },
         },
         fuzzy = { implementation = "rust" },
       })
     end,
   },
 }
+
+-- vim:set et sw=1 ts=2 fdl=2:

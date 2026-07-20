@@ -3,8 +3,7 @@ return {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     dependencies = {
-      -- The icon font for Visual Studio Code
-      { "ChristianChiarulli/neovim-codicons", lazy = true },
+      { "nvim-tree/nvim-web-devicons", lazy = true },
     },
     init = function()
       vim.g.lualine_laststatus = vim.o.laststatus
@@ -17,19 +16,6 @@ return {
       end
     end,
     config = function()
-      if vim.g.neocodeium_enable ~= nil then
-        vim.api.nvim_create_autocmd("User", {
-          pattern = {
-            "NeoCodeiumServer*",
-            "NeoCodeiumEnabled",
-            "NeoCodeiumDisabled",
-          },
-          callback = function()
-            require("lualine").refresh()
-          end,
-        })
-      end
-
       local function diff_source()
         local gitsigns = vim.b.gitsigns_status_dict
         if gitsigns then
@@ -136,8 +122,7 @@ return {
             },
           },
           {
-            require("myrc.utils.lualine.neocodeium").component,
-            color = { fg = "#ffff00" },
+            "neocodeium", color = { fg = "green" }
           },
         },
         lualine_x = {

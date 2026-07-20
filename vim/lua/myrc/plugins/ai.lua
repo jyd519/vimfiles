@@ -12,6 +12,14 @@ return {
           if vim.endswith(bufname, ".env") or vim.startswith(bufname, ".env") then return false end
           return true
         end,
+        silent = true,
+        filetypes = {
+            help = false,
+            gitcommit = false,
+            gitrebase = false,
+            markdown = false,
+            ["."] = false,
+        },
       })
       map("i", "<C-g>", neocodeium.accept, { desc = "Accept Suggestions" })
       map("i", "<C-;>", neocodeium.cycle_or_complete, { desc = "Trigger Suggestions" })
