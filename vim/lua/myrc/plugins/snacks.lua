@@ -22,6 +22,11 @@ return {
       layout = {
         width = 0.9,
       },
+      notifier = {
+        enabled = true,
+        timeout = 3000, -- timeout in ms
+        style = "fancy", -- options: "compact", "minimal", or "fancy" (resembles nvim-notify)
+      },
       picker = {
         layout = {
           cycle = true,

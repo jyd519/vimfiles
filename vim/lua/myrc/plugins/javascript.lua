@@ -15,7 +15,7 @@ return {
     end,
   },
 
-  { "mattn/emmet-vim", ft = { "html", "jsx", "vue", "javascriptreact", "javascript", "css", "scss" } },
+  { "mattn/emmet-vim", lazy=true, ft = { "html", "jsx", "vue", "javascriptreact", "javascript", "css", "scss" } },
 
   {
     "axelvc/template-string.nvim",

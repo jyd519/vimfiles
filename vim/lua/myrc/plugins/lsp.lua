@@ -217,6 +217,7 @@ return {
       automatic_enable = {
         exclude = {
           "rust_analyzer",
+          "markdown-oxide",
         },
       },
     },
@@ -226,6 +227,7 @@ return {
   -- Lsp-notify {{{1
   {
     "mrded/nvim-lsp-notify",
+    enabled = false,
     config = function()
       require("lsp-notify").setup({
         notify = require("notify"),

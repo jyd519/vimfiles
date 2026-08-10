@@ -193,9 +193,6 @@ end
 -- and looking up and up until /
 opt.tags = "./tags,tags,./.tags,.tags"
 
--- emmet-vim
-g.user_emmet_leader_key = ","
-
 -- markdown
 g.mdip_imgdir = "images"
 
