@@ -8,8 +8,8 @@ local keymap = vim.keymap
 vim.keymap.set("i", "<C-Return>", '<CR><CR><C-o>k<Tab>"', { noremap = true })
 
 -- Quick editing myvimrc
-vim.keymap.set("n", "<leader>ei", ":e! <C-r>=g:myinitrc<CR><CR>", { noremap = true })
-vim.keymap.set("n", "<leader>ev", ":e! $MYVIMRC<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>ei", ":e! $MYVIMRC<CR>", { noremap = true })
+vim.keymap.set("n", "<leader>ev", ":e! <C-r>=g:myinitrc<CR><CR>", { noremap = true })
 vim.keymap.set("n", "<leader>ss", ":source %<cr>", { noremap = true })
 
 -- Move to window using the <ctrl> hjkl keys
@@ -95,11 +95,6 @@ keymap.set(
   function() vim.fn["qf#ToggleLocationList"]() end,
   { silent = true, noremap = true, desc = "Toggle Location List" }
 )
-
--- enable osc52 copying for remote ssh connection
-if vim.env.SSH_CONNECTION ~= "" and vim.g.is_vim then
-  vim.keymap.set("n", "<leader>y", "<Plug>OSCYankVisual", { noremap = true })
-end
 
 -- Font zoom in/out
 vim.keymap.set("n", "<C-=>", function() vim.fn["zoom#ZoomIn"]() end, { silent = true, noremap = true })
@@ -373,6 +368,26 @@ vim.api.nvim_create_user_command("CopyFileName", function()
   local path = vim.fn.expand("%:t")
   copy_to_clipboard(path, 'Copied "' .. path .. '" to the clipboard!')
 end, {})
+
+
+-- 复制路径（relative / absolute）
+local function copy_path(rel, is_visual)
+  local path = rel and vim.fn.expand('%') or vim.fn.expand('%:p')
+  if is_visual then
+    local start = vim.fn.line("'<")
+    local finish = vim.fn.line("'>")
+    if start > finish then start, finish = finish, start end
+    path = string.format("%s:L%d-%d", path, start, finish)
+  end
+  vim.fn.setreg('+', path)
+  print("已复制: " .. path)
+end
+
+vim.keymap.set('n', '<leader>yr', function() copy_path(true, false) end, { desc = "复制相对路径" })
+vim.keymap.set('n', '<leader>ya', function() copy_path(false, false) end, { desc = "复制绝对路径" })
+vim.keymap.set('x', '<leader>yr', function() copy_path(true, true) end, { desc = "复制相对路径+行范围" })
+vim.keymap.set('x', '<leader>ya', function() copy_path(false, true) end, { desc = "复制绝对路径+行范围" })
+
 
 -- FloatTerm{{{2
 keymap.set(

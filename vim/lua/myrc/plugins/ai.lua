@@ -14,11 +14,11 @@ return {
         end,
         silent = true,
         filetypes = {
-            help = false,
-            gitcommit = false,
-            gitrebase = false,
-            markdown = false,
-            ["."] = false,
+          help = false,
+          gitcommit = false,
+          gitrebase = false,
+          markdown = false,
+          ["."] = false,
         },
       })
       map("i", "<C-g>", neocodeium.accept, { desc = "Accept Suggestions" })
@@ -88,12 +88,19 @@ return {
       "CodeCompanion",
       "CodeCompanionCmd",
       "CodeCompanionChat",
+      "CodeCompanionCLI",
       "CodeCompanionActions",
       "AIConfig",
     },
     keys = {
       { "<leader>aa", "<cmd>CodeCompanionChat Toggle<cr>", desc = "Code Companion Chat" },
       { "<leader>ae", function() require("codecompanion").prompt("explain") end, mode = "v", desc = "Explain code" },
+      {
+        "<leader>ac",
+        function() require("codecompanion").cli("#{this}", { focus = false }) end,
+        mode = { "n", "v" },
+        desc = "Add context to the CLI agent",
+      },
       { "<leader>al", "<cmd>CodeCompanionActions<cr>", mode = { "n", "v" }, desc = "AI Actions" },
       { "<leader>am", "<cmd>CodeCompanionChat Add<cr>", mode = "v", desc = "AI Chat Add" },
     },
@@ -169,53 +176,46 @@ return {
         },
         display = {
           chat = {
-            window = {
-              position = "right",
-              width = 0.50,
-            },
+            -- show_settings = true,  -- 启用后无法`ga`修改adapter
+            window = { position = "right", width = 0.50 },
           },
           action_palette = {
-            width = 95,
-            height = 10,
-            prompt = "Prompt ", -- Prompt used for interactive LLM calls
+            prompt = "Prompt ",
             provider = "default", -- Can be "default", "telescope", "fzf_lua", "mini_pick" or "snacks". If not specified, the plugin will autodetect installed providers.
             opts = {
-              show_preset_actions = true, -- Show the preset actions in the action palette?
-              show_preset_prompts = true, -- Show the preset prompts in the action palette?
-              title = "CodeCompanion actions", -- The title of the action palette
+              show_preset_actions = true,
+              show_preset_prompts = true,
             },
           },
         },
-        strategies = {
-          chat = { adapter = "deepseek" },
-          inline = {
-            adapter = "deepseek",
-            keymaps = {
-              accept_change = {
-                modes = { n = "ga" },
-                description = "Accept the suggested change",
-              },
-              reject_change = {
-                modes = { n = "gr" },
-                description = "Reject the suggested change",
+        interactions = {
+          cli = {
+            agent = "opencode",
+            agents = {
+              opencode = {
+                cmd = "opencode",
+                args = {},
+                description = "Open Code CLI",
+                provider = "terminal",
               },
             },
           },
+          chat = { adapter = "deepseek" },
+          inline = { adapter = "deepseek" },
           agent = { adapter = "deepseek" },
         },
         adapters = {
           http = {
             opts = {
-              show_model_choices = true,
-              show_defaults = false,
               allow_insecure = true,
+              show_presets = false,
             },
             gemini = function()
               local api_key = check_api_key("gemini_key")
               if not api_key then return nil end
               return require("codecompanion.adapters").extend("gemini", {
                 env = { api_key = api_key },
-                schema = { model = { default = "gemini-2.5-flash" } },
+                schema = { model = { default = "gemini-3.5-flash" } },
               })
             end,
             deepseek = function()
@@ -285,48 +285,11 @@ return {
                 },
               })
             end,
-            groq = function()
-              local api_key = check_api_key("groq_key")
-              if not api_key then return nil end
-              return require("codecompanion.adapters").extend("openai_compatible", {
-                formatted_name = "Groq",
-                env = {
-                  url = "https://api.groq.com/openai",
-                  api_key = api_key,
-                  chat_url = "/v1/chat/completions",
-                },
-                handlers = {
-                  form_parameters = function() return { model = "llama-3.3-70b-versatile" } end,
-                },
-              })
-            end,
             tavily = function()
               local api_key = check_api_key("tavily_key")
               if not api_key then return nil end
               return require("codecompanion.adapters").extend("tavily", {
                 env = { api_key = api_key },
-              })
-            end,
-          },
-          acp = {
-            opts = {},
-            gemini_cli = function()
-              return require("codecompanion.adapters").extend("gemini_cli", {
-                commands = {
-                  default = {
-                    "gemini",
-                    "--experimental-acp",
-                    "--proxy",
-                    default_proxy,
-                  },
-                  yolo = {
-                    "gemini",
-                    "--yolo",
-                    "--experimental-acp",
-                    "--proxy",
-                    default_proxy,
-                  },
-                },
               })
             end,
           },
@@ -350,7 +313,7 @@ return {
                 "-y",
                 "@upstash/context7-mcp@latest",
                 "--api-key",
-                "ctx7sk-d036a870-7911-454f-82c4-bf1de82c0ef1",
+                vim.g.context7_key,
               },
             },
           },

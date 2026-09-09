@@ -5,83 +5,9 @@ return {
     branch = "main",
     config = function()
       local treesitter = require("nvim-treesitter")
-
-      ---@diagnostic disable-next-line: missing-fields
-      treesitter.setup({
-        sync_install = false,
-        auto_install = false,
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<leader>gnn",
-            node_incremental = "<leader>grn",
-            scope_incremental = "<leader>grc",
-            node_decremental = "<leader>grm",
-          },
-        },
-        refactor = {
-          highlight_definitions = { enable = true },
-          highlight_current_scope = { enable = true },
-          smart_rename = {
-            enable = true,
-            keymaps = {
-              smart_rename = "grr",
-            },
-          },
-        },
-        textobjects = {
-          move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start = {
-              ["]]"] = "@jsx.element",
-              ["]f"] = "@function.outer",
-              ["]m"] = "@class.outer",
-            },
-            goto_next_end = {
-              ["]F"] = "@function.outer",
-              ["]M"] = "@class.outer",
-            },
-            goto_previous_start = {
-              ["[["] = "@jsx.element",
-              ["[f"] = "@function.outer",
-              ["[m"] = "@class.outer",
-            },
-            goto_previous_end = {
-              ["[F"] = "@function.outer",
-              ["[M"] = "@class.outer",
-            },
-          },
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-              ["as"] = { query = "@local.scope", query_group = "locals", desc = "Select language scope" },
-            },
-            selection_modes = {
-              ["@parameter.outer"] = "v",
-              ["@function.outer"] = "V",
-              ["@class.outer"] = "<c-v>",
-            },
-            include_surrounding_whitespace = true,
-          },
-          swap = {
-            enable = true,
-            swap_next = {
-              ["<leader>sn"] = "@parameter.inner",
-            },
-            swap_previous = {
-              ["<leader>sN"] = "@parameter.inner",
-            },
-          },
-        },
-      })
-
+      treesitter.setup({})
       vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "bash", "sh", "python", "javascript", "typescript", "c", "cpp", "markdown", "go", "lua", "rust" },
         callback = function()
           local ft = vim.bo.filetype
           if ft == "" then return end
@@ -90,13 +16,15 @@ return {
           local ok, parser = pcall(vim.treesitter.language.add, ft)
           if not ok then return end
 
+          pcall(vim.treesitter.start)
+
           -- 分别检查 folds 和 indents 查询是否存在
           local has_folds = pcall(vim.treesitter.query.get, ft, "folds")
           local has_indents = pcall(vim.treesitter.query.get, ft, "indents")
 
           if has_folds then
-            vim.opt_local.foldmethod = "expr"
-            vim.opt_local.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+            vim.wo.foldmethod = "expr"
+            vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()"
           else
             vim.opt_local.foldmethod = "indent"
             vim.opt_local.foldexpr = ""
@@ -108,9 +36,16 @@ return {
     end,
   },
   {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    branch = "main",
-    enabled = false,
+    "nvim-treesitter/nvim-treesitter-context",
+    config = function()
+      require("treesitter-context").setup()
+      vim.keymap.set(
+        "n",
+        "[c",
+        function() require("treesitter-context").go_to_context(vim.v.count1) end,
+        { silent = true }
+      )
+    end,
   },
   {
     "Wansmer/treesj",

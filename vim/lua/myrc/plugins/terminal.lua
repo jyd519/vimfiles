@@ -11,6 +11,7 @@ return {
         direction  = "float",
         start_in_insert = true,
         persist_mode  = false,
+        highlights = { },
         size = function (term)
           if term.direction == "horizontal" then
             return math.floor(vim.o.lines * 0.3)

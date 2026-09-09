@@ -262,8 +262,11 @@ return {
           keymap = {
             ["<Tab>"] = { "accept" },
             ["<C-y>"] = { "accept_and_enter", "fallback" },
+            ["<Right>"] = false,
+            ["<Left>"] = false,
           },
           completion = {
+            ghost_text = { enabled = true },
             list = {
               selection = {
                 preselect = true,

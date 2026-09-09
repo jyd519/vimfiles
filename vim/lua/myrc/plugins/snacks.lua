@@ -2,23 +2,18 @@ return {
   {
     "folke/snacks.nvim",
     lazy = false,
-    priority = 1000,
+    priority = 2000,
     config = function(_, opts)
       -- patch layout preview width
-      require("snacks.picker.config.layouts")["telescope"]["layout"][2]["width"] = 0.5
       require("snacks").setup(opts)
+      require("snacks.picker.config.layouts")["telescope"]["layout"][2]["width"] = 0.5
+
+      vim.api.nvim_create_user_command("Notifications", function() Snacks.notifier.show_history() end, {
+        desc = "Show notifications",
+      })
     end,
-    keys = {
-      { "<leader>fm", function() Snacks.picker.marks() end, desc = "Find Marks" },
-      {
-        "<leader>ff",
-        function() Snacks.picker.files({ layout = { hidden = { "preview" } } }) end,
-        desc = "Find Files",
-      },
-    },
     ---@type snacks.Config
     opts = {
-      input = { enabled = true },
       layout = {
         width = 0.9,
       },
@@ -63,5 +58,15 @@ return {
         end,
       })
     end,
+
+    keys = {
+      { "<leader>fm", function() Snacks.picker.marks() end, desc = "Find Marks" },
+      { "<leader>fr", function() Snacks.picker.projects() end, desc = "Find Projects" },
+      {
+        "<leader>ff",
+        function() Snacks.picker.files({ layout = { hidden = { "preview" } } }) end,
+        desc = "Find Files",
+      },
+    },
   },
 }
