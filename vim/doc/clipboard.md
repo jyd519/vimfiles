@@ -11,13 +11,13 @@
 " 最简单的配置
 let g:clipboard='osc52'
 
-" 可选
-set clipboard=unnamedplus
+set clipboard=unnamedplus   " 可选
 augroup highlight_yank
     autocmd!
     au TextYankPost * silent! lua vim.highlight.on_yank { higroup='IncSearch', timeout=200 }
 augroup END
 
+" 更复杂的配置
 " :h osc52
 vim.g.clipboard = {
   name = 'OSC 52',

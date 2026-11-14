@@ -3,7 +3,7 @@ if exists("b:current_syntax")
   finish
 endif
 
-syn keyword log_version app_version unlock_desktop lock_desktop
+syn keyword log_version app_version unlock_desktop lock_desktop Joyagent
 " syn region log_string   start=/'/ end=/'/ end=/$/ skip=/\\./
 syn region log_string   start=/"/ end=/"/ skip=/\\./
 " syn match log_number  '0x[0-9a-fA-F]*\|\[<[0-9a-f]\+>\]\|\<\d[0-9a-fA-F]*'

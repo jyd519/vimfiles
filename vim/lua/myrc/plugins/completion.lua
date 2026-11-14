@@ -262,6 +262,8 @@ return {
           keymap = {
             ["<Tab>"] = { "accept" },
             ["<C-y>"] = { "accept_and_enter", "fallback" },
+            ["<Down>"] = { "select_next", "fallback" },
+            ["<Up>"] = { "select_prev", "fallback" },
             ["<Right>"] = false,
             ["<Left>"] = false,
           },

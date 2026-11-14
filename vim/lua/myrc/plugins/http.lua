@@ -6,17 +6,35 @@ local function get_project_root()
   local root_dir = vim.fs.dirname(vim.fs.find(root_patterns, { upward = true })[1])
 
   -- If no pattern is found, fallback to the current working directory
-  if not root_dir then
-    root_dir = vim.loop.cwd() or ""
-  end
+  if not root_dir then root_dir = vim.loop.cwd() or "" end
 
   return root_dir
 end
 
 return {
   {
+    "rest-nvim/rest.nvim",
+    ft = { "http", "rest" },
+    cond = false,
+    init = function(spec)
+      ---@type rest.Opts
+      vim.g.rest_nvim = {
+        request = { skip_ssl_verification = true },
+      }
+    end,
+    config = function()
+      local map = vim.keymap.set
+      map("n", "<Enter>", "<cmd>Rest run<CR>", { buf = 0 })
+      map("n", "ge", "<cmd>Rest env select<CR>", { buf = 0 })
+      map("", ",s", function()
+        require("telescope").load_extension("rest")
+        require("telescope").extensions.rest.select_env()
+      end, { buf = 0 })
+    end,
+  },
+  {
     -- https://neovim.getkulala.net/docs/getting-started/configuration-options/
-    "mistweaverco/kulala.nvim",
+    "jyd519/kulala.nvim",
     lazy = true,
     ft = { "http", "rest" },
     opts = {
@@ -40,36 +58,29 @@ return {
           mode = { "n", "v" },
         },
       },
-      ui = {
-      },
+      ui = {},
       ---@type { [string]: fun():string }
       custom_dynamic_variables = {
         ["$randomEmail"] = function()
           local random = math.random(1000, 9999)
           return "user" .. random .. "@example.com"
         end,
-        ["$projectRoot"] = function()
-          return get_project_root()
-        end,
+        ["$projectRoot"] = function() return get_project_root() end,
       },
       -- Kulala UI keymaps; override with custom keymaps as required
       -- (see docs or lua/kulala/config/keymaps.lua)
       ---@type boolean|table
       kulala_keymaps = {
-         ["Previous tab"] = {
-            "<c-left>",
-            function()
-              require("kulala.ui").show_previous_tab()
-            end,
-            mode = { "n" },
-          },
-          ["Next tab"] = {
-            "<c-right>",
-            function()
-              require("kulala.ui").show_next_tab()
-            end,
-            mode = { "n" },
-          },
+        ["Previous tab"] = {
+          "<c-left>",
+          function() require("kulala.ui").show_previous_tab() end,
+          mode = { "n" },
+        },
+        ["Next tab"] = {
+          "<c-right>",
+          function() require("kulala.ui").show_next_tab() end,
+          mode = { "n" },
+        },
       },
     },
   },
