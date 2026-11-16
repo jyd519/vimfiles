@@ -12,6 +12,14 @@ return {
       g.test_python_djangotest_options = "--keepdb"
       g.test_rust_cargotest_options = "-- --nocapture"
       g.test_go_test_options = "-v"
+
+      vim.g["test#custom_strategies"] = {
+        capture = function(cmd)
+          vim.g.last_test_cmd = cmd
+          vim.fn.setreg("+", cmd)
+          print("Test command: " .. cmd)
+        end,
+      }
     end,
     config = function()
       local autocmd = vim.api.nvim_create_autocmd
