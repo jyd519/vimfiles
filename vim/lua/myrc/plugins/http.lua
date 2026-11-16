@@ -13,27 +13,6 @@ end
 
 return {
   {
-    "rest-nvim/rest.nvim",
-    ft = { "http", "rest" },
-    cond = false,
-    init = function(spec)
-      ---@type rest.Opts
-      vim.g.rest_nvim = {
-        request = { skip_ssl_verification = true },
-      }
-    end,
-    config = function()
-      local map = vim.keymap.set
-      map("n", "<Enter>", "<cmd>Rest run<CR>", { buf = 0 })
-      map("n", "ge", "<cmd>Rest env select<CR>", { buf = 0 })
-      map("", ",s", function()
-        require("telescope").load_extension("rest")
-        require("telescope").extensions.rest.select_env()
-      end, { buf = 0 })
-    end,
-  },
-  {
-    -- https://neovim.getkulala.net/docs/getting-started/configuration-options/
     "jyd519/kulala.nvim",
     lazy = true,
     ft = { "http", "rest" },
